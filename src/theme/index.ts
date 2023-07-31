@@ -8,6 +8,7 @@ const COLOR_PALLET = {
     whitesmoke: 'whitesmoke',
     lightGrey: 'lightGrey',
     fadedButtonBgColor: '#F3FBF5',
+    textBlue: '#0079D3',
 }
 
 const theme = createTheme({
@@ -26,28 +27,29 @@ const theme = createTheme({
     },
     textVariants: {
         header: {
-          fontWeight: 'bold',
-          fontSize: 34,
+          fontSize: 30,
           color: 'headerTextColor',
-          fontFamily: 'Red',
+          fontFamily: 'RedBold',
+        },
+        subheader: {
+          fontSize: 24,
+          color: 'headerTextColor',
+          fontFamily: 'RedMedium',
         },
         body: {
-          fontSize: 16,
-          lineHeight: 24,
+          fontSize: 18,
           color: 'textColor',
-          fontFamily: 'Red',
+          fontFamily: 'RedRegular',
         },
         xs: {
-          fontWeight: '600',
-          fontSize: 12,
+          fontSize: 14,
           color: 'textColor',
-          fontFamily: 'Red',
+          fontFamily: 'RedLight',
         },
         defaults: {
           fontSize: 16,
-          lineHeight: 24,
           color: 'textColor',
-          fontFamily: 'Red',
+          fontFamily: 'RedRegular',
         },
       },
 });
@@ -63,5 +65,7 @@ export const darkTheme: Theme = {
     secondaryBackGroundColor: 'rgb(33, 33, 33)',
     headerTextColor: COLOR_PALLET.white,
     textColor: COLOR_PALLET.whitesmoke,
+    black: 'white',
+    white: 'black',
   }
 }
