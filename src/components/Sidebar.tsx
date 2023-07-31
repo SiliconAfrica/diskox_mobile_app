@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import Box from './general/Box'
 import { useTheme } from '@shopify/restyle'
@@ -6,9 +6,7 @@ import { Theme } from '../theme'
 import { useUtilState } from '../states/util'
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image'
-import { useNavigation } from '@react-navigation/native'
-import { DrawerContentComponentProps, DrawerNavigationProp } from '@react-navigation/drawer'
-import { RootStackParamList } from '../navigation/MainNavigation'
+import { DrawerContentComponentProps } from '@react-navigation/drawer'
 import CustomText from './general/CustomText'
 import { ScrollView, Switch } from 'react-native-gesture-handler'
 
@@ -36,9 +34,15 @@ const Sidebar = ({navigation}: DrawerContentComponentProps) => {
         <ScrollView>
             <Box paddingHorizontal='m'>
                 <Item icon={<Ionicons name='person-circle' size={25} color={theme.colors.textColor} />} title='Guest' />
-                <Item icon={<Ionicons name='bookmark' size={25} color={theme.colors.textColor} />} title='Saved' />
-                <Item icon={<Ionicons name='settings' size={25} color={theme.colors.textColor} />} title='Settings' />
-                <Item icon={<Ionicons name='stats-chart' size={25} color={theme.colors.textColor} />} title='Analytics' />
+                {
+                    isLoggedIn && (
+                        <>
+                            <Item icon={<Ionicons name='bookmark' size={25} color={theme.colors.textColor} />} title='Saved' />
+                            <Item icon={<Ionicons name='settings' size={25} color={theme.colors.textColor} />} title='Settings' />
+                            <Item icon={<Ionicons name='stats-chart' size={25} color={theme.colors.textColor} />} title='Analytics' />
+                        </>
+                    )
+                }
             </Box>
             <Box paddingHorizontal='m' borderTopWidth={1} borderBottomWidth={1} flexDirection='row' justifyContent='space-between' alignItems='center' height={60} style={{ borderColor: isDarkMode ? 'grey':'lightgrey'}}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -47,6 +51,24 @@ const Sidebar = ({navigation}: DrawerContentComponentProps) => {
                 </View>
 
                 <Switch value={isDarkMode} onChange={() => setAll({ isDarkMode: !isDarkMode })} thumbColor={theme.colors.primaryColor} trackColor={{ true: isDarkMode ? 'grey' : 'lightgrey', false: theme.colors.textColor}} />
+            </Box>
+
+            <Box paddingHorizontal='m' paddingTop='l'>
+                <CustomText variant='subheader' fontSize={18}>Explore Popular Tags</CustomText>
+                <CustomText variant='body' marginTop='m'>#house</CustomText>
+                <CustomText variant='body' marginTop='m'>#Politics</CustomText>
+                <CustomText variant='body' marginTop='m'>#Politics</CustomText>
+                <CustomText variant='body' marginTop='m'>#LpMustWin</CustomText>
+
+                <Pressable style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginTop: 15,
+                    height: 20
+                }} >
+                    <CustomText variant='body'>View More</CustomText>
+                    <Feather name='chevron-right' size={25} color={theme.colors.textColor} />
+                </Pressable>
             </Box>
         </ScrollView>
     </Box>

@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import * as SecureStorage from 'expo-secure-store'
 
-export const BASE_URL="https://api.diskos.com";
+export const BASE_URL="https://test404.diskox.com/api/v1";
+export const IMAGE_BASE='https://test404.diskox.com/storage/';
 
 const httpService = axios.create({
     baseURL: BASE_URL,
@@ -35,6 +36,7 @@ httpService.interceptors.response.use((response:AxiosResponse<any, any>) => {
     if (!error.response) {
         return Promise.reject(error.message);
     } else {
+        return Promise.reject(error.response.data);
         if (error.response?.data.message instanceof Array) {
             const msg = error.response?.data.message as Array<any>;        
             return Promise.reject(JSON.stringify(error.response?.data.message));

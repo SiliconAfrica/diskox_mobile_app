@@ -10,8 +10,10 @@
     "tsc": "tsc"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^4.4.7",
     "@hookform/resolvers": "^3.1.1",
     "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-native-community/datetimepicker": "6.7.3",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native": "^6.1.7",
@@ -20,20 +22,25 @@
     "@shopify/restyle": "^2.4.2",
     "@types/react": "~18.0.27",
     "axios": "^1.4.0",
+    "country-list": "^2.3.0",
     "expo": "~48.0.18",
     "expo-font": "~11.1.1",
     "expo-image": "~1.0.1",
     "expo-secure-store": "~12.1.1",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
+    "moment": "^2.29.4",
     "moti": "^0.25.3",
     "react": "18.2.0",
     "react-hook-form": "^7.45.1",
     "react-native": "0.71.8",
+    "react-native-flags": "^1.0.0",
     "react-native-gesture-handler": "~2.9.0",
+    "react-native-otp-textinput": "^1.1.0",
     "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "4.5.0",
     "react-native-screens": "~3.20.0",
+    "react-native-searchable-country-dropdown": "^1.0.1",
     "react-native-ui-lib": "^7.5.2",
     "react-query": "^3.39.3",
     "typescript": "^4.9.4",
@@ -42,7 +49,8 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@types/moment": "^2.13.0"
   },
   "private": true
 }

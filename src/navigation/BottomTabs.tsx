@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import Posts from "../pages/bottomtabs/posts";
 import Polls from "../pages/bottomtabs/polls";
 import Questions from "../pages/bottomtabs/questions";
@@ -11,6 +12,8 @@ import Box from "../components/general/Box";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../theme";
 import Header from "../components/Header";
+import { useUtilState } from "../states/util";
+import Sidebar from "../components/Sidebar";
 
 export type RootBottomTabParamList = {
   posts: { userId: string } | undefined;
@@ -20,7 +23,12 @@ export type RootBottomTabParamList = {
   trending: { userId: string } | undefined;
 };
 
+export type RootDrawerParamList = {
+  dashboard: { userId: string } | undefined;
+};
+
 const RootBottomTabs = createBottomTabNavigator<RootBottomTabParamList>();
+const DrawerNavigation = createDrawerNavigator<RootDrawerParamList>();
 
 
 /**
@@ -36,11 +44,11 @@ const ActiveIconTab = ({
   routeName,
 }: {
   focused: boolean;
-  routeName: "posts" | "questions" | "polls" | "chats" | "trending";
+  routeName: "home" | "questions" | "polls" | "chats" | "trending";
 }) => {
   const nameOutline = React.useCallback((): any => {
     switch (routeName) {
-      case "posts": {
+      case "home": {
         return "home-outline";
       }
       case "chats": {
@@ -63,7 +71,7 @@ const ActiveIconTab = ({
 
   const nameFilled = React.useCallback((): any => {
     switch (routeName) {
-      case "posts": {
+      case "home": {
         return "home";
       }
       case "chats": {
@@ -104,9 +112,10 @@ const ActiveIconTab = ({
 + */
 const BottomTabs = (): JSX.Element => {
   const theme = useTheme<Theme>();
+  const [isLoggedIn] = useUtilState((state) => [state.isLoggedIn])
   return (
     <RootBottomTabs.Navigator 
-      detachInactiveScreens 
+      // detachInactiveScreens 
       screenOptions={{ 
         headerShown: true,
         header: () => <Header />,
@@ -122,17 +131,7 @@ const BottomTabs = (): JSX.Element => {
         options={{
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
-            <ActiveIconTab focused={focused} routeName="posts" />
-          ),
-        }}
-      />
-      <RootBottomTabs.Screen
-        name="polls"
-        component={Polls}
-        options={{
-          tabBarShowLabel: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveIconTab focused={focused} routeName="polls" />
+            <ActiveIconTab focused={focused} routeName="home" />
           ),
         }}
       />
@@ -147,6 +146,16 @@ const BottomTabs = (): JSX.Element => {
         }}
       />
       <RootBottomTabs.Screen
+        name="polls"
+        component={Polls}
+        options={{
+          tabBarShowLabel: false,
+          tabBarIcon: ({ focused }) => (
+            <ActiveIconTab focused={focused} routeName="polls" />
+          ),
+        }}
+      />
+      <RootBottomTabs.Screen
         name="questions"
         component={Questions}
         options={{
@@ -156,7 +165,8 @@ const BottomTabs = (): JSX.Element => {
           ),
         }}
       />
-      <RootBottomTabs.Screen
+      { isLoggedIn && (
+        <RootBottomTabs.Screen
         name="chats"
         component={Chats}
         options={{
@@ -166,8 +176,24 @@ const BottomTabs = (): JSX.Element => {
           ),
         }}
       />
+      )}
     </RootBottomTabs.Navigator>
   );
 };
 
-export default BottomTabs;
+const DrawerNav =() => {
+  const theme = useTheme<Theme>();
+  return (
+     <DrawerNavigation.Navigator initialRouteName='dashboard' drawerContent={(props) => <Sidebar {...props} />} screenOptions={{
+      headerShown: false,
+      drawerStyle: {
+        backgroundColor: theme.colors.secondaryBackGroundColor,
+      },
+      
+    }}>
+      <DrawerNavigation.Screen name="dashboard" component={BottomTabs} />
+    </DrawerNavigation.Navigator>
+  )
+}
+
+export default DrawerNav;
