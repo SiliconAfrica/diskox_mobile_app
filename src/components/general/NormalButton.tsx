@@ -22,7 +22,7 @@ const NormalButton = ({ label, action, isLoading = false }: {
           alignItems:'center',
           marginTop: 20,
         }}>
-          <CustomText variant='body' style={{ color: 'white' }}>
+          <CustomText variant='subheader' fontSize={18} style={{ color: 'white' }}>
             { !isLoading && label }
             { isLoading && 'submitting...' }
           </CustomText>

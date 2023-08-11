@@ -27,7 +27,6 @@ export default function App(): JSX.Element {
   });
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 

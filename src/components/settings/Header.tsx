@@ -5,27 +5,27 @@ import { Ionicons } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import CustomText from '../general/CustomText';
-import { useQuery } from 'react-query';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/MainNavigation'
-import httpService from '../../utils/httpService';
-import { URLS } from '../../services/urls'
+
 
 interface IProps {
     title: string;
     showSave: boolean;
-    onSave?: () => void
+    onSave?: () => void,
+    handleArrowPressed?: () => void;
+    rightItem?: JSX.Element;
 }
 
-const SettingsHeader = ({ title, showSave = false, onSave}: IProps) => {
+const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = null, rightItem }: IProps) => {
   const theme = useTheme<Theme>();
   
   return (
     <Box width='100%' height={100} paddingHorizontal='m' paddingTop='l' backgroundColor='mainBackGroundColor' flexDirection='row' justifyContent='space-between' alignItems='center' borderBottomWidth={2} borderBottomColor='secondaryBackGroundColor'>
         <Box flexDirection='row' alignItems='center'>
-          <Ionicons name='arrow-back-outline' size={25} color={theme.colors.textColor} />
+          <Ionicons name='arrow-back-outline' size={25} color={theme.colors.textColor} onPress={handleArrowPressed ? handleArrowPressed: null} />
           <CustomText variant='subheader' marginLeft='s'>{title}</CustomText>
         </Box>
+
+        { rightItem && rightItem }
     </Box>
   )
 }

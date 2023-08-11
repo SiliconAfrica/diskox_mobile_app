@@ -14,6 +14,7 @@ import { Theme } from "../theme";
 import Header from "../components/Header";
 import { useUtilState } from "../states/util";
 import Sidebar from "../components/Sidebar";
+import TrendingPosts from "../pages/bottomtabs/trendingpost";
 
 export type RootBottomTabParamList = {
   posts: { userId: string } | undefined;
@@ -117,8 +118,7 @@ const BottomTabs = (): JSX.Element => {
     <RootBottomTabs.Navigator 
       // detachInactiveScreens 
       screenOptions={{ 
-        headerShown: true,
-        header: () => <Header />,
+       
         tabBarStyle: {
           backgroundColor: theme.colors.mainBackGroundColor,
           height: 80,
@@ -129,6 +129,8 @@ const BottomTabs = (): JSX.Element => {
         name="posts"
         component={Posts}
         options={{
+          headerShown: true,
+          header: () => <Header />,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <ActiveIconTab focused={focused} routeName="home" />
@@ -137,8 +139,10 @@ const BottomTabs = (): JSX.Element => {
       />
       <RootBottomTabs.Screen
         name="trending"
-        component={Posts}
+        component={TrendingPosts}
         options={{
+          headerShown: true,
+          header: () => <Header />,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <ActiveIconTab focused={focused} routeName="trending" />
@@ -149,6 +153,8 @@ const BottomTabs = (): JSX.Element => {
         name="polls"
         component={Polls}
         options={{
+          headerShown: true,
+          header: () => <Header />,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <ActiveIconTab focused={focused} routeName="polls" />
@@ -159,6 +165,8 @@ const BottomTabs = (): JSX.Element => {
         name="questions"
         component={Questions}
         options={{
+          headerShown: true,
+          header: () => <Header />,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <ActiveIconTab focused={focused} routeName="questions" />
@@ -170,6 +178,7 @@ const BottomTabs = (): JSX.Element => {
         name="chats"
         component={Chats}
         options={{
+          headerShown: false,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <ActiveIconTab focused={focused} routeName="chats" />

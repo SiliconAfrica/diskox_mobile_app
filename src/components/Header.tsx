@@ -41,7 +41,7 @@ const Header = () => {
                 <Ionicons name='search-outline' size={25} color={theme.colors.textColor} />
                 <Ionicons name='notifications-outline' size={25} color={theme.colors.textColor} style={{ marginHorizontal: 10 }} />
                 <Box width={30} height={30} borderRadius={25} backgroundColor='fadedButtonBgColor' justifyContent='center' alignItems='center'>
-                    <Ionicons name='add-outline' size={25} color={theme.colors.primaryColor} />
+                    <Ionicons name='add-outline' size={25} color={theme.colors.primaryColor} onPress={() => navigation.navigate('create-post')} />
                 </Box>
                 {
                     profile_image && (

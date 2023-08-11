@@ -1,4 +1,3 @@
-import {  } from 'react-native'
 import React from 'react'
 import { Image } from 'expo-image';
 import useForm from '../../hooks/useForm';
@@ -31,6 +30,7 @@ const Login = () => {
   const [ setAll ] = useModalState((state) => [state.setAll]);
   const { setAll: updateDetails } = useDetailsState((state) => state);
   const { setAll: updateUtil } = useUtilState((state) => state)
+
   const { renderForm } = useForm({
     defaultValues: {
       email: '',
@@ -48,6 +48,7 @@ const Login = () => {
       console.log(data.data);
       updateDetails({ ...data.data.user, token: data.data.authorisation.token });
       await SecureStorage.setItemAsync('token', data.data.authorisation.token);
+      await SecureStorage.setItemAsync('user', JSON.stringify(data.data.user));
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
       navigation.navigate('home');

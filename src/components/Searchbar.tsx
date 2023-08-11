@@ -8,10 +8,13 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../theme'
 import { Feather, Ionicons} from '@expo/vector-icons';
 import { IMAGE_BASE } from '../utils/httpService'
+import { useNavigation } from '@react-navigation/native'
+import { PageType } from '../pages/login'
 
 
 const Searchbar = () => {
     const theme = useTheme<Theme>();
+    const navigation = useNavigation<PageType>();
     const { profile_image, username } = useDetailsState((state) => state)
   return (
     <Box backgroundColor='mainBackGroundColor' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
@@ -29,13 +32,16 @@ const Searchbar = () => {
         }
         <TextInput 
         placeholder='Lets diskox it...'
+        placeholderTextColor={theme.colors.textColor}
+        onPressIn={() => navigation.navigate('create-post')}
         style={{
             flex: 1,
             height: 50,
             borderRadius: 25,
             backgroundColor: theme.colors.secondaryBackGroundColor,
             marginHorizontal: 10,
-            paddingHorizontal: 10
+            paddingHorizontal: 10,
+            fontFamily: 'RedRegular',
         }} />
         <Ionicons name='image-outline' size={25} color={theme.colors.textColor} />
         <Ionicons name='videocam-outline' size={25} color={theme.colors.textColor} style={{ marginLeft: 10, }} />

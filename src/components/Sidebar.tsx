@@ -9,6 +9,8 @@ import { Image } from 'expo-image'
 import { DrawerContentComponentProps } from '@react-navigation/drawer'
 import CustomText from './general/CustomText'
 import { ScrollView, Switch } from 'react-native-gesture-handler'
+import * as SecureStorage from 'expo-secure-store';
+
 
 const Item = ({ icon, title }: {
     icon: JSX.Element,
@@ -24,7 +26,12 @@ const Item = ({ icon, title }: {
 
 const Sidebar = ({navigation}: DrawerContentComponentProps) => {
     const theme = useTheme<Theme>();
-    const [isLoggedIn, isDarkMode, setAll] = useUtilState((state) => [state.isLoggedIn, state.isDarkMode, state.setAll])
+    const [isLoggedIn, isDarkMode, setAll] = useUtilState((state) => [state.isLoggedIn, state.isDarkMode, state.setAll]);
+ 
+    const handleDarkMode = React.useCallback(async(dark: boolean) => {
+        setAll({ isDarkMode: dark });
+        await SecureStorage.setItemAsync('darkMode', JSON.stringify({ isDarkMode: dark }));
+    }, [isDarkMode]);
   return (
     <Box flex={1} backgroundColor='secondaryBackGroundColor' marginTop='xl'>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
@@ -50,7 +57,7 @@ const Sidebar = ({navigation}: DrawerContentComponentProps) => {
                     <CustomText variant='body' marginLeft='m'>{ isDarkMode ? 'Light' : 'Dark'}</CustomText>
                 </View>
 
-                <Switch value={isDarkMode} onChange={() => setAll({ isDarkMode: !isDarkMode })} thumbColor={theme.colors.primaryColor} trackColor={{ true: isDarkMode ? 'grey' : 'lightgrey', false: theme.colors.textColor}} />
+                <Switch value={isDarkMode} onChange={() => handleDarkMode(!isDarkMode)} thumbColor={theme.colors.primaryColor} trackColor={{ true: isDarkMode ? 'grey' : 'lightgrey', false: theme.colors.textColor}} />
             </Box>
 
             <Box paddingHorizontal='m' paddingTop='l'>
