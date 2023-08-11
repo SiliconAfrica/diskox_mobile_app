@@ -20,6 +20,7 @@ import { Theme } from '../theme';
 import VerifyEmail from '../pages/verifyemail';
 import CompleteSetup from '../pages/complete-setup';
 import ResetPassword from '../pages/password-reset';
+import Repost from '../pages/repost';
 
 export type RootStackParamList = {
     'home': undefined;
@@ -28,16 +29,17 @@ export type RootStackParamList = {
     'sign-up': undefined;
     'set-up': undefined;
     'create-post': undefined;
-    profile: { userId: string };
-    settings: { userId: string };
-    security: { userId: string };
-    notifications: { userId: string };
-    'blocked-users': { userId: string };
-    chat: { userId: string };
-    post: { postId: string };
+    profile: { userId: number };
+    settings: { userId: number };
+    security: { userId: number };
+    notifications: { userId: number };
+    'blocked-users': { userId: number };
+    chat: { userId: number, profile_image: string, username: string, last_seen: string };
+    post: { postId: number };
     'verify-email': undefined;
     'complete-setup': undefined;
     'reset-password': undefined;
+    repost: { id: number };
   };
 
   const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -69,6 +71,7 @@ const MainNavigation = (): JSX.Element => {
             <RootStackNavigation.Screen name='notifications' component={notifications} />
             <RootStackNavigation.Screen name='blocked-users' component={BlockedUsers} />
             <RootStackNavigation.Screen name='chat' component={Chat} />
+            <RootStackNavigation.Screen name='repost' component={Repost} />
         </RootStackNavigation.Group>
 
         {/* UNAUTHENTICATED FLOW */}

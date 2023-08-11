@@ -6,6 +6,7 @@ import { useModalState } from '../../states/modalState'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import SignUp from '../../pages/signup'
 import { useSignupState } from '../../pages/signup/state'
+import Box from '../general/Box'
 
 const SignupModal = () => {
     const [setAll] = useModalState((state) => [state.setAll]);
@@ -39,7 +40,9 @@ const SignupModal = () => {
         snapPoints={['90%']}
         ref={ref}
     >
+        <Box flex={1} backgroundColor='mainBackGroundColor' paddingHorizontal='m'>
         <SignUp />
+        </Box>
     </ModalWrapper>
   )
 }

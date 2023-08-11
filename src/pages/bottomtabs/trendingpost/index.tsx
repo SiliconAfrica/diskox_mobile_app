@@ -7,88 +7,25 @@ import { FlashList } from '@shopify/flash-list'
 import FilterTopbar from '../../../components/feeds/FilterTopbar'
 import PostCard from '../../../components/feeds/PostCard'
 import { IPost } from '../../../models/post'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery, useMutation } from 'react-query'
 import httpService from '../../../utils/httpService'
 import CustomText from '../../../components/general/CustomText'
 import { URLS } from '../../../services/urls'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../theme'
-import { useModalState } from '../../../states/modalState'
-import { POST_FILTERR } from '../../../enums/Postfilters'
 
-const Posts = () => {
+const TrendingPosts = () => {
   const { isLoggedIn } = useUtilState((state) => state);
-  const { setAll, filterBy } = useModalState((state) => state)
   const theme = useTheme<Theme>();
-  const queryClient = useQueryClient();
 
   // states
   const [posts, setPosts] = React.useState<IPost[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [total, setTotal] = React.useState(0);
   const [ids, setIds] = React.useState<number[]>([]);
-  const [url, setUrl] = React.useState<string>(POST_FILTERR.ALL);
-
-  React.useEffect(() => {
-    console.log(filterBy);
-    switch (filterBy) {
-      case POST_FILTERR.HIGHEST_UPVOTES: {
-        setUrl(URLS.MOST_UPVOTES);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_COMMENTS: {
-        setUrl(URLS.MOST_COMMENTS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_REACTIONS: {
-        setUrl(URLS.MOST_REACTIONS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.TOP_STORIES: {
-          setUrl(URLS.TOP_STORIES);
-          queryClient.invalidateQueries(['GetAllPosts']);
-          break;
-      }
-      case POST_FILTERR.ALL: {
-        setUrl(URLS.GET_POST);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-    }
-  }, [filterBy])
-
-  const request = React.useCallback(() => {
-    console.log(filterBy);
-    switch (filterBy) {
-      case POST_FILTERR.HIGHEST_UPVOTES: {
-        setUrl(URLS.MOST_UPVOTES);
-        return httpService.get(`${URLS.MOST_UPVOTES}?page=${currentPage}`)
-      }
-      case POST_FILTERR.MOST_COMMENTS: {
-        setUrl(URLS.MOST_COMMENTS);
-        return httpService.get(`${URLS.MOST_COMMENTS}?page=${currentPage}`)
-      }
-      case POST_FILTERR.MOST_REACTIONS: {
-        setUrl(URLS.MOST_REACTIONS);
-        return httpService.get(`${URLS.MOST_REACTIONS}?page=${currentPage}`)
-      }
-      case POST_FILTERR.TOP_STORIES: {
-          setUrl(URLS.TOP_STORIES);
-          return httpService.get(`${URLS.TOP_STORIES}?page=${currentPage}`)
-      }
-      case POST_FILTERR.ALL: {
-        setUrl(URLS.GET_POST);
-        return httpService.get(`${URLS.GET_POST}?page=${currentPage}`)
-      }
-    }
-  }, [filterBy, currentPage])
-
 
   // react query
-  const { isLoading, isError, error } = useQuery(['GetAllPosts', currentPage, url, request], request, {
+  const { isLoading, isError, error } = useQuery(['GetAllTrendingPosts', currentPage], () => httpService.get(`${URLS.GET_TRENDING_POSTS}?page=${currentPage}`), {
     onSuccess: async(data) => {
       if (posts.length > 0) {
         const arr = [...posts, ...data.data.data.data];
@@ -143,7 +80,11 @@ const Posts = () => {
           onEndReached={onEndReached}
           onEndReachedThreshold={1}
           ListEmptyComponent={() => (
-            <CustomText variant='body'>No Post to view</CustomText>
+            <>
+              { !isLoading && posts.length < 1 && (
+                <CustomText variant='body' textAlign='center' marginTop='l'>No Post to view</CustomText>
+              )}
+            </>
           )}
           estimatedItemSize={100}
           renderItem={({ item }) => (
@@ -151,6 +92,9 @@ const Posts = () => {
           )}
           ListHeaderComponent={() => (
             <>
+                <Box marginBottom='m'>
+                    <CustomText variant='subheader' paddingLeft='m' paddingTop='s'>Trending Posts</CustomText>
+                </Box>
               { isLoggedIn && (
                 <Searchbar /> 
               )}
@@ -168,4 +112,4 @@ const Posts = () => {
   )
 }
 
-export default Posts
+export default TrendingPosts

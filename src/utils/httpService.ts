@@ -16,7 +16,7 @@ httpService.interceptors.request.use(async(config: InternalAxiosRequestConfig<an
             return config;
         }
         config.headers!['authorization'] = `Bearer ${token}`;
-    
+       
         return config;
     } else {
         config.headers!['Content-Type'] = 'application/json';
@@ -24,7 +24,6 @@ httpService.interceptors.request.use(async(config: InternalAxiosRequestConfig<an
             return config;
         }
         config.headers!['authorization'] = `Bearer ${token}`;
-    
         return config;
     }
 })

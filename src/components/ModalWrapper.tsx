@@ -70,11 +70,11 @@ export default ModalWrapper
 export const Style = StyleSheet.create({
   parent: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     paddingTop: 10,
     paddingBottom: 20,
     zIndex: 0,
-    shadowColor: "#000",
+    shadowColor: "#000000",
     shadowOffset: {
       width: 0,
       height: 6,

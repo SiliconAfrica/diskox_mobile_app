@@ -31,13 +31,13 @@ export type IPost = {
   last_two_comments: any[];
   polls: any[];
   post_images: string[];
-  post_videos: VideoPost[];
+  post_videos: MediaPost[];
   user: IUser & UserStats;
   reposted_post: any[];
   has_reacted: any[];
 };
 
-export type VideoPost = {
+export type MediaPost = {
   id: number;
   postable_id: number;
   postable_type: string;
