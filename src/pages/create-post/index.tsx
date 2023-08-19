@@ -65,7 +65,7 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }, [activeTab, files, value, setValues]);
 
   const handleCheck = React.useCallback((val: number, valu: boolean) => {
-    if (valu) {
+    if (valu && !tags.includes(val)) {
       setTags([...tags, val]);
     } else {
       setTags(tags.filter((item) => item !== val));
@@ -131,7 +131,7 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }, [files]);
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-      <TagModal open={show} onClose={() => setShow(false)} tags={tags} setTags={handleCheck} />
+      <TagModal open={show} onClose={() => setShow(false)} tags={tags} setTags={ (tags, val) => handleCheck(tags, val)} />
       <SettingsHeader showSave={false} onSave={() => {}} rightItem={<FadedButton isLoading={isLoading} title='Post'  width={100} height={40} onPress={handleSubmit} />} title='Create Post' handleArrowPressed={() => navigation.goBack()} />
 
       {/* HEADER SECTTION */}

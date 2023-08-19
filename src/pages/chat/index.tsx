@@ -17,6 +17,8 @@ import { FlashList } from '@shopify/flash-list';
 import { IChatMessage } from '../../models/chatmessages';
 import MessageBubble from '../../components/chats/messageBubble';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import mime from 'mime';
 
 
 const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => {
@@ -27,7 +29,7 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   const { userId, last_seen, profile_image, username } = route.params;
   const [page, setPage] = React.useState(0);
   const [message, setMessage] = React.useState('');
-  const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerResult>>([]);
+  const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>([]);
   const [chats, setChats] = React.useState<Array<IChatMessage>>([]);
   const [search, setSearch] = React.useState('');
 
@@ -39,6 +41,12 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     },
   });
 
+  const getUser = useQuery(['getChatUser', userId], () => httpService.get(`${URLS.GET_USER_BY_USERNAME}/${username}`), {
+    onSuccess: (data) => {
+      console.log(data.data);
+    },
+  });
+
   // mutations
   const sendMessage = useMutation({
     mutationFn: (data: FormData) => httpService.post(`${URLS.POST_CHAT_MESSAGE}`, data),
@@ -46,6 +54,9 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
       alert('Message sent!');
       queryClient.invalidateQueries(['getMessages']);
       setMessage('');
+    },
+    onError: (error: any) => {
+      alert(error.message);
     }
   });
 
@@ -63,15 +74,18 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   }, [chats]);
 
   const pickImage = React.useCallback(async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ['image/*'],
+      multiple: false,
+      copyToCacheDirectory: true,
     });
-    if (!result.canceled) {
+    if (result.type === 'success') {
       console.log(result);
-      setImage([...image, result]);
+      const formData = new FormData();
+      // formData.append('message', 'image post');
+      formData.append('receiver_id', userId.toString());
+      formData.append('chat_images[]', { uri: result.uri, type: result.mimeType, name: result.name } as any);
+      sendMessage.mutate(formData);
     }
   }, []);
 
@@ -84,7 +98,7 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   }
 
   const handleSubmit = React.useCallback(() => {
-    if (message.length < 1) {
+    if (message.length < 1 || sendMessage.isLoading) {
       return;
     }
     const formData = new FormData();

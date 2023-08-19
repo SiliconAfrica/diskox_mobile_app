@@ -39,8 +39,8 @@ export const UserList = ({ user, action }: {
 
                 <Box marginLeft='s'>
                     <Box flexDirection='row'>
-                        <CustomText variant='subheader' fontSize={18} color='black' >{user.name}</CustomText>
-                        <CustomText variant='xs' color='grey' marginLeft='s'>@{user.username}</CustomText>
+                        <CustomText variant='subheader' fontSize={18} color='black' >@{user.username}</CustomText>
+                        {/* <CustomText variant='xs' color='grey' marginLeft='s'>@{user.username}</CustomText> */}
                         {user.unread_message > 0 && (
                             <Box width={15} height={15} borderRadius={10} justifyContent='center' alignItems='center' backgroundColor='primaryColor'>
                                 <CustomText variant='xs' style={{ color: 'white' }}>{user.unread_message}</CustomText>
@@ -71,6 +71,7 @@ const ChatList = () => {
     });
 
     const goToPage = React.useCallback((user: ChatEntry) => {
+        console.log(user);
         navigation.navigate("chat", { userId: user.user_id, profile_image: user.profile_image, username: user.username, last_seen: '' });
 
     }, []);

@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -121,7 +121,9 @@ const BottomTabs = (): JSX.Element => {
        
         tabBarStyle: {
           backgroundColor: theme.colors.mainBackGroundColor,
-          height: 80,
+          height: Platform.OS === 'ios' ? 100 : 80,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.secondaryBackGroundColor,
         } 
       }} 
     >

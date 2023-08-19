@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import Box from './general/Box'
-import { useTheme } from '@shopify/restyle';
+import { backgroundColor, useTheme } from '@shopify/restyle';
 import { Theme } from '../theme';
 import { Image } from 'expo-image'
 import CustomText from './general/CustomText';
@@ -17,7 +17,7 @@ const Header = () => {
     const theme = useTheme<Theme>();
     const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>();
     const [isDarkMode, isLoggedIn] = useUtilState((state) => [state.isDarkMode, state.isLoggedIn]);
-    const { profile_image, username } = useDetailsState((state) => state)
+    const { profile_image, username, id } = useDetailsState((state) => state)
 
   return (
     <Box paddingHorizontal='m' paddingTop='l' backgroundColor='mainBackGroundColor' height={110} flexDirection='row' justifyContent='space-between' alignItems='center' borderBottomWidth={1} borderBottomColor='secondaryBackGroundColor' >
@@ -38,21 +38,23 @@ const Header = () => {
         )}
         { isLoggedIn && (
             <Box flexDirection='row' alignItems='center'>
-                <Ionicons name='search-outline' size={25} color={theme.colors.textColor} />
-                <Ionicons name='notifications-outline' size={25} color={theme.colors.textColor} style={{ marginHorizontal: 10 }} />
+                <Ionicons name='search-outline' onPress={() => navigation.navigate('search')} size={25} color={theme.colors.textColor} />
+                <Ionicons name='notifications-outline' onPress={() => navigation.navigate('notifications')} size={25} color={theme.colors.textColor} style={{ marginHorizontal: 10 }} />
                 <Box width={30} height={30} borderRadius={25} backgroundColor='fadedButtonBgColor' justifyContent='center' alignItems='center'>
                     <Ionicons name='add-outline' size={25} color={theme.colors.primaryColor} onPress={() => navigation.navigate('create-post')} />
                 </Box>
                 {
                     profile_image && (
-                        <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 30, height: 30, borderRadius: 25, marginLeft: 10 }} contentFit='contain' />
+                        <Pressable onPress={() => navigation.navigate('profile', { userId: id })}>
+                            <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 30, height: 30, borderRadius: 25, marginLeft: 10 }} contentFit='contain' />
+                        </Pressable>
                     )
                 }
                 {
                     !profile_image && (
-                        <Box width={40} height={40} borderRadius={25} backgroundColor='fadedButtonBgColor' justifyContent='center' alignItems='center' style={{ marginLeft: 10 }}>
+                        <Pressable style={{ width: 40, height: 40, borderRadius: 25, backgroundColor: theme.colors.fadedButtonBgColor, justifyContent: 'center', alignItems: 'center', marginLeft: 10 }} onPress={() => navigation.navigate('profile', { userId: id })}>
                             <CustomText variant='subheader' color='primaryColor' fontSize={18}>{username[0].toUpperCase()}</CustomText>
-                        </Box>
+                        </Pressable>
                     )
                 }
             </Box>

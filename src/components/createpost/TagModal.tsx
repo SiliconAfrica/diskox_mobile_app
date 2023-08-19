@@ -1,4 +1,4 @@
-import { View, Text, Modal, TextInput, StyleSheet } from 'react-native'
+import { View, Text, Modal, TextInput, StyleSheet, Platform } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
 import { useTheme } from '@shopify/restyle'
@@ -20,33 +20,6 @@ type Follower = {
     user_id: number;
 }
 
-const users: Partial<IUser>[] = [
-    {
-        id: 1,
-        username: 'Dandolla',
-        profile_image: require('../../../assets/images/logoB.png'),
-        name: 'Dan Emma',
-    },
-
-    {
-        id: 2,
-        username: 'Dandolla98',
-        profile_image: require('../../../assets/images/logoB.png'),
-        name: 'Dan Emma2',
-    },
-    {
-        id: 3,
-        username: 'Dan',
-        profile_image: require('../../../assets/images/logoB.png'),
-        name: 'Dan john',
-    },
-    {
-        id: 4,
-        username: 'Emma',
-        profile_image: require('../../../assets/images/logoB.png'),
-        name: 'Emma',
-    },
-] 
 
 const TagCard = ({ user, isChecked, onChecked }: {
     user: Partial<Follower>,
@@ -56,7 +29,7 @@ const TagCard = ({ user, isChecked, onChecked }: {
     const theme = useTheme<Theme>();
     const [c, setC] = React.useState(isChecked);
     const handleChecked = React.useCallback((val: boolean) => {
-        onChecked(user.follower.id, val);
+        onChecked(user.follower_id, val);
         setC(val);
     },[isChecked])
     return (
@@ -81,37 +54,41 @@ const TagModal = ({ open, onClose, tags, setTags }: {
     setTags: (tags: number, val: boolean) => void
 }) => {
     const theme = useTheme<Theme>();
-    const [followers, setFollowers] = React.useState<Follower[]>([])
+    const [followers, setFollowers] = React.useState<Follower[]>([]);
+    const [selectedUsers, setSelectedUsers] = React.useState([])
     const [ids, setIds] = React.useState<number[]>([]);
     const [users, setUsers] = React.useState<Follower[]>([])
     const { id } = useDetailsState((state) => state);
+
+    React.useEffect(() => {
+        setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)));
+    }, [tags])
 
     const { isLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
         enabled: true,
         onSuccess: (data) => {
             const followersArr: Follower[] = data.data.data.data;
             setFollowers(followersArr);
-            console.log(data.data.data.data);
         },
         onError: (error) => {
             alert(JSON.stringify(error));
         }
     });
 
-    const Selected = React.useCallback(() => {
-        return followers.filter((item) => tags.includes(item.follower.id))
-    }, [tags, followers]);
+    // const Selected = React.useCallback(() => {
+    //     return setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)))
+    // }, [tags, followers]);
 
-    const handleCheck = React.useCallback((valid: number, val: boolean) => {
-        setTags(valid, val)
-    }, [])
+    const handleChange = React.useCallback((valid: number, val: boolean) => {
+        setTags(valid, val);
+    }, []);
    
 
   return (
     <Modal style={{ flex:1, backgroundColor: 'white' }} animationType='slide' transparent visible={open} onDismiss={() => onClose()} >
-        <Box flex={1} backgroundColor='mainBackGroundColor' paddingTop='xl' paddingHorizontal='m'>
+        <Box flex={1} backgroundColor='mainBackGroundColor' paddingTop={Platform.OS === 'ios' ? 'xl':'s'} paddingHorizontal='m'>
             {/* HEADERR BAR */}
-            <Box flexDirection='row' height={50} alignItems='center' paddingTop='m'>
+            <Box flexDirection='row' height={Platform.OS === 'ios' ? 50: 50} alignItems='center' paddingTop='m'>
                 <Ionicons name='arrow-back-outline' size={30} color={theme.colors.textColor} onPress={() => onClose()} />
                 <CustomText variant='subheader' marginLeft='s'>Tag Someone</CustomText>
             </Box>
@@ -122,14 +99,17 @@ const TagModal = ({ open, onClose, tags, setTags }: {
                 <TextInput style={{ flex: 1, fontFamily: 'RedRegular', marginLeft: 20, fontSize: theme.textVariants.body.fontSize }} placeholderTextColor={theme.colors.textColor} placeholder='Search for someone to tag'  />
             </Box>
 
-            {Selected().length > 0 && (
+            {selectedUsers.length > 0 && (
                 <Box width='100%' height={80} >
                     <FlashList 
+                        horizontal
+                        contentContainerStyle={{}}
                         estimatedItemSize={100}
                         ListEmptyComponent={() => (
                             <Text>Nothing to see here</Text>
                         )}
-                        data={Selected()}
+                        keyExtractor={(item, i) => i.toString()}
+                        data={selectedUsers}
                         renderItem={({ item }) => (
                             <Box width={100} justifyContent='center' alignItems='center' >
                                 <Image source={{ uri: `${IMAGE_BASE}${item.follower.profile_image}` }} style={{ width: 50, height: 50, borderRadius: 25 }} contentFit='cover' />
@@ -150,7 +130,7 @@ const TagModal = ({ open, onClose, tags, setTags }: {
                 estimatedItemSize={100}
                 data={followers}
                 renderItem={({ item }) => (
-                    <TagCard user={item} onChecked={setTags} isChecked={tags.includes(item.follower.id, 0)} />
+                    <TagCard user={item} onChecked={handleChange} isChecked={tags.includes(item.follower.id, 0)} />
                 )}
             />
             )}

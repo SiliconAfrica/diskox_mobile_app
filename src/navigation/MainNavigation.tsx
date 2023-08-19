@@ -21,6 +21,7 @@ import VerifyEmail from '../pages/verifyemail';
 import CompleteSetup from '../pages/complete-setup';
 import ResetPassword from '../pages/password-reset';
 import Repost from '../pages/repost';
+import Search from '../pages/search';
 
 export type RootStackParamList = {
     'home': undefined;
@@ -32,7 +33,7 @@ export type RootStackParamList = {
     profile: { userId: number };
     settings: { userId: number };
     security: { userId: number };
-    notifications: { userId: number };
+    notifications: undefined;
     'blocked-users': { userId: number };
     chat: { userId: number, profile_image: string, username: string, last_seen: string };
     post: { postId: number };
@@ -40,6 +41,7 @@ export type RootStackParamList = {
     'complete-setup': undefined;
     'reset-password': undefined;
     repost: { id: number };
+    search: undefined;
   };
 
   const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -84,6 +86,7 @@ const MainNavigation = (): JSX.Element => {
             <RootStackNavigation.Screen name='set-up' component={Setup} />
             <RootStackNavigation.Screen name='reset-password' component={ResetPassword} />
             <RootStackNavigation.Screen name='post' component={post} />
+            <RootStackNavigation.Screen name='search' component={Search} />
         </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   )
