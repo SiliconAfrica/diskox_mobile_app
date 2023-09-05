@@ -7,10 +7,12 @@ import { Video, ResizeMode } from 'expo-av';
 import { Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
+import * as ImagePicker from 'expo-image-picker';
+
 
 
 interface IProps {
-    file: DocumentResult;
+    file: ImagePicker.ImagePickerAsset;
     index: number;
     onDelete: (data:{ index?: number, clearAll?: boolean}) => void;
 }
@@ -19,8 +21,7 @@ const MediaCard = ({ file, index, onDelete }: IProps) => {
     const theme = useTheme<Theme>();
 
     const RenderItem = React.useCallback(() => {
-        if (file.type === "success") {
-            if (file.mimeType.startsWith("image")) {
+            if (file.type === 'image') {
                 return (
                     <Image source={{ uri: file.uri }} contentFit='cover' style={{ width: '100%', height: '100%' }} />
                 )
@@ -29,7 +30,6 @@ const MediaCard = ({ file, index, onDelete }: IProps) => {
                     <Video source={{ uri: `${file.uri}` }} usePoster  resizeMode={ResizeMode.COVER} useNativeControls videoStyle={{ width: '100%', height: '100%', borderRadius: 15, backgroundColor: 'grey' }} isLooping={false} style={{ width: '100%', height: '100%', borderRadius: 15, backgroundColor: 'grey', overflow: 'hidden' }} />
                 )
             }
-        }
     }, [file]);
   return (
     <Box width={150} height={'90%'} borderRadius={15} overflow='hidden' marginLeft='m'>

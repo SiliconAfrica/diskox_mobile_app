@@ -31,7 +31,7 @@ export const UserList = ({ user, action }: {
     const theme = useTheme<Theme>();
 
     return (
-        <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+        <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: theme.colors.secondaryBackGroundColor, borderBottomWidth: 2 }} >
             <Box flexDirection='row' alignItems='center' >
                 <Box width={50} height={50} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
                     <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />

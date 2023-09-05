@@ -31,4 +31,13 @@ const emailResetSchema = z.object({
     email: z.string().nonempty('Email cannot be empty').email('Invalid email'),
 });
 
-export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema };
+const changePasswordSchema = z.object({
+    oldPassword: z.string().nonempty('Password cannot be empty'),
+    password: z.string().nonempty('Password cannot be empty').min(8, 'Password must be at least 8 characters long'),
+    confirmPassword: z.string().nonempty('Password cannot be empty').min(8, 'Password must be at least 8 characters long'),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+});
+
+export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema };

@@ -1,4 +1,4 @@
-import { IUser, UserStats } from "./user";
+import { IUser, UserStats } from './user';
 
 export type IPost = {
   id: number;
@@ -29,7 +29,7 @@ export type IPost = {
   has_voted_poll: number;
   tags: any[];
   last_two_comments: any[];
-  polls: any[];
+  polls: IPoll[];
   post_images: string[];
   post_videos: MediaPost[];
   user: IUser & UserStats;
@@ -48,3 +48,14 @@ export type MediaPost = {
   type: string;
   video_thumbnail: string;
 };
+
+export type IPoll = {
+  id: number,
+  post_id: number,
+  subject: string,
+  vote_count: number,
+  deleted_at: string,
+  created_at: string,
+  updated_at: string,
+  is_voted: 0 | 1
+}

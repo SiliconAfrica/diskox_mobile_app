@@ -74,17 +74,19 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   }, [chats]);
 
   const pickImage = React.useCallback(async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ['image/*'],
-      multiple: false,
-      copyToCacheDirectory: true,
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: false,
     });
-    if (result.type === 'success') {
-      console.log(result);
+  
+    if (!result.canceled) {
+      console.log(result.assets[0]);
       const formData = new FormData();
-      // formData.append('message', 'image post');
+      const name = result.assets[0].uri.split('/').pop();
+      const mimeType = mime.getType(result.assets[0].uri);
       formData.append('receiver_id', userId.toString());
-      formData.append('chat_images[]', { uri: result.uri, type: result.mimeType, name: result.name } as any);
+      formData.append('chat_images[]', { uri: result.assets[0].uri, type: mimeType, name } as any);
       sendMessage.mutate(formData);
     }
   }, []);

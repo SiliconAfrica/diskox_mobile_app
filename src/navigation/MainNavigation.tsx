@@ -8,9 +8,7 @@ import Setup from '../pages/set-up';
 import CreatePost from '../pages/create-post';
 import Profile from '../pages/profile';
 import setting from '../pages/setting';
-import Security from '../pages/security';
 import notifications from '../pages/notifications';
-import BlockedUsers from '../pages/blocked-users';
 import Chat from '../pages/chat';
 import post from '../pages/post';
 import BottomTabs from './BottomTabs';
@@ -22,6 +20,12 @@ import CompleteSetup from '../pages/complete-setup';
 import ResetPassword from '../pages/password-reset';
 import Repost from '../pages/repost';
 import Search from '../pages/search';
+import ProfileSetting from '../pages/setting/pages/Profile'
+import NotificaitionsSettings from '../pages/setting/pages/Notifications';
+import Security from '../pages/setting/pages/Security';
+import BlockedUsers from '../pages/setting/pages/Blocked';
+import CommunitySettings from '../pages/bottomtabs/community/pages/CommunitySettings';
+import { COMMUNITY_SETTING_TYPE } from '../enums/CommunitySettings';
 
 export type RootStackParamList = {
     'home': undefined;
@@ -31,10 +35,11 @@ export type RootStackParamList = {
     'set-up': undefined;
     'create-post': undefined;
     profile: { userId: number };
-    settings: { userId: number };
-    security: { userId: number };
+    'profile-setting': undefined;
+    settings: undefined;
+    security: undefined;
     notifications: undefined;
-    'blocked-users': { userId: number };
+    'blocked-users': undefined;
     chat: { userId: number, profile_image: string, username: string, last_seen: string };
     post: { postId: number };
     'verify-email': undefined;
@@ -42,6 +47,12 @@ export type RootStackParamList = {
     'reset-password': undefined;
     repost: { id: number };
     search: undefined;
+    blocked: undefined;
+    'notifications-settings': undefined;
+    list: undefined;
+    community: { id: number };
+    'community-members': { id: number };
+    'community-settings': { id: number, type: COMMUNITY_SETTING_TYPE };
   };
 
   const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -68,12 +79,15 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Group navigationKey='Authentication'>
             <RootStackNavigation.Screen name='create-post' component={CreatePost} />
             <RootStackNavigation.Screen name='profile' component={Profile} />
+            <RootStackNavigation.Screen name='profile-setting' component={ProfileSetting} />
             <RootStackNavigation.Screen name='settings' component={setting} />
             <RootStackNavigation.Screen name='security' component={Security} />
             <RootStackNavigation.Screen name='notifications' component={notifications} />
             <RootStackNavigation.Screen name='blocked-users' component={BlockedUsers} />
             <RootStackNavigation.Screen name='chat' component={Chat} />
             <RootStackNavigation.Screen name='repost' component={Repost} />
+            <RootStackNavigation.Screen name='notifications-settings' component={NotificaitionsSettings} />
+            <RootStackNavigation.Screen name='community-settings' component={CommunitySettings} />
         </RootStackNavigation.Group>
 
         {/* UNAUTHENTICATED FLOW */}
@@ -88,6 +102,7 @@ const MainNavigation = (): JSX.Element => {
             <RootStackNavigation.Screen name='post' component={post} />
             <RootStackNavigation.Screen name='search' component={Search} />
         </RootStackNavigation.Group>
+
     </RootStackNavigation.Navigator>
   )
 }

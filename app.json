@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "diskos",
+    "name": "Diskox",
     "slug": "diskos",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,6 +16,8 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.dandolla98.diskos",
+      "buildNumber": "1",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -25,7 +27,8 @@
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#34A853",
       },
-      "package": "com.dandolla98.diskos"
+      "package": "com.dandolla98.diskox"
+      
     },
     "web": {
       "favicon": "./assets/favicon.png"

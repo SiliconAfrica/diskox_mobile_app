@@ -13,7 +13,7 @@ const FilterTopbar = () => {
     const { setAll, filterBy } = useModalState((state) => state)
 
   return (
-    <Box borderBottomWidth={1} borderBottomColor='secondaryBackGroundColor' height={80} borderTopWidth={1} borderTopColor='secondaryBackGroundColor' backgroundColor='mainBackGroundColor' width='100%' flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' marginVertical='s'>
+    <Box borderBottomWidth={1} borderBottomColor='secondaryBackGroundColor' height={80} borderTopWidth={1} borderTopColor='secondaryBackGroundColor' backgroundColor='secondaryBackGroundColor' width='100%' flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' marginVertical='s'>
 
         <Pressable onPress={() => setAll({ showFilter: true })} style={{ height: 40, width: '35%', borderRadius: 30, backgroundColor: '#F7FCF9', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
             { filterBy !== POST_FILTERR.ALL && filterBy !== POST_FILTERR.TOP_STORIES && <CustomText variant='body' color='primaryColor' fontSize={17}>{filterBy}</CustomText> } 

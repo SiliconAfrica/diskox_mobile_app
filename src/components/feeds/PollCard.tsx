@@ -23,7 +23,7 @@ interface IProps {
 }
 
 
-const PostCard = (props: IPost& IProps) => {
+const PollCard = (props: IPost& IProps) => {
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({...props})
     const { setAll } = useModalState((state) => state)
@@ -31,15 +31,16 @@ const PostCard = (props: IPost& IProps) => {
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
 
-    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }} = post;
+    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }, poll_duration, polls, has_voted_poll } = post;
 
-    const getData = useQuery([`getPost${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
+    const getData = useQuery([`getPolls${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
         refetchOnMount: false,
       onError: (error: any) => {
         alert(error.message);
       },
       onSuccess: (data) => {
         setPost(data.data.data);
+        console.log(data.data.data);
         
       }
     });
@@ -51,7 +52,7 @@ const PostCard = (props: IPost& IProps) => {
           alert(error.message);
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPost${id}`]);
+            queryClient.invalidateQueries([`getPolls${id}`]);
         }
     });
 
@@ -61,7 +62,7 @@ const PostCard = (props: IPost& IProps) => {
           alert(error.message);
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPost${id}`]);
+            queryClient.invalidateQueries([`getPolls${id}`]);
         }
     });
 
@@ -71,7 +72,23 @@ const PostCard = (props: IPost& IProps) => {
           alert(error.message);
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPost${id}`]);
+            queryClient.invalidateQueries([`getPolls${id}`]);
+        }
+    });
+
+    const votepoll = useMutation({
+        mutationFn: (data: any) => httpService.post(`${URLS.VOTE_POLL}`, data),
+        onError: (error: any) => {
+          alert(error.message);
+        },
+        onSuccess: (data) => {
+            console.log(data.data);
+            if (data.data.message) {
+                alert(data.data.message);
+                setPost(prev => ({ ...prev, has_voted_poll: 1 }));
+                return;
+            }
+            queryClient.invalidateQueries([`getPolls${id}`]);
         }
     });
     
@@ -84,6 +101,22 @@ const PostCard = (props: IPost& IProps) => {
     const handleShare = React.useCallback(() => {
         setAll({ postId: id, showShare: true });
     }, [id])
+
+    const getDate = () => {
+        const today = moment();
+        const targetData = moment(created_at).add(poll_duration, 'days');
+        const daysToGo = targetData.diff(today, 'days');
+        return daysToGo;
+    }
+
+    const vote = (poll_id: number) =>  {
+        const obj = {
+            post_id: id,
+            post_poll_id: poll_id
+        }
+
+        votepoll.mutate(obj);
+    }
 
   return (
     <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s' padding='m'>
@@ -115,38 +148,28 @@ const PostCard = (props: IPost& IProps) => {
                 <CustomText variant='body' color='primaryColor' onPress={() => setShowAll(prev => !prev)} >{showAll ? 'Show Less' : 'Read More'}</CustomText>
             )} </CustomText>
 
-            {/* IMAGE OR VIDEO SECTION */}
-            {post_images?.length > 0 || post_videos?.length > 0 && (
-                <Box flexDirection='row' justifyContent='space-between' marginTop='m' height={300} width={'100%'}>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ height: '100%', width: '100%', paddingRight: 200, backgroundColor: 'red' }}>
-                    { post_images.length > 0 &&  (
-                        <>
-                            { post_images.length === 1 && post_images.map((image, index) => (
-                                <Image source={{ uri: `${IMAGE_BASE}${image}`}} contentFit='contain' style={{ width: WIDTH, height: '100%', borderRadius: 0, }} />
-                            ))}
-                            {
-                                post.post_images.length > 1 && post_images.map((image, i) => (
-                                    <Image source={{ uri: `${IMAGE_BASE}${image}`}} contentFit='contain' style={{ width: '44%', height: '100%', borderRadius: 15, }} />
-                                ))
-                            }
-                        </>
-                    )}
+            {/* Poll SECTION */}
+            {polls?.length > 0 && (
+                <Box flexDirection='row' justifyContent='space-between' marginTop='m' maxHeight={300} width={'100%'}>
 
-                    { post_videos.length > 0 && (
-                      <>
-                        { post_videos.length === 1 && post_videos.map((video, index) => (
-                            <Video key={index} source={{ uri: `${IMAGE_BASE}${video.video_path}` }} posterSource={{ uri: `${IMAGE_BASE}${video.video_thumbnail}` }} usePoster  resizeMode={ResizeMode.COVER} useNativeControls isLooping={false} videoStyle={{ width: '100%', height: '100%', borderRadius: 15, backgroundColor: 'grey' }} style={{ width: WIDTH, height: '100%', borderRadius: 0, backgroundColor: 'grey' }} />
+                    <ScrollView  showsHorizontalScrollIndicator={false} contentContainerStyle={{ width: '100%' }}>
+                    
+                        {polls.map((poll, index) => (
+                            <Box key={index.toString()} width='100%' height={45} position='relative' overflow='hidden' borderRadius={25} marginBottom='s'>
+                                { has_voted_poll === 1 && (
+                                    <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
+                                )}
+                                <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 45, borderRadius: 25, borderWidth: 1, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
+                                    <CustomText variant='body' color='primaryColor'>{poll.subject} ({poll.vote_count}%)</CustomText>
+                                </Pressable>
+                            </Box>
                         ))}
-                        {
-                            post_videos.length > 1 && post_videos.map((item, i) => (
-                                <Video key={i} source={{ uri: `${IMAGE_BASE}${item.video_path}` }} posterSource={{ uri: `${IMAGE_BASE}${item.video_thumbnail}` }} usePoster  resizeMode={ResizeMode.COVER} useNativeControls videoStyle={{ width: '44%', height: '70%', borderRadius: 15, backgroundColor: 'grey' }} isLooping={false} style={{ width: WIDTH / 100 * 44, height: '70%', borderRadius: 15, backgroundColor: 'grey' }} />
-                            ))
-                        }
-                      </>
-                    )}
+                   
                     </ScrollView>
                 </Box>
               )}
+
+              <CustomText>{getDate() > 0 ? `${getDate()} days left` : 'Final result'  } </CustomText>
         </Box>
 
         {/* REACTION SECTION */}
@@ -203,4 +226,4 @@ const PostCard = (props: IPost& IProps) => {
   )
 }
 
-export default PostCard
+export default PollCard

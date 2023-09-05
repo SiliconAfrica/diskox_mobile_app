@@ -17,7 +17,7 @@ const Searchbar = () => {
     const navigation = useNavigation<PageType>();
     const { profile_image, username } = useDetailsState((state) => state)
   return (
-    <Box backgroundColor='mainBackGroundColor' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
+    <Box backgroundColor='secondaryBackGroundColor' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
          {
                     profile_image && (
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 40, height: 40, borderRadius: 25 }} contentFit='contain' />

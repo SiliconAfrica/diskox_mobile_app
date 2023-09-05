@@ -15,6 +15,7 @@ import Header from "../components/Header";
 import { useUtilState } from "../states/util";
 import Sidebar from "../components/Sidebar";
 import TrendingPosts from "../pages/bottomtabs/trendingpost";
+import { Communities } from "../pages/bottomtabs/community";
 
 export type RootBottomTabParamList = {
   posts: { userId: string } | undefined;
@@ -22,6 +23,7 @@ export type RootBottomTabParamList = {
   polls: { userId: string } | undefined;
   chats: { userId: string } | undefined;
   trending: { userId: string } | undefined;
+  communities: undefined;
 };
 
 export type RootDrawerParamList = {
@@ -45,7 +47,7 @@ const ActiveIconTab = ({
   routeName,
 }: {
   focused: boolean;
-  routeName: "home" | "questions" | "polls" | "chats" | "trending";
+  routeName: "home" | "questions" | "polls" | "chats" | "trending" | "community";
 }) => {
   const nameOutline = React.useCallback((): any => {
     switch (routeName) {
@@ -63,6 +65,9 @@ const ActiveIconTab = ({
       }
       case "questions": {
         return "help-circle-outline";
+      }
+      case "community": {
+        return 'people-outline'
       }
       default: {
         return "home-outline";
@@ -87,6 +92,9 @@ const ActiveIconTab = ({
       case "questions": {
         return "help-circle";
       }
+      case 'community': {
+        return 'people';
+      }
       default: {
         return "home";
       }
@@ -96,11 +104,11 @@ const ActiveIconTab = ({
     <>
       {focused && <>
         <Ionicons name={nameFilled()} size={25} color={"#34A853"} />
-        <CustomText variant="xs" color="primaryColor">{routeName.toUpperCase()}</CustomText>
+        <CustomText variant="xs" fontSize={10} color="primaryColor" marginTop="s" >{routeName.toUpperCase()}</CustomText>
       </>}
       {!focused && <>
         <Ionicons name={nameOutline()} size={25} color={"grey"} />
-        <CustomText variant="xs">{routeName.toUpperCase()}</CustomText>
+        <CustomText variant="xs" fontSize={10} marginTop="s">{routeName.toUpperCase()}</CustomText>
       </>}
     </>
   );
@@ -175,6 +183,24 @@ const BottomTabs = (): JSX.Element => {
           ),
         }}
       />
+
+    {
+      isLoggedIn && (
+        <RootBottomTabs.Screen
+          name="communities"
+          component={Communities}
+          options={{
+            headerShown: true,
+            header: () => <Header />,
+            tabBarShowLabel: false,
+            tabBarIcon: ({ focused }) => (
+              <ActiveIconTab focused={focused} routeName="community" />
+            ),
+          }}
+      />
+      )
+    }
+
       { isLoggedIn && (
         <RootBottomTabs.Screen
         name="chats"

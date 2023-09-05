@@ -8,9 +8,11 @@ import { Feather } from '@expo/vector-icons'
 import MediaCard from './MediaCard';
 import CustomText from '../general/CustomText';
 import { DocumentResult } from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+
 
 interface IProps {
-  files: DocumentResult[];
+  files: ImagePicker.ImagePickerAsset[];
   handlePicker: () => {};
   onDelete: (data:{ index?: number, clearAll?: boolean}) => void;
   description: string;
