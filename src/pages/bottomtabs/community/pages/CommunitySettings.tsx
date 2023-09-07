@@ -7,6 +7,20 @@ import { RootStackParamList } from '../../../../navigation/MainNavigation'
 import { COMMUNITY_SETTING_TYPE } from '../../../../enums/CommunitySettings'
 import { ScrollView } from 'react-native-gesture-handler'
 import Settings from './Settingspages/Settings'
+import ContentControl from './Settingspages/contentcontrol'
+import CommunityType from './Settingspages/CommunityType'
+import EditCommunity from './Settingspages/EditCommunity'
+import Topics from './Settingspages/Topics'
+import MemberRequest from './Settingspages/MemberRequest'
+import Members from './Settingspages/Members'
+import PostApproval from './Settingspages/PostApproval'
+import Moderators from './Settingspages/Moderators'
+import InviteModerators from './Settingspages/Invitemoderatorr'
+import Suspended from './Settingspages/Suspended'
+import Blocked from './Settingspages/Blocked'
+import Invites from './Settingspages/Invites'
+import Rules from './Settingspages/Rules'
+import RemovalReason from './Settingspages/RemovalReason'
 
 const CommunitySettings = ({ navigation, route }: NativeStackScreenProps<RootStackParamList, 'community-settings'>) => {
   const { id, type } = route.params;
@@ -16,6 +30,60 @@ const CommunitySettings = ({ navigation, route }: NativeStackScreenProps<RootSta
       case COMMUNITY_SETTING_TYPE.DEFAULT: {
         return 'Settings';
       }
+      case COMMUNITY_SETTING_TYPE.EDIT: {
+        return 'Edit profile'
+      }
+      case COMMUNITY_SETTING_TYPE.TYPE: {
+        return "Community type";
+      }
+      case COMMUNITY_SETTING_TYPE.REQUEST: {
+        return 'Member requests';
+      }
+      case COMMUNITY_SETTING_TYPE.POSTS: {
+        return 'Post approval';
+      }
+      case COMMUNITY_SETTING_TYPE.SUSPENDED_MEMBERS: {
+        return "Suspended";
+      }
+      case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
+        return 'Blocked';
+      }
+      case COMMUNITY_SETTING_TYPE.INVITE: {
+        return 'Invite moderators';
+      }
+      case COMMUNITY_SETTING_TYPE.MODERATORS: {
+        return 'Moderators';
+      }
+      case COMMUNITY_SETTING_TYPE.RULES: {
+        return 'Rules';
+      }
+      case COMMUNITY_SETTING_TYPE.UPDATE_RULE: {
+        return "Update rule";
+      }
+      case COMMUNITY_SETTING_TYPE.ADD_RULE: {
+        return 'Add rule';
+      }
+      case COMMUNITY_SETTING_TYPE.REMOVAL_RREASON: {
+        return "Removal reason";
+      }
+      case COMMUNITY_SETTING_TYPE.ADD_REMOVAL_REASON: {
+        return 'Add reason';
+      }
+      case COMMUNITY_SETTING_TYPE.UPDATE_REMOVAL_REASON: {
+        return 'Update removal reason'
+      }
+      case COMMUNITY_SETTING_TYPE.CONTENT_CONTROL: {
+        return 'Content control';
+      }
+      case COMMUNITY_SETTING_TYPE.TOPIC: {
+        return 'Change topic'
+      }
+      case COMMUNITY_SETTING_TYPE.MEMBERS: {
+        return 'Members'
+      }
+      default: {
+        return 'Setting Page'
+      }
     }
   }, [type]);
 
@@ -24,17 +92,54 @@ const CommunitySettings = ({ navigation, route }: NativeStackScreenProps<RootSta
       case COMMUNITY_SETTING_TYPE.DEFAULT: {
         return <Settings />
       }
+      case COMMUNITY_SETTING_TYPE.CONTENT_CONTROL: {
+        return <ContentControl />
+      }
+      case COMMUNITY_SETTING_TYPE.TYPE: {
+        return <CommunityType />
+      }
+      case COMMUNITY_SETTING_TYPE.EDIT: {
+        return <EditCommunity />
+      }
+      case COMMUNITY_SETTING_TYPE.TOPIC: {
+        return <Topics />
+      }
+      case COMMUNITY_SETTING_TYPE.REQUEST: {
+        return <MemberRequest />
+      }
+      case COMMUNITY_SETTING_TYPE.MEMBERS: {
+        return <Members />
+      }
+      case COMMUNITY_SETTING_TYPE.POSTS: {
+        return <PostApproval />
+      }
+      case COMMUNITY_SETTING_TYPE.MODERATORS: {
+        return <Moderators />
+      }
+      case COMMUNITY_SETTING_TYPE.INVITE: {
+        return <InviteModerators />
+      }
+      case COMMUNITY_SETTING_TYPE.SUSPENDED_MEMBERS: {
+        return <Suspended />
+      }
+      case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
+        return <Blocked />
+      }
+      case COMMUNITY_SETTING_TYPE.INVITE_MEMBERS: {
+        return <Invites />
+      }
+      case COMMUNITY_SETTING_TYPE.RULES: {
+        return <Rules />
+      }
+      case COMMUNITY_SETTING_TYPE.REMOVAL_RREASON: {
+        return <RemovalReason />
+      }
     }
   }, [type])
 
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor' paddingTop='s'>
-        <SettingsHeader title={renderTitle()} showSave={false} handleArrowPressed={() => navigation.goBack()} />
-        <Box flex={1}>
-          <ScrollView contentContainerStyle={{ paddingTop: 20, paddingBottom: 100 }}>
-            {renderPage()}
-          </ScrollView>
-        </Box>
+      {renderPage()}
     </Box>
   )
 }

@@ -5,6 +5,11 @@ import CustomText from '../../../../../components/general/CustomText'
 import { Ionicons, Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../../../theme'
+import { COMMUNITY_SETTING_TYPE } from '../../../../../enums/CommunitySettings'
+import { useNavigation } from '@react-navigation/native'
+import { PageType } from '../../../../login'
+import SettingsHeader from '../../../../../components/settings/Header'
+import { ScrollView } from 'react-native-gesture-handler'
 
 const SectionHeader = ({ icon, title, color = undefined }: {
     icon: JSX.Element,
@@ -20,14 +25,19 @@ const SectionHeader = ({ icon, title, color = undefined }: {
     )
 }
 
-const ListItem = ({ action, title }: {
+const ListItem = ({ type, title }: {
     title: string,
-    action: () => void
+    type: COMMUNITY_SETTING_TYPE
 }) => {
     const theme = useTheme<Theme>();
+    const navigation = useNavigation<PageType>();
+
+    const handlePress = React.useCallback(() => {
+        navigation.push('community-settings', { id: 23, type });
+    }, [type])
 
     return (
-        <Pressable style={{ flexDirection: 'row', width: '100%', height: 40,  alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 0, marginTop: 25 }} onPress={action}>
+        <Pressable style={{ flexDirection: 'row', width: '100%', height: 40,  alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 0, marginTop: 25 }} onPress={handlePress}>
             <CustomText variant='body' marginLeft='m'>{title || ''}</CustomText>
             <Feather name='chevron-right' size={30} color={theme.colors.textColor} />
         </Pressable>
@@ -36,30 +46,34 @@ const ListItem = ({ action, title }: {
 
 const Settings = () => {
     const theme = useTheme<Theme>();
+    const navigation = useNavigation<PageType>();
   return (
     <Box flex={1}>
-        {/* SETTINGS SECTION */}
-        <SectionHeader title={"Community settings"} icon={<Ionicons name='person' size={25} color={theme.colors.textColor}  />} />
-        <ListItem title='Profile' action={() => {}} />
-        <ListItem title='Community type' action={() => {}} />
-        <ListItem title='Member request' action={() => {}} />
-        <ListItem title='All members' action={() => {}} />
+        <SettingsHeader title='Community Settings' showSave={false} handleArrowPressed={() => navigation.goBack()} />
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+            {/* SETTINGS SECTION */}
+            <SectionHeader title={"Community settings"} icon={<Ionicons name='person' size={25} color={theme.colors.textColor}  />} />
+            <ListItem title='Profile' type={COMMUNITY_SETTING_TYPE.EDIT} />
+            <ListItem title='Community type' type={COMMUNITY_SETTING_TYPE.TYPE} />
+            <ListItem title='Member request' type={COMMUNITY_SETTING_TYPE.REQUEST} />
+            <ListItem title='All members' type={COMMUNITY_SETTING_TYPE.MEMBERS} />
 
-        {/* MANAGEMENT SECTION */}
-        <SectionHeader title={"Management"} icon={<Ionicons name='settings-outline' size={25} color={theme.colors.textColor}  />} />
-        <ListItem title='Post approval' action={() => {}} />
-        <ListItem title='Moderators' action={() => {}} />
-        <ListItem title='Suspended' action={() => {}} />
-        <ListItem title='Blocked' action={() => {}} />
-        <ListItem title='Invite' action={() => {}} />
+            {/* MANAGEMENT SECTION */}
+            <SectionHeader title={"Management"} icon={<Ionicons name='settings-outline' size={25} color={theme.colors.textColor}  />} />
+            <ListItem title='Post approval' type={COMMUNITY_SETTING_TYPE.POSTS} />
+            <ListItem title='Moderators' type={COMMUNITY_SETTING_TYPE.MODERATORS} />
+            <ListItem title='Suspended' type={COMMUNITY_SETTING_TYPE.SUSPENDED_MEMBERS} />
+            <ListItem title='Blocked' type={COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS} />
+            <ListItem title='Invite' type={COMMUNITY_SETTING_TYPE.INVITE_MEMBERS} />
 
-        {/* RULES SECTION */}
-        <SectionHeader title={"Rules & Regulations"} icon={<Ionicons name='file-tray-stacked' size={25} color={theme.colors.textColor}  />} />
-        <ListItem title='Rules' action={() => {}} />
-        <ListItem title='Removal reason' action={() => {}} />
-        <ListItem title='Content controls' action={() => {}} />
+            {/* RULES SECTION */}
+            <SectionHeader title={"Rules & Regulations"} icon={<Ionicons name='file-tray-stacked' size={25} color={theme.colors.textColor}  />} />
+            <ListItem title='Rules' type={COMMUNITY_SETTING_TYPE.RULES} />
+            <ListItem title='Removal reason' type={COMMUNITY_SETTING_TYPE.REMOVAL_RREASON} />
+            <ListItem title='Content controls' type={COMMUNITY_SETTING_TYPE.CONTENT_CONTROL} />
 
-        <SectionHeader title={"DELETE COMMUNITY"} icon={<Ionicons name='trash-outline' size={25} color={'red'} />} color='red' />
+            <SectionHeader title={"DELETE COMMUNITY"} icon={<Ionicons name='trash-outline' size={25} color={'red'} />} color='red' />
+        </ScrollView>
     </Box>
   )
 }

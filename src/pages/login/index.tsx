@@ -24,7 +24,7 @@ import { RootBottomTabParamList } from '../../navigation/BottomTabs';
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
   NativeStackNavigationProp<RootStackParamList>
-  >;;
+  >;
 const Login = () => {
   const navigation = useNavigation<PageType>();
   const [ setAll ] = useModalState((state) => [state.setAll]);

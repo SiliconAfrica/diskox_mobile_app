@@ -40,4 +40,10 @@ const changePasswordSchema = z.object({
     path: ['confirmPassword'],
 });
 
-export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema };
+const editCommunity = z.object({
+    title: z.string().nonempty(),
+    username: z.string().nonempty(),
+    descrription: z.string().nonempty(),
+})
+
+export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema, editCommunity };

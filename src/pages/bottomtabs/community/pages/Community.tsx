@@ -12,11 +12,16 @@ import Rules from '../../../../components/community/Rules'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../../navigation/MainNavigation'
 import { COMMUNITY_SETTING_TYPE } from '../../../../enums/CommunitySettings'
+import { PageType } from '../../../login'
+import { RootBottomTabParamList } from '../../../../navigation/BottomTabs'
+import { useNavigation } from '@react-navigation/native'
 
-const Community = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
+const Community = () => {
   const theme = useTheme<Theme>();
   const WIDTH = useWindowDimensions().width;
   const [active, setActive] = React.useState(1);
+
+  const navigation = useNavigation<PageType>();
 
   const switchPages = React.useCallback(() => {
     switch(active) {
@@ -37,7 +42,11 @@ const Community = ({ navigation }: NativeStackScreenProps<RootStackParamList>) =
         {/* BANNER */}
         <Box width='100%' height={120} position='relative' style={{ backgroundColor: '#E3A812' }}>
 
-          <Box flexDirection='row' paddingTop='m' justifyContent='flex-end' paddingHorizontal='m'>
+          <Box flexDirection='row' paddingTop='m' justifyContent='space-between' paddingHorizontal='m'>
+            <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#FFFFFF33' }}>
+              <Feather name='arrow-left' size={25} color={theme.colors.textColor} onPress={() => navigation.popToTop()} />
+            </Box>
+
             <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#FFFFFF33' }}>
               <Feather name='settings' size={25} color={theme.colors.textColor} onPress={() => navigation.navigate('community-settings', { id: 23, type: COMMUNITY_SETTING_TYPE.DEFAULT })} />
             </Box>
