@@ -12,15 +12,16 @@ import { ScrollView, Switch } from 'react-native-gesture-handler'
 import * as SecureStorage from 'expo-secure-store';
 
 
-const Item = ({ icon, title }: {
+const Item = ({ icon, title, action }: {
     icon: JSX.Element,
-    title: string
+    title: string,
+    action?: () => void
 }) => {
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', height: 50 }}>
+        <Pressable onPress={action} style={{ flexDirection: 'row', alignItems: 'center', height: 50 }}>
             {icon}
             <CustomText variant='body' marginLeft='m'>{title}</CustomText>
-        </View>
+        </Pressable>
     )
 }
 
@@ -45,7 +46,7 @@ const Sidebar = ({navigation}: DrawerContentComponentProps) => {
                     isLoggedIn && (
                         <>
                             <Item icon={<Ionicons name='bookmark' size={25} color={theme.colors.textColor} />} title='Saved' />
-                            <Item icon={<Ionicons name='settings' size={25} color={theme.colors.textColor} />} title='Settings' />
+                            <Item icon={<Ionicons name='settings' size={25} color={theme.colors.textColor} />} action={() => navigation.navigate('settings')} title='Settings' />
                             <Item icon={<Ionicons name='stats-chart' size={25} color={theme.colors.textColor} />} title='Analytics' />
                         </>
                     )

@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 3.15.0"
+    "version": ">= 4.1.1"
   },
   "build": {
     "development": {
@@ -10,16 +10,10 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "autoIncrement": "versionCode"
+        "buildType": "apk"
       }
     },
-    "production": {
-      "android": {
-        "autoIncrement": "versionCode",
-        "buildType": "app-bundle"
-      }
-    }
+    "production": {}
   },
   "submit": {
     "production": {}

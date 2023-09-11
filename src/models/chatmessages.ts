@@ -6,7 +6,7 @@ export type IChatMessage = {
     deleted_time: string;
     id: number;
     message: string;
-    post_images: Array<any>;
+    post_images: Array<{"created_at": string, "deleted_by": any, "deleted_for": any, "deleted_time": string, "id": number, "image_path": string, "processed": number, "type": string}>;
     reactions: Array<any>;
     receiver_id: number;
     sender_id: number;

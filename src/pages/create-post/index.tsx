@@ -21,15 +21,19 @@ import { RootStackParamList } from '../../navigation/MainNavigation'
 import TagModal from '../../components/createpost/TagModal'
 import { useModalState } from '../../states/modalState'
 import { useMutation } from 'react-query'
+import * as ImagePicker from 'expo-image-picker';
+import mime from 'mime';
+
 
 const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'create-post'>) => {
   const { profile_image, name, username } = useDetailsState((state) =>state);
   const { setAll, visibility } = useModalState((state) => state)
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
-  const [files, setFiles] = React.useState<DocumentPicker.DocumentResult[]>([]);
+  const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
   const [show, setShow] = React.useState(false);
   const [tags, setTags] = React.useState<number[]>([]);
   const [value, setValues] = React.useState('');
+  const [question, setQuestion] = React.useState('');
   const theme = useTheme<Theme>();
 
   // mutation
@@ -56,16 +60,16 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
         return <WritePost description={value} setDescription={setValues} files={files} handlePicker={handleDocumentPicker} onDelete={handleMediaDelete} />
       }
       case TAB_BAR_ENUM.QUESTION: {
-        return <WriteQuestion />
+        return <WriteQuestion description={question} setDescription={setQuestion} files={files} handlePicker={handleDocumentPicker} onDelete={handleMediaDelete} />
       }
       case TAB_BAR_ENUM.POLL: {
-        return <WritePoll />
+        return <WritePoll  description={question} setDescription={setQuestion}  onDelete={handleMediaDelete} />
       }
     }
   }, [activeTab, files, value, setValues]);
 
   const handleCheck = React.useCallback((val: number, valu: boolean) => {
-    if (valu) {
+    if (valu && !tags.includes(val)) {
       setTags([...tags, val]);
     } else {
       setTags(tags.filter((item) => item !== val));
@@ -90,17 +94,17 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
    }
    formData.append('status', 'active');
    if (files.length > 0) {
-    const images = files.filter((item, index) => item.type === 'success' && item.mimeType.startsWith('image/'));
-    const videos = files.filter((item, index) => item.type === 'success' && item.mimeType.startsWith('video/'));
+    const images = files.filter((item, index) => item.type === 'image');
+    const videos = files.filter((item, index) => item.type === 'video');
     images.map((item) => {
-      if (item.type === 'success') {
-        formData.append('post_images[]', { uri: item.uri, name: item.name, type: item.mimeType } as any);
-      }
+      const name = item.uri.split('/').pop();
+      const mimeType = mime.getType(item.uri);
+      formData.append('post_images[]', { uri: item.uri, name: name, type: mimeType } as any);
     })
     videos.map((item) => {
-      if (item.type === 'success') {
-        formData.append('post_videos[]', { uri: item.uri, name: item.name, type: item.mimeType } as any);
-      }
+      const name = item.uri.split('/').pop();
+      const mimeType = mime.getType(item.uri);
+      formData.append('post_videos[]', { uri: item.uri, name: name, type: mimeType } as any);
     })
    }
    mutate(formData)
@@ -111,15 +115,21 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
       alert(`You can't add more than 5 files!`);
       return;
     }
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ['image/*'],
-      multiple: false,
-      copyToCacheDirectory: true,
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: false,
     });
-    if (result.type === 'success') {
-      const arr = [...files, result];
+  
+    if (!result.canceled) {
+      console.log(result.assets[0]);
+      const formData = new FormData();
+      const name = result.assets[0].uri.split('/').pop();
+      const mimeType = mime.getType(result.assets[0].uri);
+      const arr = [...files, result.assets[0]];
       setFiles(arr);
     }
+
   }, [files])
 
   const handleMediaDelete = React.useCallback(({ index, clearAll }: {index: number, clearAll: boolean}) => {
@@ -131,7 +141,7 @@ const CreatePost = ({ navigation }: NativeStackScreenProps<RootStackParamList, '
   }, [files]);
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-      <TagModal open={show} onClose={() => setShow(false)} tags={tags} setTags={handleCheck} />
+      <TagModal open={show} onClose={() => setShow(false)} tags={tags} setTags={ (tags, val) => handleCheck(tags, val)} />
       <SettingsHeader showSave={false} onSave={() => {}} rightItem={<FadedButton isLoading={isLoading} title='Post'  width={100} height={40} onPress={handleSubmit} />} title='Create Post' handleArrowPressed={() => navigation.goBack()} />
 
       {/* HEADER SECTTION */}

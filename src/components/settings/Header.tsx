@@ -25,7 +25,7 @@ const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = 
           <CustomText variant='subheader' marginLeft='s'>{title}</CustomText>
         </Box>
 
-        { rightItem && rightItem }
+        { showSave && rightItem && rightItem }
     </Box>
   )
 }

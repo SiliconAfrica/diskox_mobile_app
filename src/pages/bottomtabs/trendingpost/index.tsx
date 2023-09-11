@@ -74,7 +74,7 @@ const TrendingPosts = () => {
   }, [currentPage, ids]);
 
   return (
-    <Box backgroundColor='secondaryBackGroundColor' flex={1}>
+    <Box backgroundColor='mainBackGroundColor' flex={1}>
         
         <FlashList 
           onEndReached={onEndReached}

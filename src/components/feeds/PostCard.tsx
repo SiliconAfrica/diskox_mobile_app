@@ -86,7 +86,7 @@ const PostCard = (props: IPost& IProps) => {
     }, [id])
 
   return (
-    <Box width='100%' backgroundColor='mainBackGroundColor' marginBottom='s' padding='m'>
+    <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s' padding='m'>
  
         {/* HEADER SECTION */}
         <Box flexDirection='row' justifyContent='space-between' alignItems='center'>

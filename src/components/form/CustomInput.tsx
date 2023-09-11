@@ -28,7 +28,10 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
   return (
     <Box style={{ ...props.containerStyle }}>
         {props.showLabel || props.showLabel === undefined && (
-            <CustomText variant='xs' fontFamily='RedRegular' marginBottom='s'>{props.label || props.placeholder }</CustomText>
+            <Box flexDirection='row'>
+                <CustomText variant='xs' fontFamily='RedRegular' marginBottom='s'>{props.label || props.placeholder }</CustomText>
+                { props.required && <CustomText style={{ color: 'red' }}>*</CustomText> }
+            </Box>
         )}
       <Controller 
         control={control}
@@ -38,7 +41,7 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
         name={props.name}
         render={({ field: { onChange, value  }}) => {
             return (
-                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'grey' }]}>
+                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'grey', }]}>
                     <Box style={{ flex: 1, justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 10 }}>
                         {/* {focused && <Text variant='xs'>{props.placeholder || props.name}</Text>} */}
                         <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor }} />

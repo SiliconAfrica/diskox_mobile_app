@@ -25,4 +25,14 @@ export const URLS = {
     CHATTED_USER: '/fetch_chatted_users',
     GET_CHAT_MESSAGES: '/fetch_messages',
     POST_CHAT_MESSAGE: '/send_message',
+    GET_USER_BY_USERNAME: '/get_user_by_username',
+    GET_USER_BY_ID: '/get_user',
+    GET_PROFILE_POSTS: '/fetch_user_posts',
+    GET_PROFILE_POLLS: '/fetch_user_polls',
+    GET_PROFILE_UPVOTES: '/fetch_user_upvoted_posts',
+    GET_PROFILE_COMMENTS: '/fetch_user_commented_posts',
+    GET_PROFILE_OVERVIEW_POSTS: '/fetch_user_overview_posts',
+    GET_POLLS: '/fetch_posts_by_post_type/poll',
+    GET_QUESTIONS: '/fetch_posts_by_post_type/question',
+    VOTE_POLL: '/vote_poll'
 }
