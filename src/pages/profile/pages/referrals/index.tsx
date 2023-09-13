@@ -4,10 +4,11 @@ import CustomText from "../../../../components/general/CustomText";
 import SettingsHeader from "../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../login";
-import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../../theme";
 import EarningsBox from "./EarningsBox";
+import TotalReferrals from "./totalReferrals";
+import ReferralList from "./ReferralList";
 
 export default function Referrals() {
   const navigation = useNavigation<PageType>();
@@ -20,7 +21,8 @@ export default function Referrals() {
         handleArrowPressed={() => navigation.goBack()}
       />
       <EarningsBox />
-      {/* <Box backgroundColor=""></Box> */}
+      <TotalReferrals />
+      <ReferralList />
     </Box>
   );
 }

@@ -6,7 +6,7 @@ const COLOR_PALLET = {
   white: "white",
   grey: "grey",
   whitesmoke: "whitesmoke",
-  lightGrey: "lightGrey",
+  lightGrey: "#D3D3D3",
   fadedButtonBgColor: "#F3FBF5",
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
