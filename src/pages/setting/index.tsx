@@ -134,6 +134,14 @@ const Setting = ({
           title="Security"
           action={() => nav("security")}
         />
+        <NavItem
+          forDarkModa={false}
+          icon={
+            <Ionicons name="shield" size={25} color={theme.colors.textColor} />
+          }
+          title="Refer & Earn"
+          action={() => nav("referrals")}
+        />
 
         <NavItem
           forDarkModa={false}
@@ -141,14 +149,6 @@ const Setting = ({
             <Ionicons name="shield" size={25} color={theme.colors.textColor} />
           }
           title="Blocked"
-          action={() => nav("blocked-users")}
-        />
-        <NavItem
-          forDarkModa={false}
-          icon={
-            <Ionicons name="shield" size={25} color={theme.colors.textColor} />
-          }
-          title="Referrals"
           action={() => nav("blocked-users")}
         />
 

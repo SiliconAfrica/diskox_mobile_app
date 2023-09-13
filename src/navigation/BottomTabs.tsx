@@ -33,7 +33,6 @@ export type RootDrawerParamList = {
 const RootBottomTabs = createBottomTabNavigator<RootBottomTabParamList>();
 const DrawerNavigation = createDrawerNavigator<RootDrawerParamList>();
 
-
 /**
 + * Renders the active icon tab based on the route name.
 + *
@@ -47,7 +46,13 @@ const ActiveIconTab = ({
   routeName,
 }: {
   focused: boolean;
-  routeName: "home" | "questions" | "polls" | "chats" | "trending" | "community";
+  routeName:
+    | "home"
+    | "questions"
+    | "polls"
+    | "chats"
+    | "trending"
+    | "community";
 }) => {
   const nameOutline = React.useCallback((): any => {
     switch (routeName) {
@@ -67,7 +72,7 @@ const ActiveIconTab = ({
         return "help-circle-outline";
       }
       case "community": {
-        return 'people-outline'
+        return "people-outline";
       }
       default: {
         return "home-outline";
@@ -92,8 +97,8 @@ const ActiveIconTab = ({
       case "questions": {
         return "help-circle";
       }
-      case 'community': {
-        return 'people';
+      case "community": {
+        return "people";
       }
       default: {
         return "home";
@@ -102,14 +107,27 @@ const ActiveIconTab = ({
   }, [routeName]);
   return (
     <>
-      {focused && <>
-        <Ionicons name={nameFilled()} size={25} color={"#34A853"} />
-        <CustomText variant="xs" fontSize={10} color="primaryColor" marginTop="s" >{routeName.toUpperCase()}</CustomText>
-      </>}
-      {!focused && <>
-        <Ionicons name={nameOutline()} size={25} color={"grey"} />
-        <CustomText variant="xs" fontSize={10} marginTop="s">{routeName.toUpperCase()}</CustomText>
-      </>}
+      {focused && (
+        <>
+          <Ionicons name={nameFilled()} size={25} color={"#34A853"} />
+          <CustomText
+            variant="xs"
+            fontSize={10}
+            color="primaryColor"
+            marginTop="s"
+          >
+            {routeName.toUpperCase()}
+          </CustomText>
+        </>
+      )}
+      {!focused && (
+        <>
+          <Ionicons name={nameOutline()} size={25} color={"grey"} />
+          <CustomText variant="xs" fontSize={10} marginTop="s">
+            {routeName.toUpperCase()}
+          </CustomText>
+        </>
+      )}
     </>
   );
 };
@@ -121,19 +139,18 @@ const ActiveIconTab = ({
 + */
 const BottomTabs = (): JSX.Element => {
   const theme = useTheme<Theme>();
-  const [isLoggedIn] = useUtilState((state) => [state.isLoggedIn])
+  const [isLoggedIn] = useUtilState((state) => [state.isLoggedIn]);
   return (
-    <RootBottomTabs.Navigator 
-      // detachInactiveScreens 
-      screenOptions={{ 
-       
+    <RootBottomTabs.Navigator
+      // detachInactiveScreens
+      screenOptions={{
         tabBarStyle: {
           backgroundColor: theme.colors.mainBackGroundColor,
-          height: Platform.OS === 'ios' ? 100 : 80,
+          height: Platform.OS === "ios" ? 100 : 80,
           borderTopWidth: 1,
           borderTopColor: theme.colors.secondaryBackGroundColor,
-        } 
-      }} 
+        },
+      }}
     >
       <RootBottomTabs.Screen
         name="posts"
@@ -184,8 +201,7 @@ const BottomTabs = (): JSX.Element => {
         }}
       />
 
-    {
-      isLoggedIn && (
+      {isLoggedIn && (
         <RootBottomTabs.Screen
           name="communities"
           component={Communities}
@@ -197,40 +213,42 @@ const BottomTabs = (): JSX.Element => {
               <ActiveIconTab focused={focused} routeName="community" />
             ),
           }}
-      />
-      )
-    }
+        />
+      )}
 
-      { isLoggedIn && (
+      {isLoggedIn && (
         <RootBottomTabs.Screen
-        name="chats"
-        component={Chats}
-        options={{
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarIcon: ({ focused }) => (
-            <ActiveIconTab focused={focused} routeName="chats" />
-          ),
-        }}
-      />
+          name="chats"
+          component={Chats}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+            tabBarIcon: ({ focused }) => (
+              <ActiveIconTab focused={focused} routeName="chats" />
+            ),
+          }}
+        />
       )}
     </RootBottomTabs.Navigator>
   );
 };
 
-const DrawerNav =() => {
+const DrawerNav = () => {
   const theme = useTheme<Theme>();
   return (
-     <DrawerNavigation.Navigator initialRouteName='dashboard' drawerContent={(props) => <Sidebar {...props} />} screenOptions={{
-      headerShown: false,
-      drawerStyle: {
-        backgroundColor: theme.colors.secondaryBackGroundColor,
-      },
-      
-    }}>
+    <DrawerNavigation.Navigator
+      initialRouteName="dashboard"
+      drawerContent={(props) => <Sidebar {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: theme.colors.secondaryBackGroundColor,
+        },
+      }}
+    >
       <DrawerNavigation.Screen name="dashboard" component={BottomTabs} />
     </DrawerNavigation.Navigator>
-  )
-}
+  );
+};
 
 export default DrawerNav;
