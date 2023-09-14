@@ -6,7 +6,7 @@ import { Image } from "expo-image";
 import { useDetailsState } from "../../states/userState";
 import { IMAGE_BASE } from "../../utils/httpService";
 import CustomText from "../../components/general/CustomText";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather, FontAwesome } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import { useUtilState } from "../../states/util";
@@ -137,7 +137,11 @@ const Setting = ({
         <NavItem
           forDarkModa={false}
           icon={
-            <Ionicons name="shield" size={25} color={theme.colors.textColor} />
+            <FontAwesome
+              name="money"
+              size={25}
+              color={theme.colors.textColor}
+            />
           }
           title="Refer & Earn"
           action={() => nav("referrals")}
