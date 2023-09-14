@@ -16,19 +16,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dandolla98.diskos",
-      "buildNumber": "1",
-      "config": {
-        "usesNonExemptEncryption": false
-      }
+      "bundleIdentifier": "com.dandolla98.diskox",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#34A853",
+        "backgroundColor": "#34A853"
       },
-      "package": "com.dandolla98.diskox"
-      
+      "package": "com.dandolla98.diskox",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -51,6 +50,12 @@
       "eas": {
         "projectId": "d9d08b33-5cc3-4ff3-9357-45475bfc87b3"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d9d08b33-5cc3-4ff3-9357-45475bfc87b3"
     }
   }
 }
