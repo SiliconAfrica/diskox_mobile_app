@@ -39,10 +39,13 @@ export default function EarningsBox() {
         alignItems="center"
         justifyContent="space-between"
       >
-        <CustomText color="white" style={{ width: "85%" }} numberOfLines={1}>
+        <CustomText color="white" style={{ width: "78%" }} numberOfLines={1}>
           https://test.discox.com/register?ref=oo
         </CustomText>
-        <Ionicons name="copy" size={20} color={theme.colors.white} />
+        <Box flexDirection="row" width={"20%"} alignItems="center">
+          <CustomText color="white">Copy</CustomText>
+          <Ionicons name="copy" size={20} color={theme.colors.white} />
+        </Box>
       </Box>
       <CustomText color="whitesmoke" mt="s" variant="body">
         Share to
