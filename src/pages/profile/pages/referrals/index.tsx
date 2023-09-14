@@ -9,20 +9,23 @@ import { Theme } from "../../../../theme";
 import EarningsBox from "./EarningsBox";
 import TotalReferrals from "./totalReferrals";
 import ReferralList from "./ReferralList";
+import { ScrollView } from "react-native";
 
 export default function Referrals() {
   const navigation = useNavigation<PageType>();
   const theme = useTheme<Theme>();
   return (
     <Box flex={1}>
-      <SettingsHeader
-        showSave={false}
-        title="Refer & Earn"
-        handleArrowPressed={() => navigation.goBack()}
-      />
-      <EarningsBox />
-      <TotalReferrals />
-      <ReferralList />
+      <ScrollView>
+        <SettingsHeader
+          showSave={false}
+          title="Refer & Earn"
+          handleArrowPressed={() => navigation.goBack()}
+        />
+        <EarningsBox />
+        <TotalReferrals />
+        <ReferralList />
+      </ScrollView>
     </Box>
   );
 }
