@@ -41,6 +41,7 @@
     "react-hook-form": "^7.45.1",
     "react-native": "0.71.8",
     "react-native-emoji-modal": "^0.2.4",
+    "react-native-emoji-selector": "^0.2.0",
     "react-native-flags": "^1.0.0",
     "react-native-gesture-handler": "~2.9.0",
     "react-native-otp-textinput": "^1.1.0",

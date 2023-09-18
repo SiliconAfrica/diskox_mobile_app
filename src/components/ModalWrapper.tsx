@@ -41,7 +41,7 @@ const ModalWrapper = React.forwardRef<BottomSheetModalMethods, IProps>(({ childr
             onDismiss={() => onClose()}
             style={{...Style.parent }}
             backdropComponent={renderBackdrop}
-            backgroundStyle={{ backgroundColor: theme.colors.mainBackGroundColor }}
+            backgroundStyle={{ backgroundColor: theme.colors.secondaryBackGroundColor }}
             handleIndicatorStyle={{ width: 50, backgroundColor: 'lightgrey', zIndex: 10 }}
             enablePanDownToClose
             // enableHandlePanningGesture

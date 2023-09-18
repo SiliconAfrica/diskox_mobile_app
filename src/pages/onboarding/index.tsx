@@ -50,10 +50,17 @@ const Onboarding = ({ route }: NativeStackScreenProps<RootStackParamList, 'onboa
           borderRadius: 50,
           height: 45,
           width: '100%',
-          justifyContent:'center',
-          alignItems:'center'
+          justifyContent:'flex-start',
+          alignItems:'center',
+          flexDirection: 'row',
+          paddingHorizontal: 20,
         }}>
-          <CustomText>Continue with Google</CustomText>
+          <Box flex={0.3}>
+            <Image source={require('../../../assets/images/googlelogo.png')} contentFit='contain' style={{ width: 30, height: 30 }} />
+          </Box>
+          <Box flex={0.7}>
+            <CustomText>Continue with Google</CustomText>
+          </Box>
         </Pressable>
 
         <Pressable 
@@ -76,7 +83,7 @@ const Onboarding = ({ route }: NativeStackScreenProps<RootStackParamList, 'onboa
           backgroundColor: '#34a85350',
           borderRadius: 50,
           height: 45,
-          width: '100%',
+          width: '50%',
           justifyContent:'center',
           alignItems:'center',
           marginTop: 20,

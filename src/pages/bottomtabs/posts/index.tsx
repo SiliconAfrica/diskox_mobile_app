@@ -17,7 +17,7 @@ import { useModalState } from "../../../states/modalState";
 import { POST_FILTERR } from "../../../enums/Postfilters";
 
 const Posts = () => {
-  const { isLoggedIn } = useUtilState((state) => state);
+  const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
   const { setAll, filterBy } = useModalState((state) => state);
   const theme = useTheme<Theme>();
   const queryClient = useQueryClient();
@@ -141,12 +141,14 @@ const Posts = () => {
   }, [currentPage, ids]);
 
   return (
-    <Box backgroundColor="mainBackGroundColor" flex={1}>
+    <Box backgroundColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} flex={1}>
       <FlashList
         onEndReached={onEndReached}
         onEndReachedThreshold={1}
         ListEmptyComponent={() => (
-          <CustomText variant="body">No Post to view</CustomText>
+         <>
+          { !isLoading &&  <CustomText variant="body">No Post to view</CustomText> }
+         </>
         )}
         estimatedItemSize={100}
         renderItem={({ item }) => <PostCard {...item} showStats />}

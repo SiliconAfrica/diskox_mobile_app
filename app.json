@@ -17,7 +17,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
-      "buildNumber": "1"
+      "buildNumber": "2",
+      "icon": "./assets/images/logo.png"
     },
     "android": {
       "adaptiveIcon": {
