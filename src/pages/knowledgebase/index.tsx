@@ -6,15 +6,15 @@ import { FlashList } from "@shopify/flash-list";
 import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
-import AnnouncementTab from "./announcementTab";
+import KnowledgeTab from "./knowledgeTab";
 
-export default function Announcements() {
+export default function KnowledgeBase() {
   const navigation = useNavigation<PageType>();
   return (
     <Box flex={1}>
       <SettingsHeader
         showSave={false}
-        title="Announcement"
+        title="Knowledge Base"
         handleArrowPressed={() => navigation.goBack()}
       />
       <FlashList
@@ -29,7 +29,7 @@ export default function Announcements() {
               />
             </Box>
             <CustomText variant="subheader" textAlign="center" py="s">
-              Announcement
+              Diskox Knowledge Base
             </CustomText>
           </>
         )}
@@ -42,7 +42,7 @@ export default function Announcements() {
             We will let you know when something amazing comes up.
           </CustomText>
         )}
-        renderItem={({ item }) => <AnnouncementTab />}
+        renderItem={({ item }) => <KnowledgeTab />}
       />
     </Box>
   );
