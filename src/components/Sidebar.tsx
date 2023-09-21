@@ -4,7 +4,12 @@ import Box from "./general/Box";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../theme";
 import { useUtilState } from "../states/util";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+  Foundation,
+} from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import CustomText from "./general/CustomText";
@@ -168,6 +173,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             }
             action={() => navigation.navigate("announcements")}
             title="Announcements"
+          />
+          <Item
+            icon={
+              <Foundation
+                name="book-bookmark"
+                size={24}
+                color={theme.colors.textColor}
+              />
+            }
+            action={() => navigation.navigate("knowledgeBase")}
+            title="Knowledge Base"
           />
         </Box>
         <Box paddingHorizontal="m" paddingTop="l">
