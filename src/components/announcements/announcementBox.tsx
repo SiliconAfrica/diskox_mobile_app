@@ -135,10 +135,12 @@ export default function AnnouncementBox() {
             transition={1000}
           />
           <Box backgroundColor="primaryColor" px="l" py="m">
-            <CustomText color="white">
-              {selectedAnnouncement.content}
-              Read more
-            </CustomText>
+            <Pressable>
+              <CustomText color="white">
+                {selectedAnnouncement.content}
+                Read more
+              </CustomText>
+            </Pressable>
             <Box
               flexDirection="row"
               justifyContent="space-between"
