@@ -6,6 +6,8 @@ import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { PageType } from "../../pages/login";
 
 interface TAnnouncements {
   active: Boolean;
@@ -20,7 +22,7 @@ interface TSelectedAnnouncement {
 }
 export default function AnnouncementBox() {
   const theme = useTheme<Theme>();
-  const [ratio, setRatio] = useState(1);
+  const navigation = useNavigation<PageType>();
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<TSelectedAnnouncement>(null);
   const [announcements, setAnnouncements] = useState<TAnnouncements[]>([
@@ -135,7 +137,9 @@ export default function AnnouncementBox() {
             transition={1000}
           />
           <Box backgroundColor="primaryColor" px="l" py="m">
-            <Pressable>
+            <Pressable
+              onPress={() => navigation.navigate("singleAnnouncement")}
+            >
               <CustomText color="white">
                 {selectedAnnouncement.content}
                 Read more
