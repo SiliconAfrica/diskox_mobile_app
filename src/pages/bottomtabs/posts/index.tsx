@@ -15,6 +15,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../theme";
 import { useModalState } from "../../../states/modalState";
 import { POST_FILTERR } from "../../../enums/Postfilters";
+import AnnouncementBox from "../../../components/announcements/announcementBox";
 
 const Posts = () => {
   const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
@@ -156,6 +157,7 @@ const Posts = () => {
           <>
             {isLoggedIn && <Searchbar />}
             <FilterTopbar />
+            <AnnouncementBox />
           </>
         )}
         data={posts}

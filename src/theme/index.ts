@@ -4,6 +4,7 @@ const COLOR_PALLET = {
   primaryColor: "#34A853",
   black: "black",
   white: "white",
+  fadedWhite: "#FCFCFC80",
   grey: "grey",
   whitesmoke: "whitesmoke",
   lightGrey: "#D3D3D3",
