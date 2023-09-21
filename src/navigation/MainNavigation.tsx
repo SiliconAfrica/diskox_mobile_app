@@ -27,6 +27,8 @@ import BlockedUsers from "../pages/setting/pages/Blocked";
 import CommunitySettings from "../pages/bottomtabs/community/pages/CommunitySettings";
 import { COMMUNITY_SETTING_TYPE } from "../enums/CommunitySettings";
 import Referrals from "../pages/profile/pages/referrals";
+import Announcements from "../pages/announcements";
+import SingleAnnouncement from "../pages/singleAnnouncement";
 
 export type RootStackParamList = {
   home: undefined;
@@ -39,6 +41,8 @@ export type RootStackParamList = {
   "profile-setting": undefined;
   referrals: undefined;
   settings: undefined;
+  announcements: undefined;
+  singleAnnouncement: { announcementId: number };
   security: undefined;
   notifications: undefined;
   "blocked-users": undefined;
@@ -136,6 +140,14 @@ const MainNavigation = (): JSX.Element => {
         />
         <RootStackNavigation.Screen name="post" component={post} />
         <RootStackNavigation.Screen name="search" component={Search} />
+        <RootStackNavigation.Screen
+          name="announcements"
+          component={Announcements}
+        />
+        <RootStackNavigation.Screen
+          name="singleAnnouncement"
+          component={SingleAnnouncement}
+        />
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   );
