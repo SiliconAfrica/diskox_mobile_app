@@ -23,6 +23,8 @@ import { useModalState } from "../../states/modalState";
 import { useMutation } from "react-query";
 import * as ImagePicker from "expo-image-picker";
 import mime from "mime";
+import Emojipicker from "../../components/general/emojipicker";
+import PrimaryButton from "../../components/general/PrimaryButton";
 
 const CreatePost = ({
   navigation,
@@ -35,7 +37,32 @@ const CreatePost = ({
   const [tags, setTags] = React.useState<number[]>([]);
   const [value, setValues] = React.useState("");
   const [question, setQuestion] = React.useState("");
+  const [pollQuestion, setPollQuestion] = React.useState("");
+  const [polls, setPolls] = React.useState(['', ''])
+  const [day, setDay] = React.useState('1 day');
+  const [showEmoji, setShowEmoji] = React.useState(false);
+
   const theme = useTheme<Theme>();
+
+
+  // functions
+  const editPoll = React.useCallback((e: string, i: number) => {
+    const copy = [...polls];
+    copy[i] = e
+    setPolls(copy);
+  }, [polls]);
+
+  const addPoll = React.useCallback(() => {
+    const arr = [...polls, ''];
+    setPolls(arr);
+  }, [polls]);
+
+  const deletePoll = React.useCallback((i: number) => {
+    if (polls.length === 2) {
+      return;
+    }
+    setPolls(polls.filter((_, index) => index !== i))
+  }, [polls])
 
   // mutation
   const { isLoading, mutate } = useMutation({
@@ -82,14 +109,22 @@ const CreatePost = ({
       case TAB_BAR_ENUM.POLL: {
         return (
           <WritePoll
-            description={question}
-            setDescription={setQuestion}
+            description={pollQuestion}
+            setDescription={setPollQuestion}
             onDelete={handleMediaDelete}
+            files={files}
+            handlePicker={handleDocumentPicker}
+            polls={polls}
+            setPolls={editPoll}
+            addPoll={addPoll}
+            deletePoll={deletePoll}
+            day={day}
+            setDay={(day) => setDay(day)}
           />
         );
       }
     }
-  }, [activeTab, files, value, setValues]);
+  }, [activeTab, files, value, pollQuestion, question, setQuestion, polls, day]);
 
   const handleCheck = React.useCallback(
     (val: number, valu: boolean) => {
@@ -102,11 +137,30 @@ const CreatePost = ({
     [tags]
   );
 
-  const handleSubmit = React.useCallback(() => {
+  const handleSubmit = React.useCallback(async() => {
     const formData = new FormData();
-    formData.append("description", value);
+    
+    if (activeTab === TAB_BAR_ENUM.POST) {
+      formData.append("description", value);
+      formData.append("post_type", "post");
+    }
+
+    if (activeTab === TAB_BAR_ENUM.QUESTION) {
+      formData.append("description", question);
+      formData.append("post_type", "question");
+    }
+
+    if (activeTab === TAB_BAR_ENUM.POLL) {
+      formData.append("description", pollQuestion);
+      formData.append("post_type", "poll");
+      formData.append("poll_duration", day);
+      polls.map((item) => {
+        formData.append('polls[]', item);
+      })
+    }
+
     formData.append("visibility", visibility);
-    formData.append("post_type", "post");
+    
     //  const ht = value.match(/#\w+/g);
     //  if (ht.length > 0) {
     //   ht.map((item) => {
@@ -141,11 +195,12 @@ const CreatePost = ({
         } as any);
       });
     }
+    console.log(formData);
     mutate(formData);
-  }, [value, visibility, tags, files]);
+  }, [value, visibility, tags, files, polls, pollQuestion, question, day, activeTab]);
 
   const handleDocumentPicker = React.useCallback(async () => {
-    if (files.length === 5) {
+    if (files.length === 10) {
       alert(`You can't add more than 5 files!`);
       return;
     }
@@ -175,6 +230,23 @@ const CreatePost = ({
     },
     [files]
   );
+
+  const updateTextWithEmoji = React.useCallback((emoji: string) => {
+    switch(activeTab) {
+      case TAB_BAR_ENUM.POST: {
+        setValues(prev => prev + emoji);
+        break;
+      }
+      case TAB_BAR_ENUM.QUESTION: {
+        setQuestion(prev => prev + emoji)
+        break;
+      }
+      case TAB_BAR_ENUM.POLL: {
+        setPollQuestion(prev => prev + emoji);
+        break;
+      }
+    }
+  }, [activeTab])
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <TagModal
@@ -184,10 +256,10 @@ const CreatePost = ({
         setTags={(tags, val) => handleCheck(tags, val)}
       />
       <SettingsHeader
-        showSave={false}
+        showSave={true}
         onSave={() => {}}
         rightItem={
-          <FadedButton
+          <PrimaryButton
             isLoading={isLoading}
             title="Post"
             width={100}
@@ -271,9 +343,17 @@ const CreatePost = ({
         borderTopColor="secondaryBackGroundColor"
         paddingHorizontal="m"
         alignItems="center"
+        position="relative"
+        zIndex={9}
       >
-        <Pressable
-          onPress={handleDocumentPicker}
+        { showEmoji && (
+          <Box width='80%' height={250} position="absolute" bottom={70} borderRadius={10} zIndex={10} backgroundColor="secondaryBackGroundColor">
+            <Emojipicker onSelected={updateTextWithEmoji} />
+          </Box>
+        )}
+
+         <Pressable
+          onPress={() => setShowEmoji(prev => !prev)}
           style={{
             width: 40,
             height: 40,
@@ -283,10 +363,10 @@ const CreatePost = ({
             alignItems: "center",
           }}
         >
-          <Ionicons
-            name="image-outline"
+          <Feather
+            name="smile"
             size={25}
-            color={theme.colors.textColor}
+            color={showEmoji ? theme.colors.primaryColor : theme.colors.textColor}
           />
         </Pressable>
 
@@ -303,11 +383,34 @@ const CreatePost = ({
           }}
         >
           <Ionicons
-            name="videocam-outline"
+            name="image-outline"
             size={25}
             color={theme.colors.textColor}
           />
         </Pressable>
+
+        {
+          activeTab !== TAB_BAR_ENUM.POLL && (
+            <Pressable
+              onPress={handleDocumentPicker}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: theme.colors.secondaryBackGroundColor,
+                justifyContent: "center",
+                alignItems: "center",
+                marginLeft: 20,
+              }}
+            >
+              <Ionicons
+                name="videocam-outline"
+                size={25}
+                color={theme.colors.textColor}
+              />
+            </Pressable>
+          )
+        }
       </Box>
     </Box>
   );

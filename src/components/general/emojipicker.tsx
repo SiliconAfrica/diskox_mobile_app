@@ -29,10 +29,10 @@ const Emojipicker = ({ onSelected } : IProps) => {
 
     const handleEmojiPicked = React.useCallback((emoji: string) => {
         onSelected(emoji);
-    }, [])
+    }, [onSelected])
 
   return (
-    <Box width={'100%'} maxHeight={400} backgroundColor='secondaryBackGroundColor' borderRadius={20} padding='m'>
+    <Box width={'100%'} maxHeight={200} backgroundColor='secondaryBackGroundColor' borderRadius={20} padding='m'>
         {/* HEADERS */}
         <Box backgroundColor='mainBackGroundColor' width='100%' height={40} borderRadius={10} justifyContent='center'>
             <ScrollView horizontal contentContainerStyle={{ justifyContent: 'center', alignItems: 'center'}}>

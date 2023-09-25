@@ -16,7 +16,7 @@ const PrimaryButton = ({ title, onPress, width = 120, height = 45, isLoading = f
     const theme = useTheme<Theme>();
   return (
     <Pressable onPress={onPress} style={{ backgroundColor: theme.colors.primaryColor, borderWidth: 0, borderColor: theme.colors.primaryColor, borderRadius:  (height as number) / 2 || 25, width, height, justifyContent: 'center', alignItems: 'center' }}>
-        { isLoading && <ActivityIndicator color={theme.colors.primaryColor} size='small' /> }
+        { isLoading && <ActivityIndicator color={'white'} size='small' /> }
         { !isLoading && <CustomText variant="subheader" color='primaryColor' fontSize={15} style={{ color: 'white'}}>{title}</CustomText> }
     </Pressable>
   )
