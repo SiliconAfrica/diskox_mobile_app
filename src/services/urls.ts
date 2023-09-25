@@ -37,4 +37,5 @@ export const URLS = {
   VOTE_POLL: "/vote_poll",
   GET_REFERRALS: "/fetch_user_referrals",
   COUNT_REFERRALS: "/count_user_referrals",
+  FETCH_REF_POINTS: "/fetch_user_referral_points",
 };

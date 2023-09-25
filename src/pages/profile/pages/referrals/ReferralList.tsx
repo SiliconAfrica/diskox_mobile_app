@@ -18,7 +18,6 @@ export default function ReferralList() {
     () => httpService.get(`${URLS.GET_REFERRALS}`),
     {
       onSuccess: (data) => {
-        console.log(data.data.data, "lool2");
         if (
           data.data.code === 1 &&
           data.data.data &&
