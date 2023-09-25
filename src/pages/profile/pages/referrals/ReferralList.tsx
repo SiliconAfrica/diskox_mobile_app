@@ -1,33 +1,37 @@
 import { useTheme } from "@shopify/restyle";
+import { useQuery } from "react-query";
 import Box from "../../../../components/general/Box";
 import CustomText from "../../../../components/general/CustomText";
 import { Theme } from "../../../../theme";
 import { ScrollView } from "react-native-gesture-handler";
+import { useEffect, useState } from "react";
+import httpService from "../../../../utils/httpService";
+import { URLS } from "../../../../services/urls";
+import { IUser } from "../../../../models/user";
 
 export default function ReferralList() {
   const theme = useTheme<Theme>();
-  const tableData = [
-    { username: "JohnDoe", gender: "Female", date: "1996-11-08" },
-    { username: "JaneSmith", gender: "Male", date: "2003-09-20" },
-    { username: "DavidBrown", gender: "Male", date: "2009-05-15" },
-    { username: "EmilyJohnson", gender: "Other", date: "2013-12-25" },
-    { username: "MichaelLee", gender: "Female", date: "2000-06-02" },
-    { username: "JaneSmith", gender: "Male", date: "1999-03-11" },
-    { username: "EmilyJohnson", gender: "Female", date: "1990-07-30" },
-    { username: "JohnDoe", gender: "Male", date: "1987-02-18" },
-    { username: "DavidBrown", gender: "Other", date: "2011-08-03" },
-    { username: "JaneSmith", gender: "Female", date: "1998-04-22" },
-    { username: "DavidBrown", gender: "Male", date: "2005-10-14" },
-    { username: "EmilyJohnson", gender: "Other", date: "1988-09-27" },
-    { username: "MichaelLee", gender: "Female", date: "1995-01-05" },
-    { username: "JohnDoe", gender: "Male", date: "2007-12-08" },
-    { username: "DavidBrown", gender: "Other", date: "1994-03-19" },
-    { username: "EmilyJohnson", gender: "Female", date: "1991-05-29" },
-    { username: "JaneSmith", gender: "Male", date: "1985-10-10" },
-    { username: "MichaelLee", gender: "Other", date: "2002-02-15" },
-    { username: "DavidBrown", gender: "Male", date: "2004-06-23" },
-    { username: "EmilyJohnson", gender: "Other", date: "2010-07-07" },
-  ];
+  const [tableData, setTableData] = useState<IUser[]>([]);
+
+  const { isLoading, refetch } = useQuery(
+    ["all_referrals"],
+    () => httpService.get(`${URLS.GET_REFERRALS}`),
+    {
+      onSuccess: (data) => {
+        console.log(data.data.data, "lool2");
+        if (
+          data.data.code === 1 &&
+          data.data.data &&
+          Array.isArray(data.data.data)
+        ) {
+          setTableData([...data.data.data]);
+        }
+      },
+      onError: (error: any) => {
+        alert(error.message);
+      },
+    }
+  );
 
   return (
     <Box
@@ -47,7 +51,7 @@ export default function ReferralList() {
           Total Referrals
         </CustomText>
       </Box>
-      {!tableData[0] ? (
+      {tableData.length === 0 ? (
         <Box width="100%" px="s" py="xl" my="l">
           <CustomText textAlign="center">
             Refer your friends to Diskox and gain points
@@ -62,19 +66,14 @@ export default function ReferralList() {
                   S/N
                 </CustomText>
               </Box>
-              <Box width={200} padding={"s"}>
+              <Box width={180} padding={"s"}>
                 <CustomText variant="body" fontFamily="RedBold" color="black">
                   Username
                 </CustomText>
               </Box>
-              <Box width={200} padding={"s"}>
+              <Box width={180} padding={"s"}>
                 <CustomText variant="body" fontFamily="RedBold" color="black">
-                  Gender
-                </CustomText>
-              </Box>
-              <Box width={200} padding={"s"}>
-                <CustomText variant="body" fontFamily="RedBold" color="black">
-                  Reg Date
+                  Name
                 </CustomText>
               </Box>
             </Box>
@@ -83,18 +82,15 @@ export default function ReferralList() {
                 <Box width={80} padding={"s"}>
                   <CustomText variant="body">{index + 1}</CustomText>
                 </Box>
-                <Box width={200} padding={"s"}>
+                <Box width={180} padding={"s"}>
                   <CustomText variant="body" color="primaryColor">
                     {item.username}
                   </CustomText>
                 </Box>
-                <Box width={200} padding={"s"}>
+                <Box width={180} padding={"s"}>
                   <CustomText variant="body" color="black">
-                    {item.gender}
+                    {item.name}
                   </CustomText>
-                </Box>
-                <Box width={200} padding={"s"}>
-                  <CustomText variant="body">{item.date}</CustomText>
                 </Box>
               </Box>
             ))}
