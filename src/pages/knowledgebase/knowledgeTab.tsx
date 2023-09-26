@@ -4,8 +4,9 @@ import { Pressable, StyleSheet } from "react-native";
 import CustomText from "../../components/general/CustomText";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
-import { format, getDay, getYear } from "date-fns";
+
 import { BASE_URL } from "../../utils/httpService";
+import { formatDate } from "../../utils/dateFormatter";
 
 import { BASE_URL } from "../../utils/httpService";
 import { formatDate } from "../../utils/dateFormatter";
