@@ -6,7 +6,7 @@ import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
 
-export default function SingleAnnouncement() {
+export default function SingleAnnouncement({ route }) {
   const navigation = useNavigation<PageType>();
   return (
     <Box flex={1}>

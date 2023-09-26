@@ -7,9 +7,32 @@ import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
 import AnnouncementTab from "./announcementTab";
+import httpService from "../../utils/httpService";
+import { useQuery } from "react-query";
+import { useState } from "react";
+import { URLS } from "../../services/urls";
 
 export default function Announcements() {
   const navigation = useNavigation<PageType>();
+  const [announcements, setAnnouncments] = useState();
+  // const { isLoading, refetch } = useQuery(
+  //   ["knowledge_base"],
+  //   () => httpService.get(`${URLS.FETCH_KNOWLEDGE_BASE}`),
+  //   {
+  //     onSuccess: (data) => {
+  //       if (
+  //         data.data.code === 1 &&
+  //         data.data.data &&
+  //         Array.isArray(data.data.data)
+  //       ) {
+  //         setAnnouncments([...data.data.data]);
+  //       }
+  //     },
+  //     onError: (error: any) => {
+  //       alert(error.message);
+  //     },
+  //   }
+  // );
   return (
     <Box flex={1}>
       <SettingsHeader
