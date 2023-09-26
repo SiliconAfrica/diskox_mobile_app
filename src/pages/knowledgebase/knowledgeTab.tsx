@@ -29,7 +29,9 @@ export default function KnowledgeTab({ knowledge }) {
       </Box>
       <Pressable
         onPress={() =>
-          navigation.navigate("singleKnowledge", { knowledgeId: knowledge.id })
+          navigation.navigate("singleKnowledge", {
+            knowledgeId: knowledge.slug,
+          })
         }
       >
         <CustomText variant="body" fontFamily="RedBold" color="black">
