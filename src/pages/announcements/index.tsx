@@ -20,7 +20,7 @@ export default function Announcements() {
   const [fetchMore, setFetchMore] = useState<boolean>(false);
 
   const { isLoading, isFetching, isRefetching, refetch } = useQuery(
-    ["knowledge_base"],
+    ["announcements"],
     () => httpService.get(`${URLS.FETCH_ANNOUNCEMENTS}?page=${page}`),
     {
       onSuccess: (data) => {
