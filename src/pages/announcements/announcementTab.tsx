@@ -24,7 +24,13 @@ export default function AnnouncementTab({ announcement }) {
           style={styles.img}
         />
       </Box>
-      <Pressable onPress={() => navigation.navigate("singleAnnouncement")}>
+      <Pressable
+        onPress={() =>
+          navigation.navigate("singleAnnouncement", {
+            announcementId: announcement.slug,
+          })
+        }
+      >
         <CustomText variant="body" fontFamily="RedBold" color="black">
           {announcement.title}
         </CustomText>
