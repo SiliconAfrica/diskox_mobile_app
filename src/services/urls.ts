@@ -40,4 +40,6 @@ export const URLS = {
   FETCH_REF_POINTS: "/fetch_user_referral_points",
   FETCH_KNOWLEDGE_BASE: "/fetch_all_knowledge_base",
   FETCH_SINGLE_KNOWLEDGE_BASE: "/fetch_single_knowledge_base/",
+  FETCH_ANNOUNCEMENTS: "/fetch_all_knowledge_basell",
+  FETCH_SINGLE_ANOUNCEMENT: "/fetch_single_knowledge_basell/",
 };
