@@ -11,24 +11,14 @@ import { useQuery } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useState } from "react";
+import { TKnowledge } from "../../types/MenuPageTypes";
 
-type TKnowledge = {
-  id: number;
-  title: string;
-  slug: string;
-  message: string;
-  created_at: string;
-  status: string;
-  is_pinned: string;
-  content_type: string;
-  cover_photo: [string];
-};
 export default function KnowledgeBase() {
   const navigation = useNavigation<PageType>();
   const [knowledgebase, setKnowledgebase] = useState<TKnowledge[]>([]);
 
   const { isLoading, refetch } = useQuery(
-    ["all_referrals"],
+    ["knowledge_base"],
     () => httpService.get(`${URLS.FETCH_KNOWLEDGE_BASE}`),
     {
       onSuccess: (data) => {
