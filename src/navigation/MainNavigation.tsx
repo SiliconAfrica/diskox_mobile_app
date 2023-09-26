@@ -44,9 +44,9 @@ export type RootStackParamList = {
   referrals: undefined;
   settings: undefined;
   announcements: undefined;
-  singleAnnouncement: { announcementId: number };
+  singleAnnouncement: { announcementId: string };
   knowledgeBase: undefined;
-  singleKnowledge: { knowledgeId: number };
+  singleKnowledge: { knowledgeId: string };
   security: undefined;
   notifications: undefined;
   "blocked-users": undefined;
