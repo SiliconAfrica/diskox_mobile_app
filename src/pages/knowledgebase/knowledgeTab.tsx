@@ -27,7 +27,11 @@ export default function KnowledgeTab({ knowledge }) {
           style={styles.img}
         />
       </Box>
-      <Pressable onPress={() => navigation.navigate("singleKnowledge")}>
+      <Pressable
+        onPress={() =>
+          navigation.navigate("singleKnowledge", { knowledgeId: knowledge.id })
+        }
+      >
         <CustomText variant="body" fontFamily="RedBold" color="black">
           {knowledge.title}
         </CustomText>
