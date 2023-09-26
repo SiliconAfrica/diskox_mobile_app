@@ -10,7 +10,7 @@ import httpService, { BASE_URL } from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useState } from "react";
 import { TKnowledge } from "../../types/MenuPageTypes";
-import { format } from "date-fns";
+import { formatDate } from "../../utils/dateFormatter";
 
 export default function SingleKnowledge({ route }) {
   const navigation = useNavigation<PageType>();
@@ -30,9 +30,6 @@ export default function SingleKnowledge({ route }) {
       },
     }
   );
-  const formatDate = (dateString) => {
-    return `${format(new Date(dateString), "dd MMM, yyyy")}`;
-  };
 
   return (
     <Box flex={1}>
