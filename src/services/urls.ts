@@ -38,4 +38,6 @@ export const URLS = {
   GET_REFERRALS: "/fetch_user_referrals",
   COUNT_REFERRALS: "/count_user_referrals",
   FETCH_REF_POINTS: "/fetch_user_referral_points",
+  FETCH_KNOWLEDGE_BASE: "/fetch_all_knowledge_base",
+  FETCH_SINGLE_KNOWLEDGE_BASE: "/fetch_single_knowledge_base/chat-got-better-3",
 };
