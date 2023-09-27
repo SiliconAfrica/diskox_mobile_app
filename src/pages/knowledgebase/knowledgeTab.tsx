@@ -12,7 +12,7 @@ export default function KnowledgeTab({ knowledge }) {
   const navigation = useNavigation<PageType>();
 
   return (
-    <Box px="s" mx="s">
+    <Box px="s" mx="s" mt='l'>
       <Box style={styles.imgbox}>
         <Image
           source={
@@ -22,7 +22,7 @@ export default function KnowledgeTab({ knowledge }) {
                 }`
               : require("../../../assets/images/diskoxLarge.png")
           }
-          contentFit="contain"
+          contentFit="cover"
           style={styles.img}
         />
       </Box>

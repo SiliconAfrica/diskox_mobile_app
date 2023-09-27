@@ -44,7 +44,7 @@ export default function Announcements() {
     }
   }, [page]);
   return (
-    <Box flex={1}>
+    <Box backgroundColor="mainBackGroundColor" flex={1}>
       <SettingsHeader
         showSave={false}
         title="Announcement"
@@ -53,20 +53,20 @@ export default function Announcements() {
       <FlashList
         ListHeaderComponent={() => (
           <>
-            <Box style={{ width: "100%", height: 200 }}>
+            <Box backgroundColor="mainBackGroundColor" style={{ width: "100%", height: 200 }}>
               <Image
                 source={require("../../../assets/images/announcementBanner.png")}
                 style={styles.banner}
-                contentFit="fill"
+                contentFit="cover"
                 transition={1000}
               />
             </Box>
-            <CustomText variant="subheader" textAlign="center" py="s">
+            <CustomText variant="subheader" textAlign="center" py="s" mt='l'>
               Announcement
             </CustomText>
           </>
         )}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        contentContainerStyle={{  }}
         keyExtractor={(item, index) => index.toString()}
         estimatedItemSize={100}
         data={announcements}
