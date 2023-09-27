@@ -7,9 +7,43 @@ import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
 import KnowledgeTab from "./knowledgeTab";
+import { useQuery } from "react-query";
+import httpService from "../../utils/httpService";
+import { URLS } from "../../services/urls";
+import { useEffect, useState } from "react";
+import { TKnowledge } from "../../types/MenuPageTypes";
 
 export default function KnowledgeBase() {
   const navigation = useNavigation<PageType>();
+  const [knowledgebase, setKnowledgebase] = useState<TKnowledge[]>([]);
+  const [fetchMore, setFetchMore] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+
+  const { isLoading, isFetching, isRefetching, refetch } = useQuery(
+    [`knowledge_base`],
+    () => httpService.get(`${URLS.FETCH_KNOWLEDGE_BASE}?page=${page}`),
+    {
+      onSuccess: (data) => {
+        if (
+          data.data.code === 1 &&
+          data.data.data &&
+          Array.isArray(data.data.data)
+        ) {
+          setKnowledgebase([...knowledgebase, ...data.data.data]);
+          setFetchMore(false);
+        }
+      },
+
+      onError: (error: any) => {
+        alert(error.message);
+      },
+    }
+  );
+  useEffect(() => {
+    if (fetchMore) {
+      refetch();
+    }
+  }, [page]);
   return (
     <Box flex={1}>
       <SettingsHeader
@@ -34,15 +68,24 @@ export default function KnowledgeBase() {
           </>
         )}
         contentContainerStyle={{ paddingHorizontal: 20 }}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => item.id.toString()}
         estimatedItemSize={100}
-        data={[0, 1]}
+        data={knowledgebase}
+        onScrollBeginDrag={() => {
+          if (!isFetching && !isLoading && !isRefetching) {
+            setFetchMore(true);
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        onEndReached={() => {
+          setPage((prev) => (prev += 1));
+        }}
         ListEmptyComponent={() => (
           <CustomText textAlign="center" style={{ paddingVertical: 100 }}>
             We will let you know when something amazing comes up.
           </CustomText>
         )}
-        renderItem={({ item }) => <KnowledgeTab />}
+        renderItem={({ item }) => <KnowledgeTab knowledge={item} />}
       />
     </Box>
   );

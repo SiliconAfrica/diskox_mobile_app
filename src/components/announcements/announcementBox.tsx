@@ -8,43 +8,70 @@ import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../pages/login";
+import httpService, { BASE_URL } from "../../utils/httpService";
+import { useQuery } from "react-query";
+import { URLS } from "../../services/urls";
 
 interface TAnnouncements {
-  active: Boolean;
-  title: String;
-  content: String;
+  active: boolean;
+  id: number;
+  title: string;
+  slug: string;
+  message: string;
+  created_at: string;
+  status: string;
+  is_pinned: number;
+  content_type: string;
+  cover_photo: [string];
 }
 interface TSelectedAnnouncement {
   active: Boolean;
   index: number;
   title: String;
-  content: String;
+  id: number;
+  slug: string;
+  message: string;
+  created_at: string;
+  status: string;
+  is_pinned: number;
+  content_type: string;
+  cover_photo: [string];
 }
 export default function AnnouncementBox() {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
+  const [showModal, setShowModal] = useState<boolean>(true);
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<TSelectedAnnouncement>(null);
-  const [announcements, setAnnouncements] = useState<TAnnouncements[]>([
+  const [announcements, setAnnouncements] = useState<TAnnouncements[]>([]);
+
+  const startAnnouncements = (data: any) => {
+    const newAnnouncements = data.map((announc, index) => ({
+      ...announc,
+      active: index === 0 ? true : false,
+    }));
+    setAnnouncements([...newAnnouncements]);
+    setSelectedAnnouncement({ ...data[0], index: 0 });
+  };
+  const { isLoading } = useQuery(
+    ["announcements"],
+    () => httpService.get(`${URLS.FETCH_ANNOUNCEMENTS}?page=1`),
     {
-      active: false,
-      title: "Sticker Update!!!",
-      content:
-        "You can now chat using stickers and make comments on post with the newly added sticker feature of diskox with your friends and family...",
-    },
-    {
-      active: false,
-      title: "Hi guys",
-      content:
-        "Remeber how MMM scammed Nigerans, now imagine the pain and try to be great...",
-    },
-    {
-      active: false,
-      title: "22Sticker Update",
-      content:
-        "You can now chat using stickers and make comments on post with the newly added sticker feature of diskox with your friends and family...",
-    },
-  ]);
+      onSuccess: (data) => {
+        if (
+          data.data.code === 1 &&
+          data.data.data &&
+          Array.isArray(data.data.data)
+        ) {
+          setShowModal(true);
+          startAnnouncements(data.data.data);
+        }
+      },
+      onError: (error: any) => {
+        alert(error.message);
+      },
+    }
+  );
   const changeShowing = (action: "next" | "prev") => {
     if (action === "next") {
       const newAnnouncements = announcements.map((announc, index) => ({
@@ -71,16 +98,6 @@ export default function AnnouncementBox() {
       setAnnouncements([...newAnnouncements]);
     }
   };
-  useEffect(() => {
-    if (announcements.length > 0) {
-      const newAnnouncements = announcements.map((announc, index) => ({
-        ...announc,
-        active: index === 0 ? true : false,
-      }));
-      setAnnouncements([...newAnnouncements]);
-      setSelectedAnnouncement({ ...announcements[0], index: 0 });
-    }
-  }, []);
 
   useEffect(() => {
     if (announcements.length > 0) {
@@ -92,12 +109,14 @@ export default function AnnouncementBox() {
         .filter((announcement, i) => {
           return announcement.active === true;
         });
-      setSelectedAnnouncement({ ...filterAnnouncements[0] });
+      if (filterAnnouncements.length > 0) {
+        setSelectedAnnouncement({ ...filterAnnouncements[0] });
+      }
     }
   }, [announcements]);
   return (
     <>
-      {selectedAnnouncement && (
+      {showModal && selectedAnnouncement && selectedAnnouncement.title && (
         <Box>
           <Box
             backgroundColor="primaryColor"
@@ -124,10 +143,22 @@ export default function AnnouncementBox() {
                 {selectedAnnouncement.title}
               </CustomText>
             </Box>
-            <Entypo name="cross" size={24} color={theme.colors.white} />
+            <Entypo
+              name="cross"
+              size={24}
+              color={theme.colors.white}
+              onPress={() => setShowModal(false)}
+            />
           </Box>
           <Image
-            source={require("../../../assets/images/announcement.png")}
+            source={
+              selectedAnnouncement.cover_photo &&
+              selectedAnnouncement.cover_photo.length > 0
+                ? `${BASE_URL.replace("/api/v1", "")}/storage/${
+                    selectedAnnouncement.cover_photo[0]
+                  }`
+                : require("../../../assets/images/diskoxLarge.png")
+            }
             style={{
               width: "100%",
               height: 150,
@@ -138,11 +169,17 @@ export default function AnnouncementBox() {
           />
           <Box backgroundColor="primaryColor" px="l" py="m">
             <Pressable
-              onPress={() => navigation.navigate("singleAnnouncement")}
+              onPress={() =>
+                navigation.navigate("singleAnnouncement", {
+                  announcementId: selectedAnnouncement.slug,
+                })
+              }
             >
               <CustomText color="white">
-                {selectedAnnouncement.content}
-                Read more
+                {`${selectedAnnouncement?.message?.substring(
+                  0,
+                  100
+                )}... Read more`}
               </CustomText>
             </Pressable>
             <Box
@@ -154,22 +191,24 @@ export default function AnnouncementBox() {
               <CustomText color="white">
                 ({selectedAnnouncement.index + 1}/{announcements.length})
               </CustomText>
-              <Box flexDirection="row">
-                <Pressable onPress={() => changeShowing("prev")}>
-                  <MaterialCommunityIcons
-                    name="chevron-left-circle"
-                    size={30}
-                    color={theme.colors.fadedWhite}
-                  />
-                </Pressable>
-                <Pressable onPress={() => changeShowing("next")}>
-                  <MaterialCommunityIcons
-                    name="chevron-right-circle"
-                    size={30}
-                    color={theme.colors.white}
-                  />
-                </Pressable>
-              </Box>
+              {announcements.length > 1 && (
+                <Box flexDirection="row">
+                  <Pressable onPress={() => changeShowing("prev")}>
+                    <MaterialCommunityIcons
+                      name="chevron-left-circle"
+                      size={30}
+                      color={theme.colors.white}
+                    />
+                  </Pressable>
+                  <Pressable onPress={() => changeShowing("next")}>
+                    <MaterialCommunityIcons
+                      name="chevron-right-circle"
+                      size={30}
+                      color={theme.colors.white}
+                    />
+                  </Pressable>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
