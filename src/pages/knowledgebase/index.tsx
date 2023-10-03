@@ -46,6 +46,7 @@ export default function KnowledgeBase() {
   }, [page]);
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
+
       <SettingsHeader
         showSave={false}
         title="Knowledge Base"
@@ -67,7 +68,9 @@ export default function KnowledgeBase() {
             </CustomText>
           </>
         )}
+
         contentContainerStyle={{ paddingHorizontal: 0 }}
+
         keyExtractor={(item, index) => item.id.toString()}
         estimatedItemSize={100}
         data={knowledgebase}

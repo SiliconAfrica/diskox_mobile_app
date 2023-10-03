@@ -25,6 +25,7 @@ const renderModals = () => {
             </>
         )
     }, [showLogin, showSignup, showShare, showVisibility, showFilter, showPostAction])
+
   return {
     renderModal,
   };

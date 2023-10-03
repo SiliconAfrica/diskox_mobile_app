@@ -44,7 +44,9 @@ export default function Announcements() {
     }
   }, [page]);
   return (
+
     <Box backgroundColor="mainBackGroundColor" flex={1}>
+
       <SettingsHeader
         showSave={false}
         title="Announcement"
@@ -62,11 +64,14 @@ export default function Announcements() {
               />
             </Box>
             <CustomText variant="subheader" textAlign="center" py="s" mt='l'>
+
               Announcement
             </CustomText>
           </>
         )}
+
         contentContainerStyle={{  }}
+
         keyExtractor={(item, index) => index.toString()}
         estimatedItemSize={100}
         data={announcements}

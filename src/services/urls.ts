@@ -35,6 +35,7 @@ export const URLS = {
   GET_POLLS: "/fetch_posts_by_post_type/poll",
   GET_QUESTIONS: "/fetch_posts_by_post_type/question",
   VOTE_POLL: "/vote_poll",
+
   GET_COMMENTS_BY_POST_ID:'/get_comment_by_post_id',
   CREATE_COMMENT: '/create_comment',
   CREATE_REPLY: '/create_reply',
@@ -46,6 +47,7 @@ export const URLS = {
   DOWNVOTE_REPLY: '/downvote_reply',
   DELETE_COMMMENT: '/delete_comment',
   DELETE_REPLY: '/delete_reply',
+
   GET_REFERRALS: "/fetch_user_referrals",
   COUNT_REFERRALS: "/count_user_referrals",
   FETCH_REF_POINTS: "/fetch_user_referral_points",
@@ -53,6 +55,7 @@ export const URLS = {
   FETCH_SINGLE_KNOWLEDGE_BASE: "/fetch_single_knowledge_base/",
   FETCH_ANNOUNCEMENTS: "/fetch_announcements_page",
   FETCH_SINGLE_ANOUNCEMENT: "/fetch_single_announcement/",
+
   SEARCH: '/search_query',
   GET_COMMUNITIES: '/all_communities',
   GET_SINGLE_COMMUNITY: '/fetch_single_community',
@@ -64,4 +67,5 @@ export const URLS = {
   GET_COMMUNITY_MODERATORS: '/fetch_community_moderators',
   GET_COMMUNITY_RULES: '/fetch_all_community_rules',
   CREATE_COMMUNITY: '/create_community',
+
 };

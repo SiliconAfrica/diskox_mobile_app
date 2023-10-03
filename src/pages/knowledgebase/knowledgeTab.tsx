@@ -13,6 +13,7 @@ export default function KnowledgeTab({ knowledge }) {
 
   return (
     <Box px="s" mx="s" mt='l'>
+
       <Box style={styles.imgbox}>
         <Image
           source={
@@ -22,7 +23,9 @@ export default function KnowledgeTab({ knowledge }) {
                 }`
               : require("../../../assets/images/diskoxLarge.png")
           }
+
           contentFit="cover"
+
           style={styles.img}
         />
       </Box>

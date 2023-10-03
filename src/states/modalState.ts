@@ -1,3 +1,4 @@
+
 import { create } from 'zustand'
 import { VISIBILITY } from '../components/modals/VisibiltyModal';
 import { POST_FILTERR } from '../enums/Postfilters';
@@ -31,4 +32,5 @@ export const useModalState = create<State>((set) => ({
     showPostAction: false,
     activePost: null,
     setAll: (data: Partial<Omit<State, 'setAll'>>) => set((state) => ({ ...state, ...data })),
+
 }));
