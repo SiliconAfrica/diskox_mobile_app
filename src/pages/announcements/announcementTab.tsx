@@ -10,7 +10,9 @@ import { BASE_URL } from "../../utils/httpService";
 export default function AnnouncementTab({ announcement }) {
   const navigation = useNavigation<PageType>();
   return (
-    <Box px="s" mx="s">
+
+    <Box px="s" mt='l' mx='m'>
+
       <Box style={styles.imgbox}>
         <Image
           source={
@@ -20,7 +22,8 @@ export default function AnnouncementTab({ announcement }) {
                 }`
               : require("../../../assets/images/diskoxLarge.png")
           }
-          contentFit="contain"
+          contentFit="cover"
+
           style={styles.img}
         />
       </Box>

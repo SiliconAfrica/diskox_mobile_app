@@ -41,9 +41,15 @@ const changePasswordSchema = z.object({
 });
 
 const editCommunity = z.object({
-    title: z.string().nonempty(),
+    name: z.string().nonempty(),
     username: z.string().nonempty(),
-    descrription: z.string().nonempty(),
+    description: z.string().nonempty(),
 })
 
-export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema, editCommunity };
+const createCommunityValidation = z.object({
+    name: z.string().nonempty(),
+    username: z.string().nonempty(),
+    description: z.string().nonempty(),
+})
+
+export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema, editCommunity, createCommunityValidation };

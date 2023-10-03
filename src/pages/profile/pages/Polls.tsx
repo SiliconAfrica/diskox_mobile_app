@@ -9,6 +9,7 @@ import httpService from '../../../utils/httpService'
 import { URLS } from '../../../services/urls'
 import PostCard from '../../../components/feeds/PostCard'
 import { ScrollView } from 'react-native-gesture-handler'
+import PollCard from '../../../components/feeds/PollCard'
 
 interface IProps {
     id: number;
@@ -45,7 +46,7 @@ const Polls = ({ id }: IProps) => {
         
         {
            getPosts.isLoading && (
-               <Box justifyContent='center' alignItems='center' height={50}>
+               <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
                 <ActivityIndicator size='large' />
                </Box>
            )
@@ -54,8 +55,9 @@ const Polls = ({ id }: IProps) => {
         {
              !getPosts.isLoading && posts.length > 0 && (
                 <>
+                    <Box height={20} />
                     { posts.map(post => (
-                        <PostCard key={post.id} {...post} showStats />
+                        <PollCard key={post.id} {...post} showStats />
                     ))}
                 </>
              )

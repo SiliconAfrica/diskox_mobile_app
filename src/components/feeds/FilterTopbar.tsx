@@ -7,10 +7,12 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import { useModalState } from "../../states/modalState";
 import { POST_FILTERR } from "../../enums/Postfilters";
+import { useUtilState } from "../../states/util";
 
 const FilterTopbar = () => {
   const theme = useTheme<Theme>();
   const { setAll, filterBy } = useModalState((state) => state);
+  const { isDarkMode } = useUtilState((state) => state)
 
   return (
     <Box
@@ -19,7 +21,7 @@ const FilterTopbar = () => {
       height={80}
       borderTopWidth={1}
       borderTopColor="secondaryBackGroundColor"
-      backgroundColor="secondaryBackGroundColor"
+      backgroundColor={ isDarkMode ? "secondaryBackGroundColor":'mainBackGroundColor'}
       width="100%"
       flexDirection="row"
       justifyContent="space-between"

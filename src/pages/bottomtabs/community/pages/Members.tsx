@@ -1,39 +1,80 @@
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, ActivityIndicator } from 'react-native'
 import React from 'react'
 import Box from '../../../../components/general/Box'
-import { Feather } from '@expo/vector-icons'
+import { Feather, Ionicons } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../../theme'
 import CustomText from '../../../../components/general/CustomText'
-import { ScrollView } from 'react-native-gesture-handler'
 import FadedButton from '../../../../components/general/FadedButton'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../../navigation/MainNavigation'
+import { IUser } from '../../../../models/user'
+import httpService, { IMAGE_BASE } from '../../../../utils/httpService'
+import { URLS } from '../../../../services/urls'
+import { useMutation, useQuery } from 'react-query'
+import { RouteProp, useRoute } from '@react-navigation/native'
+import { FlashList } from '@shopify/flash-list'
+import { useToast } from 'react-native-toast-notifications'
+import { Image } from 'expo-image'
 
-const testArray = [2,2,3,4,5,6,7,7,6,5,4,3];
 
-const MemberCard = () => {
+const MemberCard = ({ id, name, username, profile_image }: Partial<IUser>) => {
+    const theme = useTheme<Theme>();
+    const toast = useToast();
+    const { isLoading, isError, data } = useQuery(['getmemberFollowingCount', id], () => httpService.get(`${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${id}`))
+
+    const userDetails = useQuery(['getmemberFollowingCount', id], () => httpService.get(`${URLS.GET_USER_BY_USERNAME}/${username}`));
+
+    const followUnFollowMutation = useMutation({
+        mutationFn: () => httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${id}`),
+        onSuccess: (data) => {
+            //console.log(toast);
+            toast.show(data?.data?.message, { type: 'success' });
+        }
+    });
+
     return (
         <Box flexDirection='row' justifyContent='space-between' marginBottom='l' paddingHorizontal='m' alignItems='center'>
             <Box flexDirection='row' alignItems='center'>
-                <Box width={30} height={30} borderRadius={15} borderColor='primaryColor' borderWidth={2} />
+                <Box width={50} height={50} borderRadius={25} borderColor='primaryColor' borderWidth={2} overflow='hidden'>
+                    <Image source={{ uri: `${IMAGE_BASE}/${profile_image}`}} contentFit='cover' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
+                </Box>
                 
                 <Box marginLeft='m'>
-                    <CustomText variant='subheader' fontSize={17}>Robby Mark</CustomText>
-                    <Box flexDirection='row' alignItems='center' marginTop='s'>
-                        <CustomText variant='xs'>450 followers</CustomText>
-                        <CustomText variant='xs' marginLeft='m'>98 following</CustomText>
-                    </Box>
+                    <CustomText variant='subheader' fontSize={17}>{name || username}</CustomText>
+                    { isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
+                    { !isLoading && !isError && (
+                        <Box flexDirection='row' alignItems='center' marginTop='s'>
+                            <CustomText variant='xs'>{data?.data?.followers_count} followers</CustomText>
+                            <CustomText variant='xs' marginLeft='m'>{data?.data?.following_count} following</CustomText>
+                        </Box>
+                    )}
                 </Box>
             </Box>
 
-            <FadedButton title='Follow' onPress={() => {}} width={80} height={35} />
+            { userDetails.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
+            { !userDetails.isLoading && !userDetails.isError  && userDetails.data?.data?.data?.isFollowing === 0 && (
+                <FadedButton title='Follow' isLoading={followUnFollowMutation.isLoading} onPress={followUnFollowMutation.mutate} width={80} height={35} />
+            )}
         </Box>
     )
 }
 
 const Members = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
+    const [members, setMembers] = React.useState<Partial<IUser[]>>([])
     const theme = useTheme<Theme>();
+    const route = useRoute<RouteProp<RootStackParamList, 'community-members'>>();
+    const { username } = route.params;
+    const { isError, isLoading,} = useQuery(['getCommunityMembers', username], () => httpService.get(`${URLS.GET_COMMUNITY_MEMBERS}/${username}`), {
+        onSuccess: (data) => {
+            if (data.data.code === 1 && members.length < 1) {
+                setMembers(data.data.data.data);
+            } else {
+                setMembers(prev => [...prev, ...data?.data?.data?.data]);
+            }
+        }
+    });
+
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
         <Box flexDirection='row' height={50} paddingHorizontal='m' alignItems='center'>
@@ -50,16 +91,47 @@ const Members = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => 
             </Box>
         </Box>
 
-        <CustomText variant='subheader' fontSize={14} marginTop='m' marginLeft='m'>230 Members</CustomText>
+        <CustomText variant='subheader' fontSize={14} marginTop='m' marginLeft='m'>{members.length} Members</CustomText>
+
+        {/* ERROR DISPLAY */}
+        { !isLoading && isError && (
+            <Box width='100%' height={20} justifyContent='center' alignItems='center'>
+                <Ionicons name='bug-outline' size={120} color={theme.colors.primaryColor} />
+                <CustomText>An error occured</CustomText>
+            </Box>
+        )}
 
         {/* MEMBERS LIST */}
-        <Box flex={1} marginTop='l'>
-            <ScrollView>
-                { testArray.map((item, index) => (
-                    <MemberCard key={index.toString()} />
-                ))}
-            </ScrollView>
-        </Box>
+        { !isLoading && !isError && (
+            <Box flex={1} marginTop='l'>
+                <FlashList 
+                    ListEmptyComponent={() => (
+                        <>
+                            { !isLoading && (
+                                <Box width='100%' height={40} justifyContent='center' alignItems='center'>
+                                    <CustomText>No members</CustomText>
+                                </Box>
+                            )}
+                        </>
+                    )}
+                    ListFooterComponent={() => (
+                        <>
+                            { isLoading && (
+                                <Box>
+                                    <ActivityIndicator size='large' color={theme.colors.primaryColor} />
+                                </Box>
+                            )}
+                        </>
+                    )}
+                    data={members}
+                    estimatedItemSize={10}
+                    keyExtractor={(item, index) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <MemberCard {...item} />
+                    )}
+                />
+            </Box>
+        )}
     </Box>
   )
 }

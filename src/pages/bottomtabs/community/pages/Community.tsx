@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions, Pressable } from 'react-native'
+import { View, Text, useWindowDimensions, Pressable, ImageBackground } from 'react-native'
 import React, { memo } from 'react'
 import Box from '../../../../components/general/Box'
 import { Feather, Ionicons } from '@expo/vector-icons'
@@ -14,7 +14,14 @@ import { RootStackParamList } from '../../../../navigation/MainNavigation'
 import { COMMUNITY_SETTING_TYPE } from '../../../../enums/CommunitySettings'
 import { PageType } from '../../../login'
 import { RootBottomTabParamList } from '../../../../navigation/BottomTabs'
-import { useNavigation } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { CommunityStackParamList } from '..'
+import { ICommunity } from '../../../../models/Community'
+import { useQuery } from 'react-query'
+import httpService, { IMAGE_BASE } from '../../../../utils/httpService'
+import { URLS } from '../../../../services/urls'
+import { Image } from 'expo-image';
+
 
 const Community = () => {
   const theme = useTheme<Theme>();
@@ -22,6 +29,16 @@ const Community = () => {
   const [active, setActive] = React.useState(1);
 
   const navigation = useNavigation<PageType>();
+  const route = useRoute<RouteProp<CommunityStackParamList, 'community'>>();
+
+  const { id, data } = route.params;
+  const [details, setDetails] = React.useState<null | ICommunity>(null)
+
+  const { isLoading, isError } = useQuery(['getCmmunity', id], () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${data.username}`), {
+    onSuccess: (data) => {
+      setDetails(data?.data?.data);
+    }
+  });
 
   const switchPages = React.useCallback(() => {
     switch(active) {
@@ -42,25 +59,33 @@ const Community = () => {
         {/* BANNER */}
         <Box width='100%' height={120} position='relative' style={{ backgroundColor: '#E3A812' }}>
 
+          <ImageBackground source={{ uri: IMAGE_BASE + details?.banner_image }} style={{ width: '100%', height: '100%' }}>
+
           <Box flexDirection='row' paddingTop='m' justifyContent='space-between' paddingHorizontal='m'>
-            <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#FFFFFF33' }}>
-              <Feather name='arrow-left' size={25} color={theme.colors.textColor} onPress={() => navigation.popToTop()} />
+            <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' bg='fadedButtonBgColor' >
+              <Feather name='arrow-left' size={25} color={theme.colors.primaryColor} onPress={() => navigation.popToTop()} />
             </Box>
 
-            <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#FFFFFF33' }}>
-              <Feather name='settings' size={25} color={theme.colors.textColor} onPress={() => navigation.navigate('community-settings', { id: 23, type: COMMUNITY_SETTING_TYPE.DEFAULT })} />
+            <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' bg='fadedButtonBgColor' >
+              <Feather name='settings' size={25} color={theme.colors.primaryColor} onPress={() => navigation.navigate('community-settings', { id: 23, username: details.username, type: COMMUNITY_SETTING_TYPE.DEFAULT })} />
             </Box>
           </Box>
 
           <Box width={120} height={120} borderWidth={4} borderRadius={70} position='absolute' backgroundColor='secondaryBackGroundColor' left={(WIDTH / 100 )* 35} top={60} style={{ borderColor: 'white' }} justifyContent='center' alignItems='center'>
-            <Ionicons name='people' size={90} color={theme.colors.mainBackGroundColor} />
+            {details?.profile_image === null ? (
+              <Ionicons name='people' size={90} color={theme.colors.mainBackGroundColor} />
+            ): (
+              <Image source={{ uri: `${IMAGE_BASE}/${details?.profile_image}`}} contentFit='cover' style={{ width: '100%', height: '100%', borderRadius: 70 }} />
+            )}
           </Box>
+
+          </ImageBackground>
 
         </Box>
 
         <Box alignItems='center' style={{ marginTop: 70 }}>
-          <CustomText variant='subheader'>SkyHunters</CustomText>
-          <CustomText>c/SkyHunters</CustomText>
+          <CustomText variant='subheader'>{details?.name}</CustomText>
+          <CustomText>{details?.username}</CustomText>
         </Box>
 
         {/* TABVIEW         */}

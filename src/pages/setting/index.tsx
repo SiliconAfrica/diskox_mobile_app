@@ -79,13 +79,14 @@ const Setting = ({
 }: NativeStackScreenProps<RootStackParamList, "settings">) => {
   const theme = useTheme<Theme>();
   const { profile_image, name, username } = useDetailsState((state) => state);
+  const { setAll, isLoggedIn } = useUtilState((state) => state)
 
   const nav = (route: string) => {
     navigation.navigate(route as any);
   };
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
-      <SettingsHeader title="Settings" showSave={false} />
+      <SettingsHeader title="Settings" showSave={false} handleArrowPressed={() => navigation.goBack()} />
 
       {/* PROFILE SECTION */}
       <Box
@@ -190,7 +191,9 @@ const Setting = ({
         alignItems="center"
         paddingHorizontal="m"
       >
-        <Pressable
+       {
+        isLoggedIn && (
+          <Pressable
           style={{
             width: "100%",
             height: 50,
@@ -201,12 +204,15 @@ const Setting = ({
             justifyContent: "center",
             alignItems: "center",
           }}
+          onPress={() => setAll({ isLoggedIn: false })}
         >
           <Ionicons name="log-out" size={25} color="red" />
           <CustomText variant="body" style={{ color: "red" }} marginLeft="m">
             Logout
           </CustomText>
         </Pressable>
+        )
+       }
       </Box>
     </Box>
   );

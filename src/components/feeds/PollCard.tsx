@@ -1,7 +1,7 @@
 import { View, Text, Pressable, ActivityIndicator, Dimensions } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import CustomText from '../general/CustomText'
@@ -15,6 +15,7 @@ import { Video, ResizeMode } from 'expo-av';
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { URLS } from '../../services/urls'
 import { useModalState } from '../../states/modalState'
+import { useUtilState } from '../../states/util'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -26,7 +27,8 @@ interface IProps {
 const PollCard = (props: IPost& IProps) => {
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({...props})
-    const { setAll } = useModalState((state) => state)
+    const { setAll } = useModalState((state) => state);
+    const { isDarkMode } = useUtilState((state) => state)
     const theme = useTheme<Theme>();
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
@@ -175,11 +177,11 @@ const PollCard = (props: IPost& IProps) => {
         {/* REACTION SECTION */}
 
         {props.showStats && (
-            <Box width='100%' borderTopWidth={2} borderTopColor='secondaryBackGroundColor' paddingVertical='m'>
+            <Box width='100%' borderTopWidth={2} borderTopColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'}  paddingVertical='m'>
 
             <Box flexDirection='row' alignItems='center'>
                 <Ionicons name='eye-outline' size={25} color={theme.colors.grey} />
-                <CustomText variant='body' marginLeft='s'>{view_count} Views</CustomText>
+                <CustomText variant='xs' marginLeft='s'>{view_count}</CustomText>
             </Box>
 
             {/* REACTIONS */}
@@ -188,15 +190,15 @@ const PollCard = (props: IPost& IProps) => {
 
                 {/* VOTING SECTION */}
                 <Box flex={1} flexDirection='row' width='100%' alignItems='center'>
-                    <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor='secondaryBackGroundColor'>
+                    <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} >
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
-                                <Ionicons name='arrow-up-outline' size={20} color={theme.colors.textColor} />
+                                <Ionicons name='arrow-up' size={20} color={theme.colors.textColor} />
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
-                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
+                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor:  isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
                             { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={theme.colors.textColor} /> }
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
