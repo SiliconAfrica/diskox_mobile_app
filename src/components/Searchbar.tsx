@@ -10,14 +10,16 @@ import { Feather, Ionicons} from '@expo/vector-icons';
 import { IMAGE_BASE } from '../utils/httpService'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../pages/login'
+import { useUtilState } from '../states/util'
 
 
 const Searchbar = () => {
     const theme = useTheme<Theme>();
     const navigation = useNavigation<PageType>();
-    const { profile_image, username } = useDetailsState((state) => state)
+    const { profile_image, username } = useDetailsState((state) => state);
+    const { isDarkMode } = useUtilState((state) => state)
   return (
-    <Box backgroundColor='secondaryBackGroundColor' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
+    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
          {
                     profile_image && (
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 40, height: 40, borderRadius: 25 }} contentFit='contain' />
@@ -38,7 +40,7 @@ const Searchbar = () => {
             flex: 1,
             height: 50,
             borderRadius: 25,
-            backgroundColor: theme.colors.secondaryBackGroundColor,
+            backgroundColor: isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.secondaryBackGroundColor,
             marginHorizontal: 10,
             paddingHorizontal: 10,
             fontFamily: 'RedRegular',

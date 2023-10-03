@@ -11,6 +11,7 @@ import renderModals from '../hooks/renderModals';
 import * as SecureStorage from 'expo-secure-store';
 import { useDetailsState } from '../states/userState';
 import * as SplashScreen from 'expo-splash-screen';
+import { ToastProvider } from 'react-native-toast-notifications'
 
 
 
@@ -52,8 +53,17 @@ const Navigation = () => {
       <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
         <NavigationContainer>
           <StatusBar animated backgroundColor='transparent' barStyle={isDarkMode ? 'light-content' : 'dark-content'} translucent  />
-          <MainNavigation />
-          {renderModal()}
+          <ToastProvider
+            placement='bottom'
+            duration={5000}
+            animationType='slide-in'
+            textStyle={{ fontFamily: 'RedRegular', fontSize: 18  }}
+            swipeEnabled
+            successColor={theme.colors.primaryColor}
+          >
+             <MainNavigation />
+            {renderModal()}
+          </ToastProvider>
         </NavigationContainer>
       </ThemeProvider>
     </QueryClientProvider>

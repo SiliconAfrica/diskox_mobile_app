@@ -32,9 +32,9 @@ const MediaCard = ({ file, index, onDelete }: IProps) => {
             }
     }, [file]);
   return (
-    <Box width={150} height={'90%'} borderRadius={15} overflow='hidden' marginLeft='m'>
-        <Pressable style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }} onPress={() => onDelete({ index, clearAll: false })}>
-            <Feather name='trash' size={20} color={theme.colors.textColor} />
+    <Box width={150} height={'90%'} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
+        <Pressable style={{ ...style.deleteButton, backgroundColor: '#000000b9'}} onPress={() => onDelete({ index, clearAll: false })}>
+            <Feather name='trash-2' size={25} color={theme.colors.textColor} />
         </Pressable>
         {RenderItem()}
     </Box>
@@ -45,11 +45,11 @@ const style = StyleSheet.create({
     deleteButton: {
         zIndex: 10,
         position: 'absolute',
-        right: 10,
-        top: 10,
-        height: 30,
-        width: 30,
-        borderRadius: 15,
+        right: 0,
+        bottom: -1,
+        height: 40,
+        width: '100%',
+        borderRadius: 0,
         justifyContent: 'center',
         alignItems: 'center',
     }

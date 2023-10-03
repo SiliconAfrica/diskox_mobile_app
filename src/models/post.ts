@@ -30,7 +30,7 @@ export type IPost = {
   tags: any[];
   last_two_comments: any[];
   polls: IPoll[];
-  post_images: string[];
+  post_images: MediaPost[];
   post_videos: MediaPost[];
   user: IUser & UserStats;
   reposted_post: any[];

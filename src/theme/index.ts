@@ -12,6 +12,7 @@ const COLOR_PALLET = {
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
   whatsappGreen: "#25D366",
+  transparent: '#000000b9',
 };
 
 const theme = createTheme({
@@ -20,7 +21,7 @@ const theme = createTheme({
     mainBackGroundColor: COLOR_PALLET.white,
     secondaryBackGroundColor: COLOR_PALLET.whitesmoke,
     headerTextColor: COLOR_PALLET.black,
-    textColor: COLOR_PALLET.grey,
+    textColor: COLOR_PALLET.black,
   },
   spacing: {
     s: 8,

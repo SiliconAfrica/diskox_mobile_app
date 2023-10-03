@@ -7,9 +7,10 @@ import ShareModal from '../components/modals/ShareModal';
 import VisibilityModal from '../components/modals/VisibiltyModal';
 import FilterPostModal from '../components/modals/FilterPostModal';
 import UsersModal from '../components/chats/UsersModal';
+import PostActionModal from '../components/modals/PostActionModal';
 
 const renderModals = () => {
-    const { showLogin, showSignup, showShare, showVisibility, showFilter } = useModalState((state) => state);
+    const { showLogin, showSignup, showShare, showVisibility, showFilter, showPostAction } = useModalState((state) => state);
 
     const renderModal = React.useCallback(() => {
         return (
@@ -20,12 +21,14 @@ const renderModals = () => {
                 { showShare && <ShareModal /> }
                 { showVisibility && <VisibilityModal /> }
                 { showFilter && <FilterPostModal /> }
+                { showPostAction && <PostActionModal /> }
             </>
         )
-    }, [showLogin, showSignup, showShare, showVisibility, showFilter])
-  return {
-    renderModal
-  }
-}
+    }, [showLogin, showSignup, showShare, showVisibility, showFilter, showPostAction])
 
-export default renderModals
+  return {
+    renderModal,
+  };
+};
+
+export default renderModals;
