@@ -34,7 +34,7 @@ import SingleKnowledge from "../pages/singleKnowledge";
 
 export type RootStackParamList = {
   home: undefined;
-  onboarding: { showModal: 1 | 2 | undefined };
+  onboarding: { showModal: 1 | 2 | undefined; addAccount?: boolean };
   login: undefined;
   "sign-up": undefined;
   "set-up": undefined;

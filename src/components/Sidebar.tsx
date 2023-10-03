@@ -8,6 +8,7 @@ import {
   Feather,
   Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
   Foundation,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
@@ -97,6 +98,22 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           />
           {isLoggedIn && (
             <>
+              <Item
+                icon={
+                  <MaterialIcons
+                    name="person-add-alt"
+                    size={25}
+                    color={theme.colors.textColor}
+                  />
+                }
+                title="Add an account"
+                action={() =>
+                  navigation.navigate("onboarding", {
+                    showModal: 1,
+                    addAccount: true,
+                  })
+                }
+              />
               <Item
                 icon={
                   <Ionicons
