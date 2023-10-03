@@ -26,8 +26,8 @@ const renderModals = () => {
         )
     }, [showLogin, showSignup, showShare, showVisibility, showFilter, showPostAction])
   return {
-    renderModal
-  }
-}
+    renderModal,
+  };
+};
 
-export default renderModals
+export default renderModals;
