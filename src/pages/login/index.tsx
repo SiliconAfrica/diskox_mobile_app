@@ -25,6 +25,7 @@ import type {
 } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { RootBottomTabParamList } from "../../navigation/BottomTabs";
+import { useMultipleAccounts } from "../../states/multipleAccountStates";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -34,7 +35,8 @@ const Login = () => {
   const navigation = useNavigation<PageType>();
   const [setAll] = useModalState((state) => [state.setAll]);
   const { addAccount } = useModalState();
-  const { setAll: updateDetails } = useDetailsState((state) => state);
+  const { setAll: updateDetails, username } = useDetailsState((state) => state);
+  const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
   const { setAll: updateUtil } = useUtilState((state) => state);
 
   const { renderForm } = useForm({
@@ -51,11 +53,15 @@ const Login = () => {
       alert(error.message);
     },
     onSuccess: async (data) => {
-      console.log(data.data);
-      updateDetails({
-        ...data.data.user,
-        token: data.data.authorisation.token,
-      });
+      if (addAccount) {
+        addAccountFn();
+        switchAccount(username, data.data.authorisation.token);
+      } else {
+        updateDetails({
+          ...data.data.user,
+          token: data.data.authorisation.token,
+        });
+      }
       await SecureStorage.setItemAsync("token", data.data.authorisation.token);
       await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
       updateUtil({ isLoggedIn: true });
