@@ -6,10 +6,11 @@ import { Ionicons, Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../../../theme'
 import { COMMUNITY_SETTING_TYPE } from '../../../../../enums/CommunitySettings'
-import { useNavigation } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { PageType } from '../../../../login'
 import SettingsHeader from '../../../../../components/settings/Header'
 import { ScrollView } from 'react-native-gesture-handler'
+import { RootStackParamList } from '../../../../../navigation/MainNavigation'
 
 const SectionHeader = ({ icon, title, color = undefined }: {
     icon: JSX.Element,
@@ -31,9 +32,12 @@ const ListItem = ({ type, title }: {
 }) => {
     const theme = useTheme<Theme>();
     const navigation = useNavigation<PageType>();
+    const route = useRoute<RouteProp<RootStackParamList, 'community-settings'>>();
+
+    const { id, username } = route.params;
 
     const handlePress = React.useCallback(() => {
-        navigation.push('community-settings', { id: 23, type });
+        navigation.push('community-settings', { id, username, type });
     }, [type])
 
     return (

@@ -76,7 +76,7 @@ const Onboarding = ({
             <Image source={require('../../../assets/images/googlelogo.png')} contentFit='contain' style={{ width: 30, height: 30 }} />
           </Box>
           <Box flex={0.7}>
-            <CustomText>Continue with Google</CustomText>
+            <CustomText variant='header' style={{ fontSize: 18}}>Continue with Google</CustomText>
           </Box>
         </Pressable>
 
@@ -105,13 +105,13 @@ const Onboarding = ({
         style={{
           backgroundColor: '#34a85350',
           borderRadius: 50,
-          height: 45,
-          width: '50%',
+          height: 40,
+          width: '30%',
           justifyContent:'center',
           alignItems:'center',
           marginTop: 20,
         }}>
-          <CustomText color="primaryColor">Login</CustomText>
+          <CustomText variant='header' style={{ fontSize: 18}} color="primaryColor">Login</CustomText>
         </Pressable>
       </Box>
 

@@ -19,9 +19,26 @@ import Blocked from './Settingspages/Blocked'
 import Invites from './Settingspages/Invites'
 import Rules from './Settingspages/Rules'
 import RemovalReason from './Settingspages/RemovalReason'
+import { useCommunityDetailsState } from '../states/Settings.state'
+import { useQuery } from 'react-query'
+import httpService from '../../../../utils/httpService'
+import { URLS } from '../../../../services/urls'
+import { ICommunity } from '../../../../models/Community'
 
 const CommunitySettings = ({ navigation, route }: NativeStackScreenProps<RootStackParamList, 'community-settings'>) => {
-  const { id, type } = route.params;
+  const { id, type, username } = route.params;
+  const { setAll } = useCommunityDetailsState((state) => state);
+
+  const { isError, isLoading } = useQuery(['getCommunityDetails', username], () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${username}`), {
+    onSuccess: (data) => {
+      const item: ICommunity = data?.data?.data
+      setAll({
+        title: item?.name,
+        description: item?.description,
+        topics: item?.topics,
+      })
+    }
+  })
 
   const renderTitle = React.useCallback(() => {
     switch(type) {

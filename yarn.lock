@@ -3874,10 +3874,10 @@ expo-image-picker@~14.1.1:
   dependencies:
     expo-image-loader "~4.1.0"
 
-expo-image@~1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-1.0.1.tgz#0cc04fac8e5204fc0d4d86f30f26273c0b1dce08"
-  integrity sha512-h3xDHaw3ZWzOKar1eFXY4CsFgDstw6fo5Tzv6BXXs+Zte5betPMb567f8zCNnhpkr7UCo5CN7Cg92o+lqzdvRA==
+expo-image@~1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-1.0.2.tgz#11f74c89812fcdb67a467fad41625b536ddb3612"
+  integrity sha512-wDLPdtU+9xNtl57NC9SQrnEqjD6obH6ZImwoeynewSTwAZ8rppKq5Kia0189fn6Kc1zzKT5kymOrwleruqS9Qg==
 
 expo-json-utils@~0.5.0:
   version "0.5.1"
@@ -7081,6 +7081,11 @@ react-native-toast-message@^2.1.6:
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-2.1.6.tgz#322827c66901fa22cb3db614c7383cc717f5bbe2"
   integrity sha512-VctXuq20vmRa9AE13acaNZhrLcS3FaBS2zEevS3+vhBsnVZYG0FIlWIis9tVnpnNxUb3ART+BWtwQjzSttXTng==
+
+react-native-toast-notifications@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-toast-notifications/-/react-native-toast-notifications-3.4.0.tgz#9f2c79ec80fba4af6b788ecddf704f94cf21dbc2"
+  integrity sha512-ZvB//jLhRiBRemtcH7vGP1maiKCikqtW4aDqo+QYvEIOcX0y3GrjxRayVAqI4oh0qJgd/26DkbM8COobj+0MEQ==
 
 react-native-ui-lib@^7.5.2:
   version "7.6.0"

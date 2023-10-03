@@ -88,32 +88,25 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
         </Box>
       )}
 
-      {
-        isLoading && (
-          <Box width='100%' height={200} justifyContent='center' alignItems='center'>
-            <ActivityIndicator size='large' color={theme.colors.primaryColor} />
-          </Box>
-        )
-      }
 
-      { !isLoading && !isError && data?.data.data.length === 0 && (
-        <Box width='100%' alignItems='center'>
-          <CustomText>You have no notification</CustomText>
-        </Box>
-      )}
 
-      { !isLoading && !isError && data?.data?.data.length > 0 && (
+      { !isError && (
         <FlashList 
           onEndReached={onEndReached}
           estimatedItemSize={100}
           keyExtractor={(_, i)=> i.toString()}
           data={notitications}
+          ListEmptyComponent={() => (
+            <Box width='100%' alignItems='center'>
+              { !isLoading && <CustomText>You have no notification</CustomText>}
+            </Box>
+          )}
           renderItem={({ item }) => <NotificationCard {...item} />}
           ListFooterComponent={() => (
             <Box width="100%" alignItems="center" marginVertical="m">
               {isLoading && (
                 <ActivityIndicator
-                  size="small"
+                  size="large"
                   color={theme.colors.primaryColor}
                 />
               )}

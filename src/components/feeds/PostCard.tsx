@@ -35,7 +35,7 @@ const PostCard = (props: IPost& IProps) => {
     const queryClient = useQueryClient();
     const { setAll: setModalState } = useModalState((state) => state);
 
-    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }} = post;
+    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image, id: userId }} = post;
 
     const getData = useQuery([`getPost${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
         refetchOnMount: false,
@@ -64,6 +64,7 @@ const PostCard = (props: IPost& IProps) => {
           alert(error.message);
         },
         onSuccess: (data) => {
+            console.log(`The upvote : = ${post.has_upvoted}`)
             queryClient.invalidateQueries([`getPost${id}`]);
         }
     });
@@ -95,9 +96,9 @@ const PostCard = (props: IPost& IProps) => {
         <Box flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' paddingTop='m'>
             <Box flexDirection='row'>
                 <Box flexDirection='row'>
-                    <View style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
-                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
-                    </View>
+                    <Pressable onPress={()=> navigation.navigate('profile', { userId })} style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
+                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }}  />
+                    </Pressable>
 
                     <Box marginLeft='s' justifyContent='center'>
                         <Box flexDirection='row'>
@@ -174,18 +175,18 @@ const PostCard = (props: IPost& IProps) => {
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
-                                <Ionicons name='arrow-up-outline' size={20} color={theme.colors.textColor} />
+                                <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  />
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
                         <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
-                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={theme.colors.textColor} /> }
+                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={post.has_downvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor} /> }
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
                     </Box>
 
                     <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, }} onPress={() => handleReaction('love')}>
-                        <Ionicons name='heart-outline' size={20} color={theme.colors.textColor}  />
+                        <Ionicons name='heart-outline' size={20} color={post.has_reacted.includes(id) ? theme.colors.primaryColor:theme.colors.textColor}  />
                         <CustomText variant='body'>{reactions_count}</CustomText>
                     </Pressable>
 

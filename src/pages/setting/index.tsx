@@ -86,7 +86,7 @@ const Setting = ({
   };
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
-      <SettingsHeader title="Settings" showSave={false} />
+      <SettingsHeader title="Settings" showSave={false} handleArrowPressed={() => navigation.goBack()} />
 
       {/* PROFILE SECTION */}
       <Box

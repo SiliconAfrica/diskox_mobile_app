@@ -18,7 +18,7 @@ interface IProps {
     showLabel?: boolean;
 }
 
-export const CustomTextInput = (props: IProps & TextInputProps) => {
+export const CustomTextarea = (props: IProps & TextInputProps) => {
     const [focused, setFocused] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(true);
     const theme = useTheme<Theme>();
@@ -44,7 +44,7 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
                 <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'lightgrey', }]}>
                     <Box style={{ flex: 1, justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 10 }}>
                         {/* {focused && <Text variant='xs'>{props.placeholder || props.name}</Text>} */}
-                        <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular' }} />
+                        <TextInput {...props} multiline textAlignVertical='top'  placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular' }} />
 
                        
                     </Box>
@@ -63,7 +63,7 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
 const Style = StyleSheet.create({
     parent: {
         width: '100%',
-        height: 48,
+        height: 100,
         borderRadius: 12,
         borderWidth: 1,
         flexDirection: 'row',
