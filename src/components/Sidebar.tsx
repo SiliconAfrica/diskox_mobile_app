@@ -51,7 +51,6 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
   const { switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const toast = useToast();
-  console.log(accounts.map((account) => account.username));
   return (
     <Box
       style={{
@@ -150,7 +149,6 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
     state.setAll,
   ]);
   const { accounts } = useMultipleAccounts((state) => state);
-  console.log("heloo", accounts.length, "accounts in tab");
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
