@@ -2,7 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import React from "react";
 import Box from "./general/Box";
 import { useTheme } from "@shopify/restyle";
-import { Theme } from "../theme";
+import theme, { Theme } from "../theme";
 import { useUtilState } from "../states/util";
 import {
   Feather,
@@ -16,6 +16,10 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import CustomText from "./general/CustomText";
 import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
+import { useMultipleAccounts } from "../states/multipleAccountStates";
+import { IUserState, useDetailsState } from "../states/userState";
+import { BASE_URL } from "../utils/httpService";
+import { useToast } from "react-native-toast-notifications";
 
 const Item = ({
   icon,
@@ -39,6 +43,85 @@ const Item = ({
   );
 };
 
+interface Iitems {
+  image: JSX.Element;
+  action?: () => void;
+}
+const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
+  const { switchAccount } = useMultipleAccounts((state) => state);
+  const { setAll: updateDetails, username } = useDetailsState((state) => state);
+  const toast = useToast();
+  console.log(accounts.map((account) => account.username));
+  return (
+    <Box
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      {accounts &&
+        accounts.length > 0 &&
+        accounts.map((user, i) => (
+          <Pressable
+            key={i}
+            onPress={async () => {
+              const switchToken = await SecureStorage.getItemAsync(
+                `---${user.username}---token`
+              );
+              if (switchToken) {
+                //save the token and data we are to be using in normal token
+                await SecureStorage.setItemAsync("token", switchToken);
+                await SecureStorage.setItemAsync("user", JSON.stringify(user));
+                switchAccount(user.username, switchToken, updateDetails);
+                toast.show(`Logged in as ${user.username}`, {
+                  type: "success",
+                });
+              } else {
+                alert(
+                  `Please add account with username of ${user.username} again.`
+                );
+              }
+            }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 40,
+              width: 40,
+              borderRadius: 30,
+              overflow: "hidden",
+              borderColor:
+                user.username === username
+                  ? theme.colors.primaryColor
+                  : theme.colors.black,
+              borderWidth: user.username === username ? 3 : 1,
+              marginRight: 5,
+            }}
+          >
+            <Image
+              source={
+                user.profile_image
+                  ? {
+                      uri: `${BASE_URL.replace("/api/v1", "")}/storage/${
+                        user.profile_image
+                      }`,
+                    }
+                  : require("../../assets/images/diskoxLarge.png")
+              }
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              contentFit="cover"
+              transition={100}
+            />
+          </Pressable>
+        ))}
+    </Box>
+  );
+};
+
 const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   const theme = useTheme<Theme>();
   const [isLoggedIn, isDarkMode, setAll] = useUtilState((state) => [
@@ -46,6 +129,8 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
     state.isDarkMode,
     state.setAll,
   ]);
+  const { accounts } = useMultipleAccounts((state) => state);
+  console.log("heloo", accounts.length, "accounts in tab");
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -98,6 +183,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           />
           {isLoggedIn && (
             <>
+              <ScrollableItem accounts={accounts} />
               <Item
                 icon={
                   <MaterialIcons

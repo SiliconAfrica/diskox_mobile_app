@@ -20,10 +20,10 @@ const Onboarding = ({
 
   React.useEffect(() => {
     if (showModal === 1) {
-      setAll({ showLogin: true });
+      setAll({ showLogin: true, addAccount: addAccount || false });
     }
     if (showModal === 2) {
-      setAll({ showSignup: true });
+      setAll({ showSignup: true, addAccount: addAccount || false });
     }
   }, [showModal]);
   return (
@@ -60,32 +60,39 @@ const Onboarding = ({
         </CustomText>
       </Box>
 
-      <Box width='100%' height='40%' alignItems='center' paddingTop='xl'>
-        <Pressable style={{
-          borderWidth: 1,
-          borderColor: theme.colors.primaryColor,
-          borderRadius: 50,
-          height: 45,
-          width: '100%',
-          justifyContent:'flex-start',
-          alignItems:'center',
-          flexDirection: 'row',
-          paddingHorizontal: 20,
-        }}>
+      <Box width="100%" height="40%" alignItems="center" paddingTop="xl">
+        <Pressable
+          style={{
+            borderWidth: 1,
+            borderColor: theme.colors.primaryColor,
+            borderRadius: 50,
+            height: 45,
+            width: "100%",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flexDirection: "row",
+            paddingHorizontal: 20,
+          }}
+        >
           <Box flex={0.3}>
-            <Image source={require('../../../assets/images/googlelogo.png')} contentFit='contain' style={{ width: 30, height: 30 }} />
+            <Image
+              source={require("../../../assets/images/googlelogo.png")}
+              contentFit="contain"
+              style={{ width: 30, height: 30 }}
+            />
           </Box>
           <Box flex={0.7}>
-            <CustomText variant='header' style={{ fontSize: 18}}>Continue with Google</CustomText>
+            <CustomText variant="header" style={{ fontSize: 18 }}>
+              Continue with Google
+            </CustomText>
           </Box>
-
         </Pressable>
 
         <Pressable
           onPress={() =>
             setAll({
               showSignup: true,
-              addAccount: addAccount ? addAccount : false,
+              addAccount: addAccount || false,
             })
           }
           style={{
@@ -101,19 +108,30 @@ const Onboarding = ({
           <CustomText color="white">Signup</CustomText>
         </Pressable>
 
-        <Pressable 
-        onPress={() => setAll({ showLogin: true })}
-        style={{
-          backgroundColor: '#34a85350',
-          borderRadius: 50,
-          height: 40,
-          width: '30%',
-          justifyContent:'center',
-          alignItems:'center',
-          marginTop: 20,
-        }}>
-          <CustomText variant='header' style={{ fontSize: 18}} color="primaryColor">Login</CustomText>
-
+        <Pressable
+          onPress={() =>
+            setAll({
+              showLogin: true,
+              addAccount: addAccount || false,
+            })
+          }
+          style={{
+            backgroundColor: "#34a85350",
+            borderRadius: 50,
+            height: 40,
+            width: "30%",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 20,
+          }}
+        >
+          <CustomText
+            variant="header"
+            style={{ fontSize: 18 }}
+            color="primaryColor"
+          >
+            Login
+          </CustomText>
         </Pressable>
       </Box>
 
