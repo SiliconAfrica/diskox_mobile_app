@@ -70,20 +70,21 @@ const Login = () => {
           `---${userData.username}---token`,
           oldToken
         );
+        //save new user token we are switching to in local using their username
+        await SecureStorage.setItemAsync(
+          `---${data.data.user.username}---token`,
+          data.data.authorisation.token
+        );
       } else {
         updateDetails({
           ...data.data.user,
           token: data.data.authorisation.token,
         });
       }
-      //save new user token we are switching to in local using their username
-      await SecureStorage.setItemAsync(
-        `---${data.data.user.username}---token`,
-        data.data.authorisation.token
-      );
+
       await SecureStorage.setItemAsync("token", data.data.authorisation.token);
       // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
-      const [saveOldUser, saveOldUserErr] = await handlePromise(
+      const [saveUser, saveUserErr] = await handlePromise(
         AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
       );
       updateUtil({ isLoggedIn: true });

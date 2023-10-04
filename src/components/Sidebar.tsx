@@ -74,7 +74,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                 await SecureStorage.setItemAsync("token", switchToken);
                 await SecureStorage.setItemAsync("user", JSON.stringify(user));
                 switchAccount(user.username, switchToken, updateDetails);
-                toast.show(`Logged in as ${user.username}`, {
+                toast.show(`Logged in as "@${user.username}"`, {
                   type: "success",
                 });
               } else {
