@@ -41,7 +41,7 @@
     "moti": "^0.25.3",
     "react": "18.2.0",
     "react-hook-form": "^7.45.1",
-    "react-native": "0.71.8",
+    "react-native": "0.71.13",
     "react-native-emoji-modal": "^0.2.4",
     "react-native-emoji-selector": "^0.2.0",
     "react-native-flags": "^1.0.0",

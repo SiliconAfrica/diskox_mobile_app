@@ -142,14 +142,21 @@ const Posts = () => {
   }, [currentPage, ids]);
 
   return (
-    <Box backgroundColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} flex={1}>
+    <Box
+      backgroundColor={
+        isDarkMode ? "mainBackGroundColor" : "secondaryBackGroundColor"
+      }
+      flex={1}
+    >
       <FlashList
         onEndReached={onEndReached}
         onEndReachedThreshold={1}
         ListEmptyComponent={() => (
-         <>
-          { !isLoading &&  <CustomText variant="body">No Post to view</CustomText> }
-         </>
+          <>
+            {!isLoading && (
+              <CustomText variant="body">No Post to view</CustomText>
+            )}
+          </>
         )}
         estimatedItemSize={100}
         renderItem={({ item }) => <PostCard {...item} showStats />}

@@ -12,10 +12,10 @@ interface IProps {
     showSave: boolean;
     onSave?: () => void,
     handleArrowPressed?: () => void;
-    rightItem?: JSX.Element;
+    RightItem?: JSX.Element;
 }
 
-const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = null, rightItem }: IProps) => {
+const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = null, RightItem }: IProps) => {
   const theme = useTheme<Theme>();
   
   return (
@@ -25,7 +25,7 @@ const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = 
           <CustomText variant='subheader' marginLeft='s'>{title}</CustomText>
         </Box>
 
-        { showSave && rightItem && rightItem }
+        { showSave && RightItem !== null && (RightItem)  }
     </Box>
   )
 }

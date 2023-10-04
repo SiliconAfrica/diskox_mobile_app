@@ -25,8 +25,7 @@ const Navigation = () => {
     (async function() {
       const data = await SecureStorage.getItemAsync('user');
       const isDark = await SecureStorage.getItemAsync("darkMode");
-      console.log(`this is the dark mode ${isDark}`);
-      console.log(typeof isDark)
+    
 
       const obj: { isDarkMode: boolean } = JSON.parse(isDark);
 
