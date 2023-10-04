@@ -32,12 +32,12 @@ const emailResetSchema = z.object({
 });
 
 const changePasswordSchema = z.object({
-    oldPassword: z.string().nonempty('Password cannot be empty'),
+    current_password: z.string().nonempty('Password cannot be empty'),
     password: z.string().nonempty('Password cannot be empty').min(8, 'Password must be at least 8 characters long'),
-    confirmPassword: z.string().nonempty('Password cannot be empty').min(8, 'Password must be at least 8 characters long'),
-}).refine((data) => data.password === data.confirmPassword, {
+    password_confirmation: z.string().nonempty('Password cannot be empty').min(8, 'Password must be at least 8 characters long'),
+}).refine((data) => data.password === data.password_confirmation, {
     message: 'Passwords do not match',
-    path: ['confirmPassword'],
+    path: ['password_confirmation'],
 });
 
 const editCommunity = z.object({
@@ -46,4 +46,10 @@ const editCommunity = z.object({
     descrription: z.string().nonempty(),
 })
 
-export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema, editCommunity };
+const createCommunityValidation = z.object({
+    name: z.string().nonempty(),
+    username: z.string().nonempty(),
+    description: z.string().nonempty(),
+})
+
+export { loginSchema, usernameSelectSchema, passwordSchema, emailResetSchema, resetpasswordSchema, changePasswordSchema, editCommunity, createCommunityValidation };

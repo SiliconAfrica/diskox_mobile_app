@@ -49,7 +49,7 @@ const Setting = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'set
    }
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-      <SettingsHeader title='Settings' showSave={false} />
+      <SettingsHeader title='Settings' showSave={false} handleArrowPressed={() => navigation.goBack()} />
 
       {/* PROFILE SECTION */}
       <Box flexDirection='row' paddingHorizontal='m' marginTop='m' alignItems='center'>
