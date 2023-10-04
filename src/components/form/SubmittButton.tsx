@@ -1,36 +1,57 @@
-import React from 'react'
-import { useForm, useFormContext } from 'react-hook-form'
-import { Pressable } from 'react-native';
-import { Colors, Button } from 'react-native-ui-lib'
-import CustomText from '../general/CustomText';
-import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme';
+import React from "react";
+import { useForm, useFormContext } from "react-hook-form";
+import { Pressable } from "react-native";
+import { Colors, Button } from "react-native-ui-lib";
+import CustomText from "../general/CustomText";
+import { useTheme } from "@shopify/restyle";
+import { Theme } from "../../theme";
 
 interface IProps {
-    onSubmit: (data: any) => void;
-    label: string;
-    isLoading?: boolean;
-<<<<<<< HEAD
-    width?: number|string;
-=======
-    width: number|string;
->>>>>>> 4bbe935ce0999bdef5ca1a1385f37bef10a20233
+  onSubmit: (data: any) => void;
+  label: string;
+  isLoading?: boolean;
+  width: number | string;
 }
 
+export const SubmitButton = ({
+  onSubmit,
+  label,
+  isLoading,
+  width = "100%",
+}: IProps) => {
+  const {
+    handleSubmit,
+    formState: { isDirty, isValid, isSubmitting },
+  } = useFormContext();
+  const theme = useTheme<Theme>();
 
-
-export const SubmitButton = ({ onSubmit, label, isLoading, width = '100%' }: IProps ) => {
-    const { handleSubmit, formState: { isDirty, isValid, isSubmitting } } = useFormContext();
-    const theme = useTheme<Theme>();
-
-    //disabled={!isDirty || !isValid  ? true: false}
+  //disabled={!isDirty || !isValid  ? true: false}
 
   return (
     <>
-       <Pressable onPress={handleSubmit(onSubmit)}  style={{ width, height: 45, backgroundColor: !isDirty || !isValid ? '#97E1CB': theme.colors.primaryColor, borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
-        <CustomText variant='body' style={{ fontSize: 17, fontFamily: 'RedRegular', color: !isDirty || !isValid ? theme.colors.primaryColor: 'white' }}>{isLoading ? 'submitting...':label}</CustomText>
+      <Pressable
+        onPress={handleSubmit(onSubmit)}
+        style={{
+          width,
+          height: 45,
+          backgroundColor:
+            !isDirty || !isValid ? "#97E1CB" : theme.colors.primaryColor,
+          borderRadius: 50,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CustomText
+          variant="body"
+          style={{
+            fontSize: 17,
+            fontFamily: "RedRegular",
+            color: !isDirty || !isValid ? theme.colors.primaryColor : "white",
+          }}
+        >
+          {isLoading ? "submitting..." : label}
+        </CustomText>
       </Pressable>
     </>
-
-  )
-}
+  );
+};
