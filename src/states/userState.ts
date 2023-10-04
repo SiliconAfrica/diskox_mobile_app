@@ -50,3 +50,31 @@ export const useDetailsState = create<IUserState>((set) => ({
   setAll: (data: Partial<Omit<IUserState, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));
+
+export const useUserStateBeforeAddingByRegistration = create<IUserState>(
+  (set) => ({
+    username: "",
+    email: "",
+    about: "",
+    birthday: "",
+    country: "",
+    cover_photo: "",
+    deleted_at: "",
+    describes_you: "",
+    email_verified_at: "",
+    gender: "",
+    last_seen: "",
+    name: "",
+    phone_number: "",
+    profile_image: "",
+    state: "",
+    suspended_at: "",
+    suspension_expired_at: "",
+    updated_at: "",
+    created_at: "",
+    id: 0,
+    token: "",
+    setAll: (data: Partial<Omit<IUserState, "setAll">>) =>
+      set((state) => ({ ...state, ...data })),
+  })
+);
