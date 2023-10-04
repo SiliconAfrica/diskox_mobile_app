@@ -8,8 +8,6 @@ import { PageType } from "../login";
 import { BASE_URL } from "../../utils/httpService";
 import { formatDate } from "../../utils/dateFormatter";
 
-import { BASE_URL } from "../../utils/httpService";
-import { formatDate } from "../../utils/dateFormatter";
 
 export default function KnowledgeTab({ knowledge }) {
   const navigation = useNavigation<PageType>();
