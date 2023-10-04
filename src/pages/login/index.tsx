@@ -30,7 +30,7 @@ import { useMultipleAccounts } from "../../states/multipleAccountStates";
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
   NativeStackNavigationProp<RootStackParamList>
->;
+  >;
 const Login = () => {
   const navigation = useNavigation<PageType>();
   const [setAll] = useModalState((state) => [state.setAll]);
@@ -41,9 +41,9 @@ const Login = () => {
 
   const { renderForm } = useForm({
     defaultValues: {
-      email: "",
-      password: "",
-    },
+      email: '',
+      password: '',
+    }, 
     validationSchema: loginSchema,
   });
 
@@ -66,50 +66,24 @@ const Login = () => {
       await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
-      navigation.navigate("home");
-    },
-  });
+      navigation.navigate('home');
+    }
+  })
   return renderForm(
-    <Box paddingTop="xl">
-      <CustomText variant="subheader">
-        Hi there! Welcome back to diskox
-      </CustomText>
-      <CustomTextInput
-        name="email"
-        placeholder="Email"
-        containerStyle={{ marginTop: 20 }}
-      />
-      <CustomTextInput
-        name="password"
-        placeholder="Password"
-        isPassword
-        containerStyle={{ marginTop: 10 }}
-      />
+    <Box paddingTop='xl'>
+      <CustomText variant='subheader'>Hi there! Welcome back to diskox</CustomText>
+      <CustomTextInput name='email' placeholder='Email' containerStyle={{ marginTop: 20 }} />
+      <CustomTextInput name='password' placeholder='Password' isPassword containerStyle={{ marginTop: 10 }} />
       <Box height={40} />
-      <SubmitButton
-        label="Login"
-        onSubmit={(data) => mutate(data)}
-        isLoading={isLoading}
-      />
-      <LightBgButton
-        label="Signup"
-        action={() => setAll({ showLogin: false, showSignup: true })}
-        style={{ marginTop: 20 }}
-      />
+      <SubmitButton label='Login' onSubmit={(data) => mutate(data)} isLoading={isLoading} />
+      <LightBgButton label='Signup' action={() => setAll({ showLogin: false, showSignup: true })} style={{ marginTop: 20 }} />
 
-      <CustomText
-        variant="body"
-        textAlign="center"
-        marginTop="xl"
-        onPress={() => {
-          setAll({ showLogin: false });
-          navigation.navigate("reset-password");
-        }}
-      >
-        Reset Password
-      </CustomText>
+      <CustomText variant='body' textAlign='center' marginTop='xl' onPress={() => {
+        setAll({ showLogin: false });
+        navigation.navigate('reset-password')
+      }}>Reset Password</CustomText>
     </Box>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

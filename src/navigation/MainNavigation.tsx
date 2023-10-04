@@ -35,7 +35,7 @@ import { ICommunity } from "../models/Community";
 
 export type RootStackParamList = {
   home: undefined;
-  onboarding: { showModal: 1 | 2 | undefined; addAccount?: boolean };
+  onboarding: { showModal: 1 | 2 | undefined };
   login: undefined;
   "sign-up": undefined;
   "set-up": undefined;
