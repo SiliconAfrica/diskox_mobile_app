@@ -15,7 +15,10 @@ import { RootStackParamList } from "../../../navigation/MainNavigation";
 import { useModalState } from "../../../states/modalState";
 import { useMutation } from "react-query";
 import httpService from "../../../utils/httpService";
-import { useDetailsState } from "../../../states/userState";
+import {
+  useDetailsState,
+  useUserStateBeforeAddingByRegistration,
+} from "../../../states/userState";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
@@ -29,12 +32,17 @@ type RegisterPayload = {
 const Password = () => {
   const navigation = useNavigation<any>();
   const [setAll] = useModalState((state) => [state.setAll]);
+  const { addAccount } = useModalState();
   const {
     username,
     email,
     setAll: setValues,
   } = useSignupState((state) => state);
   const { setAll: updateUser } = useDetailsState((state) => state);
+  const oldUser = useDetailsState((state) => state);
+  const { setAll: updateOldUser } = useUserStateBeforeAddingByRegistration(
+    (state) => state
+  );
 
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: RegisterPayload) =>
@@ -43,6 +51,9 @@ const Password = () => {
       alert(error.message);
     },
     onSuccess: async (data) => {
+      if (addAccount) {
+        updateOldUser({ ...oldUser });
+      }
       updateUser({ ...data.data.user, token: data.data.authorisation.token });
       await SecureStore.setItemAsync("token", data.data.authorisation.token);
       console.log(data.data);
@@ -72,6 +83,8 @@ const Password = () => {
     });
     mutate(obj);
   }, []);
+
+  console.log("addderrr", addAccount);
   return renderForm(
     <Box flex={1} marginTop="xl">
       <CustomText variant="subheader">

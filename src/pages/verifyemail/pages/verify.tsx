@@ -1,5 +1,6 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
+import * as SecureStorage from "expo-secure-store";
 import OTPTextInput from "react-native-otp-textinput";
 import Box from "../../../components/general/Box";
 import CustomText from "../../../components/general/CustomText";
@@ -11,17 +12,27 @@ import { useMutation } from "react-query";
 import httpService from "../../../utils/httpService";
 import { URLS } from "../../../services/urls";
 import { useSignupState } from "../../signup/state";
-import { useDetailsState } from "../../../states/userState";
+import {
+  useDetailsState,
+  useUserStateBeforeAddingByRegistration,
+} from "../../../states/userState";
+import { useModalState } from "../../../states/modalState";
+import { useMultipleAccounts } from "../../../states/multipleAccountStates";
 
 const Verify = () => {
   const [code, setCode] = React.useState("");
   const ref = React.useRef();
   const theme = useTheme<Theme>();
   const [setAll] = useVerifyState((state) => [state.setAll]);
+  const { addAccount } = useModalState();
+  const { setAll: updateDetails, username } = useDetailsState((state) => state);
+  const user = useDetailsState((state) => state);
   const { email } = useSignupState((state) => state);
   const [state] = useDetailsState((state) => [state]);
   const [timer, setTimer] = React.useState(60);
   const [resending, setResending] = React.useState(false);
+  const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
+  const oldUser = useUserStateBeforeAddingByRegistration((state) => state);
 
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: string) =>
@@ -37,7 +48,22 @@ const Verify = () => {
     onError: (error: any) => {
       alert(error.message);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      if (addAccount) {
+        addAccountFn(oldUser, { ...user, token: undefined }); //this adds old user account to accounts arr
+        switchAccount(username, state.token, updateDetails);
+        //save old user token we are switching from to the local using their username
+        const oldToken = await SecureStorage.getItemAsync("token");
+        await SecureStorage.setItemAsync(
+          `---${oldUser.username}---token`,
+          oldToken
+        );
+        //save new user token we are switching to in local using their username
+        await SecureStorage.setItemAsync(
+          `---${state.username}---token`,
+          state.token
+        );
+      }
       console.log(data.data);
       setAll({ stage: 2 });
     },
