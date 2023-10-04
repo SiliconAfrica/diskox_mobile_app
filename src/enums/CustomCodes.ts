@@ -1,0 +1,5 @@
+export enum CUSTOM_STATUS_CODE {
+    SUCCESS = 1,
+    NO_DATA = 3,
+    INTERNAL_SERVER_ERROR = 4
+}

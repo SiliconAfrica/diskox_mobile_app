@@ -1,7 +1,7 @@
 import { View, Text, Pressable, ActivityIndicator, Dimensions } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import CustomText from '../general/CustomText'
@@ -10,11 +10,13 @@ import { Image} from 'expo-image'
 import httpService, { IMAGE_BASE } from '../../utils/httpService'
 import  moment from 'moment';
 import { useNavigation } from '@react-navigation/native'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import { Video, ResizeMode } from 'expo-av';
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { URLS } from '../../services/urls'
 import { useModalState } from '../../states/modalState'
+import { useUtilState } from '../../states/util'
+import CommentTextbox from '../post/CommentTextbox'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -26,12 +28,14 @@ interface IProps {
 const PostCard = (props: IPost& IProps) => {
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({...props})
-    const { setAll } = useModalState((state) => state)
+    const { setAll } = useModalState((state) => state);
+    const { isDarkMode } = useUtilState((state) => state)
     const theme = useTheme<Theme>();
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
+    const { setAll: setModalState } = useModalState((state) => state);
 
-    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }} = post;
+    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image, id: userId }} = post;
 
     const getData = useQuery([`getPost${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
         refetchOnMount: false,
@@ -40,7 +44,6 @@ const PostCard = (props: IPost& IProps) => {
       },
       onSuccess: (data) => {
         setPost(data.data.data);
-        
       }
     });
 
@@ -61,6 +64,7 @@ const PostCard = (props: IPost& IProps) => {
           alert(error.message);
         },
         onSuccess: (data) => {
+            console.log(`The upvote : = ${post.has_upvoted}`)
             queryClient.invalidateQueries([`getPost${id}`]);
         }
     });
@@ -86,15 +90,15 @@ const PostCard = (props: IPost& IProps) => {
     }, [id])
 
   return (
-    <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s' padding='m'>
+    <Box width='100%' backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} marginBottom='s'>
  
         {/* HEADER SECTION */}
-        <Box flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Box flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' paddingTop='m'>
             <Box flexDirection='row'>
                 <Box flexDirection='row'>
-                    <View style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
-                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
-                    </View>
+                    <Pressable onPress={()=> navigation.navigate('profile', { userId })} style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
+                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }}  />
+                    </Pressable>
 
                     <Box marginLeft='s' justifyContent='center'>
                         <Box flexDirection='row'>
@@ -105,11 +109,11 @@ const PostCard = (props: IPost& IProps) => {
                     </Box>
                 </Box>
             </Box>
-            <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} />
+            <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} onPress={() => setModalState({ activePost: post, showPostAction: true })} />
         </Box>
 
         {/* CONTENT SECTION */}
-        <Box marginVertical='m'>
+        <Box marginVertical='m' paddingHorizontal='m'>
 
             <CustomText variant='body'>{showAll ? description : description?.length > 100 ? description?.substring(0, 100) + '...' : description}  { description?.length > 100 && (
                 <CustomText variant='body' color='primaryColor' onPress={() => setShowAll(prev => !prev)} >{showAll ? 'Show Less' : 'Read More'}</CustomText>
@@ -152,11 +156,13 @@ const PostCard = (props: IPost& IProps) => {
         {/* REACTION SECTION */}
 
         {props.showStats && (
-            <Box width='100%' borderTopWidth={2} borderTopColor='secondaryBackGroundColor' paddingVertical='m'>
+            <Box width='100%' paddingVertical='m' paddingHorizontal='m'>
+
+                <Box width={'100%'} height={1} bg={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} />
 
             <Box flexDirection='row' alignItems='center'>
                 <Ionicons name='eye-outline' size={25} color={theme.colors.grey} />
-                <CustomText variant='body' marginLeft='s'>{view_count} Views</CustomText>
+                <CustomText variant='xs' marginLeft='s'>{view_count}</CustomText>
             </Box>
 
             {/* REACTIONS */}
@@ -165,39 +171,41 @@ const PostCard = (props: IPost& IProps) => {
 
                 {/* VOTING SECTION */}
                 <Box flex={1} flexDirection='row' width='100%' alignItems='center'>
-                    <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor='secondaryBackGroundColor'>
+                    <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'}>
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
-                                <Ionicons name='arrow-up-outline' size={20} color={theme.colors.textColor} />
+                                <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  />
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
-                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
-                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={theme.colors.textColor} /> }
+                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
+                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={post.has_downvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor} /> }
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
                     </Box>
 
                     <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, }} onPress={() => handleReaction('love')}>
-                        <Ionicons name='heart-outline' size={25} color={theme.colors.textColor}  />
+                        <Ionicons name='heart-outline' size={20} color={post.has_reacted.includes(id) ? theme.colors.primaryColor:theme.colors.textColor}  />
                         <CustomText variant='body'>{reactions_count}</CustomText>
                     </Pressable>
 
                     <Pressable onPress={() => navigation.navigate('post', { postId: id })} style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, }}>
-                        <Ionicons name='chatbox-ellipses-outline' size={25} color={theme.colors.textColor} />
+                        <Ionicons name='chatbox-ellipses-outline' size={20} color={theme.colors.textColor} />
                         <CustomText variant='body'>{comments_count}</CustomText>
                     </Pressable>
                 </Box>
 
                 <Pressable style={{ width: 30, flexDirection: 'row', alignItems: 'center'}} onPress={handleShare} >
-                        <Ionicons name='share-social-outline' size={25} color={theme.colors.textColor} />
+                        <Ionicons name='share-social-outline' size={20} color={theme.colors.textColor} />
                         <CustomText variant='body'>{repost_count}</CustomText>
                 </Pressable>
             </Box>
 
         </Box>
         )}
+
+        <CommentTextbox postId={post.id} />
 
     </Box>
   )

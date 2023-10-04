@@ -10,11 +10,12 @@ interface IProps {
     onSubmit: (data: any) => void;
     label: string;
     isLoading?: boolean;
+    width?: number|string;
 }
 
 
 
-export const SubmitButton = ({ onSubmit, label, isLoading }: IProps ) => {
+export const SubmitButton = ({ onSubmit, label, isLoading, width = '100%' }: IProps ) => {
     const { handleSubmit, formState: { isDirty, isValid, isSubmitting } } = useFormContext();
     const theme = useTheme<Theme>();
 
@@ -22,7 +23,7 @@ export const SubmitButton = ({ onSubmit, label, isLoading }: IProps ) => {
 
   return (
     <>
-       <Pressable onPress={handleSubmit(onSubmit)}  style={{ width: '100%', height: 45, backgroundColor: !isDirty || !isValid ? '#97E1CB': theme.colors.primaryColor, borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
+       <Pressable onPress={handleSubmit(onSubmit)}  style={{ width, height: 45, backgroundColor: !isDirty || !isValid ? '#97E1CB': theme.colors.primaryColor, borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
         <CustomText variant='body' style={{ fontSize: 17, fontFamily: 'RedRegular', color: !isDirty || !isValid ? theme.colors.primaryColor: 'white' }}>{isLoading ? 'submitting...':label}</CustomText>
       </Pressable>
     </>

@@ -26,6 +26,11 @@ import Security from '../pages/setting/pages/Security';
 import BlockedUsers from '../pages/setting/pages/Blocked';
 import CommunitySettings from '../pages/bottomtabs/community/pages/CommunitySettings';
 import { COMMUNITY_SETTING_TYPE } from '../enums/CommunitySettings';
+import { ICommunity } from '../models/Community';
+import Announcements from '../pages/announcements';
+import SingleAnnouncement from '../pages/singleAnnouncement';
+import SingleKnowledge from '../pages/singleKnowledge';
+import KnowledgeBase from '../pages/knowledgebase';
 
 export type RootStackParamList = {
     'home': undefined;
@@ -37,6 +42,10 @@ export type RootStackParamList = {
     profile: { userId: number };
     'profile-setting': undefined;
     settings: undefined;
+    announcements: undefined;
+    singleAnnouncement: { announcementId: string };
+    knowledgeBase: undefined;
+    singleKnowledge: { knowledgeId: string };
     security: undefined;
     notifications: undefined;
     'blocked-users': undefined;
@@ -50,9 +59,9 @@ export type RootStackParamList = {
     blocked: undefined;
     'notifications-settings': undefined;
     list: undefined;
-    community: { id: number };
-    'community-members': { id: number };
-    'community-settings': { id: number, type: COMMUNITY_SETTING_TYPE };
+    community: { id: number, data: ICommunity };
+    'community-members': { id: number, username: string };
+    'community-settings': { id: number, username: string, type: COMMUNITY_SETTING_TYPE };
   };
 
   const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -101,6 +110,22 @@ const MainNavigation = (): JSX.Element => {
             <RootStackNavigation.Screen name='reset-password' component={ResetPassword} />
             <RootStackNavigation.Screen name='post' component={post} />
             <RootStackNavigation.Screen name='search' component={Search} />
+            <RootStackNavigation.Screen
+          name="announcements"
+          component={Announcements}
+        />
+        <RootStackNavigation.Screen
+          name="singleAnnouncement"
+          component={SingleAnnouncement}
+        />
+        <RootStackNavigation.Screen
+          name="knowledgeBase"
+          component={KnowledgeBase}
+        />
+        <RootStackNavigation.Screen
+          name="singleKnowledge"
+          component={SingleKnowledge}
+        />
         </RootStackNavigation.Group>
 
     </RootStackNavigation.Navigator>

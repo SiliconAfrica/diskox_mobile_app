@@ -2,7 +2,7 @@ import { View, Text, useWindowDimensions } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import { FlashList } from '@shopify/flash-list'
-import BannerSection from '../../components/profile/BannerSection'
+import BannerSection, { ACTIVE_TAB } from '../../components/profile/BannerSection'
 import CustomText from '../../components/general/CustomText'
 import { ScrollView } from 'react-native-gesture-handler'
 import Overview from './pages/overview'
@@ -13,13 +13,6 @@ import Upvotes from './pages/Upvotes'
 import Comments from './pages/Comments'
 import Polls from './pages/Polls'
 
-export enum ACTIVE_TAB {
-  OVERVIEW = 1,
-  POSTS,
-  UPVOTES,
-  COMMENTS,
-  POLLS,
-}
 
 const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'>) => {
 

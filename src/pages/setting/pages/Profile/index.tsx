@@ -1,10 +1,10 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import React from 'react'
 import Box from '../../../../components/general/Box'
 import SettingsHeader from '../../../../components/settings/Header'
 import { useDetailsState } from '../../../../states/userState'
 import { Image } from 'expo-image'
-import { IMAGE_BASE } from '../../../../utils/httpService'
+import httpService, { IMAGE_BASE } from '../../../../utils/httpService'
 import CustomText from '../../../../components/general/CustomText'
 import Editable from '../../../../components/profile/Editable'
 import CustomDropDwon from '../../../../components/general/DropDown'
@@ -20,19 +20,59 @@ import { useUtilState } from '../../../../states/util'
 import * as ImagePicker from 'expo-image-picker'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../../navigation/MainNavigation'
+import { useMutation, useQueryClient } from 'react-query'
+import { URLS } from '../../../../services/urls'
+import useToast from '../../../../hooks/useToast'
+import { useTheme } from '@shopify/restyle'
+import { Theme } from '../../../../theme'
 
 const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'profile-setting'>) => {
+  const theme = useTheme<Theme>();
   const { isDarkMode } = useUtilState((state) => state);
-  const { profile_image,name, username, email, about, gender, country: nation, state: MyState, birthday } = useDetailsState((state) => state);
+  const { profile_image, name, describes_you, username, email:userEmail, about, gender, country: nation, state: MyState, birthday, setAll } = useDetailsState((state) => state);
   const [sex, setSex] = React.useState(gender);
   const [image, setImage] = React.useState(profile_image);
-  const [fullname, setName] = React.useState(name);
-  const [description, setDescription] = React.useState(about);
+  const [fullname, setFullname] = React.useState(name);
+  const [email, setEmail] = React.useState(userEmail);
+  const [description, setDescription] = React.useState(describes_you);
   const [country, setCountry] = React.useState(nation);
   const [state,  setState] = React.useState(MyState);
   const [selected, setSelectedId] = React.useState<number | null>(null);
   const [date, setDate] = React.useState(birthday);
   const [showDate, setShowDate] = React.useState(false);
+
+  const queryClient = useQueryClient();
+
+  const toast = useToast();
+
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (data: FormData) => httpService.post(`${URLS.UPDATE_PROFILE}`, data),
+    onSuccess: (data) => {
+      console.log(data?.data)
+      toast.show('Profile updated successfully', { type:'success' });
+      setAll({ ...data?.data?.data });
+      queryClient.invalidateQueries(['getLoggedInDetails']);
+      navigation.goBack();
+    },
+    onError: (error: any) => {
+      console.log(`this is the error`);
+      console.log(error);
+      toast.show('An error occured', { type: 'error' });
+    }
+  });
+
+  const handleSubmit = () => {
+    if (isLoading) return;
+    const formData = new FormData();
+    formData.append('country', country);
+    formData.append('state', state);
+    formData.append('describes_you', description);
+    formData.append('gender', gender);
+    formData.append('birthday', date);
+    formData.append('name', fullname)
+
+    mutate(formData);
+  }
 
   const handleImageSelect = React.useCallback(async() => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -69,7 +109,10 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
   }
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-      <SettingsHeader title='Profile' showSave rightItem={<></>} handleArrowPressed={() => navigation.goBack()} />
+      <SettingsHeader title='Profile' showSave RightItem={<CustomText variant='header' fontSize={18} color='primaryColor' onPress={() => handleSubmit()}>
+        { isLoading && 'Saving...'}
+        { !isLoading && 'Save'}
+      </CustomText>} handleArrowPressed={() => navigation.goBack()} />
 
       <Box flexDirection='row' paddingHorizontal='m' marginTop='m' alignItems='center'>
         <Pressable style={{ width: 50, height: 50, borderRadius: 25, overflow: 'hidden', marginRight: 10 }} onPress={handleImageSelect} >
@@ -86,9 +129,9 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
 
       <Box marginTop='l'>
         <ScrollView contentContainerStyle={{ paddingBottom: 400, paddingHorizontal: 20, paddingTop: 20 }}>
-          <Editable title='Email' value={email} showEditIcon={false}  />
-          <Editable title='name' value={fullname} showEditIcon={true}  />
-          <Editable title='About' subtitle='A brief description of yourself shown on your profile' value={about} showEditIcon={true} textarea  />
+          <Editable title='Email' value={email} showEditIcon={false} onChangeText={(e) => setEmail(e)}  />
+          <Editable title='Display name' value={fullname} onChangeText={(e) => setFullname(e)} showEditIcon={true}  />
+          <Editable title='About' subtitle='A brief description of yourself shown on your profile' onChangeText={(e) => setDescription(e)} value={description} showEditIcon={true} textarea  />
           <CustomDropDwon title='Gender' options={['Male', 'Female']} value={sex} onSelected={(val) => setSex(val)} />
           <CustomDropDwon title='country' options={Data.map((item) => item.name)} value={country} onSelected={(val) => handleSelectCountry(val)} />
           <CustomDropDwon title='State' options={renderStates()} value={state} onSelected={(val) => setState(val)} />
