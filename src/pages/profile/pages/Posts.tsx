@@ -44,7 +44,7 @@ const UserPosts = ({ id }: IProps) => {
        }
        {
            getPosts.isLoading && (
-               <Box justifyContent='center' alignItems='center' height='20%'>
+               <Box justifyContent='center' alignItems='center' height='20%' paddingTop='l'>
                 <ActivityIndicator size='large' />
                </Box>
            )

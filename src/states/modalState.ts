@@ -1,9 +1,12 @@
 import { create } from "zustand";
-import { VISIBILITY } from "../components/modals/VisibiltyModal";
 import { POST_FILTERR } from "../enums/Postfilters";
 
+export enum VISIBILITY {
+  EVERYONE = "everyone",
+  FOLLOWERS = "followers",
+}
+
 interface State {
-  addAccount: boolean;
   showLogin: boolean;
   showSignup: boolean;
   showShare: boolean;
@@ -17,7 +20,6 @@ interface State {
 }
 
 export const useModalState = create<State>((set) => ({
-  addAccount: false,
   showLogin: false,
   showSignup: false,
   showShare: false,
