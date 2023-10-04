@@ -11,19 +11,23 @@ import { Theme } from '../../../../../theme'
 import { COMMUNITY_SETTING_TYPE } from '../../../../../enums/CommunitySettings'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../../../../navigation/MainNavigation'
-import { useNavigation } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { PageType } from '../../../../login'
 import SettingsHeader from '../../../../../components/settings/Header'
+import { useCommunityDetailsState } from '../../states/Settings.state'
 
 const EditCommunity = () => {
     const navigation = useNavigation<PageType>();
     const theme = useTheme<Theme>();
     const HEIGHT = useWindowDimensions().height;
+    const { title, description, username, topics, } = useCommunityDetailsState((state) => state);
+    const route = useRoute<RouteProp<RootStackParamList, 'community-settings'>>();
+    const { id, type, username: CommunityUsername } = route.params;
     const { renderForm } = useForm({
         defaultValues: {
-            title: '',
-            username: '',
-            description: '',
+            name: title,
+            username,
+            description,
         },
         validationSchema: editCommunity
     });
@@ -52,7 +56,7 @@ const EditCommunity = () => {
                         <CustomText variant='body'>Movies</CustomText>
                     </Pressable>
 
-                    <CustomText color='primaryColor' marginLeft='m' onPress={() => navigation.push('community-settings', { id: 23, type: COMMUNITY_SETTING_TYPE.TOPIC }) } >Change Topic</CustomText>
+                    <CustomText color='primaryColor' marginLeft='m' onPress={() => navigation.push('community-settings', { id: id, username: CommunityUsername, type: COMMUNITY_SETTING_TYPE.TOPIC }) } >Change Topic</CustomText>
                 </ScrollView>
             </Box>
 

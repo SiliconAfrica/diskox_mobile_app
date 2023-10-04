@@ -45,7 +45,8 @@ export default function KnowledgeBase() {
     }
   }, [page]);
   return (
-    <Box flex={1}>
+    <Box flex={1} backgroundColor="mainBackGroundColor">
+
       <SettingsHeader
         showSave={false}
         title="Knowledge Base"
@@ -58,16 +59,18 @@ export default function KnowledgeBase() {
               <Image
                 source={require("../../../assets/images/announcementBanner.png")}
                 style={styles.banner}
-                contentFit="fill"
+                contentFit="cover"
                 transition={1000}
               />
             </Box>
-            <CustomText variant="subheader" textAlign="center" py="s">
+            <CustomText variant="subheader" textAlign="center" py="s" mt='l'>
               Diskox Knowledge Base
             </CustomText>
           </>
         )}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+
+        contentContainerStyle={{ paddingHorizontal: 0 }}
+
         keyExtractor={(item, index) => item.id.toString()}
         estimatedItemSize={100}
         data={knowledgebase}

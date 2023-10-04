@@ -31,6 +31,7 @@ import Announcements from "../pages/announcements";
 import SingleAnnouncement from "../pages/singleAnnouncement";
 import KnowledgeBase from "../pages/knowledgebase";
 import SingleKnowledge from "../pages/singleKnowledge";
+import { ICommunity } from "../models/Community";
 
 export type RootStackParamList = {
   home: undefined;
@@ -65,9 +66,9 @@ export type RootStackParamList = {
   blocked: undefined;
   "notifications-settings": undefined;
   list: undefined;
-  community: { id: number };
-  "community-members": { id: number };
-  "community-settings": { id: number; type: COMMUNITY_SETTING_TYPE };
+  community: { id: number, data: ICommunity };
+  "community-members": { id: number, username: string };
+  "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();

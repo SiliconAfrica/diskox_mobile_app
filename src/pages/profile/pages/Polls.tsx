@@ -46,7 +46,7 @@ const Polls = ({ id }: IProps) => {
         
         {
            getPosts.isLoading && (
-               <Box justifyContent='center' alignItems='center' height={50}>
+               <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
                 <ActivityIndicator size='large' />
                </Box>
            )
@@ -55,6 +55,7 @@ const Polls = ({ id }: IProps) => {
         {
              !getPosts.isLoading && posts.length > 0 && (
                 <>
+                    <Box height={20} />
                     { posts.map(post => (
                         <PollCard key={post.id} {...post} showStats />
                     ))}

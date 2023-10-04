@@ -41,10 +41,10 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
         name={props.name}
         render={({ field: { onChange, value  }}) => {
             return (
-                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'grey', }]}>
+                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'lightgrey', }]}>
                     <Box style={{ flex: 1, justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 10 }}>
                         {/* {focused && <Text variant='xs'>{props.placeholder || props.name}</Text>} */}
-                        <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor }} />
+                        <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular' }} />
 
                        
                     </Box>

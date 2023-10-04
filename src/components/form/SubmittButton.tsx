@@ -10,7 +10,11 @@ interface IProps {
     onSubmit: (data: any) => void;
     label: string;
     isLoading?: boolean;
+<<<<<<< HEAD
     width?: number|string;
+=======
+    width: number|string;
+>>>>>>> 4bbe935ce0999bdef5ca1a1385f37bef10a20233
 }
 
 

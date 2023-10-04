@@ -41,9 +41,9 @@ const changePasswordSchema = z.object({
 });
 
 const editCommunity = z.object({
-    title: z.string().nonempty(),
+    name: z.string().nonempty(),
     username: z.string().nonempty(),
-    descrription: z.string().nonempty(),
+    description: z.string().nonempty(),
 })
 
 const createCommunityValidation = z.object({
