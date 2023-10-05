@@ -63,25 +63,17 @@ const Login = () => {
           data.data.authorisation.token,
           updateDetails
         );
-
-        //save old user token we are switching from to the local using their username
-        const oldToken = await SecureStorage.getItemAsync("token");
-        await SecureStorage.setItemAsync(
-          `---${userData.username}---token`,
-          oldToken
-        );
-        //save new user token we are switching to in local using their username
-        await SecureStorage.setItemAsync(
-          `---${data.data.user.username}---token`,
-          data.data.authorisation.token
-        );
       } else {
         updateDetails({
           ...data.data.user,
           token: data.data.authorisation.token,
         });
       }
-
+      //save logged in user in local
+      await SecureStorage.setItemAsync(
+        `---${data.data.user.username}---token`,
+        data.data.authorisation.token
+      );
       await SecureStorage.setItemAsync("token", data.data.authorisation.token);
       // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
       const [saveUser, saveUserErr] = await handlePromise(

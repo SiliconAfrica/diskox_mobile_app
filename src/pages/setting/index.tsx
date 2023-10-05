@@ -1,5 +1,6 @@
 import { View, Text, Pressable, Switch } from "react-native";
 import React from "react";
+import * as SecureStorage from "expo-secure-store";
 import Box from "../../components/general/Box";
 import SettingsHeader from "../../components/settings/Header";
 import { Image } from "expo-image";
@@ -12,6 +13,10 @@ import { Theme } from "../../theme";
 import { useUtilState } from "../../states/util";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
+import { useMultipleAccounts } from "../../states/multipleAccountStates";
+import { handlePromise } from "../../utils/handlePomise";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useToast } from "react-native-toast-notifications";
 
 const NavItem = ({
   icon,
@@ -78,15 +83,68 @@ const Setting = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "settings">) => {
   const theme = useTheme<Theme>();
-  const { profile_image, name, username } = useDetailsState((state) => state);
-  const { setAll, isLoggedIn } = useUtilState((state) => state)
-
+  const {
+    profile_image,
+    name,
+    username,
+    setAll: updateDetails,
+  } = useDetailsState((state) => state);
+  const { setAll, isLoggedIn } = useUtilState((state) => state);
+  const { switchAccount, accounts, removeAccount, addAccountFn } =
+    useMultipleAccounts((state) => state);
+  const toast = useToast();
   const nav = (route: string) => {
     navigation.navigate(route as any);
   };
+
+  const logout = async () => {
+    const [loggedInUser, loggedInUserErr] = await handlePromise(
+      AsyncStorage.getItem(`user`)
+    );
+    if (loggedInUser) {
+      const theUser = JSON.parse(loggedInUser);
+      const remainingAccounts = accounts.filter((account) => {
+        return account.username !== theUser.username;
+      });
+      removeAccount(theUser.username);
+      if (remainingAccounts.length > 0) {
+        const accountToSwitchTo = remainingAccounts[0];
+        const removeOldtoken = await SecureStorage.setItemAsync(
+          `---${theUser.username}---token`,
+          ""
+        );
+        const token = await SecureStorage.getItemAsync(
+          `---${accountToSwitchTo.username}---token`
+        );
+        await SecureStorage.setItemAsync("token", token);
+        const [saveUser, saveUserErr] = await handlePromise(
+          AsyncStorage.setItem(`user`, JSON.stringify(accountToSwitchTo))
+        );
+        switchAccount(accountToSwitchTo.username, token, updateDetails);
+        toast.show(`Account switched to "@${accountToSwitchTo.username}"`, {
+          type: "success",
+        });
+      } else {
+        await SecureStorage.setItemAsync("token", "");
+        const [saveUser, saveUserErr] = await handlePromise(
+          AsyncStorage.setItem(`user`, "")
+        );
+        setAll({ isLoggedIn: false });
+        toast.show(`Logged out successfully`, {
+          type: "success",
+        });
+        navigation.navigate("home");
+      }
+    }
+  };
+
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
-      <SettingsHeader title="Settings" showSave={false} handleArrowPressed={() => navigation.goBack()} />
+      <SettingsHeader
+        title="Settings"
+        showSave={false}
+        handleArrowPressed={() => navigation.goBack()}
+      />
 
       {/* PROFILE SECTION */}
       <Box
@@ -191,28 +249,26 @@ const Setting = ({
         alignItems="center"
         paddingHorizontal="m"
       >
-       {
-        isLoggedIn && (
+        {isLoggedIn && (
           <Pressable
-          style={{
-            width: "100%",
-            height: 50,
-            borderRadius: 25,
-            borderColor: theme.colors.secondaryBackGroundColor,
-            borderWidth: 2,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={() => setAll({ isLoggedIn: false })}
-        >
-          <Ionicons name="log-out" size={25} color="red" />
-          <CustomText variant="body" style={{ color: "red" }} marginLeft="m">
-            Logout
-          </CustomText>
-        </Pressable>
-        )
-       }
+            style={{
+              width: "100%",
+              height: 50,
+              borderRadius: 25,
+              borderColor: theme.colors.secondaryBackGroundColor,
+              borderWidth: 2,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onPress={logout}
+          >
+            <Ionicons name="log-out" size={25} color="red" />
+            <CustomText variant="body" style={{ color: "red" }} marginLeft="m">
+              Logout
+            </CustomText>
+          </Pressable>
+        )}
       </Box>
     </Box>
   );

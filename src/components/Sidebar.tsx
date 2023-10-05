@@ -20,6 +20,8 @@ import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
 import { BASE_URL } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
+import { handlePromise } from "../utils/handlePomise";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Item = ({
   icon,
@@ -80,14 +82,18 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                   if (switchToken) {
                     //save the token and data we are to be using in normal token
                     await SecureStorage.setItemAsync("token", switchToken);
-                    await SecureStorage.setItemAsync(
-                      "user",
-                      JSON.stringify(user)
+
+                    await AsyncStorage.setItem("user", JSON.stringify(user));
+
+                    const [savedUser, savedUserErr] = await handlePromise(
+                      AsyncStorage.getItem("user")
                     );
-                    switchAccount(user.username, switchToken, updateDetails);
-                    toast.show(`Logged in as "@${user.username}"`, {
-                      type: "success",
-                    });
+                    if (JSON.parse(savedUser).username === user.username) {
+                      switchAccount(user.username, switchToken, updateDetails);
+                      toast.show(`Logged in as "@${user.username}"`, {
+                        type: "success",
+                      });
+                    }
                   } else {
                     alert(
                       `Please add account with username of ${user.username} again.`
@@ -103,19 +109,19 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                   borderRadius: 30,
                   overflow: "hidden",
                   borderColor:
-                    user.username === username
+                    user?.username === username
                       ? theme.colors.primaryColor
                       : theme.colors.black,
-                  borderWidth: user.username === username ? 3 : 1,
+                  borderWidth: user?.username === username ? 3 : 1,
                   marginRight: 5,
                 }}
               >
                 <Image
                   source={
-                    user.profile_image
+                    user?.profile_image
                       ? {
                           uri: `${BASE_URL.replace("/api/v1", "")}/storage/${
-                            user.profile_image
+                            user?.profile_image
                           }`,
                         }
                       : require("../../assets/images/diskoxLarge.png")
@@ -131,8 +137,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
               <CustomText
                 style={{ fontSize: 10, width: "100%", textAlign: "center" }}
               >
-                @{user.username.substring(0, 7)}
-                {user.username.length > 5 && "..."}
+                @{user?.username.substring(0, 7)}
+                {user?.username.length > 5 && "..."}
               </CustomText>
             </Box>
           ))}
