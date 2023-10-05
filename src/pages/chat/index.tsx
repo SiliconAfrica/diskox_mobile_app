@@ -5,20 +5,32 @@ import ChatList from '../../components/chats/ChatList';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/MainNavigation';
 import ChatSectionHeader from '../../components/chats/ChatSectionHeader';
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme';
-import { TextInput } from 'react-native-gesture-handler';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import httpService from '../../utils/httpService';
 import { URLS } from '../../services/urls';
 import CustomText from '../../components/general/CustomText';
 import { FlashList } from '@shopify/flash-list';
-import { IChatMessage } from '../../models/chatmessages';
+import { IChatMessage, IPost_Image } from '../../models/chatmessages';
 import MessageBubble from '../../components/chats/messageBubble';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import mime from 'mime';
+import MediaCard from '../../components/createpost/MediaCard';
+import { extract_day } from '../../utils/utils';
+import moment from 'moment';
+import ViewImageModal from '../../components/modals/ViewImageModal';
+
+enum FILE_TYPE {
+  IMAGE,
+  DOC
+}
+
+const currentDate = moment(); // Current date
+const previousDate = moment().subtract(1, 'day').format('MMMM DD YYYY'); 
 
 
 const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => {
@@ -32,6 +44,12 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>([]);
   const [chats, setChats] = React.useState<Array<IChatMessage>>([]);
   const [search, setSearch] = React.useState('');
+  const [files, setFiles] = React.useState([]);
+  const [showPickerModal, setShowPickerModal] = React.useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
+  const [fileType, setFileType] = React.useState(FILE_TYPE.IMAGE);
+  const [showImagesModal, setShowImagesModals] = React.useState(false);
+  const [activeImages, setActiveImages] = React.useState<Array<IPost_Image>>([]);
 
   // query
   const getMessages = useQuery(['getMessages', userId], () => httpService.get(`${URLS.GET_CHAT_MESSAGES}/${userId}`), {
@@ -54,6 +72,8 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
       alert('Message sent!');
       queryClient.invalidateQueries(['getMessages']);
       setMessage('');
+      setFileType(null);
+      setFiles([]);
     },
     onError: (error: any) => {
       alert(error.message);
@@ -61,6 +81,10 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   });
 
   // functions 
+  const openImagesModal = React.useCallback((data: IPost_Image[]) => {
+    setActiveImages(data);
+    setShowImagesModals(true)
+  }, [])
   const filterMessages = React.useCallback(() => {
     const msgs = chats.sort((a: IChatMessage, b: IChatMessage) => {
       if (a.created_at > b.created_at) {
@@ -73,47 +97,103 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     return msgs;
   }, [chats]);
 
-  const pickImage = React.useCallback(async () => {
+  const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       base64: false,
     });
   
     if (!result.canceled) {
-      console.log(result.assets[0]);
-      const formData = new FormData();
       const name = result.assets[0].uri.split('/').pop();
       const mimeType = mime.getType(result.assets[0].uri);
-      formData.append('receiver_id', userId.toString());
-      formData.append('chat_images[]', { uri: result.assets[0].uri, type: mimeType, name } as any);
-      sendMessage.mutate(formData);
+      setFiles(prev => [...prev,  { uri: result.assets[0].uri, type: mimeType, name }]);
+      setFileType(FILE_TYPE.IMAGE);
+      setShowPickerModal(false);
     }
-  }, []);
+  };
+
+  const pickDoc = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ['application/pdf', 'application/msword'],
+      multiple: false,
+    });
+
+    if (result.type === 'success') {
+      const name = result.name;
+      const type = mime.getType(result.uri);
+      const uri = result.uri;
+      setFiles(prev => [...prev, { name, type, uri}]);
+      setFileType(FILE_TYPE.DOC);
+      setShowPickerModal(false);
+    }
+  };
 
   if (!getMessages.isLoading && getMessages.isError) {
     return (
       <Box flex={1} backgroundColor='mainBackGroundColor' justifyContent='center' alignItems='center'>
-        <CustomText variant='body'>An Error occurred while getting yourr messgaes!</CustomText>
+        <CustomText variant='body'>An Error occurred while getting your messgaes!</CustomText>
       </Box>
     )
   }
 
   const handleSubmit = React.useCallback(() => {
-    if (message.length < 1 || sendMessage.isLoading) {
-      return;
-    }
+    if (sendMessage.isLoading) return;
     const formData = new FormData();
     formData.append('message', message);
     formData.append('receiver_id', userId.toString());
-    if (image.length > 0) {
-      formData.append('chat_images[]', image[0] as any);
+    if (fileType === FILE_TYPE.IMAGE) {
+      files.map((item, i) => {
+        formData.append('chat_images[]', item);
+      })
+    } else {
+      files.map((item, i) => {
+        formData.append('chat_files[]', item);
+      })
     }
+    // if (image.length > 0) {
+    //   formData.append('chat_images[]', image[0] as any);
+    // }
     sendMessage.mutate(formData);
-  }, [message])
+  }, [message]);
+
+  const handleMediaDelete = React.useCallback(
+    ({ index, clearAll }: { index: number; clearAll: boolean }) => {
+      if (clearAll) {
+        setFiles([]);
+        return;
+      }
+      setFiles(files.filter((item, i) => i !== index));
+    },
+    [files]
+  );
+
+  const groupChatMessagesByDate = () => {
+    const groupedMessages: { [key: string]: IChatMessage[] } = {};
+  
+    filterMessages().forEach((message, index) => {
+      const currentDate = moment(message.created_at).format("YYYY-MM-DD");
+      const previousDate = index > 0 ? moment(chats[index - 1].created_at).format("YYYY-MM-DD") : null;
+  
+      if (currentDate !== previousDate) {
+        groupedMessages[currentDate] = [message];
+      } else {
+        groupedMessages[currentDate].push(message);
+      }
+    });
+  
+    return groupedMessages;
+  };
+
+  // Render the grouped chat messages
+const groupedMessages = groupChatMessagesByDate();
+
 
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
+      {/* MODALS */}
+      <ViewImageModal isVisisble={showImagesModal} images={activeImages} onClose={() => setShowImagesModals(false)} />
+
       <ChatSectionHeader last_seen={last_seen} userId={userId} username={username} profile_image={profile_image} />
 
       {/* CHAT AREA */}
@@ -124,24 +204,84 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
             <CustomText variant='body'>Loading Messages</CustomText>
           </Box>
         )}
-        {
-          !getMessages.isLoading && (
-              <FlashList 
-                contentContainerStyle={{ padding: 20 }}
-                estimatedItemSize={100}
-                keyExtractor={(item, i)=> i.toString()}
-                data={filterMessages()}
-                renderItem={({ item }) => (
-                  <MessageBubble {...item} />
-                )}
-              />
-          )
-        }
+          <ScrollView contentContainerStyle={{ padding: 20 }}>
+          {Object.keys(groupedMessages).map((date) => (
+            <React.Fragment key={date}>
+              <CustomText textAlign="center" marginVertical='m'>
+                { moment(date).subtract(1, 'day').format('MMM DD, YYYY') === previousDate && 'Yesterday'}
+                { moment(date).format("MMMM DD, YYYY") === moment().format("MMMM DD, YYYY") && "Today" }
+                { moment(date).format('MMMM DD YYYY') !== previousDate && moment(date).format('MMMM DD YYYY') !== moment().format('MMMM DD YYYY') && moment(date).format('MMMM DD YYYY') }
+                {/* {moment(date).format("MMMM DD, YYYY") === moment().format("MMMM DD, YYYY") ? "Today" : moment(date).format("MMMM DD, YYYY")} */}
+              </CustomText>
+              {groupedMessages[date].map((message) => (
+                <MessageBubble key={message.id} {...message} openModal={openImagesModal} />
+              ))}
+            </React.Fragment>
+          ))}
+              {
+                getMessages.isLoading && (
+                  <Box alignItems='center' justifyContent='center' width='100%' height={40}>
+                    <ActivityIndicator size={'small'} color={theme.colors.primaryColor} />
+                  </Box>
+                )
+              }
+
+          </ScrollView>
+
+          {files.length > 0 && (
+            <Box width={'100%'} height={130} borderTopWidth={2} borderTopColor='secondaryBackGroundColor'>
+              <ScrollView horizontal contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
+                {files.map((item, index) => (
+                  <MediaCard width={100} height={'70%'} file={item} index={index} onDelete={handleMediaDelete} key={index} />
+                ))}
+                 {files.length < 10 && (
+              <Pressable style={{
+                marginLeft: 20,
+                width: 100, height: '70%',
+                borderRadius: 15,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 2,
+                borderColor: theme.colors.secondaryBackGroundColor,
+              }}
+                onPress={() => {
+                  if (fileType === FILE_TYPE.IMAGE) {
+                    pickImage();
+                  } else {
+                    pickDoc();
+                  }
+                }}
+              >
+                <CustomText variant='xs'>{fileType === FILE_TYPE.DOC ? 'Add Doc':'Add File'}</CustomText>
+                <Feather name={fileType === FILE_TYPE.IMAGE ? 'image' : 'file'} size={40} color={theme.colors.textColor} />
+              </Pressable>
+            )}
+              </ScrollView>
+            </Box>
+          )}
+
       </Box>
 
       {/* TEXTBOX AREA */}
-      <Box width='100%' height={100} flexDirection='row' borderTopWidth={2} borderTopColor='secondaryBackGroundColor' alignItems='center' justifyContent='space-between' paddingHorizontal='m'>
-          <Ionicons onPress={pickImage} name='images-outline' size={25} color={theme.colors.textColor} />
+      <Box width='100%' height={100} flexDirection='row' borderTopWidth={2} borderTopColor='secondaryBackGroundColor' alignItems='center' justifyContent='space-between' paddingHorizontal='m' position='relative'>
+
+         { showPickerModal && (
+           <Box position='absolute' width={200} height={100} backgroundColor='secondaryBackGroundColor' zIndex={5} borderRadius={10} left={20} bottom={70} paddingHorizontal='m'>
+           <Pressable onPress={pickImage} style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', flex: 1 }}>
+             <Feather name='image' size={25} color={theme.colors.textColor} />
+             <CustomText  marginLeft='s'>Photos & Video</CustomText>
+           </Pressable>
+
+           <Pressable onPress={pickDoc} style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', flex: 1 }}>
+             <Feather name='file' size={25} color={theme.colors.textColor} />
+             <CustomText marginLeft='s'>Document</CustomText>
+           </Pressable>
+         </Box>
+         )}
+
+          { files.length === 0 && (
+            <Ionicons onPress={() => setShowPickerModal(prev => !prev)} name='images-outline' size={25} color={theme.colors.textColor} />
+          )}
 
           <Box flex={0.9} height={50} maxHeight={200} justifyContent='center' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={25} backgroundColor='secondaryBackGroundColor'>
               <TextInput value={message} onChangeText={(e) => setMessage(e)} textAlignVertical='center'  multiline placeholder='Type your message here' placeholderTextColor={theme.colors.textColor} style={{ flex: 1, height: 50, maxHeight: 200, paddingHorizontal: 10, fontFamily: 'RedRegular', color: theme.colors.textColor }} />

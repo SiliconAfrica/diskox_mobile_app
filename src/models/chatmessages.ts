@@ -2,15 +2,30 @@ export type IChatMessage = {
     chat_code: string;
     created_at: string;
     deleted_by: number;
-    deleted_for: any;
+    deleted_for: 'everyone' | 'me';
     deleted_time: string;
     id: number;
     message: string;
-    post_images: Array<{"created_at": string, "deleted_by": any, "deleted_for": any, "deleted_time": string, "id": number, "image_path": string, "processed": number, "type": string}>;
-    reactions: Array<any>;
+    post_images: Array<{ created_at: string, deleted_by: any, deleted_for: any, deleted_time: string, id: number, image_path: string, processed: number, type: string }>;
+    reactions: Array<{
+        "id": number,
+        "type": string,
+        "reacted_by": number
+    }>;
     receiver_id: number;
     sender_id: number;
     sender_user: Array<any>;
+    post_files: Array<{
+        id: 583,
+        file_path: string,
+        type: string,
+        file_name: string,
+        processed: number,
+        created_at: string,
+        deleted_for: string,
+        deleted_by: number,
+        deleted_time: string
+    }>
 }
 
 export type IChatResponse = {
@@ -32,4 +47,15 @@ export type IChatResponse = {
         to: number;
         total: number;
     }
+}
+
+export type IPost_Image = { 
+    created_at: string; 
+    deleted_by: any; 
+    deleted_for: any; 
+    deleted_time: string; 
+    id: number; 
+    image_path: string; 
+    processed: number; 
+    type: string; 
 }
