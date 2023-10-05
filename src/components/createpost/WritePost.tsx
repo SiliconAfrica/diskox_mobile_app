@@ -47,7 +47,7 @@ const WritePost = ({files, handlePicker, onDelete, description, setDescription }
               {files.map((file, index) => (
                 <MediaCard file={file} index={index} onDelete={onDelete} key={index} />
               ))}
-            {files.length < 5 && (
+            {files.length < 10 && (
               <Pressable style={{
                 marginLeft: 20,
                 width: 150, height: '90%',

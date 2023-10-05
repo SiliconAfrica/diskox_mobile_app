@@ -15,9 +15,11 @@ interface IProps {
     file: ImagePicker.ImagePickerAsset;
     index: number;
     onDelete: (data:{ index?: number, clearAll?: boolean}) => void;
+    width?: number | string;
+    height?: number | string;
 }
 
-const MediaCard = ({ file, index, onDelete }: IProps) => {
+const MediaCard = ({ file, index, onDelete, width = 150, height = '90%' }: IProps) => {
     const theme = useTheme<Theme>();
 
     const RenderItem = React.useCallback(() => {
@@ -32,7 +34,7 @@ const MediaCard = ({ file, index, onDelete }: IProps) => {
             }
     }, [file]);
   return (
-    <Box width={150} height={'90%'} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
+    <Box width={width} height={height} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
         <Pressable style={{ ...style.deleteButton, backgroundColor: '#000000b9'}} onPress={() => onDelete({ index, clearAll: false })}>
             <Feather name='trash-2' size={25} color={theme.colors.textColor} />
         </Pressable>
