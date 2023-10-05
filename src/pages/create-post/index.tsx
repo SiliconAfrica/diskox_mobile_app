@@ -258,7 +258,7 @@ const CreatePost = ({
       <SettingsHeader
         showSave={true}
         onSave={() => {}}
-        rightItem={
+        RightItem={
           <PrimaryButton
             isLoading={isLoading}
             title="Post"

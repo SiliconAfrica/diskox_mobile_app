@@ -70,4 +70,7 @@ export const URLS = {
   UPDATE_PROFILE: "/update_profile",
   CHANGE_PASSWORD: "/password",
   FETCH_BLOCKED_USERS: "/fetch_blocked_users",
+  BLOCK_AND_UNBLOCK_USER: '/block_and_unblock_user',
+  REACT_TO_MESSAGE: '/react_to_message',
+  DELETE_MESSAGE: '/delete_sent_message'
 };
