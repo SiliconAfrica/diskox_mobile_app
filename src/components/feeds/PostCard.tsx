@@ -175,12 +175,19 @@ const PostCard = (props: IPost& IProps) => {
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
-                                <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  />
+                                {/* <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  /> */}
+                                { post.has_upvoted === 0 && <Image source={require('../../../assets/images/arrows/up.png')} contentFit='cover' style={{ width: 20, height: 20, }} /> }
+                                { post.has_upvoted !== 0 &&  <Image source={require('../../../assets/images/arrows/upfilled.png')} contentFit='cover' style={{ width: 20, height: 20, }} /> }
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
                         <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
-                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={post.has_downvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor} /> }
+                            { !downvote.isLoading && (
+                                <>
+                                    { post.has_downvoted === 0 && <Image source={require('../../../assets/images/arrows/down.png')} contentFit='cover' style={{ width: 20, height: 20, }} /> }
+                                    { post.has_downvoted !== 0 && <Image source={require('../../../assets/images/arrows/downfilled.png')} contentFit='cover' style={{ width: 20, height: 20, }} /> }
+                                </>
+                            ) }
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
                     </Box>

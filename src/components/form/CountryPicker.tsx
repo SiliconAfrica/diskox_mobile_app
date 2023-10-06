@@ -34,7 +34,7 @@ import Data from '../../utils/countries.json';
         renderItem={({item, index}) => (
           <Pressable style={{ width: '100%' }} onPress={() => handlePress(item)}>
             <Box height={60} key={index} flexDirection='row' justifyContent='flex-start' alignItems='center' paddingHorizontal='m'>
-              <Flag code={item.country_code} size={32} type="flat" />
+              {/* <Flag code={item.country_code} size={32} type="flat" /> */}
               <CustomText variant='body' marginLeft='s'>{item.name}</CustomText>
             </Box>
           </Pressable>
@@ -54,7 +54,7 @@ import Data from '../../utils/countries.json';
         <Box width='100%' height={50} marginTop='s' borderRadius={10} borderWidth={2} borderColor='secondaryBackGroundColor' flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m'>
   
         <Box flexDirection='row' alignItems='center'>
-          <Flag code={country_code} size={32} type="flat" />
+          {/* <Flag code={country_code} size={32} type="flat" /> */}
           <CustomText variant='body' marginLeft='s'>{name}</CustomText>
         </Box>
   
