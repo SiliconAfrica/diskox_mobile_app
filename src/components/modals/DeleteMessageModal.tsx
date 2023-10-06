@@ -25,17 +25,13 @@ const DeleteMessageModal = ({ isVisisble, onClose, message_id }: IProps) => {
     const theme = useTheme<Theme>();
     const { height, width } = useWindowDimensions();
     const { isLoading, mutate } = useMutation({
-        mutationFn: () => httpService.delete(`${URLS.DELETE_MESSAGE}/${message_id}/${type}`),
+        mutationFn: (data: string) => httpService.delete(`${URLS.DELETE_MESSAGE}/${message_id}/${data}`),
     });
 
-    React.useEffect(() => {
-        if (type !== '') {
-            mutate();
-        }
-    }, [type])
+
   return (
-    <ReactNavtieModalWrapper isVisible={isVisisble} height={'40%'} backgroundColor={theme.colors.secondaryBackGroundColor}>
-        <Box width='100%' paddingHorizontal='m' alignContent='flex-end'>
+    <ReactNavtieModalWrapper isVisible={isVisisble} height={'22%'} backgroundColor={theme.colors.secondaryBackGroundColor}>
+        <Box width='100%' height={'100%'} paddingHorizontal='m' alignContent='flex-end' justifyContent='center'>
 
 
            { !isLoading && (
@@ -43,8 +39,8 @@ const DeleteMessageModal = ({ isVisisble, onClose, message_id }: IProps) => {
                  <Box width='100%' alignItems='flex-end' alignContent='flex-end' marginVertical='m'>
                     <Feather name='x' size={20} color={theme.colors.textColor} onPress={() => onClose()} />
                 </Box>
-                <CustomText onPress={() => setType('everyone')} variant='subheader' fontSize={18} textAlign='right'>Delete for everyone</CustomText>
-                <CustomText onPress={() => setType('me')} variant='subheader' fontSize={18} marginVertical='m' textAlign='right'>Delete for me</CustomText>
+                <CustomText onPress={() => mutate('everyone')} variant='subheader' fontSize={18} textAlign='right'>Delete for everyone</CustomText>
+                <CustomText onPress={() => mutate('me')} variant='subheader' fontSize={18} marginVertical='m' textAlign='right'>Delete for me</CustomText>
                 <CustomText onPress={() => onClose()} variant='subheader' fontSize={18} textAlign='right'>cancel</CustomText>
                 </>
            )}

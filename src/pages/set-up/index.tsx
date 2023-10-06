@@ -91,7 +91,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       gender: gender,
     };
     console.log(obj);
-    //mutate(obj);
+    mutate(obj);
   }, [date, gender, selected, state]);
 
   return (
@@ -168,7 +168,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       </Box>
 
       <Box flex={0.2}>
-        <NormalButton label="Next" action={handleSubmit} isLoading={false} />
+        <NormalButton label="Next" action={handleSubmit} isLoading={isLoading} />
       </Box>
     </Box>
   );
