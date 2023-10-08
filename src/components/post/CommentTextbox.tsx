@@ -31,6 +31,7 @@ import * as ImagePicker from "expo-image-picker";
 import mime from "mime";
 import Emojipicker from "../general/emojipicker";
 import Reply from "./Reply";
+import useToast from "../../hooks/useToast";
 // import EmojiSelector from 'react-native-emoji-selector'
 // import EmojiModal from 'react-native-emoji-modal';
 
@@ -536,6 +537,8 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             paddingHorizontal="s"
             borderBottomWidth={1}
             borderBottomColor="secondaryBackGroundColor"
+            position="relative"
+            zIndex={5}
           >
             <Ionicons name="person" size={30} color={theme.colors.textColor} />
 
@@ -571,6 +574,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                   color: theme.colors.textColor,
                 }}
               />
+             
               <Feather
                 name={"smile"}
                 size={25}
@@ -604,6 +608,14 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             )}
           </Box>
 
+          {showEmoji && (
+                <Box width="100%" height={130} position="absolute" bottom={80} left={60} zIndex={10}>
+                  <Emojipicker
+                    onSelected={(emoji) => setReply((prev) => prev + " " + emoji)}
+                  />
+                </Box>
+              )}
+
           {commentsVisible && (
             <Box paddingLeft="m">
               {!isLoading &&
@@ -632,6 +644,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
   const [showComments, setShowComment] = React.useState(false);
   const [showEmoji, setShowEmoji] = React.useState(false);
   const TextinputtRef = React.useRef<TextInput>();
+  const toast = useToast();
 
   const [images, setImages] = React.useState<
     Array<ImagePicker.ImagePickerAsset>
@@ -642,7 +655,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     () => httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`),
     {
       onError: (error) => {
-        alert("Ann eror occured while getting the comments");
+        toast.show('An eror occured while getting the comments', { type: 'error' })
       },
       onSuccess: (data) => {
         setComments(data.data.data.data);
@@ -660,7 +673,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
       setComment("");
     },
     onError: (error: any) => {
-      alert("An error occured while rying to create the comment");
+      toast.show('An error occured while rying to create the comment', { type: 'error' })
     },
   });
 

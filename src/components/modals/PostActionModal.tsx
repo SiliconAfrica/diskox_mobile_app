@@ -16,6 +16,11 @@ import {
 } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import { useUtilState } from "../../states/util";
+import { useMutation } from "react-query";
+import httpService from "../../utils/httpService";
+import { URLS } from "../../services/urls";
+import { useToast } from "react-native-toast-notifications";
+import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 
 const ActionChip = ({
   icon,
@@ -67,11 +72,28 @@ const PostActionModal = () => {
   ]);
   const ref = useRef<BottomSheetModal>();
   const theme = useTheme<Theme>();
+  const toast = useToast();
+  const { isLoggedIn } = useUtilState((state) => state);
+  const { checkloggedInState } = useCheckLoggedInState();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "post">>();
 
+    const { mutate } = useMutation({
+      mutationFn: () => httpService.post(`${URLS.BOOKMARK_POST}/${activePost.id}`),
+      onSuccess: (data) => {},
+      onError: () => {},
+    });
+
+    const handleSave = React.useCallback(() => {
+      const check = checkloggedInState();
+      if (check) {
+        mutate();
+      }
+    }, [activePost])
+
   const obj = [
     {
+      id: 1,
       label: "View profile",
       action: () => {
         navigation.navigate("profile", { userId: activePost.user_id });
@@ -86,8 +108,9 @@ const PostActionModal = () => {
       ),
     },
     {
-      label: "Save post",
-      action: () => {},
+      id: 2,
+      label: activePost.is_bookmarked ? 'Remove post':"Save post",
+      action: () => handleSave(),
       icon: (
         <Ionicons
           name="bookmark-outline"
@@ -97,6 +120,7 @@ const PostActionModal = () => {
       ),
     },
     {
+      id: 3,
       label: "Copy link",
       action: () =>
         navigation.navigate("profile", { userId: activePost.user_id }),
@@ -109,6 +133,7 @@ const PostActionModal = () => {
       ),
     },
     {
+      id: 4,
       label: "Report post",
       action: () =>
         navigation.navigate("profile", { userId: activePost.user_id }),
@@ -149,7 +174,14 @@ const PostActionModal = () => {
         />
       </Box>
 
-      {obj.map((item, i) => (
+      {obj.filter((item) => {
+        if(isLoggedIn) {
+          return item
+        } else {
+          return item.id !== 2 && item.id !== 4;
+        }
+
+      }).map((item, i) => (
         <ActionChip {...item} key={i.toString()} />
       ))}
     </ModalWrapper>

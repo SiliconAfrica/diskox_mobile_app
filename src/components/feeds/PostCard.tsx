@@ -17,6 +17,7 @@ import { URLS } from '../../services/urls'
 import { useModalState } from '../../states/modalState'
 import { useUtilState } from '../../states/util'
 import CommentTextbox from '../post/CommentTextbox'
+import useCheckLoggedInState from '../../hooks/useCheckLoggedInState'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -34,6 +35,7 @@ const PostCard = (props: IPost& IProps) => {
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
     const { setAll: setModalState } = useModalState((state) => state);
+    const { checkloggedInState } = useCheckLoggedInState();
 
     const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image, id: userId }} = post;
 
@@ -82,12 +84,32 @@ const PostCard = (props: IPost& IProps) => {
 
     // functions
     const handleReaction = React.useCallback((type: 'love'|'upvote') => {
-        reactpost.mutate(type);
+        const check = checkloggedInState();
+        if (check) {
+            reactpost.mutate(type);
+        }
     }, []);
 
     const handleShare = React.useCallback(() => {
-        setAll({ postId: id, showShare: true });
-    }, [id])
+        const check = checkloggedInState();
+        if (check) {
+            setAll({ postId: id, showShare: true });
+        }
+    }, [id]);
+
+    const handleUpVote = () => {
+            const check = checkloggedInState();
+            if (check) {
+                upvote.mutate();
+            }
+    }
+
+    const handleDownVote = () => {
+        const check = checkloggedInState();
+        if (check) {
+            downvote.mutate();
+        }
+    }
 
   return (
     <Box width='100%' backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} marginBottom='s'>
@@ -172,7 +194,7 @@ const PostCard = (props: IPost& IProps) => {
                 {/* VOTING SECTION */}
                 <Box flex={1} flexDirection='row' width='100%' alignItems='center'>
                     <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'}>
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={handleUpVote}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
                                 {/* <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  /> */}
@@ -181,7 +203,7 @@ const PostCard = (props: IPost& IProps) => {
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
-                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
+                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor: isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={handleDownVote} >
                             { !downvote.isLoading && (
                                 <>
                                     { post.has_downvoted === 0 && <Image source={require('../../../assets/images/arrows/down.png')} contentFit='cover' style={{ width: 20, height: 20, }} /> }

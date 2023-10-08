@@ -98,6 +98,8 @@ const Setting = ({
   };
 
   const logout = async () => {
+    setAll({ isLoggedIn: false });
+    return;
     const [loggedInUser, loggedInUserErr] = await handlePromise(
       AsyncStorage.getItem(`user`)
     );
@@ -172,6 +174,7 @@ const Setting = ({
       </Box>
 
       <Box flex={0.6} paddingTop="l">
+
         <NavItem
           forDarkModa={false}
           icon={
@@ -179,6 +182,19 @@ const Setting = ({
           }
           action={() => nav("profile-setting")}
           title="Profile"
+        />
+
+        <NavItem
+          forDarkModa={false}
+          icon={
+            <Ionicons
+              name="headset"
+              size={25}
+              color={theme.colors.textColor}
+            />
+          }
+          title="Interests"
+          action={() => nav("categories")}
         />
 
         <NavItem

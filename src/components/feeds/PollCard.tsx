@@ -16,6 +16,8 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { URLS } from '../../services/urls'
 import { useModalState } from '../../states/modalState'
 import { useUtilState } from '../../states/util'
+import CommentTextbox from '../post/CommentTextbox'
+import useCheckLoggedInState from '../../hooks/useCheckLoggedInState'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -28,10 +30,12 @@ const PollCard = (props: IPost& IProps) => {
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({...props})
     const { setAll } = useModalState((state) => state);
-    const { isDarkMode } = useUtilState((state) => state)
+    const { isDarkMode, isLoggedIn } = useUtilState((state) => state)
     const theme = useTheme<Theme>();
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
+    const { checkloggedInState } = useCheckLoggedInState();
+
 
     const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }, poll_duration, polls, has_voted_poll } = post;
 
@@ -97,12 +101,32 @@ const PollCard = (props: IPost& IProps) => {
 
     // functions
     const handleReaction = React.useCallback((type: 'love'|'upvote') => {
-        reactpost.mutate(type);
+        const check = checkloggedInState();
+        if (check) {
+            reactpost.mutate(type);
+        }
     }, []);
 
     const handleShare = React.useCallback(() => {
-        setAll({ postId: id, showShare: true });
-    }, [id])
+        const check = checkloggedInState();
+        if (check) {
+            setAll({ postId: id, showShare: true });
+        }
+    }, [id]);
+
+    const handleUpVote = () => {
+            const check = checkloggedInState();
+            if (check) {
+                upvote.mutate();
+            }
+    }
+
+    const handleDownVote = () => {
+        const check = checkloggedInState();
+        if (check) {
+            downvote.mutate();
+        }
+    }
 
     const getDate = () => {
         const today = moment();
@@ -112,19 +136,21 @@ const PollCard = (props: IPost& IProps) => {
     }
 
     const vote = (poll_id: number) =>  {
-        const obj = {
-            post_id: id,
-            post_poll_id: poll_id
+        const check = checkloggedInState();
+        if (check) {
+            const obj = {
+                post_id: id,
+                post_poll_id: poll_id
+            }
+            votepoll.mutate(obj);
         }
-
-        votepoll.mutate(obj);
     }
 
   return (
-    <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s' padding='m'>
+    <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s'>
  
         {/* HEADER SECTION */}
-        <Box flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Box flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' paddingTop='m'>
             <Box flexDirection='row'>
                 <Box flexDirection='row'>
                     <View style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
@@ -144,7 +170,7 @@ const PollCard = (props: IPost& IProps) => {
         </Box>
 
         {/* CONTENT SECTION */}
-        <Box marginVertical='m'>
+        <Box marginVertical='m' paddingHorizontal='m'>
 
             <CustomText variant='body'>{showAll ? description : description?.length > 100 ? description?.substring(0, 100) + '...' : description}  { description?.length > 100 && (
                 <CustomText variant='body' color='primaryColor' onPress={() => setShowAll(prev => !prev)} >{showAll ? 'Show Less' : 'Read More'}</CustomText>
@@ -177,7 +203,7 @@ const PollCard = (props: IPost& IProps) => {
         {/* REACTION SECTION */}
 
         {props.showStats && (
-            <Box width='100%' borderTopWidth={2} borderTopColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'}  paddingVertical='m'>
+            <Box paddingHorizontal='m' width='100%' borderTopWidth={2} borderTopColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'}  paddingVertical='m'>
 
             <Box flexDirection='row' alignItems='center'>
                 <Ionicons name='eye-outline' size={25} color={theme.colors.grey} />
@@ -191,14 +217,14 @@ const PollCard = (props: IPost& IProps) => {
                 {/* VOTING SECTION */}
                 <Box flex={1} flexDirection='row' width='100%' alignItems='center'>
                     <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} >
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={() => upvote.mutate()}>
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={handleUpVote}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                             { !upvote.isLoading && <>
                                 <Ionicons name='arrow-up' size={20} color={theme.colors.textColor} />
                                 <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
                             </>}
                         </Pressable>
-                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor:  isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={() => downvote.mutate()} >
+                        <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor:  isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={handleDownVote} >
                             { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={theme.colors.textColor} /> }
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
@@ -223,6 +249,8 @@ const PollCard = (props: IPost& IProps) => {
 
         </Box>
         )}
+
+        <CommentTextbox postId={post.id} />
 
     </Box>
   )
