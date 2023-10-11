@@ -14,6 +14,7 @@ interface State {
   showSignup: boolean;
   showShare: boolean;
   showVisibility: boolean;
+  showMonetization: boolean;
   showFilter: boolean;
   showPostAction: boolean;
   postId: number;
@@ -30,6 +31,7 @@ export const useModalState = create<State>((set) => ({
   showSignup: false,
   showShare: false,
   showVisibility: false,
+  showMonetization: false,
   showFilter: false,
   showPostAction: false,
   postId: 0,
