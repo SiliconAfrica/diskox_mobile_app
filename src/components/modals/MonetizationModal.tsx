@@ -1,4 +1,11 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
@@ -11,6 +18,10 @@ import Box from "../general/Box";
 import { Image } from "expo-image";
 import CustomText from "../general/CustomText";
 import { Checkbox } from "react-native-ui-lib";
+import { useMutation } from "react-query";
+import httpService from "../../utils/httpService";
+import { URLS } from "../../services/urls";
+import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
 
 const MonetizationModal = () => {
   const toast = useToast();
@@ -18,6 +29,24 @@ const MonetizationModal = () => {
   const [checked, setChecked] = useState<boolean>(false);
   const { setAll } = useModalState();
   const theme = useTheme<Theme>();
+
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (data: any) =>
+      httpService.put(`${URLS.AD_SHARING_REQUEST}`, data),
+    onSuccess: (data) => {
+      if (data?.data?.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        console.log(data?.data, "olsjj");
+        toast.show(
+          "YOu have successfully requested to allow ads on your profile. Once approved, you will be notified",
+          { type: "success" }
+        );
+        setAll({ showMonetization: false });
+      }
+    },
+    onError: (error: any) => {
+      toast.show(error?.message, { type: "error" });
+    },
+  });
 
   useEffect(() => {
     if (ref.current !== null) {
@@ -70,12 +99,26 @@ const MonetizationModal = () => {
             I agree
           </CustomText>
         </Box>
-        <Pressable>
+        <Pressable
+          onPress={() => {
+            if (checked) {
+              mutate({});
+            } else {
+              toast.show("Please agree to the terms and conditions", {
+                type: "danger",
+              });
+            }
+          }}
+        >
           <Box
             marginVertical="s"
             style={[styles.btn, { backgroundColor: theme.colors.primaryColor }]}
           >
-            <CustomText color="white">Start Monetizing</CustomText>
+            {isLoading ? (
+              <ActivityIndicator size={15} color={theme.colors.white} />
+            ) : (
+              <CustomText color="white">Start Monetizing</CustomText>
+            )}
           </Box>
         </Pressable>
       </Box>
@@ -88,7 +131,8 @@ export default MonetizationModal;
 const styles = StyleSheet.create({
   btn: {
     borderRadius: 30,
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: "5%",
+    minWidth: "40%",
   },
 });
