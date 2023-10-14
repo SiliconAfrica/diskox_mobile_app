@@ -5,13 +5,14 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import CustomText from '../general/CustomText'
 import { IUser } from '../../models/user'
-import { Checkbox } from 'react-native-ui-lib'
 import { Image } from 'expo-image'
 import { FlashList } from '@shopify/flash-list'
 import { useQuery } from 'react-query'
 import { useDetailsState } from '../../states/userState'
 import httpService, { IMAGE_BASE } from '../../utils/httpService'
 import { Feather, Ionicons } from '@expo/vector-icons'
+import Checkbox from 'expo-checkbox';
+import { ScrollView } from 'react-native-gesture-handler'
 
 type Follower = {
     follower: IUser;
@@ -29,9 +30,8 @@ const TagCard = ({ user, isChecked, onChecked }: {
     const theme = useTheme<Theme>();
     const [c, setC] = React.useState(isChecked);
     const handleChecked = React.useCallback((val: boolean) => {
-        onChecked(user.follower_id, val);
-        setC(val);
-    },[isChecked])
+        onChecked(user.follower.id, val);
+    },[])
     return (
         <Box width='100%' height={70} flexDirection='row' alignItems='center' justifyContent='space-between'>
             <Box flexDirection='row' alignItems='center' > 
@@ -42,7 +42,7 @@ const TagCard = ({ user, isChecked, onChecked }: {
                 <CustomText variant='body' color='black' marginLeft='s'>{user.follower.name}</CustomText>
                 <CustomText variant='xs' color='grey' marginLeft='s'>@{user.follower.username}</CustomText>
             </Box>
-            <Checkbox value={c} onValueChange={handleChecked}  borderRadius={5} color={c ? theme.colors.primaryColor : theme.colors.textColor} selecedIcon={<Feather name='check' size={15} color='white' />} sele  />
+            <Checkbox value={isChecked}  onValueChange={handleChecked} color={isChecked ? theme.colors.primaryColor : theme.colors.textColor}   />
         </Box>
     )
 }
@@ -101,38 +101,29 @@ const TagModal = ({ open, onClose, tags, setTags }: {
 
             {selectedUsers.length > 0 && (
                 <Box width='100%' height={80} >
-                    <FlashList 
-                        horizontal
-                        contentContainerStyle={{}}
-                        estimatedItemSize={100}
-                        ListEmptyComponent={() => (
-                            <Text>Nothing to see here</Text>
-                        )}
-                        keyExtractor={(item, i) => i.toString()}
-                        data={selectedUsers}
-                        renderItem={({ item }) => (
-                            <Box width={100} justifyContent='center' alignItems='center' >
+                    <ScrollView horizontal contentContainerStyle={{ width: '100%', height: '100%', alignItems: 'center' }}>
+                        {selectedUsers.map((item, index) => (
+                             <Box key={index.toString()} width={80} justifyContent='center' alignItems='center' >
+                                <Box width={60} height={60} borderRadius={30} overflow='hidden'>
                                 <Image source={{ uri: `${IMAGE_BASE}${item.follower.profile_image}` }} style={{ width: 50, height: 50, borderRadius: 25 }} contentFit='cover' />
-                                <CustomText variant='xs'>@{item.follower.username}</CustomText>
-                            </Box>
-                        )}
-                    />
+                                </Box>
+                                <CustomText variant='xs' textAlign='center' style={{ width: '100%'}}>@{item.follower.username.length > 7 ? item.follower.username.substring(0, 7) + '...' : item.follower.username}</CustomText>
+                         </Box>
+                        ))}
+                    </ScrollView>
                 </Box>
             )}
 
             {/* SCROLLAREA */}
             { !isLoading && !isError && (
-                <FlashList 
-                ListEmptyComponent={() => (
-                    <Text>Nothing to see here</Text>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                estimatedItemSize={100}
-                data={followers}
-                renderItem={({ item }) => (
-                    <TagCard user={item} onChecked={handleChange} isChecked={tags.includes(item.follower.id, 0)} />
-                )}
-            />
+                <ScrollView>
+                    {
+                        followers.map((item, index) => (
+                            <TagCard key={index.toString()} user={item} onChecked={handleChange} isChecked={tags.includes(item.follower.id)} />
+
+                        ))
+                    }
+                </ScrollView>
             )}
 
         </Box>

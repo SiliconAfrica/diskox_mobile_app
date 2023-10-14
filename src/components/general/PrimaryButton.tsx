@@ -10,12 +10,13 @@ interface IProps {
     title: string;
     onPress: () => void;
     isLoading?: boolean;
+    borderRadius?: number
 }
 
-const PrimaryButton = ({ title, onPress, width = 120, height = 45, isLoading = false}: IProps) => {
+const PrimaryButton = ({ title, onPress, width = 120, height = 45, isLoading = false, borderRadius = (height as number) / 2 || 25}: IProps) => {
     const theme = useTheme<Theme>();
   return (
-    <Pressable onPress={onPress} style={{ backgroundColor: theme.colors.primaryColor, borderWidth: 0, borderColor: theme.colors.primaryColor, borderRadius:  (height as number) / 2 || 25, width, height, justifyContent: 'center', alignItems: 'center' }}>
+    <Pressable onPress={onPress} style={{ backgroundColor: theme.colors.primaryColor, borderWidth: 0, borderColor: theme.colors.primaryColor, borderRadius:  borderRadius, width, height, justifyContent: 'center', alignItems: 'center' }}>
         { isLoading && <ActivityIndicator color={'white'} size='small' /> }
         { !isLoading && <CustomText variant="subheader" color='primaryColor' fontSize={17} style={{ color: 'white'}}>{title}</CustomText> }
     </Pressable>
