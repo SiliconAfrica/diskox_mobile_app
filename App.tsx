@@ -1,6 +1,6 @@
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import Navigation from './src/navigation';
 /**
 + * Renders the main App component.
@@ -10,7 +10,6 @@ import Navigation from './src/navigation';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { View } from 'react-native';
-
 /**
 + * Renders the main App component.
 + *
@@ -33,6 +32,7 @@ export default function App(): JSX.Element {
   if (!fontsLoaded) {
     return null;
   }
+
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Navigation />

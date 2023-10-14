@@ -14,8 +14,10 @@ interface State {
   showSignup: boolean;
   showShare: boolean;
   showVisibility: boolean;
+  showMonetization: boolean;
   showFilter: boolean;
   showPostAction: boolean;
+  showVerification: boolean;
   postId: number;
   visibility: string;
   filterBy: string;
@@ -30,8 +32,10 @@ export const useModalState = create<State>((set) => ({
   showSignup: false,
   showShare: false,
   showVisibility: false,
+  showMonetization: false,
   showFilter: false,
   showPostAction: false,
+  showVerification: false,
   postId: 0,
   visibility: VISIBILITY.EVERYONE,
   filterBy: POST_FILTERR.ALL,

@@ -25,6 +25,8 @@ import { URLS } from '../../../../services/urls'
 import useToast from '../../../../hooks/useToast'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../../theme'
+import { Ionicons } from '@expo/vector-icons'
+import mime from 'mime'
 
 const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'profile-setting'>) => {
   const theme = useTheme<Theme>();
@@ -40,6 +42,7 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
   const [selected, setSelectedId] = React.useState<number | null>(null);
   const [date, setDate] = React.useState(birthday);
   const [showDate, setShowDate] = React.useState(false);
+  const [file, setFile] = React.useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -52,6 +55,7 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
       toast.show('Profile updated successfully', { type:'success' });
       setAll({ ...data?.data?.data });
       queryClient.invalidateQueries(['getLoggedInDetails']);
+      setFile(null)
       navigation.goBack();
     },
     onError: (error: any) => {
@@ -70,7 +74,11 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
     formData.append('gender', gender);
     formData.append('birthday', date);
     formData.append('name', fullname)
-
+    if (file !== null) {
+        const name = file.uri.split("/").pop();
+        const mimeType = mime.getType(file.uri);
+      formData.append("profile_picture", { uri: file.uri, name: name, type: mimeType } as any);
+    }
     mutate(formData);
   }
 
@@ -115,8 +123,13 @@ const Profile = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'pro
       </CustomText>} handleArrowPressed={() => navigation.goBack()} />
 
       <Box flexDirection='row' paddingHorizontal='m' marginTop='m' alignItems='center'>
-        <Pressable style={{ width: 50, height: 50, borderRadius: 25, overflow: 'hidden', marginRight: 10 }} onPress={handleImageSelect} >
-          <Image source={{ uri: image.startsWith('file') ? image:`${IMAGE_BASE}${image}` }}  style={{ width: '100%', height: '100%' }} contentFit='cover' />
+        <Pressable style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10, position: 'relative' }} onPress={handleImageSelect} >
+          <Box width='100%' height='100%' borderRadius={25}  overflow='hidden'>
+            <Image source={{ uri: image.startsWith('file') ? image:`${IMAGE_BASE}${image}` }}  style={{ width: '100%', height: '100%' }} contentFit='cover' />
+          </Box>
+          <Box position='absolute' width={25} height={25} borderRadius={20} bottom={-5} right={-5} backgroundColor='secondaryBackGroundColor' justifyContent='center' alignItems='center'>
+            <Ionicons name='camera-outline' size={15} color={theme.colors.textColor} />
+          </Box>
         </Pressable>
 
         <Box>

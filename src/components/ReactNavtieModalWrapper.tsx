@@ -7,22 +7,23 @@ interface IProps {
     children: React.ReactNode;
     height?: number|string;
     isVisible: boolean;
+    backgroundColor?: string;
 }
 
-const ReactNavtieModalWrapper = ({children, height, isVisible}: IProps) => {
+const ReactNavtieModalWrapper = ({ children, height, isVisible, backgroundColor = 'white' }: IProps) => {
   return (
     <Modal visible={isVisible} transparent animationType='slide' >
         <View style={{ flex: 1, backgroundColor: '#0000006f', justifyContent: 'center', alignItems: 'center' }}>
-            <Box width='95%' height={height || '30%'} borderRadius={20} backgroundColor='mainBackGroundColor'>
-                {/* { !height && ( */}
+            <View style={{ width: '95%', height: height || '30%', backgroundColor, borderRadius: 10 }} >
+                { !height && (
                     <ScrollView>
                         {children}
                     </ScrollView>
-                {/* )}
+                )}
                 {
                     height && children
-                } */}
-            </Box>
+                } 
+            </View>
         </View>
     </Modal>
   )

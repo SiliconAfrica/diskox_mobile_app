@@ -22,7 +22,7 @@ const PopupModal = ({ visible = false }: { visible: boolean }) => {
             </View>
 
             <View style={{ height: '40%', alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: 20 }}>
-                <ActivityIndicator color={theme.colors.primaryColor} size='large' />
+                {/* <ActivityIndicator color={theme.colors.primaryColor} size='large' /> */}
                 <CustomText variant='body' textAlign='center' mt='m' onPress={() => navigation.navigate('home')}>I'll do this later</CustomText>
                 <NormalButton action={() => navigation.navigate('home')} label='Continue' />
             </View>

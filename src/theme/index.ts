@@ -12,7 +12,8 @@ const COLOR_PALLET = {
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
   whatsappGreen: "#25D366",
-  transparent: '#000000b9',
+  transparent: "#000000b9",
+  yellowGreen: "#A8B60C",
 };
 
 const theme = createTheme({

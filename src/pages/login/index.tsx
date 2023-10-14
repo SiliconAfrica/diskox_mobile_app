@@ -26,6 +26,8 @@ import type {
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { RootBottomTabParamList } from "../../navigation/BottomTabs";
 import { useMultipleAccounts } from "../../states/multipleAccountStates";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { handlePromise } from "../../utils/handlePomise";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -36,6 +38,7 @@ const Login = () => {
   const [setAll] = useModalState((state) => [state.setAll]);
   const { addAccount } = useModalState();
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
+  const userData = useDetailsState((state) => state);
   const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
   const { setAll: updateUtil } = useUtilState((state) => state);
 
@@ -54,16 +57,28 @@ const Login = () => {
     },
     onSuccess: async (data) => {
       if (addAccount) {
-        addAccountFn();
-        switchAccount(username, data.data.authorisation.token);
+        addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
+        switchAccount(
+          data.data.user.username,
+          data.data.authorisation.token,
+          updateDetails
+        );
       } else {
         updateDetails({
           ...data.data.user,
           token: data.data.authorisation.token,
         });
       }
+      //save logged in user in local
+      await SecureStorage.setItemAsync(
+        `---${data.data.user.username}---token`,
+        data.data.authorisation.token
+      );
       await SecureStorage.setItemAsync("token", data.data.authorisation.token);
-      await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
+      // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
+      const [saveUser, saveUserErr] = await handlePromise(
+        AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
+      );
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
       navigation.navigate("home");
