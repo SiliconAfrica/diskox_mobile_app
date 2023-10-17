@@ -21,6 +21,7 @@ type TRefPoints = {
 export default function EarningsBox() {
   const theme = useTheme<Theme>();
   const [refPoints, setRefPoints] = useState<TRefPoints>();
+  const [copied, setCopied] = useState<boolean>(false);
   const { username } = useDetailsState((state) => state);
 
   const { isLoading } = useQuery(
@@ -106,12 +107,19 @@ export default function EarningsBox() {
           {`${FRONTEND_BASE_URL}register?ref=${username}`}
         </CustomText>
         <Pressable
-          onPress={() =>
-            copyToClipboard(`${FRONTEND_BASE_URL}register?ref=${username}`)
-          }
+          onPress={async () => {
+            const didCopy = await copyToClipboard(
+              `${FRONTEND_BASE_URL}register?ref=${username}`
+            );
+            if (didCopy) {
+              setCopied(true);
+            }
+          }}
           style={{ flexDirection: "row", width: "20%", alignItems: "center" }}
         >
-          <CustomText color="white">Copy</CustomText>
+          <CustomText color="white" variant="xs">
+            {copied ? "Copied" : "Copy"}
+          </CustomText>
           <Ionicons name="copy" size={20} color={theme.colors.white} />
         </Pressable>
       </Box>
