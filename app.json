@@ -11,7 +11,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#34A853"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
@@ -25,8 +27,11 @@
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#34A853"
       },
-      "package": "com.dandolla98.diskox",
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
+      "package": "com.dandolla98.diskos",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -249,12 +249,12 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
               <Item
                 icon={
                   <Ionicons
-                    name="person-circle"
+                    name="checkmark-circle-outline"
                     size={25}
                     color={theme.colors.textColor}
                   />
                 }
-                title="Verify Account"
+                title="Verify account"
                 action={() => navigation.navigate("verification")}
               />
             </>

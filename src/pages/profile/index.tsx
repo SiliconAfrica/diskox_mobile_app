@@ -49,7 +49,7 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
       <ScrollView>
-        <BannerSection currentTab={currentTab} switchTab={switchTab} />
+        <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
         <Box width='100%' height={HEIGHT / 100 * 89}>
           {activePage()}
         </Box>

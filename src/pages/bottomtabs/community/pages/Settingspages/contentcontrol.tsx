@@ -10,7 +10,7 @@ const ContentControl = () => {
     const navigation = useNavigation<PageType>()
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-        <SettingsHeader showSave={false} title='Content control' handleArrowPressed={() => navigation.goBack() } />
+        <SettingsHeader showSave={true} title='Content control' handleArrowPressed={() => navigation.goBack() } />
         
         <Box paddingHorizontal='m'>
             <CustomText variant='body' fontSize={18}>Set requirements and restrictions for how people post and comment in your community</CustomText>

@@ -63,9 +63,18 @@ const PostCard = (props: IPost & IProps) => {
     {
       refetchOnMount: false,
       onError: (error: any) => {
-        alert(error.message);
+        toast.show(error.message, { type: 'error'})
       },
       onSuccess: (data) => {
+        const p: IPost = data.data.data
+        if (p.has_reacted.length > 0) {
+            console.log(p.has_reacted);
+        }
+        // p.map((item) => {
+        //     if (item.has_reacted.length > 0) {
+        //         console.log(item.has_reacted);
+        //     }
+        // })
         setPost(data.data.data);
       },
     }

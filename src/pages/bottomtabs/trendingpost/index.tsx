@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator  } from 'react-native'
+import { View, Text, ActivityIndicator, RefreshControl  } from 'react-native'
 import React from 'react'
 import Box from '../../../components/general/Box'
 import Searchbar from '../../../components/Searchbar'
@@ -13,6 +13,7 @@ import CustomText from '../../../components/general/CustomText'
 import { URLS } from '../../../services/urls'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../theme'
+import useToast from '../../../hooks/useToast'
 
 const TrendingPosts = () => {
   const { isLoggedIn } = useUtilState((state) => state);
@@ -23,6 +24,7 @@ const TrendingPosts = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [total, setTotal] = React.useState(0);
   const [ids, setIds] = React.useState<number[]>([]);
+  const toast = useToast();
 
   // react query
   const { isLoading, isError, error } = useQuery(['GetAllTrendingPosts', currentPage], () => httpService.get(`${URLS.GET_TRENDING_POSTS}?page=${currentPage}`), {
@@ -46,7 +48,22 @@ const TrendingPosts = () => {
       }
     },
     onError: (error: any) => {
-      alert(error.message)
+      toast.show(error.message, { type: 'error'});
+    }
+  });
+
+  const RefreshPost = useQuery(['GetAllTrendingPosts',], () => httpService.get(`${URLS.GET_TRENDING_POSTS}?page=${currentPage}`), {
+    onSuccess: async(data) => {
+      if (posts.length > 0) {
+        const arr = [...posts, ...data.data.data.data];
+        setPosts(arr);
+        return;
+      } else {
+        setPosts(data.data.data.data);
+      }
+    },
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error'});
     }
   });
 
@@ -54,7 +71,7 @@ const TrendingPosts = () => {
   const markasViewed = useMutation({
     mutationFn: (data: { posts_id: number[] }) => httpService.post(`${URLS.INCREMENT_POST_VIEWS}`, data),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: 'error'});
     },
     onSuccess: (data) => {
       console.log(data.data);
@@ -73,10 +90,20 @@ const TrendingPosts = () => {
     }
   }, [currentPage, ids]);
 
+  const handleRefresh = () => {
+    RefreshPost.refetch();
+  }
+
   return (
     <Box backgroundColor='mainBackGroundColor' flex={1}>
         
         <FlashList 
+           refreshControl={
+            <RefreshControl 
+              refreshing={RefreshPost.isLoading}
+              onRefresh={handleRefresh} 
+            />
+          }
           onEndReached={onEndReached}
           onEndReachedThreshold={1}
           ListEmptyComponent={() => (
