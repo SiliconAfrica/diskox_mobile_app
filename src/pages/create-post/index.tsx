@@ -20,16 +20,18 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import TagModal from "../../components/createpost/TagModal";
 import { useModalState } from "../../states/modalState";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import * as ImagePicker from "expo-image-picker";
 import mime from "mime";
 import Emojipicker from "../../components/general/emojipicker";
 import PrimaryButton from "../../components/general/PrimaryButton";
+import useToast from "../../hooks/useToast";
+import { Follower } from "../../models/Follower";
 
 const CreatePost = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "create-post">) => {
-  const { profile_image, name, username } = useDetailsState((state) => state);
+  const { profile_image, name, username, id } = useDetailsState((state) => state);
   const { setAll, visibility } = useModalState((state) => state);
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -41,8 +43,13 @@ const CreatePost = ({
   const [polls, setPolls] = React.useState(['', ''])
   const [day, setDay] = React.useState('1 day');
   const [showEmoji, setShowEmoji] = React.useState(false);
+  const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([])
+  const [followers, setFollowers] = React.useState<Follower[]>([]);
+
+
 
   const theme = useTheme<Theme>();
+  const toast = useToast();
 
 
   // functions
@@ -62,14 +69,29 @@ const CreatePost = ({
       return;
     }
     setPolls(polls.filter((_, index) => index !== i))
-  }, [polls])
+  }, [polls]);
+
+  React.useEffect(() => {
+    setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)));
+}, [tags])
+
+  const { isLoading: followersLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
+    enabled: true,
+    onSuccess: (data) => {
+        const followersArr: Follower[] = data.data.data.data;
+        setFollowers(followersArr);
+    },
+    onError: (error) => {
+        alert(JSON.stringify(error));
+    }
+});
 
   // mutation
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post("/create_post", data),
     onSuccess: (data) => {
       console.log(data.data);
-      alert("Post created");
+      toast.show('Post created', { type: 'success'})
       // clean up
       setFiles([]);
       setTags([]);
@@ -77,8 +99,7 @@ const CreatePost = ({
       navigation.goBack();
     },
     onError: (error: any) => {
-      console.log(error.message);
-      alert(error.message);
+      toast.show(error?.message, { type: 'error' });
     },
   });
 
@@ -126,16 +147,15 @@ const CreatePost = ({
     }
   }, [activeTab, files, value, pollQuestion, question, setQuestion, polls, day]);
 
-  const handleCheck = React.useCallback(
-    (val: number, valu: boolean) => {
-      if (valu && !tags.includes(val)) {
-        setTags([...tags, val]);
+  const handleCheck =
+    (val: number) => {
+      if (!tags.includes(val)) {
+        setTags(prev => [...prev, val]);
       } else {
-        setTags(tags.filter((item) => item !== val));
+        setTags(prev => prev.filter((item) => item !== val));
       }
-    },
-    [tags]
-  );
+      
+    }
 
   const handleSubmit = React.useCallback(async() => {
     const formData = new FormData();
@@ -253,7 +273,7 @@ const CreatePost = ({
         open={show}
         onClose={() => setShow(false)}
         tags={tags}
-        setTags={(tags, val) => handleCheck(tags, val)}
+        setTags={(tags, val) => handleCheck(tags)}
       />
       <SettingsHeader
         showSave={true}
@@ -352,6 +372,8 @@ const CreatePost = ({
           </Box>
         )}
 
+         <Box flexDirection="row">
+
          <Pressable
           onPress={() => setShowEmoji(prev => !prev)}
           style={{
@@ -411,6 +433,17 @@ const CreatePost = ({
             </Pressable>
           )
         }
+
+         </Box>
+
+         <Box flex={1} flexDirection="row" justifyContent="flex-end">
+          {selectedUsers.length <= 4 && selectedUsers.map((item, index) => (
+            <Box width={30} height={30} borderRadius={15} overflow="hidden" backgroundColor="fadedButtonBgColor">
+              <Image source={{ uri: `${IMAGE_BASE}${item.follower.profile_image}`}} contentFit="cover" style={{ width: '100%', height: '100%'}} />
+            </Box>
+          ))}
+         </Box>
+
       </Box>
     </Box>
   );

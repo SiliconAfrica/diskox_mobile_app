@@ -28,6 +28,7 @@ import { RootBottomTabParamList } from "../../navigation/BottomTabs";
 import { useMultipleAccounts } from "../../states/multipleAccountStates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../utils/handlePomise";
+import useToast from "../../hooks/useToast";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -41,6 +42,7 @@ const Login = () => {
   const userData = useDetailsState((state) => state);
   const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
   const { setAll: updateUtil } = useUtilState((state) => state);
+  const toast = useToast();
 
   const { renderForm } = useForm({
     defaultValues: {
@@ -53,7 +55,7 @@ const Login = () => {
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: "error" });
     },
     onSuccess: async (data) => {
       if (addAccount) {
@@ -105,6 +107,7 @@ const Login = () => {
         label="Login"
         onSubmit={(data) => mutate(data)}
         isLoading={isLoading}
+        width={'100%'}
       />
       <LightBgButton
         label="Signup"

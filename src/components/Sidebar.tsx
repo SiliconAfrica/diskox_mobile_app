@@ -195,16 +195,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       </View>
       <ScrollView>
         <Box paddingHorizontal="m">
-          <Item
-            icon={
-              <Ionicons
-                name="person-circle"
-                size={25}
-                color={theme.colors.textColor}
-              />
-            }
-            title="Guest"
-          />
+          
           {isLoggedIn && (
             <>
               <ScrollableItem accounts={accounts} />
@@ -254,6 +245,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Analytics"
+              />
+              <Item
+                icon={
+                  <Ionicons
+                    name="checkmark-circle-outline"
+                    size={25}
+                    color={theme.colors.textColor}
+                  />
+                }
+                title="Verify account"
+                action={() => navigation.navigate("verification")}
               />
             </>
           )}
@@ -313,7 +315,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             title="Knowledge Base"
           />
         </Box>
-        <Box paddingHorizontal="m" paddingTop="l">
+        {/* <Box paddingHorizontal="m" paddingTop="l">
           <CustomText variant="subheader" fontSize={18}>
             Explore Popular Tags
           </CustomText>
@@ -345,7 +347,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
               color={theme.colors.textColor}
             />
           </Pressable>
-        </Box>
+        </Box> */}
       </ScrollView>
     </Box>
   );

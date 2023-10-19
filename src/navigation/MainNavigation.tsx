@@ -33,6 +33,7 @@ import KnowledgeBase from "../pages/knowledgebase";
 import SingleKnowledge from "../pages/singleKnowledge";
 import { ICommunity } from "../models/Community";
 import Interests from "../pages/interests";
+import VerifyAccount from "../pages/verifyAccount";
 
 export type RootStackParamList = {
   home: undefined;
@@ -71,6 +72,7 @@ export type RootStackParamList = {
   community: { id: number, data: ICommunity };
   "community-members": { id: number, username: string };
   "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
+  "verification": { id: number }
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -107,6 +109,7 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Screen name="referrals" component={Referrals} />
         <RootStackNavigation.Screen name="settings" component={setting} />
         <RootStackNavigation.Screen name="security" component={Security} />
+        <RootStackNavigation.Screen name="verification" component={VerifyAccount} />
         <RootStackNavigation.Screen
           name="notifications"
           component={notifications}

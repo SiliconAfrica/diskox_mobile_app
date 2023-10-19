@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator  } from 'react-native'
+import { View, Text, ActivityIndicator, RefreshControl  } from 'react-native'
 import React from 'react'
 import Box from '../../../components/general/Box'
 import Searchbar from '../../../components/Searchbar'
@@ -15,12 +15,14 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../theme'
 import { useModalState } from '../../../states/modalState'
 import { POST_FILTERR } from '../../../enums/Postfilters'
+import useToast from '../../../hooks/useToast'
 
 const Questions = () => {
   const { isLoggedIn } = useUtilState((state) => state);
   const { setAll, filterBy } = useModalState((state) => state)
   const theme = useTheme<Theme>();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   // states
   const [posts, setPosts] = React.useState<IPost[]>([]);
@@ -28,42 +30,6 @@ const Questions = () => {
   const [total, setTotal] = React.useState(0);
   const [ids, setIds] = React.useState<number[]>([]);
   const [url, setUrl] = React.useState<string>(POST_FILTERR.ALL);
-
-  React.useEffect(() => {
-    console.log(filterBy);
-    switch (filterBy) {
-      case POST_FILTERR.HIGHEST_UPVOTES: {
-        setUrl(URLS.MOST_UPVOTES);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_COMMENTS: {
-        setUrl(URLS.MOST_COMMENTS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_REACTIONS: {
-        setUrl(URLS.MOST_REACTIONS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.TOP_STORIES: {
-          setUrl(URLS.TOP_STORIES);
-          queryClient.invalidateQueries(['GetAllPosts']);
-          break;
-      }
-      case POST_FILTERR.ALL: {
-        setUrl(URLS.GET_POST);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-    }
-  }, [filterBy])
-
-  const request = React.useCallback(() => {
-    console.log(filterBy);
-    return 
-  }, [currentPage])
 
 
   // react query
@@ -95,7 +61,29 @@ const Questions = () => {
       }
     },
     onError: (error: any) => {
-      alert(error.message)
+      toast.show(error.message, { type: 'error'});
+    }
+  });
+
+  const RefreshPost = useQuery(['GetAllPosts'], () => httpService.get(`${URLS.GET_QUESTIONS}`, {
+    params: {
+      page:currentPage
+    }
+  }), {
+    onSuccess: async(data) => {
+      if (posts.length > 0) {
+        if (data.data) {
+          return;
+        }
+        const arr = [...posts, ...data.data.data.data];
+        setPosts(arr);
+        return;
+      } else {
+        setPosts(data.data.data.data);
+      }
+    },
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error'});
     }
   });
 
@@ -115,17 +103,31 @@ const Questions = () => {
     if ((total / 12) === currentPage) {
       return;
     } else {
-      // get more items
-      //markasViewed.mutate({ posts_id: ids });
-      // increment page number
       setCurrentPage(currentPage + 1);
     }
   }, [currentPage, ids]);
 
+  const handleRefresh = () => {
+    RefreshPost.refetch();
+  }
+
   return (
     <Box backgroundColor='mainBackGroundColor' flex={1}>
+
+      { RefreshPost.isLoading && (
+          <Box width='100%' height={100} justifyContent="center" alignItems="center">
+            <ActivityIndicator color={theme.colors.primaryColor} />
+            <CustomText variant="body">Refreshing posts...</CustomText>
+          </Box>
+      )}
         
         <FlashList 
+           refreshControl={
+            <RefreshControl 
+              refreshing={RefreshPost.isLoading}
+              onRefresh={handleRefresh} 
+            />
+          }
           onEndReached={onEndReached}
           onEndReachedThreshold={1}
           ListEmptyComponent={() => (

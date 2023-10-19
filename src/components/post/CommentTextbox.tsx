@@ -61,6 +61,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const { isDarkMode } = useUtilState((state) => state);
   const queryClient = useQueryClient();
   const TextinputtRef = React.useRef<TextInput>();
+  const toast = useToast();
 
   const theme = useTheme<Theme>();
 
@@ -83,20 +84,20 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_REPLY}`, data),
     onSuccess: () => {
-      alert("coment created successfully");
+      toast.show('Comment created successfully', { type: 'success' });
       queryClient.invalidateQueries(["getReplies"]);
       setImages([]);
       setReply("");
     },
     onError: (error: any) => {
-      alert("An error occured while rying to create the comment");
+      toast.show('An error occured while rying to create the comment', { type: 'error' });
     },
   });
 
   const upvote = useMutation({
     mutationFn: () => httpService.post(`${URLS.UPVOTE_COMMENT}/${comment.id}`),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error?.message, { type: 'error' });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries([`getPost${comment.id}`]);
@@ -117,6 +118,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const deletereply = useMutation({
     mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${comment.id}`),
     onError: (error: any) => {
+      toast.show('Comment created successfully', { type: 'success' });
       alert(error.message);
     },
     onSuccess: (data) => {
@@ -676,7 +678,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_COMMENT}`, data),
     onSuccess: () => {
-      alert("coment created successfully");
+      toast.show('Comment created successfully', { type: 'success' });
       queryClient.invalidateQueries(["getComments"]);
       setImages([]);
       setComment("");

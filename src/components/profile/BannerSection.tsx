@@ -49,6 +49,7 @@ export enum ACTIVE_TAB {
 interface IProps {
   currentTab: ACTIVE_TAB;
   switchTab: (data: ACTIVE_TAB) => void;
+  id?: number;
 }
 
 const BannerSection = ({ currentTab, switchTab }: IProps) => {
@@ -62,8 +63,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const theme = useTheme<Theme>();
   const toast = useToast();
 
-  const { profile_image, username, name, created_at, about, country, state } =
-    useDetailsState((state) => state);
   const { isDarkMode } = useUtilState((state) => state);
 
   const getUserDetails = useQuery(
@@ -73,26 +72,25 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       enabled: userId !== id,
       onError: () => {},
       onSuccess: (data) => {
-        console.log(`this is not my profile oooo!!!!`);
         console.log(data?.data?.data);
         setUser(data?.data?.data);
       },
     }
   );
 
-  const getAuthUserDetails = useQuery(
-    ["getLoggedInDetails", id],
-    () => httpService.get(`${URLS.GET_AUTH_USER_DETAILS}`),
-    {
-      enabled: userId === id,
-      onError: () => {},
-      onSuccess: (data) => {
-        console.log(`this is my profile`);
-        console.log(data?.data?.data);
-        setUser(data?.data?.data);
-      },
-    }
-  );
+  // const getAuthUserDetails = useQuery(
+  //   ["getLoggedInDetails", id],
+  //   () => httpService.get(`${URLS.GET_AUTH_USER_DETAILS}`),
+  //   {
+  //     enabled: userId === id,
+  //     onError: () => {},
+  //     onSuccess: (data) => {
+  //       console.log(`this is my profile`);
+  //       console.log(data?.data?.data);
+  //       setUser(data?.data?.data);
+  //     },
+  //   }
+  // );
 
   console.log(userId);
 
@@ -124,11 +122,12 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     <Box width="100%">
       <ImageBackground
         source={require("../../../assets/images/banner.png")}
-        style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
+        style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50, }}
       >
+
         {/* <Box flexDirection='row'>
-                <Text>hello therre people</Text>
-            </Box> */}
+          <Text>hello therre people</Text>
+        </Box> */}
 
         <Box
           width={100}
@@ -204,8 +203,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             </Box>
           </Pressable>
           {/* <Box width={50} height={50} borderRadius={25} borderWidth={2} borderColor='secondaryBackGroundColor' alignItems='center' justifyContent='center'>
-                        <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
-                    </Box> */}
+            <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
+          </Box> */}
         </Box>
       )}
 

@@ -77,4 +77,5 @@ export const URLS = {
   UPDATE_INTEREST: "/update_user_interests",
   BOOKMARK_POST: "/bookmark_post",
   AD_SHARING_REQUEST: "/send_ad_sharing_request",
+  UPDATE_COMMUNITY_TYPE: '/update_community_type'
 };

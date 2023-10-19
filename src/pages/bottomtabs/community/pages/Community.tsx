@@ -34,7 +34,7 @@ const Community = () => {
   const { id, data } = route.params;
   const [details, setDetails] = React.useState<null | ICommunity>(null)
 
-  const { isLoading, isError } = useQuery(['getCmmunity', id], () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${data.username}`), {
+  const { isLoading, isError } = useQuery(['getCommunity', id], () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${data.username}`), {
     onSuccess: (data) => {
       setDetails(data?.data?.data);
     }
@@ -67,7 +67,7 @@ const Community = () => {
             </Box>
 
             <Box width={40} height={40} borderRadius={20} justifyContent='center' alignItems='center' bg='fadedButtonBgColor' >
-              {/* <Feather name='settings' size={25} color={theme.colors.primaryColor} onPress={() => navigation.navigate('community-settings', { id: 23, username: details.username, type: COMMUNITY_SETTING_TYPE.DEFAULT })} /> */}
+              <Feather name='settings' size={25} color={theme.colors.primaryColor} onPress={() => navigation.navigate('community-settings', { id: details.id, username: details.username, type: COMMUNITY_SETTING_TYPE.DEFAULT })} />
             </Box>
           </Box>
 

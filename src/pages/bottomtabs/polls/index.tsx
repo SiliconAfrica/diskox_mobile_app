@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator  } from 'react-native'
+import { View, Text, ActivityIndicator, RefreshControl  } from 'react-native'
 import React from 'react'
 import Box from '../../../components/general/Box'
 import Searchbar from '../../../components/Searchbar'
@@ -16,12 +16,14 @@ import { Theme } from '../../../theme'
 import { useModalState } from '../../../states/modalState'
 import { POST_FILTERR } from '../../../enums/Postfilters'
 import PollCard from '../../../components/feeds/PollCard'
+import useToast from '../../../hooks/useToast'
 
 const Posts = () => {
   const { isLoggedIn } = useUtilState((state) => state);
   const { setAll, filterBy } = useModalState((state) => state)
   const theme = useTheme<Theme>();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   // states
   const [posts, setPosts] = React.useState<IPost[]>([]);
@@ -30,66 +32,8 @@ const Posts = () => {
   const [ids, setIds] = React.useState<number[]>([]);
   const [url, setUrl] = React.useState<string>(POST_FILTERR.ALL);
 
-  React.useEffect(() => {
-    console.log(filterBy);
-    switch (filterBy) {
-      case POST_FILTERR.HIGHEST_UPVOTES: {
-        setUrl(URLS.MOST_UPVOTES);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_COMMENTS: {
-        setUrl(URLS.MOST_COMMENTS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.MOST_REACTIONS: {
-        setUrl(URLS.MOST_REACTIONS);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-      case POST_FILTERR.TOP_STORIES: {
-          setUrl(URLS.TOP_STORIES);
-          queryClient.invalidateQueries(['GetAllPosts']);
-          break;
-      }
-      case POST_FILTERR.ALL: {
-        setUrl(URLS.GET_POST);
-        queryClient.invalidateQueries(['GetAllPosts']);
-        break;
-      }
-    }
-  }, [filterBy])
-
-  const request = React.useCallback(() => {
-    console.log(filterBy);
-    switch (filterBy) {
-      case POST_FILTERR.HIGHEST_UPVOTES: {
-        setUrl(URLS.MOST_UPVOTES);
-        return httpService.get(`${URLS.MOST_UPVOTES}?page=${currentPage}`)
-      }
-      case POST_FILTERR.MOST_COMMENTS: {
-        setUrl(URLS.MOST_COMMENTS);
-        return httpService.get(`${URLS.MOST_COMMENTS}?page=${currentPage}`)
-      }
-      case POST_FILTERR.MOST_REACTIONS: {
-        setUrl(URLS.MOST_REACTIONS);
-        return httpService.get(`${URLS.MOST_REACTIONS}?page=${currentPage}`)
-      }
-      case POST_FILTERR.TOP_STORIES: {
-          setUrl(URLS.TOP_STORIES);
-          return httpService.get(`${URLS.TOP_STORIES}?page=${currentPage}`)
-      }
-      case POST_FILTERR.ALL: {
-        setUrl(URLS.GET_POST);
-        return httpService.get(`${URLS.GET_POST}?page=${currentPage}`)
-      }
-    }
-  }, [filterBy, currentPage])
-
-
   // react query
-  const { isLoading, isError, error } = useQuery(['GetAllPolls', currentPage, url, request], () => httpService.get(`${URLS.GET_POLLS}?page=${currentPage}`), {
+  const { isLoading, isError, error } = useQuery(['GetAllPolls', currentPage, url], () => httpService.get(`${URLS.GET_POLLS}?page=${currentPage}`), {
     onSuccess: async(data) => {
       if (posts.length > 0) {
         if (!data.data) {
@@ -113,7 +57,25 @@ const Posts = () => {
       }
     },
     onError: (error: any) => {
-      alert(error.message)
+      toast.show(error.message, { type: 'error'});
+    }
+  });
+
+  const RefreshPost = useQuery(['GetAllPolls'], () => httpService.get(`${URLS.GET_POLLS}?page=${currentPage}`), {
+    onSuccess: async(data) => {
+      if (posts.length > 0) {
+        if (!data.data) {
+          return;
+        }
+        const arr = [...posts, ...data.data.data.data];
+        setPosts(arr);
+        return;
+      } else {
+        setPosts(data.data.data.data);
+      }
+    },
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error'});
     }
   });
 
@@ -121,7 +83,7 @@ const Posts = () => {
   const markasViewed = useMutation({
     mutationFn: (data: { posts_id: number[] }) => httpService.post(`${URLS.INCREMENT_POST_VIEWS}`, data),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: 'error'});
     },
     onSuccess: (data) => {
       console.log(data.data);
@@ -140,10 +102,28 @@ const Posts = () => {
     }
   }, [currentPage, ids]);
 
+  const handleRefresh = () => {
+    RefreshPost.refetch();
+  }
+
   return (
     <Box backgroundColor='mainBackGroundColor' flex={1}>
-        
-        <FlashList 
+      
+        { RefreshPost.isLoading && (
+          <Box width='100%' height={100} justifyContent="center" alignItems="center">
+            <ActivityIndicator color={theme.colors.primaryColor} />
+            <CustomText variant="body">Refreshing posts...</CustomText>
+          </Box>
+        )}
+
+        {  (
+          <FlashList 
+          refreshControl={
+            <RefreshControl 
+              refreshing={RefreshPost.isLoading}
+              onRefresh={handleRefresh} 
+            />
+          }
           onEndReached={onEndReached}
           onEndReachedThreshold={1}
           ListEmptyComponent={() => (
@@ -168,6 +148,7 @@ const Posts = () => {
             </Box>
           )}
         />
+        )}
     </Box>
   )
 }
