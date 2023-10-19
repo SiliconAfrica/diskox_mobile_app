@@ -120,7 +120,6 @@ const PostCard = (props: IPost & IProps) => {
   }, [id]);
 
   const handleUpVote = () => {
-    console.log("kkk");
     const check = checkloggedInState();
     if (check) {
       upvote.mutate();
