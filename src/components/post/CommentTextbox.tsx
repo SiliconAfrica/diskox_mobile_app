@@ -574,7 +574,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                   color: theme.colors.textColor,
                 }}
               />
-             
+
               <Feather
                 name={"smile"}
                 size={25}
@@ -609,12 +609,19 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
           </Box>
 
           {showEmoji && (
-                <Box width="100%" height={130} position="absolute" bottom={80} left={60} zIndex={10}>
-                  <Emojipicker
-                    onSelected={(emoji) => setReply((prev) => prev + " " + emoji)}
-                  />
-                </Box>
-              )}
+            <Box
+              width="100%"
+              height={130}
+              position="absolute"
+              bottom={80}
+              left={60}
+              zIndex={10}
+            >
+              <Emojipicker
+                onSelected={(emoji) => setReply((prev) => prev + " " + emoji)}
+              />
+            </Box>
+          )}
 
           {commentsVisible && (
             <Box paddingLeft="m">
@@ -655,7 +662,9 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     () => httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`),
     {
       onError: (error) => {
-        toast.show('An eror occured while getting the comments', { type: 'error' })
+        toast.show("An eror occured while getting the comments", {
+          type: "error",
+        });
       },
       onSuccess: (data) => {
         setComments(data.data.data.data);
@@ -673,7 +682,9 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
       setComment("");
     },
     onError: (error: any) => {
-      toast.show('An error occured while rying to create the comment', { type: 'error' })
+      toast.show("An error occured while rying to create the comment", {
+        type: "error",
+      });
     },
   });
 
