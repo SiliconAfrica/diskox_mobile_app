@@ -12,7 +12,8 @@ interface IProps {
     | "chatbox-ellipses-outline"
     | "heart-outline"
     | "arrow-up-outline"
-    | "reader-outline";
+    | "reader-outline"
+    | "arrow-down-outline";
   title: string;
   amount: number;
 }
