@@ -22,6 +22,8 @@ interface State {
   visibility: string;
   filterBy: string;
   forCommunity: boolean;
+  showImageVideoSlider: boolean;
+  imageVideoSliderData: any[];
   setAll: (data: Partial<State>) => void;
 }
 
@@ -40,6 +42,8 @@ export const useModalState = create<State>((set) => ({
   visibility: VISIBILITY.EVERYONE,
   filterBy: POST_FILTERR.ALL,
   forCommunity: false,
+  showImageVideoSlider: false,
+  imageVideoSliderData: [],
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

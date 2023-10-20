@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState, memo } from "react";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../pages/login";
-import httpService, { BASE_URL } from "../../utils/httpService";
+import httpService, { BASE_URL, IMAGE_BASE } from "../../utils/httpService";
 import { useQuery } from "react-query";
 import { URLS } from "../../services/urls";
 
@@ -157,9 +157,7 @@ export default function AnnouncementBox() {
             source={
               selectedAnnouncement.cover_photo &&
               selectedAnnouncement.cover_photo.length > 0
-                ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                    selectedAnnouncement.cover_photo[0]
-                  }`
+                ? `${IMAGE_BASE}${selectedAnnouncement.cover_photo[0]}`
                 : require("../../../assets/images/diskoxLarge.png")
             }
             style={{

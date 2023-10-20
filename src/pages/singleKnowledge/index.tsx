@@ -6,7 +6,7 @@ import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
 import { useQuery } from "react-query";
-import httpService, { BASE_URL } from "../../utils/httpService";
+import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useState } from "react";
 import { TKnowledge } from "../../types/MenuPageTypes";
@@ -51,9 +51,7 @@ export default function SingleKnowledge({ route }) {
             <Image
               source={
                 knowledge.cover_photo.length > 0
-                  ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                      knowledge.cover_photo[0]
-                    }`
+                  ? `${IMAGE_BASE}${knowledge.cover_photo[0]}`
                   : require("../../../assets/images/diskoxLarge.png")
               }
               style={styles.banner}

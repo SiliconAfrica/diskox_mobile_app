@@ -5,25 +5,20 @@ import CustomText from "../../components/general/CustomText";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
 import { formatDate } from "../../utils/dateFormatter";
-import { BASE_URL } from "../../utils/httpService";
+import { IMAGE_BASE } from "../../utils/httpService";
 
 export default function AnnouncementTab({ announcement }) {
   const navigation = useNavigation<PageType>();
   return (
-
-    <Box px="s" mt='l' mx='m'>
-
+    <Box px="s" mt="l" mx="m">
       <Box style={styles.imgbox}>
         <Image
           source={
             announcement.cover_photo.length > 0
-              ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                  announcement.cover_photo[0]
-                }`
+              ? `${IMAGE_BASE}${announcement.cover_photo[0]}`
               : require("../../../assets/images/diskoxLarge.png")
           }
           contentFit="cover"
-
           style={styles.img}
         />
       </Box>

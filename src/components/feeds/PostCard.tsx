@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import Box from "../general/Box";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather, FontAwesome5 } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import CustomText from "../general/CustomText";
@@ -24,6 +24,7 @@ import { useModalState } from "../../states/modalState";
 import { useUtilState } from "../../states/util";
 import CommentTextbox from "../post/CommentTextbox";
 import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
+import { useToast } from "react-native-toast-notifications";
 
 const WIDTH = Dimensions.get("screen").width;
 
@@ -32,6 +33,7 @@ interface IProps {
 }
 
 const PostCard = (props: IPost & IProps) => {
+  const toast = useToast();
   const [showAll, setShowAll] = React.useState(false);
   const [post, setPost] = React.useState<IPost>({ ...props });
   const { setAll } = useModalState((state) => state);
@@ -63,12 +65,12 @@ const PostCard = (props: IPost & IProps) => {
     {
       refetchOnMount: false,
       onError: (error: any) => {
-        toast.show(error.message, { type: 'error'})
+        toast.show(error.message, { type: "error" });
       },
       onSuccess: (data) => {
-        const p: IPost = data.data.data
+        const p: IPost = data.data.data;
         if (p.has_reacted.length > 0) {
-            console.log(p.has_reacted);
+          console.log(p.has_reacted);
         }
         // p.map((item) => {
         //     if (item.has_reacted.length > 0) {
@@ -141,7 +143,17 @@ const PostCard = (props: IPost & IProps) => {
       downvote.mutate();
     }
   };
-
+  const openGallery = () => {
+    const allVideoAndImage = [...post_images, ...post_videos];
+    let theData = allVideoAndImage.map((item) => ({
+      type: item.type,
+      uri: `${IMAGE_BASE}${item.image_path || item.video_path}`,
+    }));
+    setModalState({
+      showImageVideoSlider: true,
+      imageVideoSliderData: [...theData],
+    });
+  };
   return (
     <Box
       width="100%"
@@ -225,113 +237,196 @@ const PostCard = (props: IPost & IProps) => {
         </CustomText>
 
         {/* IMAGE OR VIDEO SECTION */}
-        {post_images?.length > 0 ||
-          (post_videos?.length > 0 && (
-            <Box
-              flexDirection="row"
-              justifyContent="space-between"
-              marginTop="m"
-              height={300}
-              width={"100%"}
-            >
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  height: "100%",
+        {(post_images?.length > 0 || post_videos?.length > 0) && (
+          <Pressable
+            onPress={openGallery}
+            style={{ marginTop: 8, height: 300, width: "100%" }}
+          >
+            {post_images.length > 0 && post_videos.length > 0 ? (
+              <Box
+                style={{
+                  position: "relative",
                   width: "100%",
-                  paddingRight: 200,
+                  height: "100%",
                   backgroundColor: "red",
                 }}
               >
-                {post_images.length > 0 && (
+                {post_images.length > 0 ? (
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE}${post_images[0].image_path}`,
+                    }}
+                    contentFit="cover"
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: undefined,
+                      paddingTop: "83%",
+                    }}
+                  />
+                ) : (
                   <>
-                    {post_images.length === 1 &&
-                      post_images.map((image, index) => (
-                        <Image
-                          source={{ uri: `${IMAGE_BASE}${image}` }}
-                          contentFit="contain"
-                          style={{
-                            width: WIDTH,
-                            height: "100%",
-                            borderRadius: 0,
-                          }}
-                        />
-                      ))}
-                    {post.post_images.length > 1 &&
-                      post_images.map((image, i) => (
-                        <Image
-                          source={{ uri: `${IMAGE_BASE}${image}` }}
-                          contentFit="contain"
-                          style={{
-                            width: "44%",
-                            height: "100%",
-                            borderRadius: 15,
-                          }}
-                        />
-                      ))}
+                    <Video
+                      source={{
+                        uri: `${IMAGE_BASE}${post_videos[0].video_path}`,
+                      }}
+                      posterSource={{
+                        uri: `${IMAGE_BASE}${post_videos[0].video_thumbnail}`,
+                      }}
+                      usePoster
+                      resizeMode={ResizeMode.COVER}
+                      useNativeControls
+                      isLooping={false}
+                      videoStyle={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 15,
+                        backgroundColor: "grey",
+                      }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 0,
+                        backgroundColor: "grey",
+                      }}
+                    />
+                    <Box
+                      style={{
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FontAwesome5
+                        name="play"
+                        size={50}
+                        color={theme.colors.whitesmoke}
+                      />
+                    </Box>
                   </>
                 )}
 
-                {post_videos.length > 0 && (
-                  <>
-                    {post_videos.length === 1 &&
-                      post_videos.map((video, index) => (
-                        <Video
-                          key={index}
-                          source={{ uri: `${IMAGE_BASE}${video.video_path}` }}
-                          posterSource={{
-                            uri: `${IMAGE_BASE}${video.video_thumbnail}`,
-                          }}
-                          usePoster
-                          resizeMode={ResizeMode.COVER}
-                          useNativeControls
-                          isLooping={false}
-                          videoStyle={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 15,
-                            backgroundColor: "grey",
-                          }}
-                          style={{
-                            width: WIDTH,
-                            height: "100%",
-                            borderRadius: 0,
-                            backgroundColor: "grey",
-                          }}
-                        />
-                      ))}
-                    {post_videos.length > 1 &&
-                      post_videos.map((item, i) => (
-                        <Video
-                          key={i}
-                          source={{ uri: `${IMAGE_BASE}${item.video_path}` }}
-                          posterSource={{
-                            uri: `${IMAGE_BASE}${item.video_thumbnail}`,
-                          }}
-                          usePoster
-                          resizeMode={ResizeMode.COVER}
-                          useNativeControls
-                          videoStyle={{
-                            width: "44%",
-                            height: "70%",
-                            borderRadius: 15,
-                            backgroundColor: "grey",
-                          }}
-                          isLooping={false}
-                          style={{
-                            width: (WIDTH / 100) * 44,
-                            height: "70%",
-                            borderRadius: 15,
-                            backgroundColor: "grey",
-                          }}
-                        />
-                      ))}
-                  </>
-                )}
-              </ScrollView>
-            </Box>
-          ))}
+                <Box
+                  backgroundColor="grey"
+                  position="absolute"
+                  width={80}
+                  height={80}
+                  alignItems="center"
+                  justifyContent="center"
+                  bottom={0}
+                  right={0}
+                >
+                  <CustomText variant="subheader" color="white">
+                    {post_images.length + post_videos.length - 1}+
+                  </CustomText>
+                </Box>
+              </Box>
+            ) : (
+              <></>
+            )}
+            {/*   old code*/}
+            {/* <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                // height: "100%",
+                // width: "100%",
+                // paddingRight: 200,
+                backgroundColor: "red",
+              }}
+            >
+              {post_images.length > 0 && (
+                <>
+                  {post_images.length === 1 &&
+                    post_images.map((image, index) => (
+                      <Image
+                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
+                        contentFit="contain"
+                        key={index}
+                        style={{
+                          width: WIDTH,
+                          height: "100%",
+                          borderRadius: 0,
+                        }}
+                      />
+                    ))}
+                  {post.post_images.length > 1 &&
+                    post_images.map((image, i) => (
+                      <Image
+                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
+                        contentFit="contain"
+                        key={i}
+                        style={{
+                          width: WIDTH - 50,
+                          height: "100%",
+                          borderRadius: 15,
+                        }}
+                      />
+                    ))}
+                </>
+              )}
+
+              {post_videos.length > 0 && (
+                <>
+                  {post_videos.length === 1 &&
+                    post_videos.map((video, index) => (
+                      <Video
+                        key={index}
+                        source={{ uri: `${IMAGE_BASE}${video.video_path}` }}
+                        posterSource={{
+                          uri: `${IMAGE_BASE}${video.video_thumbnail}`,
+                        }}
+                        usePoster
+                        resizeMode={ResizeMode.COVER}
+                        useNativeControls
+                        isLooping={false}
+                        videoStyle={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: 15,
+                          backgroundColor: "grey",
+                        }}
+                        style={{
+                          width: WIDTH,
+                          height: "100%",
+                          borderRadius: 0,
+                          backgroundColor: "grey",
+                        }}
+                      />
+                    ))}
+                  {post_videos.length > 1 &&
+                    post_videos.map((item, i) => (
+                      <Video
+                        key={i}
+                        source={{ uri: `${IMAGE_BASE}${item.video_path}` }}
+                        posterSource={{
+                          uri: `${IMAGE_BASE}${item.video_thumbnail}`,
+                        }}
+                        usePoster
+                        resizeMode={ResizeMode.COVER}
+                        useNativeControls
+                        videoStyle={{
+                          width: "44%",
+                          height: "70%",
+                          borderRadius: 15,
+                          backgroundColor: "grey",
+                        }}
+                        isLooping={false}
+                        style={{
+                          width: (WIDTH / 100) * 44,
+                          height: "70%",
+                          borderRadius: 15,
+                          backgroundColor: "grey",
+                        }}
+                      />
+                    ))}
+                </>
+              )}
+            </ScrollView> */}
+          </Pressable>
+        )}
       </Box>
 
       {/* REACTION SECTION */}

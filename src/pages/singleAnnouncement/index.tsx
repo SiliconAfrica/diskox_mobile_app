@@ -6,7 +6,7 @@ import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
 import { useQuery } from "react-query";
-import httpService, { BASE_URL } from "../../utils/httpService";
+import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useState } from "react";
 import { IAnnouncement } from "../../types/MenuPageTypes";
@@ -50,9 +50,7 @@ export default function SingleAnnouncement({ route }) {
             <Image
               source={
                 announcement && announcement.cover_photo.length > 0
-                  ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                      announcement.cover_photo[0]
-                    }`
+                  ? `${IMAGE_BASE}${announcement.cover_photo[0]}`
                   : require("../../../assets/images/diskoxLarge.png")
               }
               style={styles.banner}

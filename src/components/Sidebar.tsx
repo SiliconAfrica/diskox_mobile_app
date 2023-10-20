@@ -18,7 +18,7 @@ import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
-import { BASE_URL } from "../utils/httpService";
+import { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -120,9 +120,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                   source={
                     user?.profile_image
                       ? {
-                          uri: `${BASE_URL.replace("/api/v1", "")}/storage/${
-                            user?.profile_image
-                          }`,
+                          uri: `${IMAGE_BASE}${user?.profile_image}`,
                         }
                       : require("../../assets/images/diskoxLarge.png")
                   }
@@ -195,7 +193,6 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       </View>
       <ScrollView>
         <Box paddingHorizontal="m">
-          
           {isLoggedIn && (
             <>
               <ScrollableItem accounts={accounts} />
