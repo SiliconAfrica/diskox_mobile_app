@@ -39,6 +39,7 @@ const PostCard = (props: IPost & IProps) => {
   const { setAll } = useModalState((state) => state);
   const { isDarkMode } = useUtilState((state) => state);
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const { setAll: setModalState } = useModalState((state) => state);
@@ -559,7 +560,7 @@ const PostCard = (props: IPost & IProps) => {
                   name="heart-outline"
                   size={20}
                   color={
-                    post.has_reacted.includes(id)
+                    post.has_reacted.length > 0
                       ? theme.colors.primaryColor
                       : theme.colors.textColor
                   }

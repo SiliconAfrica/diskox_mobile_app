@@ -25,6 +25,8 @@ import { Theme } from "../../theme";
 import { useTheme } from "@shopify/restyle";
 import { ScrollView } from "react-native-gesture-handler";
 import { Video, ResizeMode } from "expo-av";
+import CommentTextbox from "../../components/post/CommentTextbox";
+import SingleCommentTextbox from "../../components/post/SinglePostCommentPage";
 
 const Post = ({
   route,
@@ -100,7 +102,10 @@ const Post = ({
         handleArrowPressed={handleBackPress}
       />
 
+      <ScrollView >
+
       <Box flex={1}>
+
         {/* HEADER SECTION */}
         <Box
           flexDirection="row"
@@ -220,63 +225,11 @@ const Post = ({
         </ScrollView>
       </Box>
 
-      <Box
-        width={`100%`}
-        height={170}
-        borderTopWidth={2}
-        borderTopColor="secondaryBackGroundColor"
-        paddingVertical="m"
-        paddingHorizontal="m"
-      >
-        <TextInput
-          placeholderTextColor={theme.colors.textColor}
-          placeholder="Leave a comment..."
-          value={comment}
-          onChangeText={(e) => setComment(e)}
-          style={{
-            ...styles.textInput,
-            borderColor: theme.colors.secondaryBackGroundColor,
-            color: theme.colors.textColor,
-          }}
-        />
+      {/* COMMENT SECTIONS */}
+      <SingleCommentTextbox postId={postId} />
 
-        <Box
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          marginTop="m"
-        >
-          <Box flexDirection="row">
-            <Feather name="smile" size={30} color={theme.colors.textColor} />
-            <Feather
-              name="image"
-              size={30}
-              color={theme.colors.textColor}
-              style={{ marginLeft: 10 }}
-            />
-          </Box>
-          <Pressable style={styles.button} onPress={handleComment}>
-            {!postComment.isLoading && (
-              <>
-                <CustomText variant="body" color="primaryColor">
-                  Send
-                </CustomText>
-                <Feather
-                  name="send"
-                  size={25}
-                  color={theme.colors.primaryColor}
-                />
-              </>
-            )}
-            {postComment.isLoading && (
-              <ActivityIndicator
-                color={theme.colors.primaryColor}
-                size="small"
-              />
-            )}
-          </Pressable>
-        </Box>
-      </Box>
+      </ScrollView>
+  
     </Box>
   );
 };
