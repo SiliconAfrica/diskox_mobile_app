@@ -8,6 +8,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -30,6 +31,7 @@ export default function VideoImageGallery({}) {
     imageVideoSliderData: data,
     setAll,
   } = useModalState((state) => state);
+  const modalState = useModalState((state) => state);
   const theme = useTheme<Theme>();
   const scrollX = useRef(new Animated.Value(0)).current;
   const [dataWithPlaceholders, setDataWithPlaceholders] = useState([]);
@@ -72,7 +74,6 @@ export default function VideoImageGallery({}) {
   useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
-        console.log("pppp", e);
         if (!isOpen) {
           // If we don't have unsaved changes, then we don't need to do anything
           return;
@@ -105,148 +106,150 @@ export default function VideoImageGallery({}) {
     return <></>;
   }
   return (
-    <>
-      <View style={styles.container}>
-        <TouchableOpacity
+    <View style={styles.container}>
+      <Pressable
+        style={{
+          top: 40,
+          left: 20,
+          position: "absolute",
+          zIndex: 50,
+        }}
+        onPress={() =>
+          setAll({
+            showImageVideoSlider: false,
+            imageVideoSliderData: [],
+          })
+        }
+      >
+        <AntDesign name="back" size={24} color={theme.colors.white} />
+      </Pressable>
+      {loading && (
+        <ActivityIndicator
+          size={20}
+          color={theme.colors.primaryColor}
           style={{
-            top: 40,
-            left: 20,
             position: "absolute",
-            zIndex: 50,
-          }}
-          onPress={() =>
-            setAll({ showImageVideoSlider: false, imageVideoSliderData: [] })
-          }
-        >
-          <AntDesign name="back" size={24} color={theme.colors.white} />
-        </TouchableOpacity>
-        {loading && (
-          <ActivityIndicator
-            size={20}
-            color={theme.colors.primaryColor}
-            style={{
-              position: "absolute",
-              zIndex: 20,
-              left: "45%",
-              top: "45%",
-            }}
-          />
-        )}
-        <FlatList
-          ref={flatListRef}
-          data={dataWithPlaceholders}
-          renderItem={({ item, index }) => {
-            if (!item.uri) {
-              return <View style={{ width: EMPTY_ITEM_LENGTH }} />;
-            }
-
-            const inputRange = [
-              (index - 2) * ITEM_LENGTH,
-              (index - 1) * ITEM_LENGTH,
-              index * ITEM_LENGTH,
-            ];
-
-            const translateY = scrollX.interpolate({
-              inputRange,
-              outputRange: [
-                CURRENT_ITEM_TRANSLATE_Y * 2,
-                CURRENT_ITEM_TRANSLATE_Y,
-                CURRENT_ITEM_TRANSLATE_Y * 2,
-              ],
-              // extrapolate: 'clamp',
-            });
-
-            return (
-              <View
-                style={{
-                  width: ITEM_LENGTH,
-                  backgroundColor: "black",
-                  paddingVertical: "30%",
-                  //   justifyContent: "center",
-                }}
-              >
-                <Animated.View
-                  style={[
-                    {
-                      transform: [{ translateY }],
-                      marginHorizontal: SPACING * 3,
-                      borderRadius: BORDER_RADIUS + SPACING * 2,
-                      backgroundColor: "black",
-                    },
-                    styles.itemContent,
-                  ]}
-                >
-                  {item.type && item.type.includes("video") ? (
-                    <Video
-                      source={{ uri: item.uri }}
-                      style={[
-                        styles.itemImage,
-                        { height: ITEM_LENGTH, borderRadius: BORDER_RADIUS },
-                      ]}
-                      volume={1}
-                      isLooping
-                      shouldPlay={false}
-                      onLoad={() => setLoading(false)}
-                      useNativeControls
-                    />
-                  ) : (
-                    <Image
-                      source={{ uri: item.uri }}
-                      style={[
-                        styles.itemImage,
-                        { height: ITEM_LENGTH, borderRadius: BORDER_RADIUS },
-                      ]}
-                      onLoad={() => setLoading(false)}
-                    />
-                  )}
-                  <Box
-                    style={{
-                      width: "100%",
-                      paddingVertical: 10,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    backgroundColor="primaryColor"
-                  >
-                    <CustomText variant="subheader" color="white">
-                      {`${index}/${data.length}`}
-                    </CustomText>
-                  </Box>
-                </Animated.View>
-              </View>
-            );
-          }}
-          getItemLayout={getItemLayout}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.uri}
-          bounces={false}
-          initialNumToRender={1}
-          decelerationRate={0}
-          renderToHardwareTextureAndroid
-          // contentContainerStyle={styles.flatListContent}
-          snapToInterval={ITEM_LENGTH}
-          snapToAlignment="start"
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
-          onViewableItemsChanged={handleOnViewableItemsChanged}
-          viewabilityConfig={{
-            itemVisiblePercentThreshold: 100,
+            zIndex: 20,
+            left: "45%",
+            top: "45%",
           }}
         />
-      </View>
-    </>
+      )}
+      <FlatList
+        ref={flatListRef}
+        data={dataWithPlaceholders}
+        renderItem={({ item, index }) => {
+          if (!item.uri) {
+            return <View style={{ width: EMPTY_ITEM_LENGTH }} />;
+          }
+
+          const inputRange = [
+            (index - 2) * ITEM_LENGTH,
+            (index - 1) * ITEM_LENGTH,
+            index * ITEM_LENGTH,
+          ];
+
+          const translateY = scrollX.interpolate({
+            inputRange,
+            outputRange: [
+              CURRENT_ITEM_TRANSLATE_Y * 2,
+              CURRENT_ITEM_TRANSLATE_Y,
+              CURRENT_ITEM_TRANSLATE_Y * 2,
+            ],
+            // extrapolate: 'clamp',
+          });
+
+          return (
+            <View
+              key={item.uri + index.toString()}
+              style={{
+                width: ITEM_LENGTH,
+                backgroundColor: "black",
+                paddingVertical: "30%",
+                //   justifyContent: "center",
+              }}
+            >
+              <Animated.View
+                style={[
+                  {
+                    transform: [{ translateY }],
+                    marginHorizontal: SPACING * 3,
+                    borderRadius: BORDER_RADIUS + SPACING * 2,
+                    backgroundColor: "black",
+                  },
+                  styles.itemContent,
+                ]}
+              >
+                {item.type && item.type.includes("video") ? (
+                  <Video
+                    source={{ uri: item.uri }}
+                    style={[
+                      styles.itemImage,
+                      { height: ITEM_LENGTH, borderRadius: BORDER_RADIUS },
+                    ]}
+                    volume={1}
+                    isLooping
+                    shouldPlay={false}
+                    onLoad={() => setLoading(false)}
+                    useNativeControls
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: item.uri }}
+                    style={[
+                      styles.itemImage,
+                      { height: ITEM_LENGTH, borderRadius: BORDER_RADIUS },
+                    ]}
+                    onLoad={() => setLoading(false)}
+                  />
+                )}
+                <Box
+                  style={{
+                    width: "100%",
+                    paddingVertical: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  backgroundColor="primaryColor"
+                >
+                  <CustomText variant="subheader" color="white">
+                    {`${index}/${data.length}`}
+                  </CustomText>
+                </Box>
+              </Animated.View>
+            </View>
+          );
+        }}
+        getItemLayout={getItemLayout}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item, index) => item.uri + index.toString()}
+        bounces={false}
+        initialNumToRender={1}
+        decelerationRate={0}
+        renderToHardwareTextureAndroid
+        // contentContainerStyle={styles.flatListContent}
+        snapToInterval={ITEM_LENGTH}
+        snapToAlignment="start"
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+        onViewableItemsChanged={handleOnViewableItemsChanged}
+        viewabilityConfig={{
+          itemVisiblePercentThreshold: 100,
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    zIndex: 10,
+    zIndex: 100,
     width: "100%",
     height: "100%",
     marginTop: "15%",

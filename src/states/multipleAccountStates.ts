@@ -14,6 +14,7 @@ interface IMultipleAccount {
     token: string,
     updateFn: (data: Partial<IUserState>) => void
   ) => void;
+  refreshAccounts: (userData: IUserState) => void;
   removeAccount: (username: any) => void;
 }
 
@@ -40,6 +41,7 @@ export const useMultipleAccounts = create<IMultipleAccount>((set) => ({
         ],
       };
     }),
+
   switchAccount: (username, token, updateFn) =>
     set((state) => {
       const accountToUse = state.accounts.filter((account) => {
@@ -66,6 +68,24 @@ export const useMultipleAccounts = create<IMultipleAccount>((set) => ({
       const newAccountsArr = [accountToUse[0], ...otherAccounts];
 
       return { ...state, accounts: newAccountsArr };
+    }),
+  refreshAccounts: (userData) =>
+    set((state) => {
+      const otherAccounts = state.accounts.filter((account) => {
+        return account.username !== userData.username;
+      });
+
+      const newAccountsArr = [userData, ...otherAccounts];
+      const updateStore = async () => {
+        const [resave, resaveErr] = await handlePromise(
+          AsyncStorage.setItem(`all_users`, JSON.stringify([...newAccountsArr]))
+        );
+      };
+      updateStore();
+      return {
+        ...state,
+        accounts: newAccountsArr,
+      };
     }),
   removeAccount: (usernameToRemove) =>
     set((state) => {

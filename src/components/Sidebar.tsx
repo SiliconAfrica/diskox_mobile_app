@@ -75,31 +75,47 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
               }}
             >
               <Pressable
-                onPress={async () => {
-                  const switchToken = await SecureStorage.getItemAsync(
-                    `---${user.username}---token`
-                  );
-                  if (switchToken) {
-                    //save the token and data we are to be using in normal token
-                    await SecureStorage.setItemAsync("token", switchToken);
+                onPress={
+                  user?.username === username
+                    ? null
+                    : async () => {
+                        const switchToken = await SecureStorage.getItemAsync(
+                          `---${user.username}---token`
+                        );
+                        if (switchToken) {
+                          //save the token and data we are to be using in normal token
+                          await SecureStorage.setItemAsync(
+                            "token",
+                            switchToken
+                          );
 
-                    await AsyncStorage.setItem("user", JSON.stringify(user));
+                          await AsyncStorage.setItem(
+                            "user",
+                            JSON.stringify(user)
+                          );
 
-                    const [savedUser, savedUserErr] = await handlePromise(
-                      AsyncStorage.getItem("user")
-                    );
-                    if (JSON.parse(savedUser).username === user.username) {
-                      switchAccount(user.username, switchToken, updateDetails);
-                      toast.show(`Logged in as "@${user.username}"`, {
-                        type: "success",
-                      });
-                    }
-                  } else {
-                    alert(
-                      `Please add account with username of ${user.username} again.`
-                    );
-                  }
-                }}
+                          const [savedUser, savedUserErr] = await handlePromise(
+                            AsyncStorage.getItem("user")
+                          );
+                          if (
+                            JSON.parse(savedUser).username === user.username
+                          ) {
+                            switchAccount(
+                              user.username,
+                              switchToken,
+                              updateDetails
+                            );
+                            toast.show(`Logged in as "@${user.username}"`, {
+                              type: "success",
+                            });
+                          }
+                        } else {
+                          alert(
+                            `Please add account with username of ${user.username} again.`
+                          );
+                        }
+                      }
+                }
                 style={{
                   flexDirection: "row",
                   alignItems: "center",

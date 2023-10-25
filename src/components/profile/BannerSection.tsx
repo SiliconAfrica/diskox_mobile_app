@@ -40,6 +40,8 @@ import { useModalState } from "../../states/modalState";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import mime from "mime";
+import { handlePromise } from "../../utils/handlePomise";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export enum ACTIVE_TAB {
   OVERVIEW = 1,
@@ -78,9 +80,12 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     () => httpService.get(`${URLS.GET_USER_BY_ID}/${userId}`),
     {
       onError: () => {},
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         console.log(data?.data?.data);
         setUser(data?.data?.data);
+        const [saveUser, saveUserErr] = await handlePromise(
+          AsyncStorage.setItem(`user`, JSON.stringify(data.data.data))
+        );
       },
     }
   );
@@ -161,9 +166,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       </Box>
     );
   }
-  useEffect(() => {
-    getUserDetails.refetch();
-  }, []);
+
   return (
     <Box width="100%">
       {!getUserDetails.isLoading && user?.cover_photo !== null && (
