@@ -32,6 +32,7 @@ import mime from "mime";
 import Emojipicker from "../general/emojipicker";
 import Reply from "./Reply";
 import useToast from "../../hooks/useToast";
+import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 // import EmojiSelector from 'react-native-emoji-selector'
 // import EmojiModal from 'react-native-emoji-modal';
 
@@ -41,7 +42,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const {
     created_at,
     post_id,
-    user: { name, profile_image },
+    user: { name, profile_image, username },
   } = comment;
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
@@ -216,7 +217,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 <CustomText variant="body" color="black">
                   {name}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey"></CustomText>
+                <CustomText variant="body" color="grey">@{username}</CustomText>
               </Box>
               <CustomText
                 variant="xs"
@@ -422,11 +423,11 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 )}
                 {!upvote.isLoading && (
                   <>
-                    <Ionicons
-                      name="arrow-up-outline"
-                      size={20}
-                      color={theme.colors.textColor}
-                    />
+                     <Image
+                        source={require("../../../assets/images/arrows/up.png")}
+                        contentFit="cover"
+                        style={{ width: 20, height: 20 }}
+                      />
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
                     </CustomText>
@@ -448,11 +449,22 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 onPress={() => downvote.mutate()}
               >
                 {!downvote.isLoading && (
-                  <Ionicons
-                    name="arrow-down-outline"
-                    size={20}
-                    color={theme.colors.textColor}
-                  />
+                 <>
+                   {comment.has_downvoted === 0 && (
+                        <Image
+                          source={require("../../../assets/images/arrows/down.png")}
+                          contentFit="cover"
+                          style={{ width: 20, height: 20 }}
+                        />
+                      )}
+                      {comment.has_downvoted !== 0 && (
+                        <Image
+                          source={require("../../../assets/images/arrows/downfilled.png")}
+                          contentFit="cover"
+                          style={{ width: 20, height: 20 }}
+                        />
+                      )}
+                 </>
                 )}
                 {downvote.isLoading && (
                   <ActivityIndicator
@@ -645,6 +657,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [comment, setComment] = React.useState("");
   const { isDarkMode } = useUtilState((state) => state);
+  const { checkloggedInState } = useCheckLoggedInState();
   const { profile_image, created_at, id, name } = useDetailsState(
     (state) => state
   );
@@ -696,9 +709,9 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     });
 
     const keyboardClosed = Keyboard.addListener("keyboardDidHide", () => {
-      if (TextinputtRef.current !== null) {
-        TextinputtRef.current.blur();
-      }
+      // if (TextinputtRef.current !== null) {
+      //   TextinputtRef.current.blur();
+      // }
     });
     return () => {
       keyboardEvent.remove();
@@ -708,8 +721,11 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
 
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
-    setComment(coment);
-  }, []);
+    const check = checkloggedInState();
+    if (check) {
+      setComment(coment);
+    }
+  }, [checkloggedInState]);
 
   const handleEnterKeyPressed = React.useCallback(
     (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {

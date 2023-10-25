@@ -17,6 +17,8 @@ import { useModalState } from "../../../states/modalState";
 import { POST_FILTERR } from "../../../enums/Postfilters";
 import AnnouncementBox from "../../../components/announcements/announcementBox";
 import useToast from "../../../hooks/useToast";
+import _ from 'lodash'
+import { FlatList } from "react-native-gesture-handler";
 
 const Posts = () => {
   const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
@@ -31,31 +33,37 @@ const Posts = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [total, setTotal] = React.useState(0);
   const [ids, setIds] = React.useState<number[]>([]);
-  const [url, setUrl] = React.useState<string>(POST_FILTERR.ALL);
-
+  const [perPage, setPerPage] = React.useState(0);
+  const [noMore, setNoMore] = React.useState(false);
 
   // react query
-  const { isLoading, isError, error } = useQuery(
-    ["GetAllPosts", currentPage, url],
-    () => httpService.get(`${URLS.GET_POST}?page=${currentPage}`),
+  const { isLoading, isError, error, refetch } = useQuery(
+    ["GetAllPosts", currentPage],
+    () => httpService.get(`${URLS.GET_POST}`, {
+      params: {
+        page: currentPage,
+      }
+    }),
     {
       onSuccess: async (data) => {
         if (posts.length > 0) {
-          const arr = [...posts, ...data.data.data.data];
-          setPosts(arr);
-          setCurrentPage(data.data.data.current_page);
-          setTotal(data.data.data.total);
-          const postData: IPost[] = data.data.data.data as IPost[];
-          const postids = await Promise.all(postData.map((item) => item.id));
-          setIds(postids);
-          return;
+          if (data.data?.data !== undefined) {
+            const uniqArr = _.uniqBy<IPost>([...posts, ...data.data?.data?.data], 'id')
+            setPosts(uniqArr);
+            const postData: IPost[] = data.data?.data?.data as IPost[];
+            const postids = postData.map((item) => item.id);
+            setIds(postids);
+          } else {
+            setNoMore(true);
+            //toast.show(data.data?.message, { type: 'success'});
+          }
         } else {
           setPosts(data.data.data.data);
-          setCurrentPage(data.data.data.current_page);
           setTotal(data.data.data.total);
           const postData: IPost[] = data.data.data.data as IPost[];
-          const postids = await Promise.all(postData.map((item) => item.id));
+          const postids = postData.map((item) => item.id);
           setIds(postids);
+          setPerPage(data.data.data.per_page);
         }
       },
       onError: (error: any) => {
@@ -64,24 +72,7 @@ const Posts = () => {
     }
   );
 
-  const RefreshPosts = useQuery(
-    ["GetAllPostsRefresh"],
-    () => httpService.get(`${URLS.GET_POST}?page=${currentPage}`),
-    {
-      onSuccess: async (data) => {
-        if (posts.length > 0) {
-          const arr = [...posts, ...data.data.data.data];
-          setPosts(arr);
-          return;
-        } else {
-          setPosts(data.data.data.data);
-        }
-      },
-      onError: (error: any) => {
-        toast.show(error.message, { type: 'error'});
-      },
-    }
-  );
+
 
   // mutations
   const markasViewed = useMutation({
@@ -91,24 +82,25 @@ const Posts = () => {
       toast.show(error.message, { type: 'error'});
     },
     onSuccess: (data) => {
-      console.log(data.data);
+      console.log(ids);
+      console.log(`current page -> ${currentPage}`);
     },
   });
 
   // functions
   const onEndReached = React.useCallback(async () => {
-    if (total / 12 === currentPage) {
-      return;
-    } else {
-      // get more items
-      markasViewed.mutate({ posts_id: ids });
-      // increment page number
-      setCurrentPage(currentPage + 1);
-    }
-  }, [currentPage, ids]);
+    const startIndex = (currentPage -1) * perPage;
+        const endIndex = Math.min(startIndex + perPage -1, total - 1);
+        if (currentPage < endIndex && posts.length > 0 && noMore === false && !isLoading) {
+          // markasViewed.mutate({ posts_id: ids });
+          setCurrentPage(prev => prev+1);
+      }
+  }, [currentPage, ids, perPage, total, noMore, isLoading]);
 
   const handleRefresh = () => {
-      RefreshPosts.refetch();
+    if (!isLoading) {
+      refetch();
+    }
   }
 
   return (
@@ -118,17 +110,11 @@ const Posts = () => {
       }
       flex={1}
     >
-      { RefreshPosts.isLoading && (
-        <Box width='100%' height={100} justifyContent="center" alignItems="center">
-          <ActivityIndicator color={theme.colors.primaryColor} />
-          <CustomText variant="body">Refreshing posts...</CustomText>
-        </Box>
-      )}
       {  (
-        <FlashList
+        <FlatList
         refreshControl={
           <RefreshControl 
-            refreshing={RefreshPosts.isLoading}
+            refreshing={isLoading && posts.length> 0}
             onRefresh={handleRefresh} 
           />
         }
@@ -137,17 +123,19 @@ const Posts = () => {
         ListEmptyComponent={() => (
           <>
             {!isLoading && (
-              <CustomText variant="body">No Post to view</CustomText>
-            )}
+              <CustomText variant="body" textAlign="center" marginTop="s">No Post to view</CustomText>
+              )}
           </>
         )}
-        estimatedItemSize={100}
+        // estimatedItemSize={1000}
+        keyExtractor={(item, index) => item.id.toString()}
+        extraData={posts}
         renderItem={({ item }) => <PostCard {...item} showStats />}
         ListHeaderComponent={() => (
           <>
             {isLoggedIn && <Searchbar />}
             <FilterTopbar />
-            <AnnouncementBox />
+            {/* <AnnouncementBox /> */}
           </>
         )}
         data={posts}
@@ -159,6 +147,11 @@ const Posts = () => {
                 color={theme.colors.primaryColor}
               />
             )}
+            {
+              !isLoading && noMore && (
+                <CustomText textAlign="center">Thats all for now</CustomText>
+              )
+            }
           </Box>
         )}
       />

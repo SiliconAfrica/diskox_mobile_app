@@ -15,7 +15,7 @@ import {
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import {
   CompositeNavigationProp,
@@ -37,6 +37,11 @@ import moment from "moment";
 import { IUser } from "../../models/user";
 import useToast from "../../hooks/useToast";
 import { useModalState } from "../../states/modalState";
+import { Feather } from '@expo/vector-icons'
+import * as ImagePicker from 'expo-image-picker';
+import mime from 'mime';
+
+
 
 export enum ACTIVE_TAB {
   OVERVIEW = 1,
@@ -54,6 +59,9 @@ interface IProps {
 
 const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const [user, setUser] = React.useState<IUser | null>(null);
+  const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>([]);
+
+
   const navigation = useNavigation<PageType>();
   const route = useRoute<any>();
   const HEIGHT = useWindowDimensions().height;
@@ -62,6 +70,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const { userId } = route.params;
   const theme = useTheme<Theme>();
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { isDarkMode } = useUtilState((state) => state);
 
@@ -69,7 +78,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     ["getDetails", userId],
     () => httpService.get(`${URLS.GET_USER_BY_ID}/${userId}`),
     {
-      enabled: userId !== id,
       onError: () => {},
       onSuccess: (data) => {
         console.log(data?.data?.data);
@@ -77,20 +85,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       },
     }
   );
-
-  // const getAuthUserDetails = useQuery(
-  //   ["getLoggedInDetails", id],
-  //   () => httpService.get(`${URLS.GET_AUTH_USER_DETAILS}`),
-  //   {
-  //     enabled: userId === id,
-  //     onError: () => {},
-  //     onSuccess: (data) => {
-  //       console.log(`this is my profile`);
-  //       console.log(data?.data?.data);
-  //       setUser(data?.data?.data);
-  //     },
-  //   }
-  // );
 
   console.log(userId);
 
@@ -118,16 +112,63 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       toast.show(data?.data?.message, { type: "success" });
     },
   });
+
+  const updateBanner = useMutation({
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.UPDATE_COVER_PHOTO}`, data),
+    onSuccess: (data) => {
+      //console.log(toast);
+      queryClient.invalidateQueries(['getDetails', userId]);
+      toast.show(data?.data?.message, { type: "success" });
+    },
+  });
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      base64: false,
+    });
+  
+    if (!result.canceled) {
+      const name = result.assets[0].uri.split('/').pop();
+      const mimeType = mime.getType(result.assets[0].uri);
+      const formData = new FormData();
+      formData.append('cover_photo', { uri: result.assets[0].uri, type: mimeType, name } as any);
+      updateBanner.mutate(formData);
+    }
+  };
+
+  const handleChat = () => {
+    navigation.navigate("chat", { userId: user.id, profile_image: user.profile_image, username: user.username, last_seen: user.last_seen });
+  }
+  if (getUserDetails.isLoading) {
+    return (
+      <Box width='100%' height={200} justifyContent='center' alignItems="center">
+        <ActivityIndicator color={theme.colors.primaryColor} size='large' />
+        <CustomText>Loading...</CustomText>
+      </Box>
+    )
+  }
   return (
     <Box width="100%">
-      <ImageBackground
-        source={require("../../../assets/images/banner.png")}
+      {
+        !getUserDetails.isLoading && user?.cover_photo !== null &&  (
+          <ImageBackground
+        source={{ uri: `${IMAGE_BASE}/${user?.cover_photo}` }}
         style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50, }}
       >
 
-        {/* <Box flexDirection='row'>
-          <Text>hello therre people</Text>
-        </Box> */}
+        { userId === id && (
+          <Box flexDirection='row' width='100%' paddingHorizontal={'m'} justifyContent="flex-end" >
+            <Box width={50} height={50} borderRadius={25} bg="grey" overflow="hidden">
+              <Pressable onPress={pickImage} style={{ width: '100%', height: '100%', borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+                { !updateBanner.isLoading && <Feather name='edit' size={20} color={theme.colors.textColor} /> }
+                { updateBanner.isLoading && <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />}
+              </Pressable>
+            </Box>
+          </Box>
+        )}
 
         <Box
           width={100}
@@ -152,6 +193,50 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           />
         </Box>
       </ImageBackground>
+        )
+      }
+
+      {
+        !getUserDetails.isLoading && user?.cover_photo === null && (
+          <Box
+        style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50, backgroundColor: theme.colors.primaryColor }}
+      >
+
+        { userId === id && (
+          <Box flexDirection='row' width='100%' paddingHorizontal={'m'} justifyContent="flex-end" >
+            <Box width={50} height={50} borderRadius={25} bg="grey" overflow="hidden">
+              <Pressable onPress={pickImage} style={{ width: '100%', height: '100%', borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+                <Feather name='edit' size={20} color={theme.colors.textColor} />
+              </Pressable>
+            </Box>
+          </Box>
+        )}
+
+        <Box
+          width={100}
+          height={100}
+          borderRadius={50}
+          backgroundColor="black"
+          position="absolute"
+          bottom={-50}
+          left={20}
+          overflow="hidden"
+          style={{
+            padding: 2,
+            backgroundColor: isDarkMode
+              ? theme.colors.secondaryBackGroundColor
+              : "white",
+          }}
+        >
+          <Image
+            source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
+            contentFit="cover"
+            style={{ width: "100%", height: "100%", borderRadius: 70 }}
+          />
+        </Box>
+      </Box>
+        )
+      }
 
       {/* BUTTONS SECTION */}
 
@@ -234,14 +319,22 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             {!followUnFollowMutation.isLoading && (
               <>
+                {(user as IUser)?.isFollowing ? (
+                <CustomText variant="header" fontSize={16} marginLeft="s" color='white'>
+                  Following
+                </CustomText>
+              ): (
+                <>
                 <Ionicons
                   name="person-add-outline"
                   size={25}
-                  color={theme.colors.textColor}
+                  color={theme.colors.white}
                 />
-                <CustomText variant="header" fontSize={16} marginLeft="s">
+                <CustomText variant="header" fontSize={16} marginLeft="s" color='white'>
                   Follow
                 </CustomText>
+              </>
+              )}
               </>
             )}
             {followUnFollowMutation.isLoading && (
@@ -261,6 +354,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               borderWidth: 2,
               marginRight: 10,
             }}
+            onPress={() => handleChat()}
           >
             <Ionicons
               name="mail-outline"

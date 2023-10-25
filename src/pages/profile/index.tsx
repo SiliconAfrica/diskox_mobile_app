@@ -54,17 +54,6 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
           {activePage()}
         </Box>
       </ScrollView>
-      {/* <FlashList 
-        ListHeaderComponent={() => <BannerSection currentTab={currentTab} switchTab={switchTab} />}
-        stickyHeaderHiddenOnScroll
-        estimatedItemSize={100}
-        keyExtractor={(item, index) => index.toString()}
-        data={nums}
-        extraData={nums}
-        renderItem={({ item }) => (
-          <CustomText>{item}</CustomText>
-        )}
-      /> */}
     </Box>
   )
 }

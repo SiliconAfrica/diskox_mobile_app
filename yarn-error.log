@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarnpkg add expo-update
+  /usr/local/bin/node /usr/local/bin/yarnpkg add expo-auth-session@~4.0.3 expo-cryptoo expo-web-browser@~12.1.1 react-native-web@~0.18.10 react-dom@18.2.0 @expo/webpack-config@^18.0.1
 
 PATH: 
   /Users/danielemmanuel/Documents/projects/DiskosMain/node_modules/.bin:/Users/danielemmanuel/Documents/projects/DiskosMain/node_modules/.bin:/Users/danielemmanuel/Documents/projects/node_modules/.bin:/Users/danielemmanuel/Documents/node_modules/.bin:/Users/danielemmanuel/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/usr/local/opt/postgresql@13/bin:/Users/danielemmanuel/.deno/bin:/usr/local/opt/postgresql@12/bin:/Users/danielemmanuel/Library/Android/sdk/build-tools:/Users/danielemmanuel/Library/Android/sdk/platform-tools:/Users/danielemmanuel/Library/Android/sdk/tools:/Users/danielemmanuel/Library/Android/sdk/platform:/Users/danielemmanuel/flutter/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Apple/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/opt/postgresql@13/bin:/Users/danielemmanuel/Library/pnpm:/Users/danielemmanuel/.deno/bin:/usr/local/opt/postgresql@12/bin:/Users/danielemmanuel/Library/Android/sdk/build-tools:/Users/danielemmanuel/Library/Android/sdk/platform-tools:/Users/danielemmanuel/Library/Android/sdk/tools:/Users/danielemmanuel/Library/Android/sdk/platform:/Users/danielemmanuel/flutter/bin:/usr/local/sbin:/Users/danielemmanuel/Library/Application Support/JetBrains/Toolbox/scripts:/Users/danielemmanuel/Library/Application Support/JetBrains/Toolbox/scripts
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/expo-update: Not found
+  Error: https://registry.yarnpkg.com/expo-cryptoo: Not found
       at params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66145:18)
       at self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140890:22)
       at Request.emit (node:events:513:28)
@@ -56,6 +56,8 @@ npm manifest:
       "dotenv": "^16.3.1",
       "expo": "~48.0.18",
       "expo-av": "~13.2.1",
+      "expo-camera": "~13.2.1",
+      "expo-checkbox": "~2.3.1",
       "expo-clipboard": "~4.1.2",
       "expo-document-picker": "~11.2.2",
       "expo-env": "^1.1.1",
@@ -63,10 +65,12 @@ npm manifest:
       "expo-font": "~11.1.1",
       "expo-image": "~1.0.2",
       "expo-image-picker": "~14.1.1",
+      "expo-permissions": "~14.1.1",
       "expo-secure-store": "~12.1.1",
       "expo-splash-screen": "~0.18.2",
       "expo-status-bar": "~1.4.4",
       "expo-updates": "~0.16.4",
+      "lodash": "^4.17.21",
       "mime": "^3.0.0",
       "moment": "^2.29.4",
       "moti": "^0.25.3",
@@ -1782,6 +1786,13 @@ Lockfile:
     dependencies:
       "@jridgewell/resolve-uri" "3.1.0"
       "@jridgewell/sourcemap-codec" "1.4.14"
+  
+  "@koale/useworker@^4.0.2":
+    version "4.0.2"
+    resolved "https://registry.yarnpkg.com/@koale/useworker/-/useworker-4.0.2.tgz#cb540a2581cd6025307c3ca6685bc60748773e58"
+    integrity sha512-xPIPADtom8/3/4FLNj7MvNcBM/Z2FleH85Fdx2O869eoKW8+PoEgtSVvoxWjCWMA46Sm9A5/R1TyzNGc+yM0wg==
+    dependencies:
+      dequal "^1.0.0"
   
   "@motionone/animation@^10.12.0":
     version "10.15.1"
@@ -3727,6 +3738,11 @@ Lockfile:
       invariant "*"
       prop-types "*"
   
+  dequal@^1.0.0:
+    version "1.0.1"
+    resolved "https://registry.yarnpkg.com/dequal/-/dequal-1.0.1.tgz#dbbf9795ec626e9da8bd68782f4add1d23700d8b"
+    integrity sha512-Fx8jxibzkJX2aJgyfSdLhr9tlRoTnHKrRJuu2XHlAgKioN2j19/Bcbe0d4mFXYZ3+wpE2KVobUVTfDutcD17xQ==
+  
   destroy@1.2.0:
     version "1.2.0"
     resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.2.0.tgz#4803735509ad8be552934c67df614f94e66fa015"
@@ -3947,6 +3963,19 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-13.2.1.tgz#ce502a4c5d4a57962fd9f5f1a40c76c39c88f5ee"
     integrity sha512-mC0mYSzaOaZgXjzhW2l4Ag325JjH6q5IbptfwD7gkMOFYy7VPOMxEMUnetadbs3DDzmgE6vUWrTjUIUbwq59qg==
   
+  expo-camera@~13.2.1:
+    version "13.2.1"
+    resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-13.2.1.tgz#bfd1e2248d10a5da43d43a4cc77e378e5acf25bb"
+    integrity sha512-fZdRyF402jJGGmLVlumrLcr5Em9+Y2SO1MIlxLBtHXnybyHbTRMRAbzVapKX1Aryfujqadh+Kl+sdsWYkMuJjg==
+    dependencies:
+      "@koale/useworker" "^4.0.2"
+      invariant "^2.2.4"
+  
+  expo-checkbox@~2.3.1:
+    version "2.3.1"
+    resolved "https://registry.yarnpkg.com/expo-checkbox/-/expo-checkbox-2.3.1.tgz#d214e797a54f387f8ec360487272fefc0aa846a0"
+    integrity sha512-CTIabriK5xbtDnI9U5Hve82/WG85XLI4GLYSRTT1XST21HjQ7mDaeiYm7DnKzcgM+qeBwmbg3crJYnp7WW/8Ew==
+  
   expo-clipboard@~4.1.2:
     version "4.1.2"
     resolved "https://registry.yarnpkg.com/expo-clipboard/-/expo-clipboard-4.1.2.tgz#0844566ae8ad1cf72854dc1bbd704c3b09c5d391"
@@ -4058,6 +4087,11 @@ Lockfile:
     dependencies:
       compare-versions "^3.4.0"
       invariant "^2.2.4"
+  
+  expo-permissions@~14.1.1:
+    version "14.1.2"
+    resolved "https://registry.yarnpkg.com/expo-permissions/-/expo-permissions-14.1.2.tgz#59ccf152d5da44b4958fc45238595b1b4282a978"
+    integrity sha512-NcozPs0cPDe65/Kc7yhSbdGcdpEIeEK1VcUlhRmOrC3kEahwlIdmyLdfhtuuUggaB75Wlo7VOGMZrsNHTWOVHw==
   
   expo-secure-store@~12.1.1:
     version "12.1.1"
