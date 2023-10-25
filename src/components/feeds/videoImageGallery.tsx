@@ -2,7 +2,9 @@ import { AntDesign } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Animated,
+  BackHandler,
   Dimensions,
   FlatList,
   Image,
@@ -17,6 +19,8 @@ import { Theme } from "../../theme";
 import { useModalState } from "../../states/modalState";
 import Box from "../general/Box";
 import CustomText from "../general/CustomText";
+import { useNavigation } from "@react-navigation/native";
+import { PageType } from "../../pages/login";
 
 const { width } = Dimensions.get("window");
 
@@ -32,6 +36,7 @@ export default function VideoImageGallery({}) {
   const currentIndex = useRef(0);
   const flatListRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<PageType>();
 
   useEffect(() => {
     setDataWithPlaceholders([{ id: -1 }, ...data, { id: data.length }]);
@@ -63,6 +68,39 @@ export default function VideoImageGallery({}) {
     offset: 0,
     index,
   });
+
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        console.log("pppp", e);
+        if (!isOpen) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+        setAll({ showImageVideoSlider: false, imageVideoSliderData: [] });
+      }),
+    [navigation, isOpen]
+  );
+
+  useEffect(() => {
+    const backAction = () => {
+      if (isOpen) {
+        setAll({ showImageVideoSlider: false, imageVideoSliderData: [] });
+      } else {
+        BackHandler.exitApp();
+      }
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
   if (!isOpen) {
     return <></>;
   }
@@ -212,7 +250,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     marginTop: "15%",
-    // alignItems: 'center',
+    alignItems: "center",
     // justifyContent: 'center',
   },
   item: {},

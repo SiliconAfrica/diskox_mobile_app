@@ -15,7 +15,7 @@ import { formatDate } from "../../utils/dateFormatter";
 export default function SingleKnowledge({ route }) {
   const navigation = useNavigation<PageType>();
   const slug = route.params.knowledgeId;
-  const [knowledge, setKnowledge] = useState<TKnowledge>();
+  const [knowledge, setKnowledge] = useState<Partial<TKnowledge>>({});
   const { isLoading, refetch } = useQuery(
     [`knowledge_${slug}`],
     () => httpService.get(`${URLS.FETCH_SINGLE_KNOWLEDGE_BASE}${slug}`),
@@ -50,7 +50,7 @@ export default function SingleKnowledge({ route }) {
           <Box style={{ width: "100%", height: 250 }} mt="l">
             <Image
               source={
-                knowledge.cover_photo.length > 0
+                knowledge.cover_photo && knowledge.cover_photo.length > 0
                   ? `${IMAGE_BASE}${knowledge.cover_photo[0]}`
                   : require("../../../assets/images/diskoxLarge.png")
               }
@@ -60,7 +60,8 @@ export default function SingleKnowledge({ route }) {
             />
           </Box>
           <CustomText variant="body" color="black" mt="m">
-            {knowledge.message.replace("<p>", "").replace("</p>", "")}
+            {knowledge.message &&
+              knowledge.message.replace("<p>", "").replace("</p>", "")}
           </CustomText>
         </Box>
       </ScrollView>

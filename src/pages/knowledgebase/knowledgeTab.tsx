@@ -13,17 +13,6 @@ export default function KnowledgeTab({ knowledge }) {
 
   return (
     <Box px="s" mx="s" mt="l">
-      <Box style={styles.imgbox}>
-        <Image
-          source={
-            knowledge.cover_photo.length > 0
-              ? `${IMAGE_BASE}${knowledge.cover_photo[0]}`
-              : require("../../../assets/images/diskoxLarge.png")
-          }
-          contentFit="cover"
-          style={styles.img}
-        />
-      </Box>
       <Pressable
         onPress={() =>
           navigation.navigate("singleKnowledge", {
@@ -31,6 +20,18 @@ export default function KnowledgeTab({ knowledge }) {
           })
         }
       >
+        <Box style={styles.imgbox}>
+          <Image
+            source={
+              knowledge.cover_photo.length > 0
+                ? `${IMAGE_BASE}${knowledge.cover_photo[0]}`
+                : require("../../../assets/images/diskoxLarge.png")
+            }
+            contentFit="cover"
+            style={styles.img}
+          />
+        </Box>
+
         <CustomText variant="body" fontFamily="RedBold" color="black">
           {knowledge.title}
         </CustomText>
