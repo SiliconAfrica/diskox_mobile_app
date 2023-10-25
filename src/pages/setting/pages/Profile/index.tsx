@@ -18,6 +18,7 @@ import moment from "moment";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import * as SecureStorage from "expo-secure-store";
 import { useUtilState } from "../../../../states/util";
 import * as ImagePicker from "expo-image-picker";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -29,12 +30,16 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../../theme";
 import { Ionicons } from "@expo/vector-icons";
 import mime from "mime";
+import { useMultipleAccounts } from "../../../../states/multipleAccountStates";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { handlePromise } from "../../../../utils/handlePomise";
 
 const Profile = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "profile-setting">) => {
   const theme = useTheme<Theme>();
   const { isDarkMode } = useUtilState((state) => state);
+  const { refreshAccounts } = useMultipleAccounts((state) => state);
   const {
     profile_image,
     name,
@@ -69,10 +74,13 @@ const Profile = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.UPDATE_PROFILE}`, data),
-    onSuccess: (data) => {
-      console.log(data?.data);
+    onSuccess: async (data) => {
       toast.show("Profile updated successfully", { type: "success" });
       setAll({ ...data?.data?.data });
+      const [saveUser, saveUserErr] = await handlePromise(
+        AsyncStorage.setItem(`user`, JSON.stringify(data?.data?.data))
+      );
+      refreshAccounts(data?.data?.data);
       queryClient.invalidateQueries(["getLoggedInDetails"]);
       setFile(null);
       navigation.goBack();
