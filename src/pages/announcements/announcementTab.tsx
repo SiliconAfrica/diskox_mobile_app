@@ -11,17 +11,6 @@ export default function AnnouncementTab({ announcement }) {
   const navigation = useNavigation<PageType>();
   return (
     <Box px="s" mt="l" mx="m">
-      <Box style={styles.imgbox}>
-        <Image
-          source={
-            announcement.cover_photo.length > 0
-              ? `${IMAGE_BASE}${announcement.cover_photo[0]}`
-              : require("../../../assets/images/diskoxLarge.png")
-          }
-          contentFit="cover"
-          style={styles.img}
-        />
-      </Box>
       <Pressable
         onPress={() =>
           navigation.navigate("singleAnnouncement", {
@@ -29,6 +18,18 @@ export default function AnnouncementTab({ announcement }) {
           })
         }
       >
+        <Box style={styles.imgbox}>
+          <Image
+            source={
+              announcement.cover_photo && announcement.cover_photo.length > 0
+                ? `${IMAGE_BASE}${announcement.cover_photo[0]}`
+                : require("../../../assets/images/diskoxLarge.png")
+            }
+            contentFit="cover"
+            style={styles.img}
+          />
+        </Box>
+
         <CustomText variant="body" fontFamily="RedBold" color="black">
           {announcement.title}
         </CustomText>
