@@ -30,7 +30,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
   const {
     created_at,
     post_id,
-    user: { name, profile_image },
+    user: { name, profile_image, username },
   } = comment;
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
@@ -202,7 +202,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 <CustomText variant="body" color="black">
                   {name}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey"></CustomText>
+                <CustomText variant="body" color="grey">@{username}</CustomText>
               </Box>
               <CustomText
                 variant="xs"

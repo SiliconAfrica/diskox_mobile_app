@@ -9,14 +9,56 @@ import { Theme } from "../../theme";
 import { useModalState } from "../../states/modalState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
+import useToast from "../../hooks/useToast";
+
+// google auth 
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import SecureStorage from 'expo-secure-store';
+import * as AuthSession from 'expo-auth-session';
+
+WebBrowser.maybeCompleteAuthSession();
+
+const redirectUri = AuthSession.makeRedirectUri();
 
 const Onboarding = ({
   route,
 }: NativeStackScreenProps<RootStackParamList, "onboarding">) => {
   const [isDarkMode] = useUtilState((state) => [state.isDarkMode]);
   const [setAll] = useModalState((state) => [state.setAll]);
+  const [googleSigninLoading, setGoogleSignInLoading] = React.useState(false);
   const { showModal, addAccount } = route.params;
   const theme = useTheme<Theme>();
+  const toast = useToast();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
+    iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
+    redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
+    expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
+    scopes: ['profile', 'email'],
+  });
+
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      // Handle successful authentication
+      console.log(response.authentication.accessToken);
+      //getDetails(response.authentication?.accessToken);
+    }
+  }, [response]);
+
+  const getDetails = async (token: string) => {
+    const request = await fetch(`https://www.googleapis.com/userinfo/v2/me?access_token=${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await request.json();
+
+    console.log(data)
+  }
+
 
   React.useEffect(() => {
     if (showModal === 1) {
@@ -26,6 +68,10 @@ const Onboarding = ({
       setAll({ showSignup: true, addAccount: addAccount || false });
     }
   }, [showModal]);
+
+  const signInWithGoogleAsync = async () => {
+    promptAsync({ useProxy: false });
+  };
   return (
     <Box
       backgroundColor="mainBackGroundColor"
@@ -73,6 +119,7 @@ const Onboarding = ({
             flexDirection: "row",
             paddingHorizontal: 20,
           }}
+          onPress={signInWithGoogleAsync}
         >
           <Box flex={0.3}>
             <Image

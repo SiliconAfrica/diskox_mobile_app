@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "userInterfaceStyle": "light",
+    "scheme": "com.diskox",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "cover",
@@ -31,7 +32,7 @@
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 3
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/favicon.png"

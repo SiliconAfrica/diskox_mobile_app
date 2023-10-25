@@ -18,6 +18,9 @@ import { useModalState } from '../../states/modalState'
 import { useUtilState } from '../../states/util'
 import CommentTextbox from '../post/CommentTextbox'
 import useCheckLoggedInState from '../../hooks/useCheckLoggedInState'
+import useToast from '../../hooks/useToast'
+import { colorizeHashtags } from '../../utils/colorizeText'
+import { useDetailsState } from '../../states/userState'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -35,15 +38,20 @@ const PollCard = (props: IPost& IProps) => {
     const navigation = useNavigation<any>();
     const queryClient = useQueryClient();
     const { checkloggedInState } = useCheckLoggedInState();
+    const { id: myId } = useDetailsState((state) => state)
+    const toast = useToast();
 
 
-    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image }, poll_duration, polls, has_voted_poll } = post;
+    const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image, id: userId, isFollowing, username }, poll_duration, polls, has_voted_poll } = post;
 
-    const getData = useQuery([`getPolls${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
+    const des = colorizeHashtags(post.description);
+
+
+    const getData = useQuery([`getPoll${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
         refetchOnMount: false,
       onError: (error: any) => {
-        alert(error.message);
-      },
+        toast.show(error.message, { type: 'error' });
+    },
       onSuccess: (data) => {
         setPost(data.data.data);
         console.log(data.data.data);
@@ -55,48 +63,64 @@ const PollCard = (props: IPost& IProps) => {
     const reactpost = useMutation({
         mutationFn: (data: any) => httpService.post(`${URLS.REACT_TO_POST}`, { post_id: id, type: data }),
         onError: (error: any) => {
-          alert(error.message);
+            toast.show(error.message, { type: 'error' });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPolls${id}`]);
+            queryClient.invalidateQueries([`getPoll${id}`, id]);
         }
     });
 
     const upvote = useMutation({
         mutationFn: () => httpService.post(`${URLS.UPVOTE_POST}/${id}`),
         onError: (error: any) => {
-          alert(error.message);
+            toast.show(error.message, { type: 'error' });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPolls${id}`]);
+            queryClient.invalidateQueries([`getPoll${id}`, id]);
         }
     });
 
     const downvote = useMutation({
         mutationFn: () => httpService.post(`${URLS.DOWN_VOTE_POST}/${id}`),
         onError: (error: any) => {
-          alert(error.message);
+            toast.show(error.message, { type: 'error' });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries([`getPolls${id}`]);
+            queryClient.invalidateQueries([`getPoll${id}`, id]);
         }
     });
 
     const votepoll = useMutation({
         mutationFn: (data: any) => httpService.post(`${URLS.VOTE_POLL}`, data),
         onError: (error: any) => {
-          alert(error.message);
+          toast.show(error.message, { type: 'status' });
         },
         onSuccess: (data) => {
-            console.log(data.data);
             if (data.data.message) {
-                alert(data.data.message);
+                toast.show(data.data?.message, { type: 'success' });
                 setPost(prev => ({ ...prev, has_voted_poll: 1 }));
+                queryClient.invalidateQueries([`getPoll${id}`, id]);
                 return;
+            } else {
+                queryClient.invalidateQueries([`getPoll${id}`, id]);
             }
-            queryClient.invalidateQueries([`getPolls${id}`]);
         }
     });
+
+    const follow = useMutation({
+        mutationFn: () => httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${userId}`),
+        onError: (error: any) => {
+          toast.show(error.message, { type: 'error' });
+        },
+        onSuccess: (data) => {
+          queryClient.invalidateQueries([`getPost${id}`, id]);
+        //   if (isFollowing === 1) {
+        //     setPost({ ...post, user: { ...post.user, isFollowing: 0 }});
+        //   } else {
+        //     setPost({ ...post, user: { ...post.user, isFollowing: 1 }});
+        //   }
+        }
+      });
     
 
     // functions
@@ -138,6 +162,10 @@ const PollCard = (props: IPost& IProps) => {
     const vote = (poll_id: number) =>  {
         const check = checkloggedInState();
         if (check) {
+            if (getDate() < 1) {
+                toast.show('Poll has ended you cannot vote anymore', {type: 'warning' });
+                return;
+            }
             const obj = {
                 post_id: id,
                 post_poll_id: poll_id
@@ -146,25 +174,65 @@ const PollCard = (props: IPost& IProps) => {
         }
     }
 
+    const handleFollow = () => {
+        const check = checkloggedInState();
+        if (check) {
+          follow.mutate();
+        }
+      }
+
+
   return (
-    <Box width='100%' backgroundColor='secondaryBackGroundColor' marginBottom='s'>
+    <Box width='100%' backgroundColor={isDarkMode ? "secondaryBackGroundColor" : "mainBackGroundColor"
+} marginBottom='s'>
  
         {/* HEADER SECTION */}
         <Box flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' paddingTop='m'>
-            <Box flexDirection='row'>
+            <Box flexDirection='row' alignItems='center'>
+
                 <Box flexDirection='row'>
                     <View style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
                     </View>
 
-                    <Box marginLeft='s' justifyContent='center'>
-                        <Box flexDirection='row'>
-                            <CustomText variant='body' color='black'>{name} </CustomText>
-                            <CustomText variant='body' color='grey'></CustomText>
+                    <Box marginLeft="s" justifyContent="center">
+                        <Box flexDirection="row" >
+                            <CustomText variant="body" color="black">
+                            {name?.length > 5 ? 
+                                name?.substring(0, 5) + '...'  :
+                                name
+                            }
+                            </CustomText>
+                            <CustomText variant="body" color="grey">@{username}</CustomText>
                         </Box>
-                        <CustomText variant='xs' onPress={() => navigation.navigate('post', { postId: id })}>{moment(created_at).fromNow()}</CustomText>
-                    </Box>
+                        <CustomText
+                            variant="xs"
+                            onPress={() => navigation.navigate("post", { postId: id })}
+                        >
+                            {moment(created_at).fromNow()}
+                        </CustomText>
+                        </Box>
                 </Box>
+
+                { myId !== userId && (
+              <Pressable style={{
+                backgroundColor: theme.colors.fadedButtonBgColor,
+                padding: 5,
+                
+                borderRadius: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 20
+              }}
+                onPress={handleFollow}
+              >
+                { follow.isLoading ? (
+                  <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
+                ): (
+                  <CustomText variant="header" fontSize={14} color="primaryColor">{ isFollowing === 1 ? 'Following':'Follow'}</CustomText>
+                )}
+              </Pressable>
+            )}
             </Box>
             <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} />
         </Box>
@@ -172,9 +240,24 @@ const PollCard = (props: IPost& IProps) => {
         {/* CONTENT SECTION */}
         <Box marginVertical='m' paddingHorizontal='m'>
 
-            <CustomText variant='body'>{showAll ? description : description?.length > 100 ? description?.substring(0, 100) + '...' : description}  { description?.length > 100 && (
-                <CustomText variant='body' color='primaryColor' onPress={() => setShowAll(prev => !prev)} >{showAll ? 'Show Less' : 'Read More'}</CustomText>
-            )} </CustomText>
+        <Box paddingHorizontal="m">
+        <CustomText variant="body">
+          {showAll
+            ? des
+            : des?.length > 100
+            ? des?.substring(0, 100) + "..."
+            : des}{" "}
+          {des?.length > 100 && (
+            <CustomText
+              variant="body"
+              color="primaryColor"
+              onPress={() => setShowAll((prev) => !prev)}
+            >
+              {showAll ? "Show Less" : "Read More"}
+            </CustomText>
+          )}{" "}
+        </CustomText>
+        </Box>
 
             {/* Poll SECTION */}
             {polls?.length > 0 && (
@@ -187,6 +270,11 @@ const PollCard = (props: IPost& IProps) => {
                                 { has_voted_poll === 1 && (
                                     <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
                                 )}
+                                {
+                                    getDate() < 1 && (
+                                        <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
+                                    )
+                                }
                                 <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 45, borderRadius: 25, borderWidth: 1, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
                                     <CustomText variant='body' color='primaryColor'>{poll.subject} ({poll.vote_count}%)</CustomText>
                                 </Pressable>
@@ -219,19 +307,54 @@ const PollCard = (props: IPost& IProps) => {
                     <Box width='45%' flexDirection='row' height={40} borderRadius={20} borderWidth={2} borderColor={isDarkMode ? 'mainBackGroundColor':'secondaryBackGroundColor'} >
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, flex: 0.7 }} onPress={handleUpVote}>
                             { upvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
-                            { !upvote.isLoading && <>
-                                <Ionicons name='arrow-up' size={20} color={theme.colors.textColor} />
-                                <CustomText variant='xs'>{upvotes_count} Upvote</CustomText>
-                            </>}
+                            {!upvote.isLoading && (
+                                <>
+                                {/* <Ionicons name='arrow-up-outline' size={20} color={post.has_upvoted !== 0 ? theme.colors.primaryColor:theme.colors.textColor}  /> */}
+                                {post.has_upvoted === 0 && (
+                                    <Image
+                                    source={require("../../../assets/images/arrows/up.png")}
+                                    contentFit="cover"
+                                    style={{ width: 20, height: 20 }}
+                                    />
+                                )}
+                                {post.has_upvoted !== 0 && (
+                                    <Image
+                                    source={require("../../../assets/images/arrows/upfilled.png")}
+                                    contentFit="cover"
+                                    style={{ width: 20, height: 20 }}
+                                    />
+                                )}
+                                <CustomText variant="xs">
+                                    {upvotes_count} Upvote
+                                </CustomText>
+                                </>
+                            )}
                         </Pressable>
                         <Pressable style={{ width: 15, flex: 0.2, height: '100%', borderLeftWidth: 2, borderLeftColor:  isDarkMode ? theme.colors.mainBackGroundColor : theme.colors.secondaryBackGroundColor, justifyContent: 'center', alignItems: 'center'}} onPress={handleDownVote} >
-                            { !downvote.isLoading && <Ionicons name='arrow-down-outline' size={20} color={theme.colors.textColor} /> }
+                        {!downvote.isLoading && (
+                            <>
+                            {post.has_downvoted === 0 && (
+                                <Image
+                                source={require("../../../assets/images/arrows/down.png")}
+                                contentFit="cover"
+                                style={{ width: 20, height: 20 }}
+                                />
+                        )}
+                      {post.has_downvoted !== 0 && (
+                        <Image
+                          source={require("../../../assets/images/arrows/downfilled.png")}
+                          contentFit="cover"
+                          style={{ width: 20, height: 20 }}
+                        />
+                      )}
+                    </>
+                  )}
                             { downvote.isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                         </Pressable>
                     </Box>
 
                     <Pressable style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, }} onPress={() => handleReaction('love')}>
-                        <Ionicons name='heart-outline' size={25} color={theme.colors.textColor}  />
+                        <Ionicons name='heart-outline' size={25} color={post.has_reacted.length > 0 ? theme.colors.primaryColor : theme.colors.textColor}  />
                         <CustomText variant='body'>{reactions_count}</CustomText>
                     </Pressable>
 

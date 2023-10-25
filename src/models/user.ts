@@ -20,6 +20,7 @@ export type IUser = {
   disabled_at: string;
   suspension_expired_at: string;
   last_seen: string;
+  isFollowing?: 0|1;
 };
 
 export type UserStats = {

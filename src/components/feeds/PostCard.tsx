@@ -25,6 +25,8 @@ import { useUtilState } from "../../states/util";
 import CommentTextbox from "../post/CommentTextbox";
 import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 import { useToast } from "react-native-toast-notifications";
+import { useDetailsState } from "../../states/userState";
+import { colorizeHashtags } from "../../utils/colorizeText";
 
 const WIDTH = Dimensions.get("screen").width;
 
@@ -39,11 +41,11 @@ const PostCard = (props: IPost & IProps) => {
   const { setAll } = useModalState((state) => state);
   const { isDarkMode } = useUtilState((state) => state);
   const theme = useTheme<Theme>();
-  const toast = useToast();
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const { setAll: setModalState } = useModalState((state) => state);
   const { checkloggedInState } = useCheckLoggedInState();
+  const { id: myId } = useDetailsState((state) => state)
 
   const {
     description,
@@ -57,7 +59,7 @@ const PostCard = (props: IPost & IProps) => {
     replies_count,
     repost_count,
     comments_count,
-    user: { name, profile_image, id: userId },
+    user: { name, profile_image, id: userId, username, isFollowing },
   } = post;
 
   const getData = useQuery(
@@ -70,29 +72,39 @@ const PostCard = (props: IPost & IProps) => {
       },
       onSuccess: (data) => {
         const p: IPost = data.data.data;
-        if (p.has_reacted.length > 0) {
-          console.log(p.has_reacted);
-        }
-        // p.map((item) => {
-        //     if (item.has_reacted.length > 0) {
-        //         console.log(item.has_reacted);
-        //     }
-        // })
         setPost(data.data.data);
       },
     }
   );
+  
+
+  const des = colorizeHashtags(description);
 
   // muatations
   const reactpost = useMutation({
     mutationFn: (data: any) =>
       httpService.post(`${URLS.REACT_TO_POST}`, { post_id: id, type: data }),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: 'error' });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries([`getPost${id}`]);
     },
+  });
+
+  const follow = useMutation({
+    mutationFn: () => httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${userId}`),
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error' });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries([`getPost${id}`, id]);
+      if (isFollowing === 1) {
+        setPost({ ...post, user: { ...post.user, isFollowing: 0 }});
+      } else {
+        setPost({ ...post, user: { ...post.user, isFollowing: 1 }});
+      }
+    }
   });
 
   const upvote = useMutation({
@@ -155,6 +167,13 @@ const PostCard = (props: IPost & IProps) => {
       imageVideoSliderData: [...theData],
     });
   };
+
+  const handleFollow = () => {
+    const check = checkloggedInState();
+    if (check) {
+      follow.mutate();
+    }
+  }
   return (
     <Box
       width="100%"
@@ -171,8 +190,10 @@ const PostCard = (props: IPost & IProps) => {
         paddingHorizontal="m"
         paddingTop="m"
       >
-        <Box flexDirection="row">
-          <Box flexDirection="row">
+        <Box flex={0.9} flexDirection="row" flexWrap="wrap">
+
+          <Box flexDirection="row" alignItems="center">
+
             <Pressable
               onPress={() => navigation.navigate("profile", { userId })}
               style={{
@@ -186,47 +207,77 @@ const PostCard = (props: IPost & IProps) => {
               }}
             >
               <Image
-                source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                source={{ uri: `${IMAGE_BASE}${post.user.profile_image}` }}
                 contentFit="contain"
                 style={{ width: "100%", height: "100%", borderRadius: 25 }}
               />
             </Pressable>
 
             <Box marginLeft="s" justifyContent="center">
-              <Box flexDirection="row">
+              <Box flexDirection="row" >
                 <CustomText variant="body" color="black">
-                  {name}{" "}
+                  {post.user.name?.length > 5 ? 
+                    post.user.name?.substring(0, 5) + '...'  :
+                    post.user.name
+                }
                 </CustomText>
-                <CustomText variant="body" color="grey"></CustomText>
+                <CustomText variant="body" color="grey">@{post.user.username}</CustomText>
               </Box>
               <CustomText
                 variant="xs"
                 onPress={() => navigation.navigate("post", { postId: id })}
               >
-                {moment(created_at).fromNow()}
+                {moment(post.created_at).fromNow()}
               </CustomText>
             </Box>
+
+            { myId !== userId && (
+              <Pressable style={{
+                backgroundColor: theme.colors.fadedButtonBgColor,
+                padding: 5,
+                borderRadius: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: 20
+              }}
+                onPress={handleFollow}
+              >
+                { follow.isLoading ? (
+                  <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
+                ): (
+                  <CustomText variant="header" fontSize={14} color="primaryColor">{ isFollowing === 1 ? 'Following':'Follow'}</CustomText>
+                )}
+              </Pressable>
+            )}
+
           </Box>
+
         </Box>
+
+       <Box flex={0.1} alignItems="flex-end">
         <Ionicons
-          name="ellipsis-vertical"
-          size={20}
-          color={theme.colors.textColor}
-          onPress={() =>
-            setModalState({ activePost: post, showPostAction: true })
-          }
-        />
+            name="ellipsis-vertical"
+            size={20}
+            color={theme.colors.textColor}
+            onPress={() =>
+              setModalState({ activePost: post, showPostAction: true })
+            }
+          />
+       </Box>
+
       </Box>
 
       {/* CONTENT SECTION */}
-      <Box marginVertical="m" paddingHorizontal="m">
+      <Box marginVertical="m">
+
+        <Box paddingHorizontal="m">
         <CustomText variant="body">
           {showAll
-            ? description
-            : description?.length > 100
-            ? description?.substring(0, 100) + "..."
-            : description}{" "}
-          {description?.length > 100 && (
+            ? des
+            : des?.length > 100
+            ? des?.substring(0, 100) + "..."
+            : des}{" "}
+          {des?.length > 100 && (
             <CustomText
               variant="body"
               color="primaryColor"
@@ -236,26 +287,26 @@ const PostCard = (props: IPost & IProps) => {
             </CustomText>
           )}{" "}
         </CustomText>
+        </Box>
 
         {/* IMAGE OR VIDEO SECTION */}
-        {(post_images?.length > 0 || post_videos?.length > 0) && (
+        {(post.post_images?.length > 0 || post.post_videos?.length > 0) && (
           <Pressable
             onPress={openGallery}
             style={{ marginTop: 8, height: 300, width: "100%" }}
           >
-            {post_images.length > 0 && post_videos.length > 0 ? (
+            {post.post_images.length > 0 && post.post_videos.length > 0 ? (
               <Box
                 style={{
                   position: "relative",
                   width: "100%",
                   height: "100%",
-                  backgroundColor: "red",
                 }}
               >
-                {post_images.length > 0 ? (
+                {post.post_images.length > 0 ? (
                   <Image
                     source={{
-                      uri: `${IMAGE_BASE}${post_images[0].image_path}`,
+                      uri: `${IMAGE_BASE}${post.post_images[0].image_path}`,
                     }}
                     contentFit="cover"
                     style={{
@@ -269,10 +320,10 @@ const PostCard = (props: IPost & IProps) => {
                   <>
                     <Video
                       source={{
-                        uri: `${IMAGE_BASE}${post_videos[0].video_path}`,
+                        uri: `${IMAGE_BASE}${post.post_videos[0].video_path}`,
                       }}
                       posterSource={{
-                        uri: `${IMAGE_BASE}${post_videos[0].video_thumbnail}`,
+                        uri: `${IMAGE_BASE}${post.post_videos[0].video_thumbnail}`,
                       }}
                       usePoster
                       resizeMode={ResizeMode.COVER}
@@ -310,122 +361,26 @@ const PostCard = (props: IPost & IProps) => {
                 )}
 
                 <Box
-                  backgroundColor="grey"
+                  backgroundColor="mainBackGroundColor"
                   position="absolute"
                   width={80}
                   height={80}
                   alignItems="center"
                   justifyContent="center"
-                  bottom={0}
-                  right={0}
+                  bottom={10}
+                  right={10}
+                  style={{
+                    backgroundColor: '#0000006f'
+                  }}
                 >
-                  <CustomText variant="subheader" color="white">
-                    {post_images.length + post_videos.length - 1}+
+                  <CustomText variant="subheader" style={{ color: 'white'}} >
+                    {post.post_images.length + post.post_videos.length - 1}+
                   </CustomText>
                 </Box>
               </Box>
             ) : (
               <></>
             )}
-            {/*   old code*/}
-            {/* <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                // height: "100%",
-                // width: "100%",
-                // paddingRight: 200,
-                backgroundColor: "red",
-              }}
-            >
-              {post_images.length > 0 && (
-                <>
-                  {post_images.length === 1 &&
-                    post_images.map((image, index) => (
-                      <Image
-                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
-                        contentFit="contain"
-                        key={index}
-                        style={{
-                          width: WIDTH,
-                          height: "100%",
-                          borderRadius: 0,
-                        }}
-                      />
-                    ))}
-                  {post.post_images.length > 1 &&
-                    post_images.map((image, i) => (
-                      <Image
-                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
-                        contentFit="contain"
-                        key={i}
-                        style={{
-                          width: WIDTH - 50,
-                          height: "100%",
-                          borderRadius: 15,
-                        }}
-                      />
-                    ))}
-                </>
-              )}
-
-              {post_videos.length > 0 && (
-                <>
-                  {post_videos.length === 1 &&
-                    post_videos.map((video, index) => (
-                      <Video
-                        key={index}
-                        source={{ uri: `${IMAGE_BASE}${video.video_path}` }}
-                        posterSource={{
-                          uri: `${IMAGE_BASE}${video.video_thumbnail}`,
-                        }}
-                        usePoster
-                        resizeMode={ResizeMode.COVER}
-                        useNativeControls
-                        isLooping={false}
-                        videoStyle={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: 15,
-                          backgroundColor: "grey",
-                        }}
-                        style={{
-                          width: WIDTH,
-                          height: "100%",
-                          borderRadius: 0,
-                          backgroundColor: "grey",
-                        }}
-                      />
-                    ))}
-                  {post_videos.length > 1 &&
-                    post_videos.map((item, i) => (
-                      <Video
-                        key={i}
-                        source={{ uri: `${IMAGE_BASE}${item.video_path}` }}
-                        posterSource={{
-                          uri: `${IMAGE_BASE}${item.video_thumbnail}`,
-                        }}
-                        usePoster
-                        resizeMode={ResizeMode.COVER}
-                        useNativeControls
-                        videoStyle={{
-                          width: "44%",
-                          height: "70%",
-                          borderRadius: 15,
-                          backgroundColor: "grey",
-                        }}
-                        isLooping={false}
-                        style={{
-                          width: (WIDTH / 100) * 44,
-                          height: "70%",
-                          borderRadius: 15,
-                          backgroundColor: "grey",
-                        }}
-                      />
-                    ))}
-                </>
-              )}
-            </ScrollView> */}
           </Pressable>
         )}
       </Box>
@@ -443,7 +398,7 @@ const PostCard = (props: IPost & IProps) => {
           <Box flexDirection="row" alignItems="center">
             <Ionicons name="eye-outline" size={25} color={theme.colors.grey} />
             <CustomText variant="xs" marginLeft="s">
-              {view_count}
+              {post.view_count}
             </CustomText>
           </Box>
 
@@ -502,7 +457,7 @@ const PostCard = (props: IPost & IProps) => {
                         />
                       )}
                       <CustomText variant="xs">
-                        {upvotes_count} Upvote
+                        {post.upvotes_count} Upvote
                       </CustomText>
                     </>
                   )}
@@ -581,7 +536,7 @@ const PostCard = (props: IPost & IProps) => {
                   size={20}
                   color={theme.colors.textColor}
                 />
-                <CustomText variant="body">{comments_count}</CustomText>
+                <CustomText variant="body">{post.comments_count}</CustomText>
               </Pressable>
             </Box>
 
@@ -594,7 +549,7 @@ const PostCard = (props: IPost & IProps) => {
                 size={20}
                 color={theme.colors.textColor}
               />
-              <CustomText variant="body">{repost_count}</CustomText>
+              <CustomText variant="body">{post.repost_count}</CustomText>
             </Pressable>
           </Box>
         </Box>

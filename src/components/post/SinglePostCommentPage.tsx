@@ -599,7 +599,7 @@ import {
                   onKeyPress={handleEnterKeyPressed}
                   onFocus={() => {
                     setFocused(true);
-                    setShowComment(true);
+                    // setShowComment(true);
                   }}
                   onBlur={() => setFocused(false)}
                   placeholder="Leave a comment"
@@ -810,7 +810,18 @@ import {
           borderBottomWidth={1}
           borderBottomColor="secondaryBackGroundColor"
         >
-          <Ionicons name="person" size={30} color={theme.colors.textColor} />
+          <Box width={40} height={40} borderRadius={20} overflow="hidden">
+            { profile_image ? (
+              <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit="cover" style={{
+                width: '100%',
+                height: '100%'
+              }} />
+            ) : (
+              <Box width='100%' height={'100%'} justifyContent="center" alignItems="center">
+                <Ionicons name="person" size={30} color={theme.colors.textColor} />
+              </Box>
+            )}
+          </Box>
   
           <Box
             flex={0.9}
@@ -832,7 +843,6 @@ import {
               onKeyPress={handleEnterKeyPressed}
               onFocus={() => {
                 setFocused(true);
-                setShowComment(true);
               }}
               onBlur={() => setFocused(false)}
               placeholder="Leave a comment"
@@ -930,22 +940,20 @@ import {
                 />
               </Pressable>
   
-              <Feather
+              {/* <Feather
                 name="x"
                 size={25}
                 color={theme.colors.textColor}
                 onPress={() => setShowComment(false)}
-              />
+              /> */}
             </Box>
   
             {comments.length > 0 && (
               <Box maxHeight={250}>
-                <ScrollView>
                   {comments.length > 0 &&
                     comments.map((item, index) => (
                       <CommentBox comment={item} key={index.toString()} />
                     ))}
-                </ScrollView>
               </Box>
             )}
             {comments.length < 1 && (

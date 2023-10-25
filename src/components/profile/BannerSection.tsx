@@ -86,20 +86,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     }
   );
 
-  // const getAuthUserDetails = useQuery(
-  //   ["getLoggedInDetails", id],
-  //   () => httpService.get(`${URLS.GET_AUTH_USER_DETAILS}`),
-  //   {
-  //     enabled: userId === id,
-  //     onError: () => {},
-  //     onSuccess: (data) => {
-  //       console.log(`this is my profile`);
-  //       console.log(data?.data?.data);
-  //       setUser(data?.data?.data);
-  //     },
-  //   }
-  // );
-
   console.log(userId);
 
   // query
@@ -152,6 +138,10 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       updateBanner.mutate(formData);
     }
   };
+
+  const handleChat = () => {
+    navigation.navigate("chat", { userId: user.id, profile_image: user.profile_image, username: user.username, last_seen: user.last_seen });
+  }
   if (getUserDetails.isLoading) {
     return (
       <Box width='100%' height={200} justifyContent='center' alignItems="center">
@@ -329,14 +319,22 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             {!followUnFollowMutation.isLoading && (
               <>
+                {(user as IUser)?.isFollowing ? (
+                <CustomText variant="header" fontSize={16} marginLeft="s" color='white'>
+                  Following
+                </CustomText>
+              ): (
+                <>
                 <Ionicons
                   name="person-add-outline"
                   size={25}
-                  color={theme.colors.textColor}
+                  color={theme.colors.white}
                 />
-                <CustomText variant="header" fontSize={16} marginLeft="s">
+                <CustomText variant="header" fontSize={16} marginLeft="s" color='white'>
                   Follow
                 </CustomText>
+              </>
+              )}
               </>
             )}
             {followUnFollowMutation.isLoading && (
@@ -356,6 +354,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               borderWidth: 2,
               marginRight: 10,
             }}
+            onPress={() => handleChat()}
           >
             <Ionicons
               name="mail-outline"

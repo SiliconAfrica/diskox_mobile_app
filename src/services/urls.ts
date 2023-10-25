@@ -79,5 +79,6 @@ export const URLS = {
   AD_SHARING_REQUEST: "/send_ad_sharing_request",
   UPDATE_COMMUNITY_TYPE: '/update_community_type',
   UPDATE_COVER_PHOTO: '/update_cover_photo',
-  REACT_TO_COMMENT: '/react_to_comment'
+  REACT_TO_COMMENT: '/react_to_comment',
+  GET_BOOKMARK_POSTS: '/fetch_bookmarked_post'
 };

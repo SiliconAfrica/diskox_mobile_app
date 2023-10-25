@@ -69,7 +69,6 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   const sendMessage = useMutation({
     mutationFn: (data: FormData) => httpService.post(`${URLS.POST_CHAT_MESSAGE}`, data),
     onSuccess: (data) => {
-      alert('Message sent!');
       queryClient.invalidateQueries(['getMessages']);
       setMessage('');
       setFileType(null);
@@ -86,7 +85,10 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     setShowImagesModals(true)
   }, [])
   const filterMessages = React.useCallback(() => {
-    const msgs = chats.sort((a: IChatMessage, b: IChatMessage) => {
+    if (chats?.length < 1) {
+      return [];
+    }
+    const msgs = chats?.sort((a: IChatMessage, b: IChatMessage) => {
       if (a.created_at > b.created_at) {
         return 1;
       } else {
@@ -169,9 +171,12 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   );
 
   const groupChatMessagesByDate = () => {
+    if (chats?.length < 1) {
+      return [];
+    }
     const groupedMessages: { [key: string]: IChatMessage[] } = {};
   
-    filterMessages().forEach((message, index) => {
+    filterMessages()?.forEach((message, index) => {
       const currentDate = moment(message.created_at).format("YYYY-MM-DD");
       const previousDate = index > 0 ? moment(chats[index - 1].created_at).format("YYYY-MM-DD") : null;
   
@@ -205,7 +210,7 @@ const groupedMessages = groupChatMessagesByDate();
           </Box>
         )}
           <ScrollView contentContainerStyle={{ padding: 20 }}>
-          {Object.keys(groupedMessages).map((date) => (
+          {Object.keys(groupedMessages).length > 0 && Object.keys(groupedMessages).map((date) => (
             <React.Fragment key={date}>
               <CustomText textAlign="center" marginVertical='m'>
                 { moment(date).subtract(1, 'day').format('MMM DD, YYYY') === previousDate && 'Yesterday'}
