@@ -31,7 +31,7 @@ export default function SingleAnnouncement({ route }) {
     }
   );
   return (
-    <Box flex={1}>
+    <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
         showSave={false}
         title="Announcement"

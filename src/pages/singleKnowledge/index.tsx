@@ -32,7 +32,7 @@ export default function SingleKnowledge({ route }) {
   );
 
   return (
-    <Box flex={1}>
+    <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
         showSave={false}
         title="Knowledge Base"
