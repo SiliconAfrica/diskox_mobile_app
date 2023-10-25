@@ -107,7 +107,7 @@ const Login = () => {
         label="Login"
         onSubmit={(data) => mutate(data)}
         isLoading={isLoading}
-        width={'100%'}
+        width={"100%"}
       />
       <LightBgButton
         label="Signup"

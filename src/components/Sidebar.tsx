@@ -221,9 +221,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Saved"
-                action={() =>
-                  navigation.navigate("bookmark")
-                }
+                action={() => navigation.navigate("bookmark")}
               />
               <Item
                 icon={
