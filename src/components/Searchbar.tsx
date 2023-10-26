@@ -35,7 +35,7 @@ const Searchbar = () => {
         <TextInput 
         placeholder='Lets diskox it...'
         placeholderTextColor={theme.colors.textColor}
-        onPressIn={() => navigation.navigate('create-post')}
+        onChangeText={() => navigation.navigate('create-post')}
         style={{
             flex: 1,
             height: 50,

@@ -113,12 +113,12 @@ const PollCard = (props: IPost& IProps) => {
           toast.show(error.message, { type: 'error' });
         },
         onSuccess: (data) => {
-          queryClient.invalidateQueries([`getPost${id}`, id]);
-        //   if (isFollowing === 1) {
-        //     setPost({ ...post, user: { ...post.user, isFollowing: 0 }});
-        //   } else {
-        //     setPost({ ...post, user: { ...post.user, isFollowing: 1 }});
-        //   }
+        //   queryClient.invalidateQueries([`getPost${id}`, id]);
+          if (isFollowing === 1) {
+            setPost({ ...post, user: { ...post.user, isFollowing: 0 }});
+          } else {
+            setPost({ ...post, user: { ...post.user, isFollowing: 1 }});
+          }
         }
       });
     

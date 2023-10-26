@@ -66,13 +66,14 @@ const PostCard = (props: IPost & IProps) => {
     [`getPost${id}`, id],
     () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`),
     {
-      refetchOnMount: false,
+      refetchOnMount: true,
       onError: (error: any) => {
         toast.show(error.message, { type: "error" });
       },
       onSuccess: (data) => {
         const p: IPost = data.data.data;
         setPost(data.data.data);
+        console.log(`Is following ------- ${p.user.isFollowing}`)
       },
     }
   );
@@ -98,7 +99,7 @@ const PostCard = (props: IPost & IProps) => {
       toast.show(error.message, { type: 'error' });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost${id}`, id]);
+      // queryClient.invalidateQueries([`getPost${id}`]);
       if (isFollowing === 1) {
         setPost({ ...post, user: { ...post.user, isFollowing: 0 }});
       } else {
@@ -245,7 +246,7 @@ const PostCard = (props: IPost & IProps) => {
                 { follow.isLoading ? (
                   <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
                 ): (
-                  <CustomText variant="header" fontSize={14} color="primaryColor">{ isFollowing === 1 ? 'Following':'Follow'}</CustomText>
+                  <CustomText variant="header" fontSize={14} color="primaryColor">{ post.user.isFollowing === 1 ? 'Following':'Follow'}</CustomText>
                 )}
               </Pressable>
             )}

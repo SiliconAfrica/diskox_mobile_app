@@ -116,6 +116,9 @@ const Posts = () => {
           <RefreshControl 
             refreshing={isLoading && posts.length> 0}
             onRefresh={handleRefresh} 
+            progressViewOffset={50}
+            progressBackgroundColor={theme.colors.primaryColor}
+            colors={['white']}
           />
         }
         onEndReached={onEndReached}

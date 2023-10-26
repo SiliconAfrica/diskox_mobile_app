@@ -80,5 +80,6 @@ export const URLS = {
   UPDATE_COMMUNITY_TYPE: '/update_community_type',
   UPDATE_COVER_PHOTO: '/update_cover_photo',
   REACT_TO_COMMENT: '/react_to_comment',
-  GET_BOOKMARK_POSTS: '/fetch_bookmarked_post'
+  GET_BOOKMARK_POSTS: '/fetch_bookmarked_post',
+  REPORT_USER: '/report_post'
 };
