@@ -24,6 +24,7 @@ interface State {
   forCommunity: boolean;
   showImageVideoSlider: boolean;
   imageVideoSliderData: any[];
+  showReportPost: boolean;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -44,6 +45,7 @@ export const useModalState = create<State>((set) => ({
   forCommunity: false,
   showImageVideoSlider: false,
   imageVideoSliderData: [],
+  showReportPost: false,
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

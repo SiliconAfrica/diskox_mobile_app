@@ -10,6 +10,7 @@ import UsersModal from "../components/chats/UsersModal";
 import PostActionModal from "../components/modals/PostActionModal";
 import MonetizationModal from "../components/modals/MonetizationModal";
 import VideoImageGallery from "../components/feeds/videoImageGallery";
+import ReportPost from "../components/modals/ReportPost";
 
 const renderModals = () => {
   const {
@@ -21,6 +22,7 @@ const renderModals = () => {
     showPostAction,
     showMonetization,
     showImageVideoSlider,
+    showReportPost
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -35,6 +37,7 @@ const renderModals = () => {
         {showPostAction && <PostActionModal />}
         {showMonetization && <MonetizationModal />}
         {showImageVideoSlider && <VideoImageGallery />}
+        {showReportPost && <ReportPost />}
       </>
     );
   }, [
@@ -46,6 +49,7 @@ const renderModals = () => {
     showPostAction,
     showMonetization,
     showImageVideoSlider,
+    showReportPost
   ]);
 
   return {

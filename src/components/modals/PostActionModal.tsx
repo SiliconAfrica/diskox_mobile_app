@@ -21,21 +21,25 @@ import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useToast } from "react-native-toast-notifications";
 import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
+import * as Clipboard from 'expo-clipboard';
+
 
 const ActionChip = ({
   icon,
   label,
   action,
+  isLoading = false
 }: {
   icon: any;
   label: string;
   action: () => void;
+  isLoading?: boolean;
 }) => {
   const { isDarkMode } = useUtilState((state) => state);
   const theme = useTheme<Theme>();
   return (
     <Pressable
-      onPress={action}
+      onPress={() => isLoading ? null : action()}
       style={{
         flexDirection: "row",
         paddingHorizontal: 20,
@@ -49,7 +53,7 @@ const ActionChip = ({
         height={40}
         style={{
           backgroundColor: isDarkMode
-            ? theme.colors.mainBackGroundColor
+            ? theme.colors.secondaryBackGroundColor
             : "#F3FBF5",
         }}
         borderRadius={20}
@@ -59,7 +63,7 @@ const ActionChip = ({
         {icon}
       </Box>
       <CustomText variant="body" marginLeft="m">
-        {label}
+        { isLoading ? "Loading..." : label}
       </CustomText>
     </Pressable>
   );
@@ -78,18 +82,30 @@ const PostActionModal = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "post">>();
 
-    const { mutate } = useMutation({
+    const { mutate, isLoading } = useMutation({
       mutationFn: () => httpService.post(`${URLS.BOOKMARK_POST}/${activePost.id}`),
-      onSuccess: (data) => {},
-      onError: () => {},
+      onSuccess: (data) => {
+        toast.show(data.data.message, { type: 'success' });
+        setAll({ activePost: { ...activePost, is_bookmarked: activePost.is_bookmarked === 1 ?0:1 } });
+      },
+      onError: (error: any) => {
+        toast.show(error.message, { type: 'error' });
+
+      },
     });
+
+    const copyToClipboard = async () => {
+      await Clipboard.setStringAsync(`https://test404.diskox.com/post/${activePost.id}`);
+      toast.show('Post copied to clipboard', { type: 'success' });
+    };
+  
 
     const handleSave = React.useCallback(() => {
       const check = checkloggedInState();
       if (check) {
         mutate();
       }
-    }, [activePost])
+    }, [activePost, checkloggedInState])
 
   const obj = [
     {
@@ -109,21 +125,21 @@ const PostActionModal = () => {
     },
     {
       id: 2,
-      label: activePost.is_bookmarked ? 'Remove post':"Save post",
+      isLoading: isLoading,
+      label: activePost.is_bookmarked === 1 ? 'Remove post':"Save post",
       action: () => handleSave(),
       icon: (
         <Ionicons
           name="bookmark-outline"
           size={20}
-          color={theme.colors.textColor}
+          color={activePost.is_bookmarked === 1 ? theme.colors.primaryColor:theme.colors.textColor}
         />
       ),
     },
     {
       id: 3,
       label: "Copy link",
-      action: () =>
-        navigation.navigate("profile", { userId: activePost.user_id }),
+      action: () => copyToClipboard(),
       icon: (
         <Ionicons
           name="link-outline"
@@ -135,8 +151,7 @@ const PostActionModal = () => {
     {
       id: 4,
       label: "Report post",
-      action: () =>
-        navigation.navigate("profile", { userId: activePost.user_id }),
+      action: () => handleReport(),
       icon: (
         <Ionicons
           name="flag-outline"
@@ -152,6 +167,10 @@ const PostActionModal = () => {
       ref.current.present();
     }
   }, []);
+
+  const handleReport = () => {
+    setAll({ showPostAction: false, showReportPost: true });
+  }
   return (
     <ModalWrapper
       onClose={() => setAll({ showPostAction: false, activePost: null })}
