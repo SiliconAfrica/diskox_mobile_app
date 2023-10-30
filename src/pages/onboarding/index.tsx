@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React from "react";
 import Box from "../../components/general/Box";
 import { Image } from "expo-image";
@@ -16,6 +16,9 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import SecureStorage from 'expo-secure-store';
 import * as AuthSession from 'expo-auth-session';
+import { useMutation } from "react-query";
+import httpService from "../../utils/httpService";
+import { URLS } from "../../services/urls";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,32 +35,39 @@ const Onboarding = ({
   const toast = useToast();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
-    iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
+    // androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
+    // iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
+    // redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
+    // expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
+    androidClientId: '304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com',
+    iosClientId: '304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1.apps.googleusercontent.com',
+    expoClientId: '304260188611-brt1bj0fr87p8nugabs40s6ciar4ov75.apps.googleusercontent.com',
     redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
-    expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
     scopes: ['profile', 'email'],
   });
+
+  // mutation
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (data: string) => httpService.post(`${URLS.GOOGLE_AUTH}/${data}`),
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error: any) => {
+      toast.show(error.message,{ type: 'error' })
+    }
+  })
 
   React.useEffect(() => {
     if (response?.type === 'success') {
       // Handle successful authentication
       console.log(response.authentication.accessToken);
-      //getDetails(response.authentication?.accessToken);
+      mutate(response.authentication?.accessToken);
     }
   }, [response]);
 
-  const getDetails = async (token: string) => {
-    const request = await fetch(`https://www.googleapis.com/userinfo/v2/me?access_token=${token}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await request.json();
-
-    console.log(data)
-  }
+  // const getDetails = async (token: string) => {
+  //   mutate(token);
+  // }
 
 
   React.useEffect(() => {
@@ -70,7 +80,7 @@ const Onboarding = ({
   }, [showModal]);
 
   const signInWithGoogleAsync = async () => {
-    promptAsync({ useProxy: false });
+    promptAsync({ useProxy: true, projectNameForProxy: '@dandolla98/diskos' });
   };
   return (
     <Box
@@ -129,9 +139,16 @@ const Onboarding = ({
             />
           </Box>
           <Box flex={0.7}>
-            <CustomText variant="header" style={{ fontSize: 18 }}>
-              Continue with Google
-            </CustomText>
+            { !isLoading && (
+              <CustomText variant="header" style={{ fontSize: 18 }}>
+                Continue with Google
+              </CustomText>
+            )}
+            {
+              isLoading && (
+                <ActivityIndicator size='small' color={theme.colors.textColor} />
+              )
+            }
           </Box>
         </Pressable>
 

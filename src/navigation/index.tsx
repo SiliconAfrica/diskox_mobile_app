@@ -5,7 +5,7 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { ThemeProvider } from "@shopify/restyle";
 import theme, { darkTheme } from "../theme";
 import { useUtilState } from "../states/util";
-import { StatusBar } from "react-native";
+import { Alert, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import renderModals from "../hooks/renderModals";
 import * as SecureStorage from "expo-secure-store";
@@ -32,8 +32,10 @@ const Navigation = () => {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync();
-        // Prompt the user to reload the app to apply the update
-        Updates.reloadAsync();
+        Alert.alert('New Upate', 'An update is available for this app', [
+          { text: 'Update', onPress: () => Updates.reloadAsync(), style: 'default', isPreferred: true },
+          { text: 'Cancel', onPress: () => {}, style: 'cancel', }
+        ])
       }
     } catch (error) {
       console.error("Error checking for updates:", error);

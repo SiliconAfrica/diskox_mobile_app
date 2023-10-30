@@ -40,6 +40,8 @@ const PollCard = (props: IPost& IProps) => {
     const { checkloggedInState } = useCheckLoggedInState();
     const { id: myId } = useDetailsState((state) => state)
     const toast = useToast();
+    const { setAll: setModalState } = useModalState((state) => state);
+
 
 
     const { description, created_at, id, post_images, post_videos, view_count, upvotes_count, reactions_count, replies_count, repost_count, comments_count, user: { name, profile_image, id: userId, isFollowing, username }, poll_duration, polls, has_voted_poll } = post;
@@ -174,6 +176,18 @@ const PollCard = (props: IPost& IProps) => {
         }
     }
 
+    const openGallery = () => {
+        const allVideoAndImage = [...post_images, ...post_videos];
+        let theData = allVideoAndImage.map((item) => ({
+          type: item.type,
+          uri: `${IMAGE_BASE}${item.image_path || item.video_path}`,
+        }));
+        setModalState({
+          showImageVideoSlider: true,
+          imageVideoSliderData: [...theData],
+        });
+      };
+
     const handleFollow = () => {
         const check = checkloggedInState();
         if (check) {
@@ -258,6 +272,100 @@ const PollCard = (props: IPost& IProps) => {
           )}{" "}
         </CustomText>
         </Box>
+
+        {(post.post_images?.length > 0 || post.post_videos?.length > 0) && (
+          <Pressable
+            onPress={openGallery}
+            style={{ marginTop: 8, height: 300, width: "100%" }}
+          >
+            {post.post_images.length > 0 && post.post_videos.length > 0 ? (
+              <Box
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                {post.post_images.length > 0 ? (
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE}${post.post_images[0].image_path}`,
+                    }}
+                    contentFit="cover"
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: undefined,
+                      paddingTop: "83%",
+                    }}
+                  />
+                ) : (
+                  <>
+                    <Video
+                      source={{
+                        uri: `${IMAGE_BASE}${post.post_videos[0].video_path}`,
+                      }}
+                      posterSource={{
+                        uri: `${IMAGE_BASE}${post.post_videos[0].video_thumbnail}`,
+                      }}
+                      usePoster
+                      resizeMode={ResizeMode.COVER}
+                      useNativeControls
+                      isLooping={false}
+                      videoStyle={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 15,
+                        backgroundColor: "grey",
+                      }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 0,
+                        backgroundColor: "grey",
+                      }}
+                    />
+                    <Box
+                      style={{
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FontAwesome5
+                        name="play"
+                        size={50}
+                        color={theme.colors.whitesmoke}
+                      />
+                    </Box>
+                  </>
+                )}
+
+                <Box
+                  backgroundColor="mainBackGroundColor"
+                  position="absolute"
+                  width={80}
+                  height={80}
+                  alignItems="center"
+                  justifyContent="center"
+                  bottom={10}
+                  right={10}
+                  style={{
+                    backgroundColor: '#0000006f'
+                  }}
+                >
+                  <CustomText variant="subheader" style={{ color: 'white'}} >
+                    {post.post_images.length + post.post_videos.length - 1}+
+                  </CustomText>
+                </Box>
+              </Box>
+            ) : (
+              <></>
+            )}
+          </Pressable>
+        )}
 
             {/* Poll SECTION */}
             {polls?.length > 0 && (
