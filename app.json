@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
-      "buildNumber": "4"
+      "buildNumber": "5"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +29,7 @@
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 6,
+      "versionCode": 8,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
@@ -65,7 +65,8 @@
       }
     },
     "runtimeVersion": {
-      "policy": "sdkVersion"
+      "policy": "sdkVersion",
+      "nativeVersion": "48.0.18",
     },
     "updates": {
       "url": "https://u.expo.dev/d9d08b33-5cc3-4ff3-9357-45475bfc87b3"
