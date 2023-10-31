@@ -41,7 +41,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const {
     created_at,
     post_id,
-    user: { name, profile_image },
+    user: { username, profile_image },
   } = comment;
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
@@ -236,7 +236,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             <Box marginLeft="s" justifyContent="center">
               <Box flexDirection="row">
                 <CustomText variant="body" color="black">
-                  {name}{" "}
+                  {username}{" "}
                 </CustomText>
                 <CustomText variant="body" color="grey"></CustomText>
               </Box>
