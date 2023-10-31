@@ -203,6 +203,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const toggleEditComment = () => {
     setShowEditComment((prev) => !prev);
     setShowMenu(false);
+    setShowEmoji(false);
   };
   return (
     <>
