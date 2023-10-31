@@ -85,20 +85,22 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_REPLY}`, data),
     onSuccess: () => {
-      toast.show('Comment created successfully', { type: 'success' });
+      toast.show("Comment created successfully", { type: "success" });
       queryClient.invalidateQueries(["getReplies"]);
       setImages([]);
       setReply("");
     },
     onError: (error: any) => {
-      toast.show('An error occured while rying to create the comment', { type: 'error' });
+      toast.show("An error occured while rying to create the comment", {
+        type: "error",
+      });
     },
   });
 
   const upvote = useMutation({
     mutationFn: () => httpService.post(`${URLS.UPVOTE_COMMENT}/${comment.id}`),
     onError: (error: any) => {
-      toast.show(error?.message, { type: 'error' });
+      toast.show(error?.message, { type: "error" });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries([`getPost${comment.id}`]);
@@ -119,7 +121,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const deletereply = useMutation({
     mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${comment.id}`),
     onError: (error: any) => {
-      toast.show('Comment created successfully', { type: 'success' });
+      toast.show("Comment created successfully", { type: "success" });
       alert(error.message);
     },
     onSuccess: (data) => {
@@ -217,7 +219,9 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 <CustomText variant="body" color="black">
                   {name}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey">@{username}</CustomText>
+                <CustomText variant="body" color="grey">
+                  @{username}
+                </CustomText>
               </Box>
               <CustomText
                 variant="xs"
@@ -423,11 +427,11 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 )}
                 {!upvote.isLoading && (
                   <>
-                     <Image
-                        source={require("../../../assets/images/arrows/up.png")}
-                        contentFit="cover"
-                        style={{ width: 20, height: 20 }}
-                      />
+                    <Image
+                      source={require("../../../assets/images/arrows/up.png")}
+                      contentFit="cover"
+                      style={{ width: 20, height: 20 }}
+                    />
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
                     </CustomText>
@@ -449,22 +453,22 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 onPress={() => downvote.mutate()}
               >
                 {!downvote.isLoading && (
-                 <>
-                   {comment.has_downvoted === 0 && (
-                        <Image
-                          source={require("../../../assets/images/arrows/down.png")}
-                          contentFit="cover"
-                          style={{ width: 20, height: 20 }}
-                        />
-                      )}
-                      {comment.has_downvoted !== 0 && (
-                        <Image
-                          source={require("../../../assets/images/arrows/downfilled.png")}
-                          contentFit="cover"
-                          style={{ width: 20, height: 20 }}
-                        />
-                      )}
-                 </>
+                  <>
+                    {comment.has_downvoted === 0 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/down.png")}
+                        contentFit="cover"
+                        style={{ width: 20, height: 20 }}
+                      />
+                    )}
+                    {comment.has_downvoted !== 0 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/downfilled.png")}
+                        contentFit="cover"
+                        style={{ width: 20, height: 20 }}
+                      />
+                    )}
+                  </>
                 )}
                 {downvote.isLoading && (
                   <ActivityIndicator
@@ -691,7 +695,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_COMMENT}`, data),
     onSuccess: () => {
-      toast.show('Comment created successfully', { type: 'success' });
+      toast.show("Comment created successfully", { type: "success" });
       queryClient.invalidateQueries(["getComments"]);
       setImages([]);
       setComment("");
@@ -719,13 +723,16 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     };
   }, []);
 
-  const handleTextChange = React.useCallback((coment: string) => {
-    // do regex to gext mentioned users
-    const check = checkloggedInState();
-    if (check) {
-      setComment(coment);
-    }
-  }, [checkloggedInState]);
+  const handleTextChange = React.useCallback(
+    (coment: string) => {
+      // do regex to gext mentioned users
+      const check = checkloggedInState();
+      if (check) {
+        setComment(coment);
+      }
+    },
+    [checkloggedInState]
+  );
 
   const handleEnterKeyPressed = React.useCallback(
     (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {

@@ -202,7 +202,9 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 <CustomText variant="body" color="black">
                   {name}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey">@{username}</CustomText>
+                <CustomText variant="body" color="grey">
+                  @{username}
+                </CustomText>
               </Box>
               <CustomText
                 variant="xs"
@@ -408,16 +410,20 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 )}
                 {!upvote.isLoading && (
                   <>
-                     {
-                        comment.has_upvoted === 0 && (
-                            <Image source={require('../../../assets/images/arrows/up.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
-                        )
-                      }
-                       {
-                        comment.has_upvoted === 1 && (
-                            <Image source={require('../../../assets/images/arrows/upfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
-                        )
-                      }
+                    {comment.has_upvoted === 0 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/up.png")}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="cover"
+                      />
+                    )}
+                    {comment.has_upvoted === 1 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/upfilled.png")}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="cover"
+                      />
+                    )}
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
                     </CustomText>
@@ -439,17 +445,21 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 onPress={() => downvote.mutate()}
               >
                 {!downvote.isLoading && (
-                    <>
-                    {
-                   comment.has_downvoted === 0 && (
-                       <Image source={require('../../../assets/images/arrows/down.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
-                   )
-                    }
-                      {
-                      comment.has_downvoted === 1 && (
-                          <Image source={require('../../../assets/images/arrows/downfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
-                      )
-                    }
+                  <>
+                    {comment.has_downvoted === 0 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/down.png")}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="cover"
+                      />
+                    )}
+                    {comment.has_downvoted === 1 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/downfilled.png")}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="cover"
+                      />
+                    )}
                   </>
                 )}
                 {downvote.isLoading && (
