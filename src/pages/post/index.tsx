@@ -37,13 +37,12 @@ const Post = ({
   const { postId } = route.params;
   const theme = useTheme<Theme>();
   const { isLoggedIn } = useUtilState((state) => state);
-  const { setAll: setModalState } = useModalState((state) => state)
+  const { setAll: setModalState } = useModalState((state) => state);
   const [post, setPost] = React.useState<IPost | null>(null);
   const videoRef = React.useRef<Video>(null);
   const [comment, setComment] = React.useState("");
   const queryClient = useQueryClient();
   const { checkloggedInState } = useCheckLoggedInState();
-
 
   const { isLoading } = useQuery(
     ["getPostById", postId],
@@ -77,15 +76,15 @@ const Post = ({
       alert(error.message);
     },
     onSuccess: (data) => {
-        console.log(data.data);
-        if (data.data.message) {
-            alert(data.data.message);
-            setPost(prev => ({ ...prev, has_voted_poll: 1 }));
-            return;
-        }
-        queryClient.invalidateQueries(["getPostById", postId]);
-    }
-});
+      console.log(data.data);
+      if (data.data.message) {
+        alert(data.data.message);
+        setPost((prev) => ({ ...prev, has_voted_poll: 1 }));
+        return;
+      }
+      queryClient.invalidateQueries(["getPostById", postId]);
+    },
+  });
 
   // functions
   const handleBackPress = () => {
@@ -117,21 +116,24 @@ const Post = ({
 
   const getDate = () => {
     const today = moment();
-    const targetData = moment(post?.created_at).add(post?.poll_duration, 'days');
-    const daysToGo = targetData.diff(today, 'days');
+    const targetData = moment(post?.created_at).add(
+      post?.poll_duration,
+      "days"
+    );
+    const daysToGo = targetData.diff(today, "days");
     return daysToGo;
-}
+  };
 
-const vote = (poll_id: number) =>  {
-  const check = checkloggedInState();
-  if (check) {
+  const vote = (poll_id: number) => {
+    const check = checkloggedInState();
+    if (check) {
       const obj = {
-          post_id: post.id,
-          post_poll_id: poll_id
-      }
+        post_id: post.id,
+        post_poll_id: poll_id,
+      };
       votepoll.mutate(obj);
-  }
-}
+    }
+  };
 
   if (isLoading) {
     return (
@@ -153,196 +155,231 @@ const vote = (poll_id: number) =>  {
         handleArrowPressed={handleBackPress}
       />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }} >
-
-      <Box flex={1}>
-
-        {/* HEADER SECTION */}
-        <Box
-          flexDirection="row"
-          height={100}
-          justifyContent="space-between"
-          alignItems="center"
-          paddingHorizontal="m"
-        >
-          <Box flexDirection="row">
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <Box flex={1}>
+          {/* HEADER SECTION */}
+          <Box
+            flexDirection="row"
+            height={100}
+            justifyContent="space-between"
+            alignItems="center"
+            paddingHorizontal="m"
+          >
             <Box flexDirection="row">
-              <View
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 25,
-                  borderWidth: 2,
-                  borderColor: theme.colors.primaryColor,
-                  backgroundColor: theme.colors.secondaryBackGroundColor,
-                  overflow: "hidden",
-                }}
-              >
-                <Image
-                  source={{ uri: `${IMAGE_BASE}${post?.user.profile_image}` }}
-                  contentFit="contain"
-                  style={{ width: "100%", height: "100%", borderRadius: 25 }}
-                />
-              </View>
+              <Box flexDirection="row">
+                <View
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 25,
+                    borderWidth: 2,
+                    borderColor: theme.colors.primaryColor,
+                    backgroundColor: theme.colors.secondaryBackGroundColor,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Image
+                    source={{ uri: `${IMAGE_BASE}${post?.user.profile_image}` }}
+                    contentFit="contain"
+                    style={{ width: "100%", height: "100%", borderRadius: 25 }}
+                  />
+                </View>
 
-              <Box marginLeft="s" justifyContent="center">
-                <Box flexDirection="row">
-                  <CustomText variant="body" color="black">
-                    {post?.user.name}{" "}
+                <Box marginLeft="s" justifyContent="center">
+                  <Box flexDirection="row">
+                    <CustomText variant="body" color="black">
+                      {post?.user.name}{" "}
+                    </CustomText>
+                    <CustomText variant="body" color="grey"></CustomText>
+                  </Box>
+                  <CustomText variant="xs">
+                    {moment(post?.created_at).fromNow()}
                   </CustomText>
-                  <CustomText variant="body" color="grey"></CustomText>
                 </Box>
-                <CustomText variant="xs">
-                  {moment(post?.created_at).fromNow()}
-                </CustomText>
               </Box>
             </Box>
+            <Ionicons
+              name="ellipsis-vertical"
+              size={20}
+              color={theme.colors.textColor}
+            />
           </Box>
-          <Ionicons
-            name="ellipsis-vertical"
-            size={20}
-            color={theme.colors.textColor}
-          />
-        </Box>
 
-        {/* CONTENT SECTION */}
-        <ScrollView
-          contentContainerStyle={{
-            marginVertical: 20,
-            flex: 1,
-          }}
-        >
-         <Box paddingHorizontal="m">
-          <CustomText variant="body" textAlign="left">
-              {post?.description}
-            </CustomText>
-         </Box>
-
-
-           {/* IMAGE OR VIDEO SECTION */}
-        {(post?.post_images?.length > 0 || post?.post_videos?.length > 0) && (
-          <Pressable
-            onPress={openGallery}
-            style={{ marginTop: 8, height: 300, width: "100%" }}
+          {/* CONTENT SECTION */}
+          <ScrollView
+            contentContainerStyle={{
+              marginVertical: 20,
+              flex: 1,
+            }}
           >
-            {post.post_images.length > 0 && post.post_videos.length > 0 ? (
-              <Box
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                }}
+            <Box paddingHorizontal="m">
+              <CustomText variant="body" textAlign="left">
+                {post?.description}
+              </CustomText>
+            </Box>
+
+            {/* IMAGE OR VIDEO SECTION */}
+            {(post?.post_images?.length > 0 ||
+              post?.post_videos?.length > 0) && (
+              <Pressable
+                onPress={openGallery}
+                style={{ marginTop: 8, height: 300, width: "100%" }}
               >
-                {post.post_images.length > 0 ? (
-                  <Image
-                    source={{
-                      uri: `${IMAGE_BASE}${post.post_images[0].image_path}`,
-                    }}
-                    contentFit="cover"
+                {post.post_images.length > 0 && post.post_videos.length > 0 ? (
+                  <Box
                     style={{
                       position: "relative",
                       width: "100%",
-                      height: undefined,
-                      paddingTop: "83%",
+                      height: "100%",
                     }}
-                  />
-                ) : (
-                  <>
-                    <Video
-                      source={{
-                        uri: `${IMAGE_BASE}${post.post_videos[0].video_path}`,
-                      }}
-                      posterSource={{
-                        uri: `${IMAGE_BASE}${post.post_videos[0].video_thumbnail}`,
-                      }}
-                      usePoster
-                      resizeMode={ResizeMode.COVER}
-                      useNativeControls
-                      isLooping={false}
-                      videoStyle={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: 15,
-                        backgroundColor: "grey",
-                      }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: 0,
-                        backgroundColor: "grey",
-                      }}
-                    />
-                    <Box
-                      style={{
-                        position: "absolute",
-                        width: "100%",
-                        height: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <FontAwesome5
-                        name="play"
-                        size={50}
-                        color={theme.colors.whitesmoke}
+                  >
+                    {post.post_images.length > 0 ? (
+                      <Image
+                        source={{
+                          uri: `${IMAGE_BASE}${post.post_images[0].image_path}`,
+                        }}
+                        contentFit="cover"
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                          height: undefined,
+                          paddingTop: "83%",
+                        }}
                       />
+                    ) : (
+                      <>
+                        <Video
+                          source={{
+                            uri: `${IMAGE_BASE}${post.post_videos[0].video_path}`,
+                          }}
+                          posterSource={{
+                            uri: `${IMAGE_BASE}${post.post_videos[0].video_thumbnail}`,
+                          }}
+                          usePoster
+                          resizeMode={ResizeMode.COVER}
+                          useNativeControls
+                          isLooping={false}
+                          videoStyle={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 15,
+                            backgroundColor: "grey",
+                          }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 0,
+                            backgroundColor: "grey",
+                          }}
+                        />
+                        <Box
+                          style={{
+                            position: "absolute",
+                            width: "100%",
+                            height: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <FontAwesome5
+                            name="play"
+                            size={50}
+                            color={theme.colors.whitesmoke}
+                          />
+                        </Box>
+                      </>
+                    )}
+
+                    <Box
+                      backgroundColor="mainBackGroundColor"
+                      position="absolute"
+                      width={80}
+                      height={80}
+                      alignItems="center"
+                      justifyContent="center"
+                      bottom={0}
+                      right={0}
+                    >
+                      <CustomText variant="subheader">
+                        {post.post_images.length + post.post_videos.length - 1}+
+                      </CustomText>
                     </Box>
-                  </>
+                  </Box>
+                ) : (
+                  <></>
                 )}
-
-                <Box
-                  backgroundColor="mainBackGroundColor"
-                  position="absolute"
-                  width={80}
-                  height={80}
-                  alignItems="center"
-                  justifyContent="center"
-                  bottom={0}
-                  right={0}
-                >
-                  <CustomText variant="subheader" >
-                    {post.post_images.length + post.post_videos.length - 1}+
-                  </CustomText>
-                </Box>
-              </Box>
-            ) : (
-              <></>
+              </Pressable>
             )}
-          </Pressable>
-        )}
 
-         {/* Poll SECTION */}
-         {post?.polls?.length > 0 && (
-                <Box flexDirection='row' justifyContent='space-between' marginTop='m' paddingHorizontal="m" maxHeight={300} width={'100%'}>
+            {/* Poll SECTION */}
+            {post?.polls?.length > 0 && (
+              <Box
+                flexDirection="row"
+                justifyContent="space-between"
+                marginTop="m"
+                paddingHorizontal="m"
+                maxHeight={300}
+                width={"100%"}
+              >
+                <ScrollView
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ width: "100%" }}
+                >
+                  {post?.polls.map((poll, index) => (
+                    <Box
+                      key={index.toString()}
+                      width="100%"
+                      height={45}
+                      position="relative"
+                      overflow="hidden"
+                      borderRadius={25}
+                      marginBottom="s"
+                    >
+                      {post?.has_voted_poll === 1 && (
+                        <Box
+                          position="absolute"
+                          width={`${poll.vote_count}%`}
+                          top={0}
+                          height="100%"
+                          zIndex={1}
+                          backgroundColor="fadedButtonBgColor"
+                        />
+                      )}
+                      <Pressable
+                        onPress={() => vote(poll.id)}
+                        style={{
+                          zIndex: 2,
+                          width: "100%",
+                          height: 45,
+                          borderRadius: 25,
+                          borderWidth: 1,
+                          borderColor: theme.colors.primaryColor,
+                          paddingHorizontal: 20,
+                          justifyContent: "center",
+                          marginBottom: 10,
+                        }}
+                      >
+                        <CustomText variant="body" color="primaryColor">
+                          {poll.subject} ({poll.vote_count}%)
+                        </CustomText>
+                      </Pressable>
+                    </Box>
+                  ))}
+                </ScrollView>
+              </Box>
+            )}
 
-                    <ScrollView  showsHorizontalScrollIndicator={false} contentContainerStyle={{ width: '100%' }}>
-                    
-                        {post?.polls.map((poll, index) => (
-                            <Box key={index.toString()} width='100%' height={45} position='relative' overflow='hidden' borderRadius={25} marginBottom='s'>
-                                { post?.has_voted_poll === 1 && (
-                                    <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
-                                )}
-                                <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 45, borderRadius: 25, borderWidth: 1, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
-                                    <CustomText variant='body' color='primaryColor'>{poll.subject} ({poll.vote_count}%)</CustomText>
-                                </Pressable>
-                            </Box>
-                        ))}
-                   
-                    </ScrollView>
-                </Box>
-              )}
+            {post?.polls?.length > 0 && (
+              <CustomText marginLeft="m">
+                {getDate() > 0 ? `${getDate()} days left` : "Final result"}{" "}
+              </CustomText>
+            )}
+          </ScrollView>
+        </Box>
 
-              { post?.polls?.length > 0 && (
-                <CustomText marginLeft="m">{getDate() > 0 ? `${getDate()} days left` : 'Final result'  } </CustomText>
-              )}
-        </ScrollView>
-      </Box>
-
-      {/* COMMENT SECTIONS */}
-      <SingleCommentTextbox postId={postId} />
-
+        {/* COMMENT SECTIONS */}
+        <SingleCommentTextbox postId={postId} />
       </ScrollView>
-  
     </Box>
   );
 };
