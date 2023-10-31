@@ -188,7 +188,7 @@ const Post = ({
                 <Box marginLeft="s" justifyContent="center">
                   <Box flexDirection="row">
                     <CustomText variant="body" color="black">
-                      {post?.user.name}{" "}
+                      @{post?.user.username}{" "}
                     </CustomText>
                     <CustomText variant="body" color="grey"></CustomText>
                   </Box>
