@@ -25,11 +25,7 @@
       },
       "package": "com.dandolla98.diskos",
       "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-<<<<<<< HEAD
-      "versionCode": 6,
-=======
       "versionCode": 8,
->>>>>>> development
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
