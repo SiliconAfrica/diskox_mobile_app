@@ -155,7 +155,7 @@ const Post = ({
         handleArrowPressed={handleBackPress}
       />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 10000 }}>
         <Box flex={1}>
           {/* HEADER SECTION */}
           <Box
