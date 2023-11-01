@@ -26,8 +26,8 @@ export interface IComment {
     following_count: number;
     followers_count: number;
     isFollowing: number;
+    has_reacted: any[];
   };
-  has_reacted: any[];
 }
 
 export interface IReply {
