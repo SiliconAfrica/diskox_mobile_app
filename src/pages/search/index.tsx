@@ -64,16 +64,16 @@ const Search = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'noti
       </Box>
 
       <Box width='100%' height={60} flexDirection='row' paddingHorizontal='m' justifyContent='space-evenly' >
-        <Pressable onPress={() => setActive(1)} style={{ minWidth: 100, height: 45, borderRadius: 25, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: active === 1 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 1 ? 0 : 2 }}>
-            <CustomText variant='body' style={{ color: active === 1 ?'white':theme.colors.textColor }} >Post</CustomText>
+        <Pressable onPress={() => setActive(1)} style={{ minWidth: 100, height: 35, borderRadius: 25,  justifyContent: 'center', alignItems: 'center', backgroundColor: active === 1 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 1 ? 0 : 2 }}>
+            <CustomText variant='header' fontSize={14} style={{ color: active === 1 ?'white':theme.colors.textColor }} >Post</CustomText>
         </Pressable>
 
-        <Pressable onPress={() => setActive(2)}  style={{ minWidth: 100, height: 45, borderRadius: 25, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: active === 2 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 2 ? 0 : 2 }}>
-            <CustomText variant='body' style={{ color: active === 2 ?'white':theme.colors.textColor }} >People</CustomText>
+        <Pressable onPress={() => setActive(2)}  style={{ minWidth: 100, height: 35, borderRadius: 25,  justifyContent: 'center', alignItems: 'center', backgroundColor: active === 2 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 2 ? 0 : 2 }}>
+            <CustomText variant='header' fontSize={14} style={{ color: active === 2 ?'white':theme.colors.textColor }} >People</CustomText>
         </Pressable>
 
-        <Pressable onPress={() => setActive(3)}  style={{ minWidth: 100, height: 45, borderRadius: 25, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: active === 3 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 3 ? 0 : 2 }}>
-            <CustomText variant='body' style={{ color: active === 3 ?'white':theme.colors.textColor }} >Communities</CustomText>
+        <Pressable onPress={() => setActive(3)}  style={{ minWidth: 100, height:35, borderRadius: 25,  justifyContent: 'center', alignItems: 'center', backgroundColor: active === 3 ? theme.colors.primaryColor:theme.colors.mainBackGroundColor, borderColor: theme.colors.secondaryBackGroundColor, borderWidth: active === 3 ? 0 : 2 }}>
+            <CustomText variant='header' fontSize={14} style={{ color: active === 3 ?'white':theme.colors.textColor }} >Communities</CustomText>
         </Pressable>
       </Box>
       

@@ -16,13 +16,13 @@ const NormalButton = ({ label, action, isLoading = false }: {
         style={{
           backgroundColor: theme.colors.primaryColor,
           borderRadius: 50,
-          height: 45,
+          height: 38,
           width: '100%',
           justifyContent:'center',
           alignItems:'center',
           marginTop: 20,
         }}>
-          <CustomText variant='subheader' fontSize={18} style={{ color: 'white' }}>
+          <CustomText variant='header' fontSize={16} style={{ color: 'white' }}>
             { !isLoading && label }
             { isLoading && 'submitting...' }
           </CustomText>

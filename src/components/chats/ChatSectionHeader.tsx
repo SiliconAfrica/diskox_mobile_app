@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
 import { Ionicons, Feather } from '@expo/vector-icons'
@@ -11,8 +11,10 @@ import { Image } from 'expo-image'
 import { IMAGE_BASE } from '../../utils/httpService'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
+import { useModalState } from '../../states/modalState'
 
 const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Partial<IUser> & { userId: number }) => {
+    const { setAll } = useModalState((state) => state)
     const theme = useTheme<Theme>();
     const navigation = useNavigation<PageType>();
     const [showMenu, setShowMenu] = React.useState(false);
@@ -36,15 +38,27 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
        {
         showMenu && (
             <Box  elevation={4} position='absolute' height={150} backgroundColor='secondaryBackGroundColor' borderRadius={10} zIndex={100} right={20} bottom={-120} padding='m'>
-                <Box flexDirection='row' alignItems='center' flex={1}>
+                <Pressable style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => {
+                    setAll({
+                        activeChat: { userId, username},
+                        showBlockUser: true,
+                        showDeleteConvo: false,
+                    })
+                }}>
                     <Feather name='slash' size={20} color={theme.colors.textColor} />
                     <CustomText variant="body" marginLeft='s'>Block this person</CustomText>
-                </Box>
+                </Pressable>
 
-                <Box flexDirection='row' alignItems='center' flex={1}>
+                <Pressable style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => {
+                    setAll({
+                        activeChat: { userId, username},
+                        showBlockUser: false,
+                        showDeleteConvo: true
+                    })
+                }} >
                     <Feather name='trash-2' size={20} color={theme.colors.textColor} />
                     <CustomText variant="body" marginLeft='s'>Delete conversation</CustomText>
-                </Box>
+                </Pressable>
 
                 <Box flexDirection='row' alignItems='center' flex={1}>
                     <Feather name='flag' size={20} color={theme.colors.textColor} />
