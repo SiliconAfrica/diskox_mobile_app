@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import React from 'react'
 import Box from '../../../../../components/general/Box'
 import CustomText from '../../../../../components/general/CustomText'
@@ -7,8 +7,15 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../../../theme'
 import { useUtilState } from '../../../../../states/util'
 import SettingsHeader from '../../../../../components/settings/Header'
-import { useNavigation } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { PageType } from '../../../../login'
+import { useMutation } from 'react-query'
+import httpService from '../../../../../utils/httpService'
+import { URLS } from '../../../../../services/urls'
+import { CommunityStackParamList } from '../..'
+import { RootStackParamList } from '../../../../../navigation/MainNavigation'
+import useToast from '../../../../../hooks/useToast'
+import { CUSTOM_STATUS_CODE } from '../../../../../enums/CustomCodes'
 
 const TypeCard = ({ active, isPublic, action }: {
     active: boolean,
@@ -38,11 +45,41 @@ const TypeCard = ({ active, isPublic, action }: {
 
 const CommunityType = () => {
     const navigation = useNavigation<PageType>();
+    const theme = useTheme<Theme>();
+    const toast = useToast();
     const [isPublic, setIsPublic] = React.useState(true);
 
+    const route = useRoute<RouteProp<RootStackParamList, 'community-settings'>>();
+
+    const { id } = route.params;
+    const { isLoading, mutate } = useMutation({
+        mutationFn: (data: FormData) => httpService.put(`${URLS.UPDATE_COMMUNITY_TYPE}/${id}`, data),
+        onSuccess: (data) => {
+            if(data.data?.code === CUSTOM_STATUS_CODE.SUCCESS) {
+                toast.show(data?.data?.message, { type: 'sucess' });
+                // navigation.goBack();
+            }
+            if (data.data?.code === CUSTOM_STATUS_CODE.INTERNAL_SERVER_ERROR) {
+                toast.show(data?.data?.message, { type: 'error' });
+            }
+        },
+        onError: (error: any) => {
+            toast.show(error.message, { type: 'error' });
+        }
+    });
+
     const action = (isPublicc: boolean) => {
-        if (isPublicc) setIsPublic(true);
-        setIsPublic(false)
+        setIsPublic(true)
+        const formData = new FormData();
+        formData.append('type', 'public');
+        mutate(formData);
+    }
+
+    const action2 = (isPublicc: boolean) => {
+        setIsPublic(false);
+        const formData = new FormData();
+        formData.append('type', 'private');
+        mutate(formData);
     }
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
@@ -51,8 +88,19 @@ const CommunityType = () => {
         <Box  padding='m'>
             <CustomText variant='body' marginBottom='m'>Change people who can access your community</CustomText>
 
-            <TypeCard isPublic active={isPublic ? true: false} action={action} />
-            <TypeCard isPublic={false} active={isPublic ? false:true} action={action} />
+            { !isLoading && (
+                <Box>
+                    <TypeCard isPublic active={isPublic ? true: false} action={action} />
+                    <TypeCard isPublic={false} active={isPublic ? false:true} action={action2} />   
+                </Box>
+            )}
+            {
+                isLoading && (
+                    <Box width='100%' justifyContent='center' alignItems='center'>
+                        <ActivityIndicator size='large' color={theme.colors.primaryColor} />
+                    </Box>
+                )
+            }
         </Box>
 
     </Box>

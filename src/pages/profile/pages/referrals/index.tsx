@@ -15,7 +15,7 @@ export default function Referrals() {
   const navigation = useNavigation<PageType>();
   const theme = useTheme<Theme>();
   return (
-    <Box flex={1}>
+    <Box flex={1} backgroundColor="mainBackGroundColor">
       <ScrollView>
         <SettingsHeader
           showSave={false}

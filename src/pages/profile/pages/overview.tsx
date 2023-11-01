@@ -44,7 +44,7 @@ const Overview = ({ id }: IProps) => {
         alert(error.message);
       },
       onSuccess: (data) => {
-        console.log(data.data);
+        console.log(data.data?.data, "hhh");
         if (data.data.data) {
           setAnalysis(data?.data?.data);
         } else {
@@ -73,13 +73,6 @@ const Overview = ({ id }: IProps) => {
             mt="m"
           >
             <StatsCard
-              title="Total Earnings"
-              amount={analysis?.total_views || 0}
-              mainColor="#34A853"
-              iconBg="#F6F0FF"
-              iconName="stats-chart-outline"
-            />
-            <StatsCard
               title="Post Views"
               amount={analysis?.total_views || 0}
               mainColor="#9747FF"
@@ -92,6 +85,13 @@ const Overview = ({ id }: IProps) => {
               iconName="arrow-up-outline"
               mainColor="#39A2AE"
               iconBg="#EBF7FF"
+            />
+            <StatsCard
+              title="Downvotes"
+              amount={analysis?.total_downvotes || 0}
+              mainColor="#34A853"
+              iconBg="#F6F0FF"
+              iconName="arrow-down-outline"
             />
             <StatsCard
               title="Posts"

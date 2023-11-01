@@ -18,7 +18,7 @@ import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
-import { BASE_URL } from "../utils/httpService";
+import { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -75,31 +75,47 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
               }}
             >
               <Pressable
-                onPress={async () => {
-                  const switchToken = await SecureStorage.getItemAsync(
-                    `---${user.username}---token`
-                  );
-                  if (switchToken) {
-                    //save the token and data we are to be using in normal token
-                    await SecureStorage.setItemAsync("token", switchToken);
+                onPress={
+                  user?.username === username
+                    ? null
+                    : async () => {
+                        const switchToken = await SecureStorage.getItemAsync(
+                          `---${user.username}---token`
+                        );
+                        if (switchToken) {
+                          //save the token and data we are to be using in normal token
+                          await SecureStorage.setItemAsync(
+                            "token",
+                            switchToken
+                          );
 
-                    await AsyncStorage.setItem("user", JSON.stringify(user));
+                          await AsyncStorage.setItem(
+                            "user",
+                            JSON.stringify(user)
+                          );
 
-                    const [savedUser, savedUserErr] = await handlePromise(
-                      AsyncStorage.getItem("user")
-                    );
-                    if (JSON.parse(savedUser).username === user.username) {
-                      switchAccount(user.username, switchToken, updateDetails);
-                      toast.show(`Logged in as "@${user.username}"`, {
-                        type: "success",
-                      });
-                    }
-                  } else {
-                    alert(
-                      `Please add account with username of ${user.username} again.`
-                    );
-                  }
-                }}
+                          const [savedUser, savedUserErr] = await handlePromise(
+                            AsyncStorage.getItem("user")
+                          );
+                          if (
+                            JSON.parse(savedUser).username === user.username
+                          ) {
+                            switchAccount(
+                              user.username,
+                              switchToken,
+                              updateDetails
+                            );
+                            toast.show(`Logged in as "@${user.username}"`, {
+                              type: "success",
+                            });
+                          }
+                        } else {
+                          alert(
+                            `Please add account with username of ${user.username} again.`
+                          );
+                        }
+                      }
+                }
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -120,9 +136,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                   source={
                     user?.profile_image
                       ? {
-                          uri: `${BASE_URL.replace("/api/v1", "")}/storage/${
-                            user?.profile_image
-                          }`,
+                          uri: `${IMAGE_BASE}${user?.profile_image}`,
                         }
                       : require("../../assets/images/diskoxLarge.png")
                   }
@@ -195,7 +209,6 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       </View>
       <ScrollView>
         <Box paddingHorizontal="m">
-          
           {isLoggedIn && (
             <>
               <ScrollableItem accounts={accounts} />
@@ -224,6 +237,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Saved"
+                action={() => navigation.navigate("bookmark")}
               />
               <Item
                 icon={
@@ -249,12 +263,12 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
               <Item
                 icon={
                   <Ionicons
-                    name="person-circle"
+                    name="checkmark-circle-outline"
                     size={25}
                     color={theme.colors.textColor}
                   />
                 }
-                title="Verify Account"
+                title="Verify account"
                 action={() => navigation.navigate("verification")}
               />
             </>

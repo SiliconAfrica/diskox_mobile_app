@@ -34,6 +34,7 @@ import SingleKnowledge from "../pages/singleKnowledge";
 import { ICommunity } from "../models/Community";
 import Interests from "../pages/interests";
 import VerifyAccount from "../pages/verifyAccount";
+import Bookmarks from "../pages/bookmarks";
 
 export type RootStackParamList = {
   home: undefined;
@@ -72,7 +73,8 @@ export type RootStackParamList = {
   community: { id: number, data: ICommunity };
   "community-members": { id: number, username: string };
   "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
-  "verification": { id: number }
+  "verification": { id: number },
+  "bookmark": undefined;
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -169,6 +171,10 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Screen
           name="singleKnowledge"
           component={SingleKnowledge}
+        />
+         <RootStackNavigation.Screen
+          name="bookmark"
+          component={Bookmarks}
         />
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>

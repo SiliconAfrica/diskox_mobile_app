@@ -4,11 +4,11 @@ import CustomText from "../general/CustomText";
 import { Theme } from "../../theme";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../pages/login";
-import httpService, { BASE_URL } from "../../utils/httpService";
+import httpService, { BASE_URL, IMAGE_BASE } from "../../utils/httpService";
 import { useQuery } from "react-query";
 import { URLS } from "../../services/urls";
 
@@ -40,7 +40,7 @@ interface TSelectedAnnouncement {
 export default function AnnouncementBox() {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
-  const [showModal, setShowModal] = useState<boolean>(true);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedAnnouncement, setSelectedAnnouncement] =
     useState<TSelectedAnnouncement>(null);
   const [announcements, setAnnouncements] = useState<TAnnouncements[]>([]);
@@ -51,7 +51,8 @@ export default function AnnouncementBox() {
       active: index === 0 ? true : false,
     }));
     setAnnouncements([...newAnnouncements]);
-    setSelectedAnnouncement({ ...data[0], index: 0 });
+
+    // setSelectedAnnouncement({ ...announcements[0], index: 0 });
   };
   const { isLoading } = useQuery(
     ["announcements"],
@@ -61,9 +62,9 @@ export default function AnnouncementBox() {
         if (
           data.data.code === 1 &&
           data.data.data &&
-          Array.isArray(data.data.data)
+          Array.isArray(data.data.data) &&
+          announcements.length < 1
         ) {
-          setShowModal(true);
           startAnnouncements(data.data.data);
         }
       },
@@ -111,9 +112,11 @@ export default function AnnouncementBox() {
         });
       if (filterAnnouncements.length > 0) {
         setSelectedAnnouncement({ ...filterAnnouncements[0] });
+        setShowModal(true);
       }
     }
   }, [announcements]);
+
   return (
     <>
       {showModal && selectedAnnouncement && selectedAnnouncement.title && (
@@ -154,9 +157,7 @@ export default function AnnouncementBox() {
             source={
               selectedAnnouncement.cover_photo &&
               selectedAnnouncement.cover_photo.length > 0
-                ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                    selectedAnnouncement.cover_photo[0]
-                  }`
+                ? `${IMAGE_BASE}${selectedAnnouncement.cover_photo[0]}`
                 : require("../../../assets/images/diskoxLarge.png")
             }
             style={{

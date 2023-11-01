@@ -14,7 +14,7 @@ interface IProps {
     borderColor?: string;
 }
 
-const BorderButton = ({ title, onPress, width = 120, height = 45, isLoading = false, borderRadius = (height as number) / 2 || 25, borderColor }: IProps) => {
+const BorderButton = ({ title, onPress, width = 120, height = 44, isLoading = false, borderRadius = (height as number) / 2 || 25, borderColor }: IProps) => {
     const theme = useTheme<Theme>();
   return (
     <Pressable onPress={onPress} style={{ borderWidth: 1, borderColor: borderColor ?? theme.colors.mainBackGroundColor, borderRadius:  borderRadius, width, height, justifyContent: 'center', alignItems: 'center', }}>

@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "../general/Box";
 import CustomText from "../general/CustomText";
 import {
@@ -15,7 +15,7 @@ import {
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import {
   CompositeNavigationProp,
@@ -37,6 +37,11 @@ import moment from "moment";
 import { IUser } from "../../models/user";
 import useToast from "../../hooks/useToast";
 import { useModalState } from "../../states/modalState";
+import { Feather } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import mime from "mime";
+import { handlePromise } from "../../utils/handlePomise";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export enum ACTIVE_TAB {
   OVERVIEW = 1,
@@ -49,10 +54,15 @@ export enum ACTIVE_TAB {
 interface IProps {
   currentTab: ACTIVE_TAB;
   switchTab: (data: ACTIVE_TAB) => void;
+  id?: number;
 }
 
 const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const [user, setUser] = React.useState<IUser | null>(null);
+  const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>(
+    []
+  );
+
   const navigation = useNavigation<PageType>();
   const route = useRoute<any>();
   const HEIGHT = useWindowDimensions().height;
@@ -61,40 +71,24 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const { userId } = route.params;
   const theme = useTheme<Theme>();
   const toast = useToast();
+  const queryClient = useQueryClient();
 
-  const { profile_image, username, name, created_at, about, country, state } =
-    useDetailsState((state) => state);
   const { isDarkMode } = useUtilState((state) => state);
 
   const getUserDetails = useQuery(
     ["getDetails", userId],
     () => httpService.get(`${URLS.GET_USER_BY_ID}/${userId}`),
     {
-      enabled: userId !== id,
       onError: () => {},
-      onSuccess: (data) => {
-        console.log(`this is not my profile oooo!!!!`);
+      onSuccess: async (data) => {
         console.log(data?.data?.data);
         setUser(data?.data?.data);
+        const [saveUser, saveUserErr] = await handlePromise(
+          AsyncStorage.setItem(`user`, JSON.stringify(data.data.data))
+        );
       },
     }
   );
-
-  const getAuthUserDetails = useQuery(
-    ["getLoggedInDetails", id],
-    () => httpService.get(`${URLS.GET_AUTH_USER_DETAILS}`),
-    {
-      enabled: userId === id,
-      onError: () => {},
-      onSuccess: (data) => {
-        console.log(`this is my profile`);
-        console.log(data?.data?.data);
-        setUser(data?.data?.data);
-      },
-    }
-  );
-
-  console.log(userId);
 
   // query
 
@@ -120,39 +114,200 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       toast.show(data?.data?.message, { type: "success" });
     },
   });
+
+  const updateBanner = useMutation({
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.UPDATE_COVER_PHOTO}`, data),
+    onSuccess: (data) => {
+      //console.log(toast);
+      queryClient.invalidateQueries(["getDetails", userId]);
+      toast.show(data?.data?.message, { type: "success" });
+    },
+  });
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      base64: false,
+    });
+
+    if (!result.canceled) {
+      const name = result.assets[0].uri.split("/").pop();
+      const mimeType = mime.getType(result.assets[0].uri);
+      const formData = new FormData();
+      formData.append("cover_photo", {
+        uri: result.assets[0].uri,
+        type: mimeType,
+        name,
+      } as any);
+      updateBanner.mutate(formData);
+    }
+  };
+
+  const handleChat = () => {
+    navigation.navigate("chat", {
+      userId: user.id,
+      profile_image: user.profile_image,
+      username: user.username,
+      last_seen: user.last_seen,
+    });
+  };
+  if (getUserDetails.isLoading) {
+    return (
+      <Box
+        width="100%"
+        height={200}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <ActivityIndicator color={theme.colors.primaryColor} size="large" />
+        <CustomText>Loading...</CustomText>
+      </Box>
+    );
+  }
+
   return (
     <Box width="100%">
-      <ImageBackground
-        source={require("../../../assets/images/banner.png")}
-        style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
-      >
-        {/* <Box flexDirection='row'>
-                <Text>hello therre people</Text>
-            </Box> */}
+      {!getUserDetails.isLoading && user?.cover_photo !== null && (
+        <ImageBackground
+          source={{ uri: `${IMAGE_BASE}/${user?.cover_photo}` }}
+          style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
+        >
+          {userId === id && (
+            <Box
+              flexDirection="row"
+              width="100%"
+              paddingHorizontal={"m"}
+              justifyContent="flex-end"
+            >
+              <Box
+                width={50}
+                height={50}
+                borderRadius={25}
+                bg="grey"
+                overflow="hidden"
+              >
+                <Pressable
+                  onPress={pickImage}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 25,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {!updateBanner.isLoading && (
+                    <Feather
+                      name="edit"
+                      size={20}
+                      color={theme.colors.textColor}
+                    />
+                  )}
+                  {updateBanner.isLoading && (
+                    <ActivityIndicator
+                      color={theme.colors.primaryColor}
+                      size={"small"}
+                    />
+                  )}
+                </Pressable>
+              </Box>
+            </Box>
+          )}
 
+          <Box
+            width={100}
+            height={100}
+            borderRadius={50}
+            backgroundColor="black"
+            position="absolute"
+            bottom={-50}
+            left={20}
+            overflow="hidden"
+            style={{
+              padding: 2,
+              backgroundColor: isDarkMode
+                ? theme.colors.secondaryBackGroundColor
+                : "white",
+            }}
+          >
+            <Image
+              source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
+              contentFit="cover"
+              style={{ width: "100%", height: "100%", borderRadius: 70 }}
+            />
+          </Box>
+        </ImageBackground>
+      )}
+
+      {!getUserDetails.isLoading && user?.cover_photo === null && (
         <Box
-          width={100}
-          height={100}
-          borderRadius={50}
-          backgroundColor="black"
-          position="absolute"
-          bottom={-50}
-          left={20}
-          overflow="hidden"
           style={{
-            padding: 2,
-            backgroundColor: isDarkMode
-              ? theme.colors.secondaryBackGroundColor
-              : "white",
+            width: "100%",
+            height: (HEIGHT / 100) * 25,
+            paddingTop: 50,
+            backgroundColor: theme.colors.primaryColor,
           }}
         >
-          <Image
-            source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
-            contentFit="cover"
-            style={{ width: "100%", height: "100%", borderRadius: 70 }}
-          />
+          {userId === id && (
+            <Box
+              flexDirection="row"
+              width="100%"
+              paddingHorizontal={"m"}
+              justifyContent="flex-end"
+            >
+              <Box
+                width={50}
+                height={50}
+                borderRadius={25}
+                bg="grey"
+                overflow="hidden"
+              >
+                <Pressable
+                  onPress={pickImage}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 25,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Feather
+                    name="edit"
+                    size={20}
+                    color={theme.colors.textColor}
+                  />
+                </Pressable>
+              </Box>
+            </Box>
+          )}
+
+          <Box
+            width={100}
+            height={100}
+            borderRadius={50}
+            backgroundColor="black"
+            position="absolute"
+            bottom={-50}
+            left={20}
+            overflow="hidden"
+            style={{
+              padding: 2,
+              backgroundColor: isDarkMode
+                ? theme.colors.secondaryBackGroundColor
+                : "white",
+            }}
+          >
+            <Image
+              source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
+              contentFit="cover"
+              style={{ width: "100%", height: "100%", borderRadius: 70 }}
+            />
+          </Box>
         </Box>
-      </ImageBackground>
+      )}
 
       {/* BUTTONS SECTION */}
 
@@ -168,7 +323,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => navigation.navigate("settings")}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -204,8 +359,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             </Box>
           </Pressable>
           {/* <Box width={50} height={50} borderRadius={25} borderWidth={2} borderColor='secondaryBackGroundColor' alignItems='center' justifyContent='center'>
-                        <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
-                    </Box> */}
+            <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
+          </Box> */}
         </Box>
       )}
 
@@ -221,7 +376,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => followUnFollowMutation.mutate()}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -235,14 +390,38 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             {!followUnFollowMutation.isLoading && (
               <>
-                <Ionicons
-                  name="person-add-outline"
-                  size={25}
-                  color={theme.colors.textColor}
-                />
-                <CustomText variant="header" fontSize={16} marginLeft="s">
-                  Follow
-                </CustomText>
+                {(user as IUser)?.isFollowing ? (
+                  <CustomText
+                    variant="header"
+                    fontSize={16}
+                    marginLeft="s"
+                    color="white"
+                    style={{
+                      color: 'white'
+                    }}
+                  >
+                    Following
+                  </CustomText>
+                ) : (
+                  <>
+                    <Ionicons
+                      name="person-add-outline"
+                      size={25}
+                      color={'white'}
+                    />
+                    <CustomText
+                      variant="header"
+                      fontSize={16}
+                      marginLeft="s"
+                      color="white"
+                      style={{
+                        color: 'white'
+                      }}
+                    >
+                      Follow
+                    </CustomText>
+                  </>
+                )}
               </>
             )}
             {followUnFollowMutation.isLoading && (
@@ -252,8 +431,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
 
           <Pressable
             style={{
-              height: 50,
-              width: 50,
+              height: 35,
+              width: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -262,10 +441,11 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               borderWidth: 2,
               marginRight: 10,
             }}
+            onPress={() => handleChat()}
           >
             <Ionicons
               name="mail-outline"
-              size={25}
+              size={20}
               color={theme.colors.textColor}
             />
           </Pressable>
@@ -312,7 +492,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           </Box>
         </Box>
 
-        <CustomText variant="body" marginTop="m">
+        <CustomText variant="body" fontSize={15} marginTop="m">
           {user?.about}
         </CustomText>
 

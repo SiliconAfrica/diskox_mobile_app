@@ -42,7 +42,7 @@ const theme = createTheme({
       fontFamily: "RedMedium",
     },
     body: {
-      fontSize: 18,
+      fontSize: 16,
       color: "textColor",
       fontFamily: "RedRegular",
     },
@@ -52,7 +52,7 @@ const theme = createTheme({
       fontFamily: "RedLight",
     },
     defaults: {
-      fontSize: 16,
+      fontSize: 15,
       color: "textColor",
       fontFamily: "RedRegular",
     },

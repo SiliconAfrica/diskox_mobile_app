@@ -46,7 +46,7 @@ const Header = () => {
                 {
                     profile_image && (
                         <Pressable onPress={() => navigation.navigate('profile', { userId: id })}>
-                            <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 30, height: 30, borderRadius: 25, marginLeft: 10 }} contentFit='contain' />
+                            <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 32, height: 32, borderRadius: 17, marginLeft: 10 }} contentFit='cover' />
                         </Pressable>
                     )
                 }

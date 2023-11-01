@@ -31,7 +31,9 @@ import { Follower } from "../../models/Follower";
 const CreatePost = ({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "create-post">) => {
-  const { profile_image, name, username, id } = useDetailsState((state) => state);
+  const { profile_image, name, username, id } = useDetailsState(
+    (state) => state
+  );
   const { setAll, visibility } = useModalState((state) => state);
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -40,58 +42,67 @@ const CreatePost = ({
   const [value, setValues] = React.useState("");
   const [question, setQuestion] = React.useState("");
   const [pollQuestion, setPollQuestion] = React.useState("");
-  const [polls, setPolls] = React.useState(['', ''])
-  const [day, setDay] = React.useState('1 day');
+  const [polls, setPolls] = React.useState(["", ""]);
+  const [day, setDay] = React.useState("1 day");
   const [showEmoji, setShowEmoji] = React.useState(false);
-  const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([])
+  const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
-
-
 
   const theme = useTheme<Theme>();
   const toast = useToast();
 
-
   // functions
-  const editPoll = React.useCallback((e: string, i: number) => {
-    const copy = [...polls];
-    copy[i] = e
-    setPolls(copy);
-  }, [polls]);
+  const editPoll = React.useCallback(
+    (e: string, i: number) => {
+      const copy = [...polls];
+      copy[i] = e;
+      setPolls(copy);
+    },
+    [polls]
+  );
 
   const addPoll = React.useCallback(() => {
-    const arr = [...polls, ''];
+    const arr = [...polls, ""];
     setPolls(arr);
   }, [polls]);
 
-  const deletePoll = React.useCallback((i: number) => {
-    if (polls.length === 2) {
-      return;
-    }
-    setPolls(polls.filter((_, index) => index !== i))
-  }, [polls]);
+  const deletePoll = React.useCallback(
+    (i: number) => {
+      if (polls.length === 2) {
+        return;
+      }
+      setPolls(polls.filter((_, index) => index !== i));
+    },
+    [polls]
+  );
 
   React.useEffect(() => {
-    setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)));
-}, [tags])
+    setSelectedUsers(
+      followers.filter((item) => tags.includes(item.follower.id))
+    );
+  }, [tags]);
 
-  const { isLoading: followersLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
-    enabled: true,
-    onSuccess: (data) => {
+  const { isLoading: followersLoading, isError } = useQuery(
+    ["GetFollower", id],
+    () => httpService.get(`/fetch_user_followers/${id}`),
+    {
+      enabled: true,
+      onSuccess: (data) => {
         const followersArr: Follower[] = data.data.data.data;
         setFollowers(followersArr);
-    },
-    onError: (error) => {
+      },
+      onError: (error) => {
         alert(JSON.stringify(error));
+      },
     }
-});
+  );
 
   // mutation
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post("/create_post", data),
     onSuccess: (data) => {
       console.log(data.data);
-      toast.show('Post created', { type: 'success'})
+      toast.show("Post created", { type: "success" });
       // clean up
       setFiles([]);
       setTags([]);
@@ -99,7 +110,7 @@ const CreatePost = ({
       navigation.goBack();
     },
     onError: (error: any) => {
-      toast.show(error?.message, { type: 'error' });
+      toast.show(error?.message, { type: "error" });
     },
   });
 
@@ -145,21 +156,28 @@ const CreatePost = ({
         );
       }
     }
-  }, [activeTab, files, value, pollQuestion, question, setQuestion, polls, day]);
+  }, [
+    activeTab,
+    files,
+    value,
+    pollQuestion,
+    question,
+    setQuestion,
+    polls,
+    day,
+  ]);
 
-  const handleCheck =
-    (val: number) => {
-      if (!tags.includes(val)) {
-        setTags(prev => [...prev, val]);
-      } else {
-        setTags(prev => prev.filter((item) => item !== val));
-      }
-      
+  const handleCheck = (val: number) => {
+    if (!tags.includes(val)) {
+      setTags((prev) => [...prev, val]);
+    } else {
+      setTags((prev) => prev.filter((item) => item !== val));
     }
+  };
 
-  const handleSubmit = React.useCallback(async() => {
+  const handleSubmit = React.useCallback(async () => {
     const formData = new FormData();
-    
+
     if (activeTab === TAB_BAR_ENUM.POST) {
       formData.append("description", value);
       formData.append("post_type", "post");
@@ -175,12 +193,12 @@ const CreatePost = ({
       formData.append("post_type", "poll");
       formData.append("poll_duration", day);
       polls.map((item) => {
-        formData.append('polls[]', item);
-      })
+        formData.append("polls[]", item);
+      });
     }
 
     formData.append("visibility", visibility);
-    
+
     //  const ht = value.match(/#\w+/g);
     //  if (ht.length > 0) {
     //   ht.map((item) => {
@@ -215,30 +233,42 @@ const CreatePost = ({
         } as any);
       });
     }
-    console.log(formData);
     mutate(formData);
-  }, [value, visibility, tags, files, polls, pollQuestion, question, day, activeTab]);
+  }, [
+    value,
+    visibility,
+    tags,
+    files,
+    polls,
+    pollQuestion,
+    question,
+    day,
+    activeTab,
+  ]);
 
-  const handleDocumentPicker = React.useCallback(async () => {
-    if (files.length === 10) {
-      alert(`You can't add more than 5 files!`);
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      base64: false,
-    });
+  const handleDocumentPicker = React.useCallback(
+    async (documentType: "All" | "Images" | "Videos" | null) => {
+      if (files.length === 10) {
+        alert(`You can't add more than 5 files!`);
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions[documentType || "Images"],
+        allowsEditing: true,
+        base64: false,
+      });
 
-    if (!result.canceled) {
-      console.log(result.assets[0]);
-      const formData = new FormData();
-      const name = result.assets[0].uri.split("/").pop();
-      const mimeType = mime.getType(result.assets[0].uri);
-      const arr = [...files, result.assets[0]];
-      setFiles(arr);
-    }
-  }, [files]);
+      if (!result.canceled) {
+        console.log(result.assets[0]);
+        const formData = new FormData();
+        const name = result.assets[0].uri.split("/").pop();
+        const mimeType = mime.getType(result.assets[0].uri);
+        const arr = [...files, result.assets[0]];
+        setFiles(arr);
+      }
+    },
+    [files]
+  );
 
   const handleMediaDelete = React.useCallback(
     ({ index, clearAll }: { index: number; clearAll: boolean }) => {
@@ -251,22 +281,25 @@ const CreatePost = ({
     [files]
   );
 
-  const updateTextWithEmoji = React.useCallback((emoji: string) => {
-    switch(activeTab) {
-      case TAB_BAR_ENUM.POST: {
-        setValues(prev => prev + emoji);
-        break;
+  const updateTextWithEmoji = React.useCallback(
+    (emoji: string) => {
+      switch (activeTab) {
+        case TAB_BAR_ENUM.POST: {
+          setValues((prev) => prev + emoji);
+          break;
+        }
+        case TAB_BAR_ENUM.QUESTION: {
+          setQuestion((prev) => prev + emoji);
+          break;
+        }
+        case TAB_BAR_ENUM.POLL: {
+          setPollQuestion((prev) => prev + emoji);
+          break;
+        }
       }
-      case TAB_BAR_ENUM.QUESTION: {
-        setQuestion(prev => prev + emoji)
-        break;
-      }
-      case TAB_BAR_ENUM.POLL: {
-        setPollQuestion(prev => prev + emoji);
-        break;
-      }
-    }
-  }, [activeTab])
+    },
+    [activeTab]
+  );
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <TagModal
@@ -366,55 +399,63 @@ const CreatePost = ({
         position="relative"
         zIndex={9}
       >
-        { showEmoji && (
-          <Box width='80%' height={250} position="absolute" bottom={70} borderRadius={10} zIndex={10} backgroundColor="secondaryBackGroundColor">
+        {showEmoji && (
+          <Box
+            width="80%"
+            height={250}
+            position="absolute"
+            bottom={70}
+            borderRadius={10}
+            zIndex={10}
+            backgroundColor="secondaryBackGroundColor"
+          >
             <Emojipicker onSelected={updateTextWithEmoji} />
           </Box>
         )}
 
-         <Box flexDirection="row">
+        <Box flexDirection="row">
+          <Pressable
+            onPress={() => setShowEmoji((prev) => !prev)}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: theme.colors.secondaryBackGroundColor,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Feather
+              name="smile"
+              size={25}
+              color={
+                showEmoji ? theme.colors.primaryColor : theme.colors.textColor
+              }
+            />
+          </Pressable>
 
-         <Pressable
-          onPress={() => setShowEmoji(prev => !prev)}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: theme.colors.secondaryBackGroundColor,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Feather
-            name="smile"
-            size={25}
-            color={showEmoji ? theme.colors.primaryColor : theme.colors.textColor}
-          />
-        </Pressable>
+          <Pressable
+            onPress={() => handleDocumentPicker("Images")}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: theme.colors.secondaryBackGroundColor,
+              justifyContent: "center",
+              alignItems: "center",
+              marginLeft: 20,
+            }}
+          >
+            <Ionicons
+              name="image-outline"
+              size={25}
+              color={theme.colors.textColor}
+            />
+          </Pressable>
 
-        <Pressable
-          onPress={handleDocumentPicker}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: theme.colors.secondaryBackGroundColor,
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: 20,
-          }}
-        >
-          <Ionicons
-            name="image-outline"
-            size={25}
-            color={theme.colors.textColor}
-          />
-        </Pressable>
-
-        {
-          activeTab !== TAB_BAR_ENUM.POLL && (
+          {activeTab !== TAB_BAR_ENUM.POLL && (
             <Pressable
-              onPress={handleDocumentPicker}
+              onPress={() => handleDocumentPicker("Videos")}
               style={{
                 width: 40,
                 height: 40,
@@ -431,19 +472,29 @@ const CreatePost = ({
                 color={theme.colors.textColor}
               />
             </Pressable>
-          )
-        }
+          )}
+        </Box>
 
-         </Box>
-
-         <Box flex={1} flexDirection="row" justifyContent="flex-end">
-          {selectedUsers.length <= 4 && selectedUsers.map((item, index) => (
-            <Box width={30} height={30} borderRadius={15} overflow="hidden" backgroundColor="fadedButtonBgColor">
-              <Image source={{ uri: `${IMAGE_BASE}${item.follower.profile_image}`}} contentFit="cover" style={{ width: '100%', height: '100%'}} />
-            </Box>
-          ))}
-         </Box>
-
+        <Box flex={1} flexDirection="row" justifyContent="flex-end">
+          {selectedUsers.length <= 4 &&
+            selectedUsers.map((item, index) => (
+              <Box
+                width={30}
+                height={30}
+                borderRadius={15}
+                overflow="hidden"
+                backgroundColor="fadedButtonBgColor"
+              >
+                <Image
+                  source={{
+                    uri: `${IMAGE_BASE}${item.follower.profile_image}`,
+                  }}
+                  contentFit="cover"
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </Box>
+            ))}
+        </Box>
       </Box>
     </Box>
   );

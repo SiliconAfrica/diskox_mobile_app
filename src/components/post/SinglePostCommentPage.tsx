@@ -24,7 +24,7 @@ import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useDetailsState } from "../../states/userState";
-import { IComment, IReply } from "../../models/comments";
+import { IComment } from "../../models/comments";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { URLS } from "../../services/urls";
 import * as ImagePicker from "expo-image-picker";
@@ -32,7 +32,6 @@ import mime from "mime";
 import Emojipicker from "../general/emojipicker";
 import Reply from "./Reply";
 import useToast from "../../hooks/useToast";
-import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 // import EmojiSelector from 'react-native-emoji-selector'
 // import EmojiModal from 'react-native-emoji-modal';
 
@@ -42,7 +41,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const {
     created_at,
     post_id,
-    user: { name, profile_image, username },
+    user: { username, profile_image },
   } = comment;
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
@@ -53,7 +52,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   >([]);
   const [showComments, setShowComment] = React.useState(false);
   const [isReply, setIsReply] = React.useState(false);
-  const [comments, setComments] = React.useState<Array<IReply>>([]);
+  const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [commentsVisible, setCommentsVisible] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
 
@@ -65,17 +64,16 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const toast = useToast();
 
   const theme = useTheme<Theme>();
-  const { isLoggedIn } = useUtilState((state) => state);
-  const { profile_image: profile_pic} = useDetailsState((state) => state)
 
   //query
   const { isLoading } = useQuery(
-    [`getReplies-${comment.id}`, comment.id],
+    ["getReplies", comment.id],
     () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
     {
-      onError: () => {},
+      onError: (error: any) => {
+        toast.show(error.message, { type: "error" });
+      },
       onSuccess: (data) => {
-        console.log(data.data);
         if (data?.data) {
           setComments(data?.data?.data?.data || []);
         }
@@ -93,6 +91,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
       setReply("");
     },
     onError: (error: any) => {
+      toast.show(error.message, { type: "error" });
       toast.show("An error occured while rying to create the comment", {
         type: "error",
       });
@@ -105,7 +104,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
       toast.show(error?.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
+      queryClient.invalidateQueries([`getComments`, comment.post_id]);
     },
   });
 
@@ -113,43 +112,34 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
     mutationFn: () =>
       httpService.post(`${URLS.DOWNVOTE_COMMENT}/${comment.id}`),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
+      queryClient.invalidateQueries([`getComments`, comment.post_id]);
     },
   });
 
-  const reacttocomment = useMutation({
+  const reactToComment = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.REACT_TO_COMMENT}`, data),
     onError: (error: any) => {
-      alert(error.message);
+      toast.show(error.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
+      queryClient.invalidateQueries([`getComments`, comment.post_id]);
     },
   });
 
   const deletereply = useMutation({
-    mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${comment.id}`),
+    mutationFn: () => httpService.post(`${URLS.DELETE_COMMMENT}/${comment.id}`),
     onError: (error: any) => {
-      toast.show("Comment created successfully", { type: "success" });
-      alert(error.message);
+      toast.show(error.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost`]);
+      queryClient.invalidateQueries([`getComments`, comment.post_id]);
       setShowMenu(false);
     },
   });
-
-  const handleReaction = () => {
-    const formData = new FormData()
-    formData.append('comment_id', comment.id.toString());
-    formData.append('type', 'like');
-
-    reacttocomment.mutate(formData);
-  }
 
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
@@ -199,6 +189,14 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
     mutate(formData);
   }, [comment.id, mutationLoading, reply, images]);
 
+  const handleReaction = React.useCallback(() => {
+    const formData = new FormData();
+    formData.append("comment_id", comment.id.toString());
+    formData.append("type", "like");
+
+    reactToComment.mutate(formData);
+  }, [comment]);
+
   return (
     <Box
       width="100%"
@@ -238,11 +236,9 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             <Box marginLeft="s" justifyContent="center">
               <Box flexDirection="row">
                 <CustomText variant="body" color="black">
-                  {name}{" "}
+                  {username}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey">
-                  @{username}
-                </CustomText>
+                <CustomText variant="body" color="grey"></CustomText>
               </Box>
               <CustomText
                 variant="xs"
@@ -383,7 +379,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                     comment?.post_images.map((image, index) => (
                       <Image
                         key={index.toString()}
-                        source={{ uri: `${IMAGE_BASE}/${image.image_path}` }}
+                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
                         contentFit="cover"
                         style={{
                           width: 40,
@@ -397,7 +393,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                     comment?.post_images.map((image, i) => (
                       <Image
                         key={i.toString()}
-                        source={{ uri: `${IMAGE_BASE}/${image.image_path}` }}
+                        source={{ uri: `${IMAGE_BASE}${image.image_path}` }}
                         contentFit="cover"
                         style={{
                           width: 40,
@@ -448,12 +444,20 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 )}
                 {!upvote.isLoading && (
                   <>
-                     <Image
-                        source={comment.has_upvoted === 1 ? require("../../../assets/images/arrows/upfilled.png"):require("../../../assets/images/arrows/up.png")}
-                        contentFit="cover"
+                    {comment.has_upvoted === 0 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/up.png")}
                         style={{ width: 20, height: 20 }}
+                        contentFit="cover"
                       />
-
+                    )}
+                    {comment.has_upvoted === 1 && (
+                      <Image
+                        source={require("../../../assets/images/arrows/upfilled.png")}
+                        style={{ width: 20, height: 20 }}
+                        contentFit="cover"
+                      />
+                    )}
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
                     </CustomText>
@@ -479,15 +483,15 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                     {comment.has_downvoted === 0 && (
                       <Image
                         source={require("../../../assets/images/arrows/down.png")}
-                        contentFit="cover"
                         style={{ width: 20, height: 20 }}
+                        contentFit="cover"
                       />
                     )}
-                    {comment.has_downvoted !== 0 && (
+                    {comment.has_downvoted === 1 && (
                       <Image
                         source={require("../../../assets/images/arrows/downfilled.png")}
-                        contentFit="cover"
                         style={{ width: 20, height: 20 }}
+                        contentFit="cover"
                       />
                     )}
                   </>
@@ -495,7 +499,11 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 {downvote.isLoading && (
                   <ActivityIndicator
                     size="small"
-                    color={theme.colors.primaryColor}
+                    color={
+                      comment.has_downvoted === 1
+                        ? theme.colors.primaryColor
+                        : theme.colors.textColor
+                    }
                   />
                 )}
               </Pressable>
@@ -509,12 +517,16 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
               alignItems: "center",
               marginLeft: 10,
             }}
-            onPress={handleReaction}
+            onPress={() => handleReaction()}
           >
             <Ionicons
               name="heart-outline"
               size={20}
-              color={comment.has_reacted.length > 0 ? theme.colors.primaryColor:theme.colors.textColor}
+              color={
+                comment.has_reacted.length > 0
+                  ? theme.colors.primaryColor
+                  : theme.colors.textColor
+              }
             />
             <CustomText variant="body">{comment.reactions_count}</CustomText>
           </Pressable>
@@ -581,12 +593,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             position="relative"
             zIndex={5}
           >
-            { isLoggedIn && (
-            <Box width={32} height={32} borderRadius={17} overflow="hidden">
-              <Image source={{ uri: `${IMAGE_BASE}${profile_pic}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
-            </Box>
-        )}
-        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
+            <Ionicons name="person" size={30} color={theme.colors.textColor} />
 
             <Box
               flex={0.9}
@@ -608,10 +615,10 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 onKeyPress={handleEnterKeyPressed}
                 onFocus={() => {
                   setFocused(true);
-                  setShowComment(true);
+                  // setShowComment(true);
                 }}
                 onBlur={() => setFocused(false)}
-                placeholder={`Reply to @${comment.user.username}`}
+                placeholder="Leave a comment"
                 placeholderTextColor={theme.colors.textColor}
                 style={{
                   flex: 1,
@@ -684,12 +691,11 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   );
 };
 
-const CommentTextbox = ({ postId }: { postId: number }) => {
+const SingleCommentTextbox = ({ postId }: { postId: number }) => {
   const [focused, setFocused] = React.useState(false);
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [comment, setComment] = React.useState("");
-  const { isDarkMode, isLoggedIn } = useUtilState((state) => state);
-  const { checkloggedInState } = useCheckLoggedInState();
+  const { isDarkMode } = useUtilState((state) => state);
   const { profile_image, created_at, id, name } = useDetailsState(
     (state) => state
   );
@@ -705,7 +711,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
   >([]);
 
   const { isLoading } = useQuery(
-    [`getComments-${postId}`, postId],
+    ["getComments", postId],
     () => httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`),
     {
       onError: (error) => {
@@ -741,9 +747,9 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     });
 
     const keyboardClosed = Keyboard.addListener("keyboardDidHide", () => {
-      // if (TextinputtRef.current !== null) {
-      //   TextinputtRef.current.blur();
-      // }
+      if (TextinputtRef.current !== null) {
+        TextinputtRef.current.blur();
+      }
     });
     return () => {
       keyboardEvent.remove();
@@ -751,16 +757,10 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
     };
   }, []);
 
-  const handleTextChange = React.useCallback(
-    (coment: string) => {
-      // do regex to gext mentioned users
-      const check = checkloggedInState();
-      if (check) {
-        setComment(coment);
-      }
-    },
-    [checkloggedInState]
-  );
+  const handleTextChange = React.useCallback((coment: string) => {
+    // do regex to gext mentioned users
+    setComment(coment);
+  }, []);
 
   const handleEnterKeyPressed = React.useCallback(
     (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
@@ -826,12 +826,31 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
         borderBottomWidth={1}
         borderBottomColor="secondaryBackGroundColor"
       >
-        { isLoggedIn && (
-            <Box width={32} height={32} borderRadius={17} overflow="hidden">
-              <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
+        <Box width={40} height={40} borderRadius={20} overflow="hidden">
+          {profile_image ? (
+            <Image
+              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+              contentFit="cover"
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          ) : (
+            <Box
+              width="100%"
+              height={"100%"}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Ionicons
+                name="person"
+                size={30}
+                color={theme.colors.textColor}
+              />
             </Box>
-        )}
-        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
+          )}
+        </Box>
 
         <Box
           flex={0.9}
@@ -840,7 +859,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
           backgroundColor={
             isDarkMode ? "secondaryBackGroundColor" : "mainBackGroundColor"
           }
-          height={44}
+          height={50}
           flexDirection="row"
           paddingHorizontal="s"
           borderWidth={focused ? 1 : 0}
@@ -853,7 +872,6 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
             onKeyPress={handleEnterKeyPressed}
             onFocus={() => {
               setFocused(true);
-              setShowComment(true);
             }}
             onBlur={() => setFocused(false)}
             placeholder="Leave a comment"
@@ -931,7 +949,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
         </Box>
       )}
 
-      {showComments && (
+      {
         <Box padding="m">
           <Box
             width="100%"
@@ -951,31 +969,29 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
               />
             </Pressable>
 
-            <Feather
-              name="x"
-              size={25}
-              color={theme.colors.textColor}
-              onPress={() => setShowComment(false)}
-            />
+            {/* <Feather
+                name="x"
+                size={25}
+                color={theme.colors.textColor}
+                onPress={() => setShowComment(false)}
+              /> */}
           </Box>
 
           {comments.length > 0 && (
             <Box maxHeight={250}>
-              <ScrollView>
-                {comments.length > 0 &&
-                  comments.map((item, index) => (
-                    <CommentBox comment={item} key={index.toString()} />
-                  ))}
-              </ScrollView>
+              {comments.length > 0 &&
+                comments.map((item, index) => (
+                  <CommentBox comment={item} key={index.toString()} />
+                ))}
             </Box>
           )}
           {comments.length < 1 && (
             <CustomText marginTop="m">No comments yet.</CustomText>
           )}
         </Box>
-      )}
+      }
     </Box>
   );
 };
 
-export default CommentTextbox;
+export default SingleCommentTextbox;

@@ -5,30 +5,14 @@ import CustomText from "../../components/general/CustomText";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
 
-import { BASE_URL } from "../../utils/httpService";
+import { IMAGE_BASE } from "../../utils/httpService";
 import { formatDate } from "../../utils/dateFormatter";
 
 export default function KnowledgeTab({ knowledge }) {
   const navigation = useNavigation<PageType>();
 
   return (
-    <Box px="s" mx="s" mt='l'>
-
-      <Box style={styles.imgbox}>
-        <Image
-          source={
-            knowledge.cover_photo.length > 0
-              ? `${BASE_URL.replace("/api/v1", "")}/storage/${
-                  knowledge.cover_photo[0]
-                }`
-              : require("../../../assets/images/diskoxLarge.png")
-          }
-
-          contentFit="cover"
-
-          style={styles.img}
-        />
-      </Box>
+    <Box px="s" mx="s" mt="l">
       <Pressable
         onPress={() =>
           navigation.navigate("singleKnowledge", {
@@ -36,6 +20,18 @@ export default function KnowledgeTab({ knowledge }) {
           })
         }
       >
+        <Box style={styles.imgbox}>
+          <Image
+            source={
+              knowledge.cover_photo.length > 0
+                ? `${IMAGE_BASE}${knowledge.cover_photo[0]}`
+                : require("../../../assets/images/diskoxLarge.png")
+            }
+            contentFit="cover"
+            style={styles.img}
+          />
+        </Box>
+
         <CustomText variant="body" fontFamily="RedBold" color="black">
           {knowledge.title}
         </CustomText>
