@@ -11,6 +11,8 @@ import PostActionModal from "../components/modals/PostActionModal";
 import MonetizationModal from "../components/modals/MonetizationModal";
 import VideoImageGallery from "../components/feeds/videoImageGallery";
 import ReportPost from "../components/modals/ReportPost";
+import BlockUserModal from "../components/modals/BlockUserModal";
+import DeleteConversationModal from "../components/modals/DeleteConversationModal";
 
 const renderModals = () => {
   const {
@@ -22,7 +24,9 @@ const renderModals = () => {
     showPostAction,
     showMonetization,
     showImageVideoSlider,
-    showReportPost
+    showReportPost,
+    showBlockUser,
+    showDeleteConvo
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -38,6 +42,8 @@ const renderModals = () => {
         {showMonetization && <MonetizationModal />}
         {showImageVideoSlider && <VideoImageGallery />}
         {showReportPost && <ReportPost />}
+        {showBlockUser && <BlockUserModal />}
+        {showDeleteConvo && <DeleteConversationModal />}
       </>
     );
   }, [
@@ -49,7 +55,9 @@ const renderModals = () => {
     showPostAction,
     showMonetization,
     showImageVideoSlider,
-    showReportPost
+    showReportPost,
+    showBlockUser,
+    showDeleteConvo
   ]);
 
   return {

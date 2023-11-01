@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { URLS } from '../../services/urls'
 import useToast from '../../hooks/useToast'
 import DeleteMessageModal from '../modals/DeleteMessageModal'
+import { useUtilState } from '../../states/util'
 
 const REACTIONS: Array<{name: string; icon: string}> = [
   {
@@ -51,6 +52,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
     const [showReact, setShowReact] = React.useState(false);
     const queryClient = useQueryClient();
     const toast = useToast();
+    const { isDarkMode } = useUtilState((state) => state);
 
     const { isLoading, mutate } = useMutation({
       mutationFn: (data: string) => httpService.post(`${URLS.REACT_TO_MESSAGE}/${message_id}`, {
@@ -72,7 +74,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
       {
         deleted_by === null && (
           <Box width='100%' alignItems='flex-end' alignContent='flex-end' marginBottom='m'>
-            <Feather name={showDropdown ? 'chevron-up':'chevron-down'} onPress={() => setShowDropdown(true)} size={25} color={theme.colors.textColor} />
+            <Feather name={showDropdown ? 'chevron-up':'chevron-down'} onPress={() => setShowDropdown(true)} size={15} color={theme.colors.textColor} />
           </Box>
         )
       }
@@ -81,7 +83,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
         deleted_by !== null && reactions !== null || reactions !== undefined && reactions.length > 0 && (
           <Box zIndex={30} position='absolute' bottom={-25} right={0} width={35} height={35} paddingHorizontal='s' backgroundColor='secondaryBackGroundColor' borderRadius={20} elevation={5} justifyContent='center' alignContent='center'>
               {reactions.map((item, i) => (
-                <CustomText  key={i.toString()}>{REACTIONS.filter((ite) => ite.name === item.type )[0].icon}</CustomText>
+                <CustomText  key={i.toString()}>{REACTIONS.filter((ite) => ite.name === item.type )[0]?.icon}</CustomText>
               ))}
           </Box>
         )
@@ -156,7 +158,8 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
 
         { deleted_by === null && (
           <>
-            <CustomText variant='body'>{message}</CustomText>
+            <CustomText variant='body' fontSize={15} style={{ color: sender_id === id ? isDarkMode ?  'white':'black':'black'}} color={sender_id === id ?'white':
+          'black'}>{message}</CustomText>
             <CustomText textAlign={ sender_id === id ? 'right':'left'} variant='xs' marginTop='s'>
                 {moment(created_at).format("hh:mm a")}
             </CustomText>

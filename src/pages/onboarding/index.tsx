@@ -140,7 +140,7 @@ const Onboarding = ({
           </Box>
           <Box flex={0.7}>
             { !isLoading && (
-              <CustomText variant="header" style={{ fontSize: 18 }}>
+              <CustomText variant="header" style={{ fontSize: 16 }}>
                 Continue with Google
               </CustomText>
             )}
@@ -169,7 +169,7 @@ const Onboarding = ({
             marginTop: 20,
           }}
         >
-          <CustomText color="white">Signup</CustomText>
+          <CustomText variant="header" fontSize={16} style={{ color: 'white'}}>Signup</CustomText>
         </Pressable>
 
         <Pressable
@@ -191,7 +191,7 @@ const Onboarding = ({
         >
           <CustomText
             variant="header"
-            style={{ fontSize: 18 }}
+            style={{ fontSize: 16 }}
             color="primaryColor"
           >
             Login

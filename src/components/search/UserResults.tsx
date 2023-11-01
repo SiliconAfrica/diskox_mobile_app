@@ -16,16 +16,16 @@ const UserCard = ({ user }: {
 }) => {
     const navigation = useNavigation<any>();
     return (
-        <Box px='m' width='100%' height={70} flexDirection='row' alignItems='center' justifyContent='space-between' marginBottom='s'>
+        <Box px='m' width='100%' height={50} flexDirection='row' alignItems='center' justifyContent='space-between' marginBottom='s'>
             <Box flexDirection='row' alignItems='center' > 
-                <Box width={50} height={50} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
+                <Box width={32} height={32} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
                     <Pressable onPress={() => navigation.navigate('profile', { userId: user.id })} style={{ width:  '100%', height: '100%', borderRadius: 25 }}>
                         <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />
                     </Pressable>
                 </Box>
 
-                <CustomText variant='body' color='black' marginLeft='s'>{user.name}</CustomText>
-                <CustomText variant='xs' color='grey' marginLeft='s'>@{user.username}</CustomText>
+                <CustomText variant='subheader' fontSize={15} color='black' marginLeft='s'>{user.name}</CustomText>
+                <CustomText variant='body' color='grey' marginLeft='s'>@{user.username}</CustomText>
             </Box>
         </Box>
     )

@@ -29,6 +29,7 @@ import { useMultipleAccounts } from "../../states/multipleAccountStates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../utils/handlePomise";
 import useToast from "../../hooks/useToast";
+import CustomButton from "../../components/general/CustomButton";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -109,11 +110,13 @@ const Login = () => {
         isLoading={isLoading}
         width={"100%"}
       />
-      <LightBgButton
-        label="Signup"
-        action={() => setAll({ showLogin: false, showSignup: true })}
-        style={{ marginTop: 20 }}
-      />
+     
+     <Box width='100%' marginTop="m" alignItems="center">
+      <CustomButton
+          title="Signup"
+          onPress={() => setAll({ showLogin: false, showSignup: true })}
+        />
+     </Box>
 
       <CustomText
         variant="body"

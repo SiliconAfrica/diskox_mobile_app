@@ -32,8 +32,8 @@ const Header = () => {
         </View>
 
         { !isLoggedIn && (
-            <Pressable onPress={() =>navigation.navigate('onboarding', { showModal: undefined })} style={{ width: 80, height: 40, borderRadius: 45, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.primaryColor }}>
-                <CustomText variant='body' color='white'>Login</CustomText>
+            <Pressable onPress={() =>navigation.navigate('onboarding', { showModal: undefined })} style={{ width: 80, height: 32, borderRadius: 45, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.primaryColor }}>
+                <CustomText variant='header' fontSize={16} style={{ color: 'white'}} color='white'>Login</CustomText>
             </Pressable>
         )}
         { isLoggedIn && (
@@ -46,7 +46,7 @@ const Header = () => {
                 {
                     profile_image && (
                         <Pressable onPress={() => navigation.navigate('profile', { userId: id })}>
-                            <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 30, height: 30, borderRadius: 25, marginLeft: 10 }} contentFit='contain' />
+                            <Image source={{ uri:  `${IMAGE_BASE}${profile_image}` }} style={{ width: 32, height: 32, borderRadius: 17, marginLeft: 10 }} contentFit='cover' />
                         </Pressable>
                     )
                 }

@@ -198,9 +198,9 @@ const PostCard = (props: IPost & IProps) => {
             <Pressable
               onPress={() => navigation.navigate("profile", { userId })}
               style={{
-                width: 50,
-                height: 50,
-                borderRadius: 25,
+                width: 32,
+                height: 32,
+                borderRadius: 17,
                 borderWidth: 2,
                 borderColor: theme.colors.primaryColor,
                 backgroundColor: theme.colors.secondaryBackGroundColor,
@@ -235,7 +235,8 @@ const PostCard = (props: IPost & IProps) => {
             { myId !== userId && (
               <Pressable style={{
                 backgroundColor: theme.colors.fadedButtonBgColor,
-                padding: 5,
+                height: 24,
+                paddingHorizontal: 3,
                 borderRadius: 20,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -272,7 +273,7 @@ const PostCard = (props: IPost & IProps) => {
       <Box marginVertical="m">
 
         <Box paddingHorizontal="m">
-        <CustomText variant="body">
+        <CustomText variant="body" fontSize={10} style={{ fontSize: 10, color: 'red'}}>
           {showAll
             ? des
             : des?.length > 100
@@ -313,7 +314,7 @@ const PostCard = (props: IPost & IProps) => {
                     style={{
                       position: "relative",
                       width: "100%",
-                      height: undefined,
+                      height: '100%',
                       paddingTop: "83%",
                     }}
                   />

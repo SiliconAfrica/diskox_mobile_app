@@ -11,7 +11,7 @@ import {
 import { useTheme } from "@shopify/restyle";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { IComment } from "../../models/comments";
+import { IComment, IReply } from "../../models/comments";
 import Box from "../general/Box";
 import { useUtilState } from "../../states/util";
 import { Theme } from "../../theme";
@@ -24,7 +24,7 @@ import mime from "mime";
 import { Image } from "expo-image";
 
 const EditReplyBox = ({
-  comment,
+  reply,
   // edit,
   toggleEditing,
   showEmoji,
@@ -32,7 +32,7 @@ const EditReplyBox = ({
   editedReply,
   setEditedReply,
 }: {
-  comment: IComment;
+  reply: IReply;
   toggleEditing: () => void;
   showEmoji: boolean;
   setShowEmoji: any;
@@ -95,13 +95,13 @@ const EditReplyBox = ({
     setImages([...filterImages]);
   };
   useEffect(() => {
-    setEditedReply(comment.reply);
-    setPrevImages([...comment.post_images]);
+    setEditedReply(reply.reply);
+    setPrevImages([...reply.post_images]);
   }, []);
 
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
-      httpService.post(`${URLS.UPDATED_REPLY}/${comment.id}`, data),
+      httpService.post(`${URLS.UPDATED_REPLY}/${reply.id}`, data),
     onSuccess: () => {
       toast.show("Reply updated successfully", { type: "success" });
       toggleEditing();
@@ -120,7 +120,7 @@ const EditReplyBox = ({
   const handleSubmit = useCallback(() => {
     if (mutationLoading) return;
     const formData = new FormData();
-    formData.append("comment_id", comment.comment_id.toString() as any),
+    formData.append("comment_id", reply.comment_id.toString() as any),
       formData.append("reply", editedReply);
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
@@ -141,7 +141,7 @@ const EditReplyBox = ({
     //formData.append('mentioned_users', [].toString())
     mutate(formData);
   }, [
-    comment.id,
+    reply.id,
     mutationLoading,
     editedReply,
     images,

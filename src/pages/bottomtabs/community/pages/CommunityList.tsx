@@ -26,8 +26,8 @@ const CommunityList = () => {
 
       {/* HEADER */}
       <Box width='100%' flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='s' marginTop='m' paddingBottom='m'>
-        <CustomText>Explore Popular communities</CustomText>
-        <FadedButton title='Create community' width={150} onPress={() => setShowModal(true)} />
+        <CustomText variant='header' fontSize={15}>Explore Popular communities</CustomText>
+        <FadedButton title='Create community' width={150} height={40} onPress={() => setShowModal(true)} />
       </Box>
 
      <FlashList 

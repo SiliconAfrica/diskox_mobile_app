@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#34A853"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
@@ -24,8 +26,10 @@
         "backgroundColor": "#34A853"
       },
       "package": "com.dandolla98.diskos",
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 8,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "versionCode": 10,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"

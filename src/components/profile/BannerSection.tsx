@@ -182,8 +182,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               justifyContent="flex-end"
             >
               <Box
-                width={50}
-                height={50}
+                width={40}
+                height={40}
                 borderRadius={25}
                 bg="grey"
                 overflow="hidden"
@@ -323,7 +323,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => navigation.navigate("settings")}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -339,7 +339,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               size={25}
               color={theme.colors.textColor}
             />
-            <CustomText variant="xs" marginLeft="s">
+            <CustomText variant="subheader" fontSize={15} marginLeft="s">
               Edit Profile
             </CustomText>
           </Pressable>
@@ -376,7 +376,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => followUnFollowMutation.mutate()}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -396,6 +396,9 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     fontSize={16}
                     marginLeft="s"
                     color="white"
+                    style={{
+                      color: 'white'
+                    }}
                   >
                     Following
                   </CustomText>
@@ -404,13 +407,16 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     <Ionicons
                       name="person-add-outline"
                       size={25}
-                      color={theme.colors.white}
+                      color={'white'}
                     />
                     <CustomText
                       variant="header"
                       fontSize={16}
                       marginLeft="s"
                       color="white"
+                      style={{
+                        color: 'white'
+                      }}
                     >
                       Follow
                     </CustomText>
@@ -425,8 +431,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
 
           <Pressable
             style={{
-              height: 50,
-              width: 50,
+              height: 35,
+              width: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -439,7 +445,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             <Ionicons
               name="mail-outline"
-              size={25}
+              size={20}
               color={theme.colors.textColor}
             />
           </Pressable>
@@ -486,7 +492,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           </Box>
         </Box>
 
-        <CustomText variant="body" marginTop="m">
+        <CustomText variant="body" fontSize={15} marginTop="m">
           {user?.about}
         </CustomText>
 
@@ -533,7 +539,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.OVERVIEW)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.OVERVIEW
                   ? "primaryColor"
@@ -553,7 +560,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.POSTS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.POSTS ? "primaryColor" : "textColor"
               }
@@ -571,7 +579,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.UPVOTES)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.UPVOTES ? "primaryColor" : "textColor"
               }
@@ -589,7 +598,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.COMMENTS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.COMMENTS
                   ? "primaryColor"
@@ -609,7 +619,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.POLLS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.POLLS ? "primaryColor" : "textColor"
               }

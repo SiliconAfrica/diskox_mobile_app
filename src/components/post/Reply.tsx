@@ -9,7 +9,7 @@ import {
   TextInputKeyPressEventData,
 } from "react-native";
 import React from "react";
-import { IComment } from "../../models/comments";
+import { IComment, IReply } from "../../models/comments";
 import { useNavigation } from "@react-navigation/native";
 import moment from "moment";
 import { useQueryClient, useQuery, useMutation } from "react-query";
@@ -28,26 +28,29 @@ import { useDetailsState } from "../../states/userState";
 import EditReplyBox from "./EditReplyBox";
 import Emojipicker from "../general/emojipicker";
 
-const Reply = ({ comment }: { comment: IComment }) => {
-  const {
-    created_at,
-    post_id,
-    user: { name, profile_image, username },
-  } = comment;
+const Reply = ({
+  comment: reply,
+  isReply: ISREPLY = false,
+}: {
+  comment: IReply;
+  isReply?: boolean;
+}) => {
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
   const [showEmoji, setShowEmoji] = React.useState(false);
-  const [reply, setReply] = React.useState("");
+  // const [reply, setReply] = React.useState<IReply>(comment);
   const [images, setImages] = React.useState<
     Array<ImagePicker.ImagePickerAsset>
   >([]);
   const [showComments, setShowComment] = React.useState(false);
   const [showEditReply, setShowEditReply] = React.useState(false);
   const [editedReply, setEditedReply] = React.useState("");
-  const [isReply, setIsReply] = React.useState(false);
+  // const [isReply, setIsReply] = React.useState(false);
+  const [isReply, setIsReply] = React.useState(ISREPLY);
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [commentsVisible, setCommentsVisible] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
+  const [text, setText] = React.useState("");
 
   const navigation = useNavigation<any>();
   const { isDarkMode } = useUtilState((state) => state);
@@ -56,69 +59,107 @@ const Reply = ({ comment }: { comment: IComment }) => {
   const TextinputtRef = React.useRef<TextInput>();
 
   const theme = useTheme<Theme>();
+  const { isLoggedIn } = useUtilState((state) => state);
+  const { profile_image: profilePic } = useDetailsState((state) => state);
 
-  //query
-  const { isLoading } = useQuery(
-    ["getReplies", comment.id],
-    () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
-    {
-      onError: () => {},
-      onSuccess: (data) => {
-        if (data?.data) {
-          setComments(data?.data?.data?.data || []);
-        }
-      },
-    }
-  );
+  // const GetSingleReply = useQuery(
+  //   [`getSingleReply-${comment.id}`, comment.id],
+  //   () => httpService.get(`${URLS.GET_SINGLE_REPLY}/${comment.id}`),
+  //   {
+  //     onError: () => {},
+  //     onSuccess: (data) => {
+  //       console.log(data.data);
+  //       if (data?.data) {
+  //         setReply({...reply, ...data?.data?.data});
+  //       }
+  //     },
+  //   }
+  // );
+
+  // //query
+  // const { isLoading } = useQuery(
+  //   [`getReplyReplies-${comment.id}`, comment.id],
+  //   () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
+  //   {
+  //     enabled: isReply,
+  //     onError: () => {},
+  //     onSuccess: (data) => {
+  //       if (data?.data) {
+  //         console.log('---RELPY---')
+  //         console.log(data?.data?.data.data[0]);
+  //         setComments(data?.data?.data?.data || []);
+  //       }
+  //     },
+  //   }
+  // );
 
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_REPLY}`, data),
     onSuccess: () => {
       alert("coment created successfully");
-      queryClient.invalidateQueries(["getReplies"]);
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
       setImages([]);
-      setReply("");
+      setText("");
     },
     onError: (error: any) => {
       alert("An error occured while rying to create the comment");
     },
   });
 
-  const upvote = useMutation({
-    mutationFn: () => httpService.post(`${URLS.UPVOTE_REPLY}/${comment.id}`),
+  const reacttocomment = useMutation({
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.REACT_TO_REPLY}`, data),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`, comment.id]);
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
+    },
+  });
+
+  const upvote = useMutation({
+    mutationFn: () => httpService.post(`${URLS.UPVOTE_REPLY}/${reply.id}`),
+    onError: (error: any) => {
+      alert(error.message);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
 
   const downvote = useMutation({
-    mutationFn: () => httpService.post(`${URLS.DOWNVOTE_REPLY}/${comment.id}`),
+    mutationFn: () => httpService.post(`${URLS.DOWNVOTE_REPLY}/${reply.id}`),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`, comment.id]);
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
 
   const deletereply = useMutation({
-    mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${comment.id}`),
+    mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${reply.id}`),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`]);
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
       setShowMenu(false);
     },
   });
 
+  const handleReaction = () => {
+    const formData = new FormData();
+    formData.append("reply_id", reply.id.toString());
+    formData.append("type", "like");
+
+    reacttocomment.mutate(formData);
+  };
+
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
-    setReply(coment);
+    setText(coment);
   }, []);
 
   const handleEnterKeyPressed = React.useCallback(
@@ -153,8 +194,8 @@ const Reply = ({ comment }: { comment: IComment }) => {
   const handleSubmit = React.useCallback(() => {
     if (mutationLoading) return;
     const formData = new FormData();
-    formData.append("comment_id", comment.id.toString() as any),
-      formData.append("reply", reply);
+    formData.append("comment_id", reply.comment_id.toString() as any),
+      formData.append("reply", text);
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const name = images[i].uri.split("/").pop();
@@ -168,14 +209,14 @@ const Reply = ({ comment }: { comment: IComment }) => {
     }
     //formData.append('mentioned_users', [].toString())
     mutate(formData);
-  }, [comment.id, mutationLoading, reply, images]);
+  }, [reply.comment_id, mutationLoading, text, images]);
 
   return (
     <>
       {showEditReply ? (
         <>
           <EditReplyBox
-            comment={comment}
+            reply={reply}
             toggleEditing={toggleEditComment}
             showEmoji={showEmoji}
             setShowEmoji={setShowEmoji}
@@ -219,9 +260,9 @@ const Reply = ({ comment }: { comment: IComment }) => {
               <Box flexDirection="row">
                 <View
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
+                    width: 32,
+                    height: 32,
+                    borderRadius: 17,
                     borderWidth: 2,
                     borderColor: theme.colors.primaryColor,
                     backgroundColor: theme.colors.secondaryBackGroundColor,
@@ -229,7 +270,9 @@ const Reply = ({ comment }: { comment: IComment }) => {
                   }}
                 >
                   <Image
-                    source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                    source={{
+                      uri: `${IMAGE_BASE}${reply?.user?.profile_image}`,
+                    }}
                     contentFit="contain"
                     style={{ width: "100%", height: "100%", borderRadius: 25 }}
                   />
@@ -238,19 +281,19 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 <Box marginLeft="s" justifyContent="center">
                   <Box flexDirection="row">
                     <CustomText variant="body" color="black">
-                      {name}{" "}
+                      {reply?.user.name}{" "}
                     </CustomText>
                     <CustomText variant="body" color="grey">
-                      @{username}
+                      @{reply?.user?.username}
                     </CustomText>
                   </Box>
                   <CustomText
                     variant="xs"
                     onPress={() =>
-                      navigation.navigate("post", { postId: post_id })
+                      navigation.navigate("post", { postId: reply.post_id })
                     }
                   >
-                    {moment(created_at).fromNow()}
+                    {moment(reply?.created_at).fromNow()}
                   </CustomText>
                 </Box>
               </Box>
@@ -277,7 +320,8 @@ const Reply = ({ comment }: { comment: IComment }) => {
                   top={20}
                   zIndex={20}
                 >
-                  {id === comment?.user.id && (
+                  {/* MENU SECTION */}
+                  {id === reply?.user.id && (
                     <>
                       <Box
                         flex={1}
@@ -296,12 +340,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                             size={20}
                             color={theme.colors.textColor}
                           />
-                          <CustomText
-                            marginLeft="s"
-                            onPress={toggleEditComment}
-                          >
-                            Edit reply
-                          </CustomText>
+                          <CustomText marginLeft="s">Edit comment</CustomText>
                         </Box>
                       </Box>
 
@@ -325,13 +364,13 @@ const Reply = ({ comment }: { comment: IComment }) => {
                             marginLeft="s"
                             onPress={() => deletereply.mutate()}
                           >
-                            Delete reply
+                            Delete comment
                           </CustomText>
                         </Box>
                       </Box>
                     </>
                   )}
-                  {id !== comment?.user.id && (
+                  {id !== reply?.user.id && (
                     <>
                       <Box
                         flex={1}
@@ -363,12 +402,15 @@ const Reply = ({ comment }: { comment: IComment }) => {
           {/* CONTENT SECTION */}
           <Box paddingHorizontal="m" marginTop="s">
             <CustomText variant="body">
+              <CustomText color="primaryColor">
+                @{reply?.user?.username}
+              </CustomText>
               {showAll
-                ? comment?.reply
-                : comment?.reply?.length > 100
-                ? comment.reply?.substring(0, 100) + "..."
-                : comment.reply}{" "}
-              {comment.reply?.length > 100 && (
+                ? reply?.reply
+                : reply?.reply?.length > 100
+                ? reply.reply?.substring(0, 100) + "..."
+                : reply.reply}{" "}
+              {reply.reply?.length > 100 && (
                 <CustomText
                   variant="body"
                   color="primaryColor"
@@ -380,7 +422,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
             </CustomText>
 
             {/* IMAGE OR VIDEO SECTION */}
-            {comment?.post_images?.length > 0 && (
+            {reply?.post_images?.length > 0 && (
               <Box
                 flexDirection="row"
                 justifyContent="space-between"
@@ -398,10 +440,10 @@ const Reply = ({ comment }: { comment: IComment }) => {
                     paddingTop: 5,
                   }}
                 >
-                  {comment?.post_images.length > 0 && (
+                  {reply?.post_images.length > 0 && (
                     <>
-                      {comment?.post_images.length === 1 &&
-                        comment?.post_images.map((image, index) => (
+                      {reply?.post_images.length === 1 &&
+                        reply?.post_images.map((image, index) => (
                           <Image
                             key={index.toString()}
                             source={{
@@ -416,8 +458,8 @@ const Reply = ({ comment }: { comment: IComment }) => {
                             }}
                           />
                         ))}
-                      {comment?.post_images.length > 1 &&
-                        comment?.post_images.map((image, i) => (
+                      {reply?.post_images.length > 1 &&
+                        reply?.post_images.map((image, i) => (
                           <Image
                             key={i.toString()}
                             source={{
@@ -475,22 +517,23 @@ const Reply = ({ comment }: { comment: IComment }) => {
                     )}
                     {!upvote.isLoading && (
                       <>
-                        {comment.has_upvoted === 0 && (
+                        {reply.has_upvoted === 0 && (
                           <Image
                             source={require("../../../assets/images/arrows/up.png")}
                             style={{ width: 20, height: 20 }}
                             contentFit="cover"
                           />
                         )}
-                        {comment.has_upvoted === 1 && (
+                        {reply.has_upvoted === 1 && (
                           <Image
                             source={require("../../../assets/images/arrows/upfilled.png")}
                             style={{ width: 20, height: 20 }}
                             contentFit="cover"
                           />
                         )}
+
                         <CustomText variant="xs">
-                          {comment?.upvotes_count} Upvote
+                          {reply?.upvotes_count} Upvote
                         </CustomText>
                       </>
                     )}
@@ -511,14 +554,14 @@ const Reply = ({ comment }: { comment: IComment }) => {
                   >
                     {!downvote.isLoading && (
                       <>
-                        {comment.has_downvoted === 0 && (
+                        {reply.has_downvoted === 0 && (
                           <Image
                             source={require("../../../assets/images/arrows/down.png")}
                             style={{ width: 20, height: 20 }}
                             contentFit="cover"
                           />
                         )}
-                        {comment.has_downvoted === 1 && (
+                        {reply.has_downvoted === 1 && (
                           <Image
                             source={require("../../../assets/images/arrows/downfilled.png")}
                             style={{ width: 20, height: 20 }}
@@ -544,58 +587,61 @@ const Reply = ({ comment }: { comment: IComment }) => {
                   alignItems: "center",
                   marginLeft: 10,
                 }}
+                onPress={handleReaction}
               >
                 <Ionicons
                   name="heart-outline"
                   size={20}
-                  color={theme.colors.textColor}
+                  color={
+                    reply.has_reacted.length > 0
+                      ? theme.colors.primaryColor
+                      : theme.colors.textColor
+                  }
                 />
-                <CustomText variant="body">
-                  {comment.reactions_count}
-                </CustomText>
+                <CustomText variant="body">{reply.reactions_count}</CustomText>
               </Pressable>
 
-              <Pressable
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginLeft: 10,
-                }}
-              >
-                <CustomText
-                  variant="body"
-                  onPress={() => setCommentsVisible((prev) => !prev)}
-                >
-                  {isReply ? "Close" : "Reply"}
-                </CustomText>
-              </Pressable>
+              {/* <Pressable
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginLeft: 10,
+            }}
+          >
+            <CustomText
+              variant="body"
+              onPress={() => setCommentsVisible((prev) => !prev)}
+            >
+              {isReply ? "Close" : "Reply"}
+            </CustomText>
+          </Pressable> */}
             </Box>
           </Box>
 
           {/* VIEW BUTTON */}
 
-          {!isLoading && comments.length > 0 && (
-            <Pressable
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: 10,
-                marginBottom: 10,
-              }}
-            >
-              <CustomText
-                variant="body"
-                color="primaryColor"
-                onPress={() => setCommentsVisible((prev) => !prev)}
-              >
-                {commentsVisible
-                  ? "close"
-                  : `View ${comments.length} ${
-                      comments.length > 1 ? "replies" : "reply"
-                    }`}
-              </CustomText>
-            </Pressable>
-          )}
+          {/* {!isLoading && comments.length > 0 && (
+        <Pressable
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginLeft: 10,
+            marginBottom: 10,
+          }}
+        >
+          <CustomText
+            variant="body"
+            color="primaryColor"
+            onPress={() => setCommentsVisible((prev) => !prev)}
+          >
+            {commentsVisible
+              ? "close"
+              : `View ${comments.length} ${
+                  comments.length > 1 ? "replies" : "reply"
+                }`}
+          </CustomText>
+        </Pressable>
+      )} */}
 
           {/* COMMENT BOX */}
 
@@ -617,11 +663,31 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 borderBottomWidth={1}
                 borderBottomColor="secondaryBackGroundColor"
               >
-                <Ionicons
-                  name="person"
-                  size={30}
-                  color={theme.colors.textColor}
-                />
+                {isLoggedIn && (
+                  <Box
+                    width={32}
+                    height={32}
+                    borderRadius={17}
+                    overflow="hidden"
+                  >
+                    <Image
+                      source={{ uri: `${IMAGE_BASE}${profilePic}` }}
+                      contentFit="cover"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 17,
+                      }}
+                    />
+                  </Box>
+                )}
+                {!isLoggedIn && (
+                  <Ionicons
+                    name="person"
+                    size={30}
+                    color={theme.colors.textColor}
+                  />
+                )}
 
                 <Box
                   flex={0.9}
@@ -632,7 +698,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                       ? "secondaryBackGroundColor"
                       : "mainBackGroundColor"
                   }
-                  height={50}
+                  height={44}
                   flexDirection="row"
                   paddingHorizontal="s"
                   borderWidth={focused ? 1 : 0}
@@ -640,7 +706,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 >
                   <TextInput
                     ref={TextinputtRef}
-                    value={reply}
+                    value={text}
                     onChangeText={handleTextChange}
                     onKeyPress={handleEnterKeyPressed}
                     onFocus={() => {
@@ -648,7 +714,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                       setShowComment(true);
                     }}
                     onBlur={() => setFocused(false)}
-                    placeholder="Leave a comment"
+                    placeholder={`Reply to @${reply.user.username}`}
                     placeholderTextColor={theme.colors.textColor}
                     style={{
                       flex: 1,
@@ -692,15 +758,15 @@ const Reply = ({ comment }: { comment: IComment }) => {
                 )}
               </Box>
 
-              {commentsVisible && (
-                <Box paddingLeft="m">
-                  {!isLoading &&
-                    comments.length > 0 &&
-                    comments.map((item, index) => (
-                      <Reply comment={item} key={index.toString()} />
-                    ))}
-                </Box>
-              )}
+              {/* {isReply && commentsVisible && (
+            <Box paddingLeft="m">
+              {!isLoading &&
+                comments.length > 0 &&
+                comments.map((item, index) => (
+                  <Reply comment={item} key={index.toString()} isReply />
+                ))}
+            </Box>
+          )} */}
             </>
           )}
         </Box>
