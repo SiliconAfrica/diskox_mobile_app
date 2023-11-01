@@ -137,7 +137,7 @@ const Reply = ({
       queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
-
+  console.log(reply, "rep");
   const deletereply = useMutation({
     mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${reply.id}`),
     onError: (error: any) => {
@@ -340,7 +340,12 @@ const Reply = ({
                             size={20}
                             color={theme.colors.textColor}
                           />
-                          <CustomText marginLeft="s">Edit comment</CustomText>
+                          <CustomText
+                            marginLeft="s"
+                            onPress={toggleEditComment}
+                          >
+                            Edit reply
+                          </CustomText>
                         </Box>
                       </Box>
 
@@ -364,7 +369,7 @@ const Reply = ({
                             marginLeft="s"
                             onPress={() => deletereply.mutate()}
                           >
-                            Delete comment
+                            Delete reply
                           </CustomText>
                         </Box>
                       </Box>

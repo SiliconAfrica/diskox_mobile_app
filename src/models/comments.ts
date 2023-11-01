@@ -16,11 +16,26 @@ export interface IComment {
   post_images: MediaPost[];
   user: {
     id: number;
+<<<<<<< HEAD
+=======
+    user_id: number;
+    post_id: number;
+    comment: string;
+    created_at: string;
+    upvotes_count: number
+    downvotes_count: number;
+    reactions_count: number;
+    replies_count: number;
+    has_upvoted: number;
+    has_downvoted: number;
+    post_images: MediaPost[],
+>>>>>>> development
     name: string;
     username: string;
     describes_you: string;
     profile_image: string;
     cover_photo: string;
+<<<<<<< HEAD
     about: string;
     last_seen: string;
     following_count: number;
@@ -28,6 +43,15 @@ export interface IComment {
     isFollowing: number;
   };
   has_reacted: any[];
+=======
+    about: string
+    last_seen: string
+    following_count: number
+    followers_count: number
+    isFollowing: number
+    has_reacted: any[]
+>>>>>>> development
+}
 }
 
 export interface IReply {
