@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { POST_FILTERR } from "../enums/Postfilters";
 import { IPost } from "../models/post";
+import { IChatMessage } from "../models/chatmessages";
 
 export enum VISIBILITY {
   EVERYONE = "everyone",
@@ -25,6 +26,9 @@ interface State {
   showImageVideoSlider: boolean;
   imageVideoSliderData: any[];
   showReportPost: boolean;
+  showBlockUser: boolean,
+  showDeleteConvo: boolean,
+  activeChat: { userId: number, username: string }| null;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -46,6 +50,9 @@ export const useModalState = create<State>((set) => ({
   showImageVideoSlider: false,
   imageVideoSliderData: [],
   showReportPost: false,
+  showBlockUser: false,
+  activeChat: null,
+  showDeleteConvo: false,
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

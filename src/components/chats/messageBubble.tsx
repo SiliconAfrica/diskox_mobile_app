@@ -156,7 +156,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
 
         { deleted_by === null && (
           <>
-            <CustomText variant='body'>{message}</CustomText>
+            <CustomText variant='body' fontSize={15}>{message}</CustomText>
             <CustomText textAlign={ sender_id === id ? 'right':'left'} variant='xs' marginTop='s'>
                 {moment(created_at).format("hh:mm a")}
             </CustomText>

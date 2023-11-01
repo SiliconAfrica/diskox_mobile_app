@@ -19,6 +19,7 @@ import moment from 'moment'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
 import { Ionicons } from '@expo/vector-icons'
+import useDebounce from '../../hooks/useDebounce'
 
 
 interface IProps {
@@ -33,13 +34,13 @@ export const UserList = ({ user, action }: {
     return (
         <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: theme.colors.secondaryBackGroundColor, borderBottomWidth: 2 }} >
             <Box flexDirection='row' alignItems='center' >
-                <Box width={50} height={50} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
+                <Box width={32} height={32} borderRadius={17} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
                     <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />
                 </Box>
 
                 <Box marginLeft='s'>
                     <Box flexDirection='row'>
-                        <CustomText variant='subheader' fontSize={18} color='black' >@{user.username}</CustomText>
+                        <CustomText variant='subheader' fontSize={15} color='black' >@{user.username}</CustomText>
                         {/* <CustomText variant='xs' color='grey' marginLeft='s'>@{user.username}</CustomText> */}
                         {user.unread_message > 0 && (
                             <Box width={15} height={15} borderRadius={10} justifyContent='center' alignItems='center' backgroundColor='primaryColor'>
@@ -47,7 +48,7 @@ export const UserList = ({ user, action }: {
                             </Box>
                         )}
                     </Box>
-                    <CustomText variant='body' fontSize={16}>{user.message}</CustomText>
+                    <CustomText variant='body' fontSize={14}>{user.message}</CustomText>
                 </Box>
             </Box>
             <CustomText variant='xs'>{moment(user.created_at).startOf('hour').fromNow()}</CustomText>
@@ -59,6 +60,9 @@ const ChatList = () => {
     const { setAll } = useChatScreenState((state) => state);
     const navigation = useNavigation<PageType>();
     const theme = useTheme<Theme>();
+    const [searchText, setSearchText] = React.useState('');
+
+    const debounceValue = useDebounce(searchText);
 
     const { isLoading } = useQuery(['getChatedUsers'], () => httpService.get(`${URLS.CHATTED_USER}`), {
         onSuccess: (data) => {
@@ -78,7 +82,7 @@ const ChatList = () => {
 
     return (
         <Box flex={1} backgroundColor='mainBackGroundColor' position='relative'>
-            <ChatHeader />
+            <ChatHeader text={searchText} onChange={(e) => setSearchText(e)} />
 
             {chats.length > 0 && (
                 <Pressable onPress={() => setAll({ showModal: true })} style={{ width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', bottom: 20, right: 20, backgroundColor: theme.colors.primaryColor, position: 'absolute', zIndex: 10 }}>
@@ -97,7 +101,15 @@ const ChatList = () => {
                 )}
                 keyExtractor={(item, index) => index.toString()}
                 estimatedItemSize={100}
-                data={chats}
+                data={chats.filter((item) => {
+                    if (debounceValue === '') {
+                        return item;
+                    } else if (item.username.toLowerCase().includes(debounceValue.toLowerCase())) {
+                        return item;
+                    }else {
+                        return
+                    }
+                })}
                 renderItem={({ item }) => (
                     <UserList user={item} action={goToPage} />
                 )}

@@ -14,6 +14,7 @@ import { Feather, Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
 import { Follower } from '../../models/Follower'
+import useDebounce from '../../hooks/useDebounce'
 
 
 export const UserCard = ({ user, action }: {
@@ -23,13 +24,13 @@ export const UserCard = ({ user, action }: {
     const theme = useTheme<Theme>();
  
     return (
-        <Pressable onPress={() => action(user as Follower)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+        <Pressable onPress={() => action(user as Follower)} style={{ width: '100%', height:60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
             <Box flexDirection='row' alignItems='center' > 
-                <Box width={50} height={50} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
+                <Box width={32} height={32} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
                     <Image source={{ uri: `${IMAGE_BASE}${user.follower.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />
                 </Box>
 
-                <CustomText variant='body' color='black' marginLeft='s'>{user.follower.name}</CustomText>
+                <CustomText variant='subheader' fontSize={15} color='black' marginLeft='s'>{user.follower.name}</CustomText>
                 <CustomText variant='xs' color='grey' marginLeft='s'>@{user.follower.username}</CustomText>
             </Box>
         </Pressable>
@@ -44,6 +45,9 @@ const UserModal = ({ open, onClose }: {
     const [followers, setFollowers] = React.useState<Follower[]>([])
     const { id } = useDetailsState((state) => state);
     const navigation = useNavigation<PageType>();
+    const [searchText, setSearchText] = React.useState('');
+
+    const debounceValue = useDebounce(searchText);
 
     const { isLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
         enabled: true,
@@ -80,7 +84,7 @@ const UserModal = ({ open, onClose }: {
             {/* SEARCH  BAR AREA */}
             <Box style={{ ...style.textInput }} marginBottom='l' backgroundColor='secondaryBackGroundColor'>
                 <Ionicons name='search-outline' size={25} color={theme.colors.textColor} />
-                <TextInput style={{ flex: 1, fontFamily: 'RedRegular', marginLeft: 20, fontSize: theme.textVariants.body.fontSize }} placeholderTextColor={theme.colors.textColor} placeholder='Search for someone to tag'  />
+                <TextInput style={{ flex: 1, fontFamily: 'RedRegular', marginLeft: 20, fontSize: theme.textVariants.body.fontSize }} placeholderTextColor={theme.colors.textColor} placeholder='Search for someone'  />
             </Box>
 
             {
