@@ -29,7 +29,7 @@
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "versionCode": 8,
+      "versionCode": 9,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
@@ -66,7 +66,7 @@
     },
     "runtimeVersion": {
       "policy": "sdkVersion",
-      "nativeVersion": "48.0.18",
+      "nativeVersion": "48.0.18"
     },
     "updates": {
       "url": "https://u.expo.dev/d9d08b33-5cc3-4ff3-9357-45475bfc87b3"

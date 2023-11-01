@@ -205,7 +205,7 @@ const PollCard = (props: IPost& IProps) => {
             <Box flexDirection='row' alignItems='center'>
 
                 <Box flexDirection='row'>
-                    <View style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
+                    <View style={{ width: 32, height: 32, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
                     </View>
 
@@ -295,7 +295,7 @@ const PollCard = (props: IPost& IProps) => {
                     style={{
                       position: "relative",
                       width: "100%",
-                      height: undefined,
+                      height: '100%',
                       paddingTop: "83%",
                     }}
                   />
@@ -350,7 +350,7 @@ const PollCard = (props: IPost& IProps) => {
                   height={80}
                   alignItems="center"
                   justifyContent="center"
-                  bottom={10}
+                  bottom={40}
                   right={10}
                   style={{
                     backgroundColor: '#0000006f'

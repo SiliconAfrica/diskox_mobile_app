@@ -26,7 +26,7 @@ import { Image } from "expo-image";
 import mime from "mime";
 import { useDetailsState } from "../../states/userState";
 
-const Reply = ({ comment }: { comment: IComment }) => {
+const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isReply?: boolean }) => {
   const {
     created_at,
     post_id,
@@ -40,7 +40,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
     Array<ImagePicker.ImagePickerAsset>
   >([]);
   const [showComments, setShowComment] = React.useState(false);
-  const [isReply, setIsReply] = React.useState(false);
+  const [isReply, setIsReply] = React.useState(ISREPLY);
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [commentsVisible, setCommentsVisible] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
@@ -52,12 +52,15 @@ const Reply = ({ comment }: { comment: IComment }) => {
   const TextinputtRef = React.useRef<TextInput>();
 
   const theme = useTheme<Theme>();
+  const { isLoggedIn } = useUtilState((state) => state);
+  const { profile_image: profilePic } = useDetailsState((state) => state)
 
   //query
   const { isLoading } = useQuery(
-    ["getReplies", comment.id],
+    [`getReplyReplies-${comment.id}`, comment.id],
     () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
     {
+      enabled: isReply,
       onError: () => {},
       onSuccess: (data) => {
         console.log(data.data);
@@ -67,13 +70,18 @@ const Reply = ({ comment }: { comment: IComment }) => {
       },
     }
   );
+ 
 
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_REPLY}`, data),
     onSuccess: () => {
       alert("coment created successfully");
-      queryClient.invalidateQueries(["getReplies"]);
+      if (isReply) {
+        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
+      } else {
+        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
+      }
       setImages([]);
       setReply("");
     },
@@ -88,7 +96,11 @@ const Reply = ({ comment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`, comment.id]);
+      if (isReply) {
+        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
+      } else {
+        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
+      }
     },
   });
 
@@ -98,7 +110,11 @@ const Reply = ({ comment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`, comment.id]);
+      if (isReply) {
+        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
+      } else {
+        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
+      }
     },
   });
 
@@ -108,7 +124,11 @@ const Reply = ({ comment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getReplies`, comment.id]);
+      if (isReply) {
+        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
+      } else {
+        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
+      }
       setShowMenu(false);
     },
   });
@@ -181,9 +201,9 @@ const Reply = ({ comment }: { comment: IComment }) => {
           <Box flexDirection="row">
             <View
               style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15,
+                width: 32,
+                height: 32,
+                borderRadius: 17,
                 borderWidth: 2,
                 borderColor: theme.colors.primaryColor,
                 backgroundColor: theme.colors.secondaryBackGroundColor,
@@ -302,6 +322,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
       {/* CONTENT SECTION */}
       <Box paddingHorizontal="m" marginTop="s">
         <CustomText variant="body">
+          <CustomText color="primaryColor">@{comment.user.username}</CustomText>
           {showAll
             ? comment?.comment
             : comment?.comment?.length > 100
@@ -538,7 +559,12 @@ const Reply = ({ comment }: { comment: IComment }) => {
             borderBottomWidth={1}
             borderBottomColor="secondaryBackGroundColor"
           >
-            <Ionicons name="person" size={30} color={theme.colors.textColor} />
+            { isLoggedIn && (
+                <Box width={32} height={32} borderRadius={17} overflow="hidden">
+                  <Image source={{ uri: `${IMAGE_BASE}${profilePic}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
+                </Box>
+            )}
+            { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
 
             <Box
               flex={0.9}
@@ -547,7 +573,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
               backgroundColor={
                 isDarkMode ? "secondaryBackGroundColor" : "mainBackGroundColor"
               }
-              height={50}
+              height={44}
               flexDirection="row"
               paddingHorizontal="s"
               borderWidth={focused ? 1 : 0}
@@ -563,7 +589,7 @@ const Reply = ({ comment }: { comment: IComment }) => {
                   setShowComment(true);
                 }}
                 onBlur={() => setFocused(false)}
-                placeholder="Leave a comment"
+                placeholder={`Reply to @${comment.user.username}`}
                 placeholderTextColor={theme.colors.textColor}
                 style={{
                   flex: 1,
@@ -605,12 +631,12 @@ const Reply = ({ comment }: { comment: IComment }) => {
             )}
           </Box>
 
-          {commentsVisible && (
+          {isReply && commentsVisible && (
             <Box paddingLeft="m">
               {!isLoading &&
                 comments.length > 0 &&
                 comments.map((item, index) => (
-                  <Reply comment={item} key={index.toString()} />
+                  <Reply comment={item} key={index.toString()} isReply />
                 ))}
             </Box>
           )}

@@ -65,10 +65,12 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   const toast = useToast();
 
   const theme = useTheme<Theme>();
+  const { isLoggedIn } = useUtilState((state) => state);
+  const { profile_image: profile_pic} = useDetailsState((state) => state)
 
   //query
   const { isLoading } = useQuery(
-    ["getReplies", comment.id],
+    [`getReplies-${comment.id}`, comment.id],
     () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
     {
       onError: () => {},
@@ -101,7 +103,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
       toast.show(error?.message, { type: 'error' });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost${comment.id}`]);
+      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
     },
   });
 
@@ -112,7 +114,18 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost`]);
+      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
+    },
+  });
+
+  const reacttocomment = useMutation({
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.REACT_TO_COMMENT}`, data),
+    onError: (error: any) => {
+      alert(error.message);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
     },
   });
 
@@ -127,6 +140,14 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
       setShowMenu(false);
     },
   });
+
+  const handleReaction = () => {
+    const formData = new FormData()
+    formData.append('comment_id', comment.id.toString());
+    formData.append('type', 'like');
+
+    reacttocomment.mutate(formData);
+  }
 
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
@@ -424,7 +445,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 {!upvote.isLoading && (
                   <>
                      <Image
-                        source={require("../../../assets/images/arrows/up.png")}
+                        source={comment.has_upvoted === 1 ? require("../../../assets/images/arrows/upfilled.png"):require("../../../assets/images/arrows/up.png")}
                         contentFit="cover"
                         style={{ width: 20, height: 20 }}
                       />
@@ -483,11 +504,12 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
               alignItems: "center",
               marginLeft: 10,
             }}
+            onPress={handleReaction}
           >
             <Ionicons
               name="heart-outline"
               size={20}
-              color={theme.colors.textColor}
+              color={comment.has_reacted.length > 0 ? theme.colors.primaryColor:theme.colors.textColor}
             />
             <CustomText variant="body">{comment.reactions_count}</CustomText>
           </Pressable>
@@ -554,7 +576,12 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             position="relative"
             zIndex={5}
           >
-            <Ionicons name="person" size={30} color={theme.colors.textColor} />
+            { isLoggedIn && (
+            <Box width={32} height={32} borderRadius={17} overflow="hidden">
+              <Image source={{ uri: `${IMAGE_BASE}${profile_pic}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
+            </Box>
+        )}
+        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
 
             <Box
               flex={0.9}
@@ -579,7 +606,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                   setShowComment(true);
                 }}
                 onBlur={() => setFocused(false)}
-                placeholder="Leave a comment"
+                placeholder={`Reply to @${comment.user.username}`}
                 placeholderTextColor={theme.colors.textColor}
                 style={{
                   flex: 1,
@@ -656,7 +683,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
   const [focused, setFocused] = React.useState(false);
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [comment, setComment] = React.useState("");
-  const { isDarkMode } = useUtilState((state) => state);
+  const { isDarkMode, isLoggedIn } = useUtilState((state) => state);
   const { checkloggedInState } = useCheckLoggedInState();
   const { profile_image, created_at, id, name } = useDetailsState(
     (state) => state
@@ -673,7 +700,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
   >([]);
 
   const { isLoading } = useQuery(
-    ["getComments", postId],
+    [`getComments-${postId}`, postId],
     () => httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`),
     {
       onError: (error) => {
@@ -791,7 +818,12 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
         borderBottomWidth={1}
         borderBottomColor="secondaryBackGroundColor"
       >
-        <Ionicons name="person" size={30} color={theme.colors.textColor} />
+        { isLoggedIn && (
+            <Box width={32} height={32} borderRadius={17} overflow="hidden">
+              <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
+            </Box>
+        )}
+        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
 
         <Box
           flex={0.9}
@@ -800,7 +832,7 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
           backgroundColor={
             isDarkMode ? "secondaryBackGroundColor" : "mainBackGroundColor"
           }
-          height={50}
+          height={44}
           flexDirection="row"
           paddingHorizontal="s"
           borderWidth={focused ? 1 : 0}

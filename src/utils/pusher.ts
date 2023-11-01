@@ -1,10 +1,12 @@
-import Pusher from 'pusher-js/react-native';
+import {Pusher} from '@pusher/pusher-websocket-react-native';
 
-const pusher = new Pusher('ap2', {
+const pusher = Pusher.getInstance();
+
+pusher.init({
+    apiKey: 'f5d4f2be017648807ffe',
     cluster: 'ap2',
 });
 
-const channel = pusher.subscribe('chat');
-const loginUser = pusher.subscribe('login-user');
+const pusherInstance = async () => await pusher.connect();
 
-export { channel, pusher };
+export default pusher;
