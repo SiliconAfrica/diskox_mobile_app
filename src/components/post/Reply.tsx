@@ -137,7 +137,6 @@ const Reply = ({
       queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
-  console.log(reply, "rep");
   const deletereply = useMutation({
     mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${reply.id}`),
     onError: (error: any) => {
