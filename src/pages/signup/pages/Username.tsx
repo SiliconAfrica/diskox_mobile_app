@@ -10,9 +10,12 @@ import { useSignupState } from '../state'
 import { useMutation } from 'react-query'
 import httpService from '../../../utils/httpService'
 import { URLS } from '../../../services/urls'
+import CustomButton from '../../../components/general/CustomButton'
+import { useModalState } from '../../../states/modalState'
 
 const Username = () => {
   const [setAll, values] = useSignupState((state) => [state.setAll, { username: state.username, email: state.email }]);
+  const { setAll: modalFunc } = useModalState((state) => state)
   const [details, setDetails] = React.useState({
     username: '',
     email: '',
@@ -59,7 +62,12 @@ const Username = () => {
       <CustomTextInput name='email' placeholder='Enter your email address' label='Email'  containerStyle={{ marginTop: 20 }}  />
 
       <Box height={20} />
-      <SubmitButton label='Continue' onSubmit={handleSubmit} isLoading={checkUsername.isLoading || checkEmail.isLoading} />
+      <SubmitButton width='100%'  label='Next' onSubmit={handleSubmit} isLoading={checkUsername.isLoading || checkEmail.isLoading} />
+
+      <Box width='100%' alignItems='center' marginTop='m'>
+        <CustomButton title='Login' onPress={() => modalFunc({ showLogin: true, showSignup: false })} />
+      </Box>
+
     </Box>
   )
 }

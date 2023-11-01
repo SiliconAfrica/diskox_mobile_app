@@ -83,4 +83,6 @@ export const URLS = {
   GET_BOOKMARK_POSTS: '/fetch_bookmarked_post',
   REPORT_USER: '/report_post',
   GOOGLE_AUTH: '/login_or_register_with_google',
+  GET_SINGLE_REPLY: '/get_single_reply',
+  REACT_TO_REPLY: '/react_to_reply',
 };

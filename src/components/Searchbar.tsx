@@ -22,7 +22,7 @@ const Searchbar = () => {
     <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
          {
                     profile_image && (
-                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 40, height: 40, borderRadius: 25 }} contentFit='contain' />
+                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 32, height: 32, borderRadius: 17 }} contentFit='cover' />
                     )
                 }
                 {
@@ -38,12 +38,14 @@ const Searchbar = () => {
         onChangeText={() => navigation.navigate('create-post')}
         style={{
             flex: 1,
-            height: 50,
+            height: 44,
             borderRadius: 25,
             backgroundColor: isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.secondaryBackGroundColor,
             marginHorizontal: 10,
             paddingHorizontal: 10,
             fontFamily: 'RedRegular',
+            fontSize: 14,
+            color: theme.colors.textColor
         }} />
         <Ionicons name='image-outline' size={25} color={theme.colors.textColor} />
         <Ionicons name='videocam-outline' size={25} color={theme.colors.textColor} style={{ marginLeft: 10, }} />
