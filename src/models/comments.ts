@@ -27,20 +27,18 @@ export interface IComment {
     has_upvoted: number;
     has_downvoted: number;
     post_images: MediaPost[],
-    user: {
-        id: number
-        name: string;
-        username: string;
-        describes_you: string;
-        profile_image: string;
-        cover_photo: string;
-        about: string
-        last_seen: string
-        following_count: number
-        followers_count: number
-        isFollowing: number
-    },
+    name: string;
+    username: string;
+    describes_you: string;
+    profile_image: string;
+    cover_photo: string;
+    about: string
+    last_seen: string
+    following_count: number
+    followers_count: number
+    isFollowing: number
     has_reacted: any[]
+}
 }
 
 export interface IReply {
