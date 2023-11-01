@@ -9,7 +9,7 @@ import {
   TextInputKeyPressEventData,
 } from "react-native";
 import React from "react";
-import { IComment } from "../../models/comments";
+import { IComment, IReply } from "../../models/comments";
 import { useNavigation } from "@react-navigation/native";
 import moment from "moment";
 import { useQueryClient, useQuery, useMutation } from "react-query";
@@ -26,16 +26,11 @@ import { Image } from "expo-image";
 import mime from "mime";
 import { useDetailsState } from "../../states/userState";
 
-const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isReply?: boolean }) => {
-  const {
-    created_at,
-    post_id,
-    user: { name, profile_image, username },
-  } = comment;
+const Reply = ({ comment: reply, isReply: ISREPLY = false }: { comment: IReply, isReply?: boolean }) => {
   const [showAll, setShowAll] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
   const [showEmoji, setShowEmoji] = React.useState(false);
-  const [reply, setReply] = React.useState("");
+  // const [reply, setReply] = React.useState<IReply>(comment);
   const [images, setImages] = React.useState<
     Array<ImagePicker.ImagePickerAsset>
   >([]);
@@ -44,6 +39,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
   const [comments, setComments] = React.useState<Array<IComment>>([]);
   const [commentsVisible, setCommentsVisible] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
+  const [text, setText] = React.useState('')
 
   const navigation = useNavigation<any>();
   const { isDarkMode } = useUtilState((state) => state);
@@ -55,21 +51,36 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
   const { isLoggedIn } = useUtilState((state) => state);
   const { profile_image: profilePic } = useDetailsState((state) => state)
 
-  //query
-  const { isLoading } = useQuery(
-    [`getReplyReplies-${comment.id}`, comment.id],
-    () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
-    {
-      enabled: isReply,
-      onError: () => {},
-      onSuccess: (data) => {
-        console.log(data.data);
-        if (data?.data) {
-          setComments(data?.data?.data?.data || []);
-        }
-      },
-    }
-  );
+  // const GetSingleReply = useQuery(
+  //   [`getSingleReply-${comment.id}`, comment.id],
+  //   () => httpService.get(`${URLS.GET_SINGLE_REPLY}/${comment.id}`),
+  //   {
+  //     onError: () => {},
+  //     onSuccess: (data) => {
+  //       console.log(data.data);
+  //       if (data?.data) {
+  //         setReply({...reply, ...data?.data?.data});
+  //       }
+  //     },
+  //   }
+  // );
+
+  // //query
+  // const { isLoading } = useQuery(
+  //   [`getReplyReplies-${comment.id}`, comment.id],
+  //   () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
+  //   {
+  //     enabled: isReply,
+  //     onError: () => {},
+  //     onSuccess: (data) => {
+  //       if (data?.data) {
+  //         console.log('---RELPY---')
+  //         console.log(data?.data?.data.data[0]);
+  //         setComments(data?.data?.data?.data || []);
+  //       }
+  //     },
+  //   }
+  // );
  
 
   const { mutate, isLoading: mutationLoading } = useMutation({
@@ -77,65 +88,68 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
       httpService.post(`${URLS.CREATE_REPLY}`, data),
     onSuccess: () => {
       alert("coment created successfully");
-      if (isReply) {
-        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
-      } else {
-        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
-      }
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
       setImages([]);
-      setReply("");
+      setText("");
     },
     onError: (error: any) => {
       alert("An error occured while rying to create the comment");
     },
   });
 
-  const upvote = useMutation({
-    mutationFn: () => httpService.post(`${URLS.UPVOTE_REPLY}/${comment.id}`),
+  const reacttocomment = useMutation({
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.REACT_TO_REPLY}`, data),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      if (isReply) {
-        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
-      } else {
-        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
-      }
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
+    },
+  });
+
+  const upvote = useMutation({
+    mutationFn: () => httpService.post(`${URLS.UPVOTE_REPLY}/${reply.id}`),
+    onError: (error: any) => {
+      alert(error.message);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
 
   const downvote = useMutation({
-    mutationFn: () => httpService.post(`${URLS.DOWNVOTE_REPLY}/${comment.id}`),
+    mutationFn: () => httpService.post(`${URLS.DOWNVOTE_REPLY}/${reply.id}`),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      if (isReply) {
-        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
-      } else {
-        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
-      }
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
 
   const deletereply = useMutation({
-    mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${comment.id}`),
+    mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${reply.id}`),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      if (isReply) {
-        queryClient.invalidateQueries([`getReplyReplies-${comment.id}`]);
-      } else {
-        queryClient.invalidateQueries([`getReplies-${comment.id}`]);
-      }
+      queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
       setShowMenu(false);
     },
   });
 
+  const handleReaction = () => {
+    const formData = new FormData()
+    formData.append('reply_id', reply.id.toString());
+    formData.append('type', 'like');
+
+    reacttocomment.mutate(formData);
+  }
+
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
-    setReply(coment);
+    setText(coment);
   }, []);
 
   const handleEnterKeyPressed = React.useCallback(
@@ -164,8 +178,8 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
   const handleSubmit = React.useCallback(() => {
     if (mutationLoading) return;
     const formData = new FormData();
-    formData.append("comment_id", comment.id.toString() as any),
-      formData.append("reply", reply);
+    formData.append("comment_id", reply.comment_id.toString() as any),
+      formData.append("reply", text);
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const name = images[i].uri.split("/").pop();
@@ -179,7 +193,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
     }
     //formData.append('mentioned_users', [].toString())
     mutate(formData);
-  }, [comment.id, mutationLoading, reply, images]);
+  }, [reply.comment_id, mutationLoading, text, images]);
 
   return (
     <Box
@@ -211,7 +225,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
               }}
             >
               <Image
-                source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                source={{ uri: `${IMAGE_BASE}${reply?.user?.profile_image}` }}
                 contentFit="contain"
                 style={{ width: "100%", height: "100%", borderRadius: 25 }}
               />
@@ -220,15 +234,15 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
             <Box marginLeft="s" justifyContent="center">
               <Box flexDirection="row">
                 <CustomText variant="body" color="black">
-                  {name}{" "}
+                  {reply?.user.name}{" "}
                 </CustomText>
-                <CustomText variant="body" color="grey">@{username}</CustomText>
+                <CustomText variant="body" color="grey">@{reply?.user?.username}</CustomText>
               </Box>
               <CustomText
                 variant="xs"
-                onPress={() => navigation.navigate("post", { postId: post_id })}
+                onPress={() => navigation.navigate("post", { postId: reply.post_id })}
               >
-                {moment(created_at).fromNow()}
+                {moment(reply?.created_at).fromNow()}
               </CustomText>
             </Box>
           </Box>
@@ -253,7 +267,8 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
               top={20}
               zIndex={20}
             >
-              {id === comment?.user.id && (
+              {/* MENU SECTION */}
+              {id === reply?.user.id && (
                 <>
                   <Box
                     flex={1}
@@ -294,7 +309,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                   </Box>
                 </>
               )}
-              {id !== comment?.user.id && (
+              {id !== reply?.user.id && (
                 <>
                   <Box
                     flex={1}
@@ -322,13 +337,13 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
       {/* CONTENT SECTION */}
       <Box paddingHorizontal="m" marginTop="s">
         <CustomText variant="body">
-          <CustomText color="primaryColor">@{comment.user.username}</CustomText>
+          <CustomText color="primaryColor">@{reply?.user?.username }</CustomText>
           {showAll
-            ? comment?.comment
-            : comment?.comment?.length > 100
-            ? comment.comment?.substring(0, 100) + "..."
-            : comment.comment}{" "}
-          {comment.comment?.length > 100 && (
+            ? reply?.reply
+            : reply?.reply?.length > 100
+            ? reply.reply?.substring(0, 100) + "..."
+            : reply.reply}{" "}
+          {reply.reply?.length > 100 && (
             <CustomText
               variant="body"
               color="primaryColor"
@@ -340,7 +355,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
         </CustomText>
 
         {/* IMAGE OR VIDEO SECTION */}
-        {comment?.post_images?.length > 0 && (
+        {reply?.post_images?.length > 0 && (
           <Box
             flexDirection="row"
             justifyContent="space-between"
@@ -358,10 +373,10 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                 paddingTop: 5,
               }}
             >
-              {comment?.post_images.length > 0 && (
+              {reply?.post_images.length > 0 && (
                 <>
-                  {comment?.post_images.length === 1 &&
-                    comment?.post_images.map((image, index) => (
+                  {reply?.post_images.length === 1 &&
+                    reply?.post_images.map((image, index) => (
                       <Image
                         key={index.toString()}
                         source={{ uri: `${IMAGE_BASE}/${image.image_path}` }}
@@ -374,8 +389,8 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                         }}
                       />
                     ))}
-                  {comment?.post_images.length > 1 &&
-                    comment?.post_images.map((image, i) => (
+                  {reply?.post_images.length > 1 &&
+                    reply?.post_images.map((image, i) => (
                       <Image
                         key={i.toString()}
                         source={{ uri: `${IMAGE_BASE}/${image.image_path}` }}
@@ -430,17 +445,17 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                 {!upvote.isLoading && (
                   <>
                      {
-                        comment.has_upvoted === 0 && (
+                        reply.has_upvoted === 0 && (
                             <Image source={require('../../../assets/images/arrows/up.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                         )
                       }
                        {
-                        comment.has_upvoted === 1 && (
+                        reply.has_upvoted === 1 && (
                             <Image source={require('../../../assets/images/arrows/upfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                         )
                       }
                     <CustomText variant="xs">
-                      {comment?.upvotes_count} Upvote
+                      {reply?.upvotes_count} Upvote
                     </CustomText>
                   </>
                 )}
@@ -462,12 +477,12 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                 {!downvote.isLoading && (
                     <>
                     {
-                   comment.has_downvoted === 0 && (
+                   reply.has_downvoted === 0 && (
                        <Image source={require('../../../assets/images/arrows/down.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                    )
                     }
                       {
-                      comment.has_downvoted === 1 && (
+                      reply.has_downvoted === 1 && (
                           <Image source={require('../../../assets/images/arrows/downfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                       )
                     }
@@ -490,16 +505,17 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
               alignItems: "center",
               marginLeft: 10,
             }}
+            onPress={handleReaction}
           >
             <Ionicons
               name="heart-outline"
               size={20}
-              color={theme.colors.textColor}
+              color={reply.has_reacted.length > 0 ? theme.colors.primaryColor : theme.colors.textColor}
             />
-            <CustomText variant="body">{comment.reactions_count}</CustomText>
+            <CustomText variant="body">{reply.reactions_count}</CustomText>
           </Pressable>
 
-          <Pressable
+          {/* <Pressable
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -512,13 +528,13 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
             >
               {isReply ? "Close" : "Reply"}
             </CustomText>
-          </Pressable>
+          </Pressable> */}
         </Box>
       </Box>
 
       {/* VIEW BUTTON */}
 
-      {!isLoading && comments.length > 0 && (
+      {/* {!isLoading && comments.length > 0 && (
         <Pressable
           style={{
             flexDirection: "row",
@@ -539,7 +555,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                 }`}
           </CustomText>
         </Pressable>
-      )}
+      )} */}
 
       {/* COMMENT BOX */}
 
@@ -581,7 +597,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
             >
               <TextInput
                 ref={TextinputtRef}
-                value={reply}
+                value={text}
                 onChangeText={handleTextChange}
                 onKeyPress={handleEnterKeyPressed}
                 onFocus={() => {
@@ -589,7 +605,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                   setShowComment(true);
                 }}
                 onBlur={() => setFocused(false)}
-                placeholder={`Reply to @${comment.user.username}`}
+                placeholder={`Reply to @${reply.user.username}`}
                 placeholderTextColor={theme.colors.textColor}
                 style={{
                   flex: 1,
@@ -631,7 +647,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
             )}
           </Box>
 
-          {isReply && commentsVisible && (
+          {/* {isReply && commentsVisible && (
             <Box paddingLeft="m">
               {!isLoading &&
                 comments.length > 0 &&
@@ -639,7 +655,7 @@ const Reply = ({ comment, isReply: ISREPLY = false }: { comment: IComment, isRep
                   <Reply comment={item} key={index.toString()} isReply />
                 ))}
             </Box>
-          )}
+          )} */}
         </>
       )}
     </Box>

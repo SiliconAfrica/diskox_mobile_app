@@ -7,9 +7,9 @@ export const colorizeHashtags = (text) => {
     if (parts) {
       return parts.map((part, index) => {
         if (part.match(regex)) {
-          return <CustomText variant="body" key={index} color="primaryColor">{part}</CustomText>; // Apply styling to matched words
+          return <CustomText variant="body" key={index} fontSize={15} color="primaryColor">{part}</CustomText>; // Apply styling to matched words
         }
-        return <CustomText variant="body" key={index}>{part}</CustomText>; // Preserve non-matched parts
+        return <CustomText variant="body" fontSize={15} key={index}>{part}</CustomText>; // Preserve non-matched parts
       });
     }
   };

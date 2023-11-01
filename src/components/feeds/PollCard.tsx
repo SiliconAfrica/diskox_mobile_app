@@ -374,7 +374,7 @@ const PollCard = (props: IPost& IProps) => {
                     <ScrollView  showsHorizontalScrollIndicator={false} contentContainerStyle={{ width: '100%' }}>
                     
                         {polls.map((poll, index) => (
-                            <Box key={index.toString()} width='100%' height={45} position='relative' overflow='hidden' borderRadius={25} marginBottom='s'>
+                            <Box key={index.toString()} width='100%' height={40} position='relative' overflow='hidden' borderRadius={25} marginBottom='s'>
                                 { has_voted_poll === 1 && (
                                     <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
                                 )}
@@ -383,7 +383,7 @@ const PollCard = (props: IPost& IProps) => {
                                         <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
                                     )
                                 }
-                                <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 45, borderRadius: 25, borderWidth: 1, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
+                                <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 40, borderRadius: 25, borderWidth: 1, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
                                     <CustomText variant='body' color='primaryColor'>{poll.subject} ({poll.vote_count}%)</CustomText>
                                 </Pressable>
                             </Box>

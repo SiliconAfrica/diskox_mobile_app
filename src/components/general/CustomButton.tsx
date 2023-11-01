@@ -19,7 +19,7 @@ const CustomButton = ({ title, onPress, width = 120, height = 45, isLoading = fa
   return (
     <Pressable onPress={onPress} style={{ backgroundColor: color, borderRadius: 25, width, height, justifyContent: 'center', alignItems: 'center' }}>
         { isLoading && <ActivityIndicator color={theme.colors.primaryColor} size='small' /> }
-        { !isLoading && <CustomText variant="subheader" color='primaryColor' fontSize={15} style={{ color: textColor }}>{title}</CustomText> }
+        { !isLoading && <CustomText variant="header" color='primaryColor' fontSize={16} style={{ color: textColor }}>{title}</CustomText> }
     </Pressable>
   )
 }

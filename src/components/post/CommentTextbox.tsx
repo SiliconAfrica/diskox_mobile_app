@@ -24,7 +24,7 @@ import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useDetailsState } from "../../states/userState";
-import { IComment } from "../../models/comments";
+import { IComment, IReply } from "../../models/comments";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { URLS } from "../../services/urls";
 import * as ImagePicker from "expo-image-picker";
@@ -53,7 +53,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   >([]);
   const [showComments, setShowComment] = React.useState(false);
   const [isReply, setIsReply] = React.useState(false);
-  const [comments, setComments] = React.useState<Array<IComment>>([]);
+  const [comments, setComments] = React.useState<Array<IReply>>([]);
   const [commentsVisible, setCommentsVisible] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
 

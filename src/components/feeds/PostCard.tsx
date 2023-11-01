@@ -235,7 +235,8 @@ const PostCard = (props: IPost & IProps) => {
             { myId !== userId && (
               <Pressable style={{
                 backgroundColor: theme.colors.fadedButtonBgColor,
-                padding: 5,
+                height: 24,
+                paddingHorizontal: 3,
                 borderRadius: 20,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -272,7 +273,7 @@ const PostCard = (props: IPost & IProps) => {
       <Box marginVertical="m">
 
         <Box paddingHorizontal="m">
-        <CustomText variant="body">
+        <CustomText variant="body" fontSize={10} style={{ fontSize: 10, color: 'red'}}>
           {showAll
             ? des
             : des?.length > 100

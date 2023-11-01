@@ -42,10 +42,9 @@ export const SubmitButton = ({
         }}
       >
         <CustomText
-          variant="body"
+          variant="header"
           style={{
-            fontSize: 17,
-            fontFamily: "RedRegular",
+            fontSize: 16,
             color: !isDirty || !isValid ? theme.colors.primaryColor : "white",
           }}
         >

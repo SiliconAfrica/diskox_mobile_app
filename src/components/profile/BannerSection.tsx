@@ -323,7 +323,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => navigation.navigate("settings")}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -376,7 +376,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Pressable
             onPress={() => followUnFollowMutation.mutate()}
             style={{
-              height: 50,
+              height: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -396,6 +396,9 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     fontSize={16}
                     marginLeft="s"
                     color="white"
+                    style={{
+                      color: 'white'
+                    }}
                   >
                     Following
                   </CustomText>
@@ -404,13 +407,16 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     <Ionicons
                       name="person-add-outline"
                       size={25}
-                      color={theme.colors.white}
+                      color={'white'}
                     />
                     <CustomText
                       variant="header"
                       fontSize={16}
                       marginLeft="s"
                       color="white"
+                      style={{
+                        color: 'white'
+                      }}
                     >
                       Follow
                     </CustomText>
@@ -425,8 +431,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
 
           <Pressable
             style={{
-              height: 50,
-              width: 50,
+              height: 35,
+              width: 35,
               borderRadius: 25,
               flexDirection: "row",
               justifyContent: "center",
@@ -439,7 +445,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             <Ionicons
               name="mail-outline"
-              size={25}
+              size={20}
               color={theme.colors.textColor}
             />
           </Pressable>
@@ -486,7 +492,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           </Box>
         </Box>
 
-        <CustomText variant="body" marginTop="m">
+        <CustomText variant="body" fontSize={15} marginTop="m">
           {user?.about}
         </CustomText>
 
