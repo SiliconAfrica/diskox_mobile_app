@@ -514,7 +514,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             <Ionicons
               name="heart-outline"
               size={20}
-              color={comment.has_reacted.length > 0 ? theme.colors.primaryColor:theme.colors.textColor}
+              color={comment.user?.has_reacted?.length > 0 ? theme.colors.primaryColor:theme.colors.textColor}
             />
             <CustomText variant="body">{comment.reactions_count}</CustomText>
           </Pressable>
