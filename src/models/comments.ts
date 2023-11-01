@@ -4,6 +4,7 @@ export interface IComment {
   id: number;
   user_id: number;
   post_id: number;
+  comment_id: number | undefined;
   comment: string;
   reply: string | undefined;
   created_at: string;

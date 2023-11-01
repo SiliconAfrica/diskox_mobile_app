@@ -46,6 +46,7 @@ export const URLS = {
   DOWNVOTE_REPLY: "/downvote_reply",
   UPDATE_COMMMENT: "/update_comment",
   DELETE_COMMMENT: "/delete_comment",
+  UPDATED_REPLY: "/update_reply",
   DELETE_REPLY: "/delete_reply",
   GET_REFERRALS: "/fetch_user_referrals",
   COUNT_REFERRALS: "/count_user_referrals",

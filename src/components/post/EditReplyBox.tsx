@@ -23,21 +23,21 @@ import { useMutation, useQueryClient } from "react-query";
 import mime from "mime";
 import { Image } from "expo-image";
 
-const EditCommentBox = ({
+const EditReplyBox = ({
   comment,
   // edit,
   toggleEditing,
   showEmoji,
   setShowEmoji,
-  editedComment,
-  setEditedComment,
+  editedReply,
+  setEditedReply,
 }: {
   comment: IComment;
   toggleEditing: () => void;
   showEmoji: boolean;
   setShowEmoji: any;
-  editedComment: string;
-  setEditedComment: any;
+  editedReply: string;
+  setEditedReply: any;
 }) => {
   const theme = useTheme<Theme>();
   const toast = useToast();
@@ -52,7 +52,7 @@ const EditCommentBox = ({
 
   const handleTextChange = useCallback((coment: string) => {
     // do regex to gext mentioned users
-    setEditedComment(coment);
+    setEditedReply(coment);
   }, []);
 
   const handleEnterKeyPressed = useCallback(
@@ -95,23 +95,23 @@ const EditCommentBox = ({
     setImages([...filterImages]);
   };
   useEffect(() => {
-    setEditedComment(comment.comment);
+    setEditedReply(comment.reply);
     setPrevImages([...comment.post_images]);
   }, []);
 
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
-      httpService.post(`${URLS.UPDATE_COMMMENT}/${comment.id}`, data),
+      httpService.post(`${URLS.UPDATED_REPLY}/${comment.id}`, data),
     onSuccess: () => {
-      toast.show("Comment updated successfully", { type: "success" });
+      toast.show("Reply updated successfully", { type: "success" });
       toggleEditing();
-      queryClient.invalidateQueries(["getComments", comment.post_id]);
+      queryClient.invalidateQueries(["getReplies"]);
       setImages([]);
-      setEditedComment("");
+      setEditedReply("");
     },
     onError: (error: any) => {
       toast.show(error.message, { type: "error" });
-      toast.show("An error occured while trying to edit the comment", {
+      toast.show("An error occured while trying to edit the reply", {
         type: "error",
       });
     },
@@ -120,13 +120,13 @@ const EditCommentBox = ({
   const handleSubmit = useCallback(() => {
     if (mutationLoading) return;
     const formData = new FormData();
-    formData.append("post_id", comment.post_id.toString() as any),
-      formData.append("comment", editedComment);
+    formData.append("comment_id", comment.comment_id.toString() as any),
+      formData.append("reply", editedReply);
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const name = images[i].uri.split("/").pop();
         const mimeType = mime.getType(images[i].uri);
-        formData.append("comment_images[]", {
+        formData.append("reply_images[]", {
           uri: images[i].uri,
           type: mimeType,
           name,
@@ -143,7 +143,7 @@ const EditCommentBox = ({
   }, [
     comment.id,
     mutationLoading,
-    editedComment,
+    editedReply,
     images,
     prevImages,
     removedImages,
@@ -183,7 +183,7 @@ const EditCommentBox = ({
         >
           <TextInput
             ref={TextinputtRef}
-            value={editedComment}
+            value={editedReply}
             onChangeText={handleTextChange}
             onKeyPress={handleEnterKeyPressed}
             onFocus={() => {
@@ -316,4 +316,4 @@ const EditCommentBox = ({
   );
 };
 
-export default EditCommentBox;
+export default EditReplyBox;
