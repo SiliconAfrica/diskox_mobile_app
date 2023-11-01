@@ -23,8 +23,6 @@ import MediaCard from '../../components/createpost/MediaCard';
 import { extract_day } from '../../utils/utils';
 import moment from 'moment';
 import ViewImageModal from '../../components/modals/ViewImageModal';
-import pusher from '../../utils/pusher';
-import { PusherEvent } from '@pusher/pusher-websocket-react-native';
 import { useDetailsState } from '../../states/userState';
 
 enum FILE_TYPE {
@@ -63,38 +61,6 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     },
   });
 
-  React.useEffect(() => {
-   (async function() {
-   const uMessage = await pusher.subscribe({
-      channelName: `private.send_message.${loggedUser}`,
-      onEvent: (event: PusherEvent) => {
-        console.log('---SEND MESSAGE---');
-        console.log(event);
-      }
-    });
-
-
-    pusher.subscribe({
-      channelName: `private.delete_message.${loggedUser}`,
-      onEvent: (event: PusherEvent) => {
-        console.log('---DELETE MESSAGE---');
-        console.log(event);
-      }
-    })
-
-    pusher.subscribe({
-      channelName: `react_to.${loggedUser}`,
-      onEvent: (event: PusherEvent) => {
-        console.log('---REACTION---');
-        console.log(event);
-      }
-    })
-   })()
-    
-    return () => {
-      
-    }
-  }, [])
 
   const getUser = useQuery(['getChatUser', userId], () => httpService.get(`${URLS.GET_USER_BY_USERNAME}/${username}`), {
     onSuccess: (data) => {
