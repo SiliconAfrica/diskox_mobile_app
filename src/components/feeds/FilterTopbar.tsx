@@ -8,6 +8,7 @@ import { Theme } from "../../theme";
 import { useModalState } from "../../states/modalState";
 import { POST_FILTERR } from "../../enums/Postfilters";
 import { useUtilState } from "../../states/util";
+import { Image } from "expo-image";
 
 const FilterTopbar = () => {
   const theme = useTheme<Theme>();
@@ -32,7 +33,7 @@ const FilterTopbar = () => {
       <Pressable
         onPress={() => setAll({ showFilter: true })}
         style={{
-          height: 40,
+          height: 35,
           width: "35%",
           borderRadius: 30,
           backgroundColor: "#F7FCF9",
@@ -43,12 +44,12 @@ const FilterTopbar = () => {
       >
         {filterBy !== POST_FILTERR.ALL &&
           filterBy !== POST_FILTERR.TOP_STORIES && (
-            <CustomText variant="body" color="primaryColor" fontSize={17}>
+            <CustomText variant="subheader" fontSize={15} color="primaryColor" >
               {filterBy}
             </CustomText>
           )}
         {filterBy === POST_FILTERR.ALL && (
-          <CustomText variant="body" color="primaryColor" fontSize={17}>
+          <CustomText variant="subheader" color="primaryColor" fontSize={16}>
             SortBy
           </CustomText>
         )}
@@ -81,7 +82,8 @@ const FilterTopbar = () => {
           style={{ marginRight: 4 }}
         />
         <CustomText
-          variant="body"
+          variant="subheader"
+          fontSize={16}
           color={filterBy === POST_FILTERR.ALL ? "primaryColor" : "textColor"}
         >
           New
@@ -98,18 +100,10 @@ const FilterTopbar = () => {
           alignItems: "center",
         }}
       >
-        <Ionicons
-          name="arrow-up-outline"
-          size={25}
-          color={
-            filterBy === POST_FILTERR.TOP_STORIES
-              ? theme.colors.primaryColor
-              : theme.colors.textColor
-          }
-          style={{ marginRight: 4 }}
-        />
+        <Image source={require('../../../assets/images/arrows/up.png')} contentFit="contain" style={{ width: 20, height: 20, marginRight: 5 }} />
         <CustomText
-          variant="body"
+          variant="subheader"
+          fontSize={16}
           color={
             filterBy === POST_FILTERR.TOP_STORIES ? "primaryColor" : "textColor"
           }

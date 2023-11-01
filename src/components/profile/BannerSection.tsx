@@ -182,8 +182,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               justifyContent="flex-end"
             >
               <Box
-                width={50}
-                height={50}
+                width={40}
+                height={40}
                 borderRadius={25}
                 bg="grey"
                 overflow="hidden"
@@ -339,7 +339,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               size={25}
               color={theme.colors.textColor}
             />
-            <CustomText variant="xs" marginLeft="s">
+            <CustomText variant="subheader" fontSize={15} marginLeft="s">
               Edit Profile
             </CustomText>
           </Pressable>
@@ -539,7 +539,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.OVERVIEW)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.OVERVIEW
                   ? "primaryColor"
@@ -559,7 +560,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.POSTS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.POSTS ? "primaryColor" : "textColor"
               }
@@ -577,7 +579,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.UPVOTES)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.UPVOTES ? "primaryColor" : "textColor"
               }
@@ -595,7 +598,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.COMMENTS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.COMMENTS
                   ? "primaryColor"
@@ -615,7 +619,8 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             onPress={() => switchTab(ACTIVE_TAB.POLLS)}
           >
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               color={
                 currentTab === ACTIVE_TAB.POLLS ? "primaryColor" : "textColor"
               }

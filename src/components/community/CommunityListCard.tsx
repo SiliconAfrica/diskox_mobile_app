@@ -45,10 +45,10 @@ const CommunityListCard = (props: ICommunity) => {
         </Box>
 
         { is_member === 0 && (
-          <PrimaryButton title='Join' onPress={() => mutate()} height={40} width={70}></PrimaryButton>
+          <PrimaryButton title='Join' onPress={() => mutate()} height={35} width={70}></PrimaryButton>
         )}
         { is_member !== 0 && (
-          <PrimaryButton title='View' onPress={() => navigation.navigate('community', { id, data: props })} height={40} width={70}></PrimaryButton>
+          <PrimaryButton title='View' onPress={() => navigation.navigate('community', { id, data: props })} height={35} width={70}></PrimaryButton>
         )}
     </Box>
   )
