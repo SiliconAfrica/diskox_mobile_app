@@ -455,6 +455,7 @@ const Reply = ({ comment: reply, isReply: ISREPLY = false }: { comment: IReply, 
                         reply.has_upvoted === 1 && (
                             <Image source={require('../../../assets/images/arrows/upfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                         )
+                      }
 
                     <CustomText variant="xs">
                       {reply?.upvotes_count} Upvote
