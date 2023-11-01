@@ -83,6 +83,7 @@ const Reply = ({ comment: reply, isReply: ISREPLY = false }: { comment: IReply, 
   // );
  
 
+
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_REPLY}`, data),
@@ -344,6 +345,7 @@ const Reply = ({ comment: reply, isReply: ISREPLY = false }: { comment: IReply, 
             ? reply.reply?.substring(0, 100) + "..."
             : reply.reply}{" "}
           {reply.reply?.length > 100 && (
+
             <CustomText
               variant="body"
               color="primaryColor"
@@ -453,7 +455,7 @@ const Reply = ({ comment: reply, isReply: ISREPLY = false }: { comment: IReply, 
                         reply.has_upvoted === 1 && (
                             <Image source={require('../../../assets/images/arrows/upfilled.png')} style={{ width: 20, height: 20 }} contentFit="cover" />
                         )
-                      }
+
                     <CustomText variant="xs">
                       {reply?.upvotes_count} Upvote
                     </CustomText>

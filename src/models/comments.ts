@@ -1,6 +1,20 @@
 import { MediaPost } from './post';
 
 export interface IComment {
+  id: number;
+  user_id: number;
+  post_id: number;
+  comment: string;
+  reply: string | undefined;
+  created_at: string;
+  upvotes_count: number;
+  downvotes_count: number;
+  reactions_count: number;
+  replies_count: number;
+  has_upvoted: number;
+  has_downvoted: number;
+  post_images: MediaPost[];
+  user: {
     id: number;
     user_id: number;
     post_id: number;
@@ -62,3 +76,4 @@ export interface IReply {
     }
     has_reacted: any[]
 }
+

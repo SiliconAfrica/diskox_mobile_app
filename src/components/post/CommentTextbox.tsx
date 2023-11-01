@@ -453,6 +453,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                         contentFit="cover"
                         style={{ width: 20, height: 20 }}
                       />
+
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
                     </CustomText>
