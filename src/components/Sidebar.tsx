@@ -10,6 +10,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
   Foundation,
+  FontAwesome,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
@@ -22,6 +23,7 @@ import { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useModalState } from "../states/modalState";
 
 const Item = ({
   icon,
@@ -169,6 +171,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
     state.setAll,
   ]);
   const { accounts } = useMultipleAccounts((state) => state);
+  const { setAll: setModal } = useModalState((state) => state);
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -270,6 +273,25 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                 }
                 title="Verify account"
                 action={() => navigation.navigate("verification")}
+              />
+              <Item
+                icon={
+                  <Box
+                    borderWidth={1}
+                    paddingHorizontal="s"
+                    paddingVertical="s"
+                    borderRadius={5}
+                    style={{ borderColor: theme.colors.textColor }}
+                  >
+                    <FontAwesome
+                      name="dollar"
+                      size={10}
+                      color={theme.colors.textColor}
+                    />
+                  </Box>
+                }
+                title="Monetization"
+                action={() => setModal({ showMonetization: true })}
               />
             </>
           )}
