@@ -27,7 +27,9 @@ const MonetizationModal = () => {
   const toast = useToast();
   const ref = useRef<BottomSheetModal>();
   const [checked, setChecked] = useState<boolean>(false);
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const { setAll } = useModalState();
+  const { ad_sharing } = useDetailsState();
   const theme = useTheme<Theme>();
 
   const { isLoading, mutate } = useMutation({
@@ -35,18 +37,23 @@ const MonetizationModal = () => {
       httpService.put(`${URLS.AD_SHARING_REQUEST}`, data),
     onSuccess: (data) => {
       if (data?.data?.code === CUSTOM_STATUS_CODE.SUCCESS) {
-        console.log(data?.data, "olsjj");
-        toast.show(
-          "YOu have successfully requested to allow ads on your profile. Once approved, you will be notified",
-          { type: "success" }
-        );
-        setAll({ showMonetization: false });
+        setShowSuccess(true);
       }
     },
     onError: (error: any) => {
       toast.show(error?.message, { type: "error" });
     },
   });
+
+  const startMonetizing = () => {
+    if (checked) {
+      mutate({});
+    } else {
+      toast.show("Please agree to the terms and conditions", {
+        type: "danger",
+      });
+    }
+  };
 
   useEffect(() => {
     if (ref.current !== null) {
@@ -58,7 +65,7 @@ const MonetizationModal = () => {
     <ModalWrapper
       onClose={() => setAll({ showMonetization: false })}
       shouldScrroll={false}
-      snapPoints={["60%"]}
+      snapPoints={[showSuccess ? "40%" : "60%"]}
       ref={ref}
     >
       <Box
@@ -67,60 +74,102 @@ const MonetizationModal = () => {
         paddingVertical="s"
         alignItems="center"
       >
-        <Box
-          width={"50%"}
-          position="relative"
-          style={{ paddingTop: "50%" }}
-          marginVertical="s"
-        >
-          <Image
-            source={require("../../../assets/images/cashbag.png")}
-            contentFit="contain"
-            style={{
-              width: "100%",
-              height: undefined,
-              aspectRatio: 1,
-              position: "absolute",
-            }}
-          />
-        </Box>
-        <CustomText variant="header">Ad Revenue Sharing</CustomText>
-        <CustomText variant="body" textAlign="center" marginVertical="s">
-          You agree that diskox can put ads on your post, user profile and
-          community created by this user.
-        </CustomText>
-        <Box flexDirection="row">
-          <Checkbox
-            value={checked}
-            onValueChange={() => setChecked((prev) => !prev)}
-            color={checked ? theme.colors.primaryColor : theme.colors.textColor}
-          />
-          <CustomText variant="body" marginHorizontal="s">
-            I agree
-          </CustomText>
-        </Box>
-        <Pressable
-          onPress={() => {
-            if (checked) {
-              mutate({});
-            } else {
-              toast.show("Please agree to the terms and conditions", {
-                type: "danger",
-              });
-            }
-          }}
-        >
-          <Box
-            marginVertical="s"
-            style={[styles.btn, { backgroundColor: theme.colors.primaryColor }]}
-          >
-            {isLoading ? (
-              <ActivityIndicator size={15} color={theme.colors.white} />
-            ) : (
-              <CustomText color="white">Start Monetizing</CustomText>
-            )}
-          </Box>
-        </Pressable>
+        {showSuccess ? (
+          <>
+            <Box
+              width={"15%"}
+              position="relative"
+              style={{ paddingTop: "15%" }}
+              marginVertical="s"
+            >
+              <Image
+                source={require("../../../assets/images/verify.png")}
+                contentFit="contain"
+                style={{
+                  width: "100%",
+                  height: undefined,
+                  aspectRatio: 1,
+                  position: "absolute",
+                }}
+              />
+            </Box>
+            <CustomText variant="header" textAlign="center">
+              Ad Revenue Sharing Successful
+            </CustomText>
+            <Pressable onPress={() => setAll({ showMonetization: false })}>
+              <Box
+                marginVertical="s"
+                style={[
+                  styles.btn,
+                  { backgroundColor: theme.colors.primaryColor },
+                ]}
+              >
+                <CustomText color="white" variant="body" textAlign="center">
+                  Okay
+                </CustomText>
+              </Box>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <Box
+              width={"50%"}
+              position="relative"
+              style={{ paddingTop: "50%" }}
+              marginVertical="s"
+            >
+              <Image
+                source={require("../../../assets/images/cashbag.png")}
+                contentFit="contain"
+                style={{
+                  width: "100%",
+                  height: undefined,
+                  aspectRatio: 1,
+                  position: "absolute",
+                }}
+              />
+            </Box>
+            <CustomText variant="header">Ad Revenue Sharing</CustomText>
+            <CustomText variant="body" textAlign="center" marginVertical="s">
+              You agree that diskox can put ads on your post, user profile and
+              community created by this user.
+            </CustomText>
+            <Box flexDirection="row">
+              <Checkbox
+                value={checked}
+                onValueChange={() => setChecked((prev) => !prev)}
+                color={
+                  checked ? theme.colors.primaryColor : theme.colors.textColor
+                }
+              />
+              <CustomText variant="body" marginHorizontal="s">
+                I agree
+              </CustomText>
+            </Box>
+            <Pressable onPress={startMonetizing}>
+              <Box
+                marginVertical="s"
+                style={[
+                  styles.btn,
+                  {
+                    backgroundColor:
+                      ad_sharing === 1
+                        ? theme.colors.error
+                        : theme.colors.primaryColor,
+                  },
+                ]}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size={15} color={theme.colors.white} />
+                ) : (
+                  <CustomText color="white">
+                    {ad_sharing === 1 ? "Stop Monetizing" : "Start Monetizing"}
+                  </CustomText>
+                )}
+              </Box>
+            </Pressable>
+          </>
+        )}
       </Box>
     </ModalWrapper>
   );
