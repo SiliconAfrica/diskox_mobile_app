@@ -20,6 +20,7 @@ export interface IUserState {
   phone_number: string;
   profile_image: string;
   state: string;
+  ad_sharing: number;
   suspended_at: string;
   suspension_expired_at: string;
   setAll: (data: Partial<IUserState>) => void;
@@ -43,6 +44,7 @@ export const useDetailsState = create<IUserState>((set) => ({
   state: "",
   suspended_at: "",
   suspension_expired_at: "",
+  ad_sharing: 0,
   updated_at: "",
   created_at: "",
   id: 0,
@@ -70,6 +72,7 @@ export const useUserStateBeforeAddingByRegistration = create<IUserState>(
     state: "",
     suspended_at: "",
     suspension_expired_at: "",
+    ad_sharing: 0,
     updated_at: "",
     created_at: "",
     id: 0,

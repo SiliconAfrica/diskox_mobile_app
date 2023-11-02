@@ -14,6 +14,7 @@ const COLOR_PALLET = {
   whatsappGreen: "#25D366",
   transparent: "#000000b9",
   yellowGreen: "#A8B60C",
+  error: "#FA2019",
 };
 
 const theme = createTheme({

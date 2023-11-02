@@ -79,6 +79,8 @@ export const URLS = {
   UPDATE_INTEREST: "/update_user_interests",
   BOOKMARK_POST: "/bookmark_post",
   AD_SHARING_REQUEST: "/send_ad_sharing_request",
+  GET_VERIFICATION_AND_MONETIZATION_REQUIREMENT:
+    "/get_user_requirements_for_verification_and_monetization",
   UPDATE_COMMUNITY_TYPE: "/update_community_type",
   UPDATE_COVER_PHOTO: "/update_cover_photo",
   REACT_TO_COMMENT: "/react_to_comment",
