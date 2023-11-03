@@ -63,7 +63,7 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
 const Style = StyleSheet.create({
     parent: {
         width: '100%',
-        height: 48,
+        height: 52,
         borderRadius: 12,
         borderWidth: 1,
         flexDirection: 'row',

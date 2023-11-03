@@ -10,11 +10,12 @@ interface IProps {
     title: string;
     onPress: () => void;
     isLoading?: boolean;
+    
     color?: string;
     textColor?: string;
 }
 
-const CustomButton = ({ title, onPress, width = 120, height = 45, isLoading = false, color='grey', textColor = 'white'}: IProps) => {
+const CustomButton = ({ title, onPress, width = 120, height = 32, isLoading = false, color='grey', textColor = 'white'}: IProps) => {
     const theme = useTheme<Theme>();
   return (
     <Pressable onPress={onPress} style={{ backgroundColor: color, borderRadius: 25, width, height, justifyContent: 'center', alignItems: 'center' }}>

@@ -2,6 +2,7 @@ import 'react-native-reanimated'
 import 'react-native-gesture-handler'
 import { useCallback, useEffect } from 'react'
 import Navigation from './src/navigation';
+// import Echo from 'laravel-echo';
 /**
 + * Renders the main App component.
 + *
@@ -15,6 +16,18 @@ import { View } from 'react-native';
 + *
 + * @return {JSX.Element} The Navigation component.
 + */
+
+
+
+// const NewEcho = new Echo({
+//   broadcaster: 'pusher',
+//   key: 'f5d4f2be017648807ffe',
+//   cluster: 'ap2',
+//   forceTLS: true
+// });
+
+
+
 
 SplashScreen.preventAutoHideAsync();
 export default function App(): JSX.Element {
