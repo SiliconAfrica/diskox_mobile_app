@@ -5657,6 +5657,11 @@ expo-manifests@~0.5.0:
   dependencies:
     expo-json-utils "~0.5.0"
 
+expo-media-library@~15.2.3:
+  version "15.2.3"
+  resolved "https://registry.yarnpkg.com/expo-media-library/-/expo-media-library-15.2.3.tgz#188f3c77f58b354f0ea6250f6756ac1e1a226291"
+  integrity sha512-Oz8b8Xsvfj7YcutUBtI84NUIqSnt7iCM5HZ5DyKoWKKiDK/+aUuj3RXNQELG8jUw6pQPgEwgbZ1+J8SdH/y9jw==
+
 expo-modules-autolinking@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/expo-modules-autolinking/-/expo-modules-autolinking-1.2.0.tgz#3ead115510a43fe196fc0498586b6133bd573209"
@@ -9672,6 +9677,13 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.0.tgz#f67fa67c94da8f4d0cfff981aee4118064199b8f"
   integrity sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==
 
+pusher-js@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/pusher-js/-/pusher-js-8.3.0.tgz#a40d76c373a56ba8b3de2c55414380cb49975207"
+  integrity sha512-6GohP06WlVeomAQQe9qWh1IDzd3+InluWt+ZUOcecVK1SEQkg6a8uYVsvxSJm7cbccfmHhE0jDkmhKIhue8vmA==
+  dependencies:
+    tweetnacl "^1.0.3"
+
 qrcode-terminal@0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/qrcode-terminal/-/qrcode-terminal-0.11.0.tgz#ffc6c28a2fc0bfb47052b47e23f4f446a5fbdb9e"
@@ -11439,6 +11451,11 @@ turndown@7.1.1:
   integrity sha512-BEkXaWH7Wh7e9bd2QumhfAXk5g34+6QUmmWx+0q6ThaVOLuLUqsnkq35HQ5SBHSaxjSfSM7US5o4lhJNH7B9MA==
   dependencies:
     domino "^2.1.6"
+
+tweetnacl@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
+  integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
 type-detect@4.0.8:
   version "4.0.8"

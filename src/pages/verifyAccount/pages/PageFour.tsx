@@ -29,21 +29,42 @@ const PageFour = ({next}: {
     const [recording, setRecording] = React.useState(false);
     const cameraRef = React.useRef<Camera>(null);
     const [dataUrl, setDataUrl] = React.useState('');
-    const [cameraReady, setCameraReady] = React.useState(false);
+
+    const [hasCameraPermission, setHasCameraPermissioon] = React.useState<boolean|undefined>();
+    const [hasMicrophonePermission, setMicrophonePermission] = React.useState<boolean|undefined>();
+
     const theme = useTheme<Theme>();
     const toast = useToast();
 
     React.useEffect(() => {
+      (async function() {
+        const cameraPermission = await Camera.requestCameraPermissionsAsync();
+        const microphonePermission = await Camera.requestMicrophonePermissionsAsync();
+        await Audio.requestPermissionsAsync();
+
+        setHasCameraPermissioon(cameraPermission.status === 'granted');
+        setMicrophonePermission(microphonePermission.status === 'granted');
+      })()
     }, [])
+
+    if (hasCameraPermission === undefined || hasMicrophonePermission === undefined) {
+      return (
+        <CustomText>Requesting permission...</CustomText>
+      )
+    } else if (!hasCameraPermission) {
+      return <CustomText>You need to grant the app permission to be about to continue</CustomText>
+    }
 
 
     const startRecording = async () => {
-        alert('clicked');
+        // alert('clicked');
         if (cameraRef.current) {
           try {
+
             const data = await cameraRef.current.recordAsync({
-                quality: VideoQuality['480p'],
+                quality: VideoQuality['1080p'],
                 maxDuration: 60 * 1000,
+                mute: true,
             });
             setRecording(true);
             setDataUrl(data.uri);
@@ -68,9 +89,9 @@ const PageFour = ({next}: {
         <Box width={'100%'} height={350}  borderRadius={15} borderWidth={1} backgroundColor={isDarkMode ? 'mainBackGroundColor' : 'black'} marginTop='m' overflow='hidden' justifyContent='center' alignItems='center' >
 
             <Box height={250} width={250} borderRadius={125} borderWidth={2} borderColor='primaryColor' borderStyle='dashed' justifyContent='center' alignItems='center' bg='white'>
-                {/* <Camera style={{ flex: 1 }} flashMode={FlashMode.on} useCamera2Api ref={cameraRef} type={CameraType.front} onCameraReady={() => alert('Ready')} >
-                    <Video source={{ uri: dataUrl }} style={{ flex: 1 }} />
-                </Camera> */}
+                <Camera style={{ flex: 1 }} flashMode={FlashMode.on} useCamera2Api ref={cameraRef} type={CameraType.front} onCameraReady={() => alert('Ready')} >
+                    {/* <Video source={{ uri: dataUrl }} style={{ flex: 1 }} /> */}
+                </Camera>
             </Box>
          
         </Box>       

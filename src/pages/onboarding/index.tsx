@@ -180,9 +180,9 @@ const Onboarding = ({
             })
           }
           style={{
-            backgroundColor: "#34a85350",
+            backgroundColor: "#D0F1D9",
             borderRadius: 50,
-            height: 40,
+            height:32,
             width: "30%",
             justifyContent: "center",
             alignItems: "center",
@@ -191,7 +191,7 @@ const Onboarding = ({
         >
           <CustomText
             variant="header"
-            style={{ fontSize: 16 }}
+            style={{ fontSize: 16, color: '#34A853' }}
             color="primaryColor"
           >
             Login
