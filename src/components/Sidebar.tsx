@@ -24,7 +24,7 @@ import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useModalState } from "../states/modalState";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { URLS } from "../services/urls";
 
 const Item = ({
@@ -57,6 +57,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
   const { switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   return (
     <Box
@@ -108,7 +109,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                             switchAccount(
                               user.username,
                               switchToken,
-                              updateDetails
+                              updateDetails,
+                              queryClient
                             );
                             toast.show(`Logged in as "@${user.username}"`, {
                               type: "success",
