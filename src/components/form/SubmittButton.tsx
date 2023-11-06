@@ -33,9 +33,9 @@ export const SubmitButton = ({
         onPress={handleSubmit(onSubmit)}
         style={{
           width,
-          height: 45,
+          height: 52,
           backgroundColor:
-            !isDirty || !isValid ? "#97E1CB" : theme.colors.primaryColor,
+            !isDirty || !isValid ? "#B8E0C2" : theme.colors.primaryColor,
           borderRadius: 50,
           justifyContent: "center",
           alignItems: "center",
@@ -45,7 +45,7 @@ export const SubmitButton = ({
           variant="header"
           style={{
             fontSize: 16,
-            color: !isDirty || !isValid ? theme.colors.primaryColor : "white",
+            color: "#FFFFFF",
           }}
         >
           {isLoading ? "submitting..." : label}

@@ -68,7 +68,6 @@ const Reply = ({
   //   {
   //     onError: () => {},
   //     onSuccess: (data) => {
-  //       console.log(data.data);
   //       if (data?.data) {
   //         setReply({...reply, ...data?.data?.data});
   //       }
@@ -85,8 +84,6 @@ const Reply = ({
   //     onError: () => {},
   //     onSuccess: (data) => {
   //       if (data?.data) {
-  //         console.log('---RELPY---')
-  //         console.log(data?.data?.data.data[0]);
   //         setComments(data?.data?.data?.data || []);
   //       }
   //     },

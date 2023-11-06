@@ -75,7 +75,6 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
     {
       onError: () => {},
       onSuccess: (data) => {
-        console.log(data.data);
         if (data?.data) {
           setComments(data?.data?.data?.data || []);
         }

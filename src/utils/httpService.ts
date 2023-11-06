@@ -40,7 +40,6 @@ httpService.interceptors.response.use(
     return response;
   },
   async (error: AxiosError<any, any>) => {
-    console.log(error.message);
     if (!error.response) {
       return Promise.reject(error.message);
     } else {

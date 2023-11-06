@@ -26,7 +26,6 @@ const Overview = ({ id }: IProps) => {
         alert(error.message);
       },
       onSuccess: (data) => {
-        console.log(data.data);
         if (data.data.data) {
           setPosts(data.data.data.data);
         } else {
@@ -44,7 +43,6 @@ const Overview = ({ id }: IProps) => {
         alert(error.message);
       },
       onSuccess: (data) => {
-        console.log(data.data?.data, "hhh");
         if (data.data.data) {
           setAnalysis(data?.data?.data);
         } else {

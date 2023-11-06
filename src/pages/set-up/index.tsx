@@ -57,7 +57,6 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       alert(error.message);
     },
     onSuccess: (data: any) => {
-      console.log(data.data);
       setShowModal(true);
       setAll({ isLoggedIn: true });
     },
@@ -90,7 +89,6 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       birthday: date,
       gender: gender,
     };
-    console.log(obj);
     mutate(obj);
   }, [date, gender, selected, state]);
 

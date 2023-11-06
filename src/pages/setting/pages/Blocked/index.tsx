@@ -69,13 +69,11 @@ const BlockedUsers= ({ navigation }: NativeStackScreenProps<RootStackParamList, 
     }
   }), {
     onSuccess: ( data) => {
-      console.log(data?.data);
       // if (data?.data?.code !== CUSTOM_STATUS_CODE.INTERNAL_SERVER_ERROR && data?.data?.code === CUSTOM_STATUS_CODE.SUCCESS) {
       //   setUsers(data?.data?.data?.data);
       // }
     },
     onError: (error: any) => {
-      console.log(error)
     }
   })
   return (

@@ -28,7 +28,6 @@ const MemberCard = ({ id, name, username, profile_image }: Partial<IUser>) => {
     const followUnFollowMutation = useMutation({
         mutationFn: () => httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${id}`),
         onSuccess: (data) => {
-            //console.log(toast);
             toast.show(data?.data?.message, { type: 'success' });
         }
     });

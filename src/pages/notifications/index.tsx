@@ -47,7 +47,6 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
 
   const { isLoading, isError, error, data, refetch } = useQuery(['getNotifications', currentPage], () => httpService.get(`${URLS.GET_NOITIFICATIONS}`), {
     onSuccess: (data) => {
-      // console.log(data?.data?.meta);
       if (notitications.length > 0) {
         const arr = [...notitications, ...data?.data?.data];
         setNotifications(arr);
@@ -66,7 +65,6 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
 
    // functions
    const onEndReached = React.useCallback(async () => {
-    console.log(`currentPage = ${currentPage}, lastPage = ${lastPage}`);
     if (currentPage === lastPage) {
       return;
     } else {

@@ -22,7 +22,6 @@ const Polls = ({ id }: IProps) => {
             alert(error.message);
         },
         onSuccess: (data) => {
-            console.log(data.data);
             if (data.data.data) {
                 setPosts(data.data.data.data);
             } else {

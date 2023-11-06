@@ -113,6 +113,8 @@ const Login = () => {
      
      <Box width='100%' marginTop="m" alignItems="center">
       <CustomButton
+          color="#D0F1D9"
+          textColor="#34A853"
           title="Signup"
           onPress={() => setAll({ showLogin: false, showSignup: true })}
         />

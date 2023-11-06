@@ -38,7 +38,6 @@ const PageThree = ({next}: {
           allowsMultipleSelection: false,
         });
     
-        console.log(result);
     
         if (!result.canceled) {
          setAll({ self_with_id: result.assets[0] });

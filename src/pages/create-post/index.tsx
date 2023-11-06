@@ -101,7 +101,6 @@ const CreatePost = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post("/create_post", data),
     onSuccess: (data) => {
-      console.log(data.data);
       toast.show("Post created", { type: "success" });
       // clean up
       setFiles([]);
@@ -122,7 +121,7 @@ const CreatePost = ({
             description={value}
             setDescription={setValues}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
           />
         );
@@ -133,7 +132,7 @@ const CreatePost = ({
             description={question}
             setDescription={setQuestion}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
           />
         );
@@ -145,7 +144,7 @@ const CreatePost = ({
             setDescription={setPollQuestion}
             onDelete={handleMediaDelete}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             polls={polls}
             setPolls={editPoll}
             addPoll={addPoll}
@@ -249,7 +248,7 @@ const CreatePost = ({
   const handleDocumentPicker = React.useCallback(
     async (documentType: "All" | "Images" | "Videos" | null) => {
       if (files.length === 10) {
-        alert(`You can't add more than 5 files!`);
+        alert(`You can't add more than 10 files!`);
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -259,7 +258,6 @@ const CreatePost = ({
       });
 
       if (!result.canceled) {
-        console.log(result.assets[0]);
         const formData = new FormData();
         const name = result.assets[0].uri.split("/").pop();
         const mimeType = mime.getType(result.assets[0].uri);

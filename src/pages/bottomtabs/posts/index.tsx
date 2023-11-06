@@ -82,8 +82,6 @@ const Posts = () => {
       toast.show(error.message, { type: 'error'});
     },
     onSuccess: (data) => {
-      console.log(ids);
-      console.log(`current page -> ${currentPage}`);
     },
   });
 
