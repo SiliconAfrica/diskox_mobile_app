@@ -66,7 +66,6 @@ const ChatList = () => {
 
     const { isLoading } = useQuery(['getChatedUsers'], () => httpService.get(`${URLS.CHATTED_USER}`), {
         onSuccess: (data) => {
-            console.log(data.data.data);
             setChats(data.data.data.data);
         },
         onError: (error: any) => {
@@ -75,7 +74,6 @@ const ChatList = () => {
     });
 
     const goToPage = React.useCallback((user: ChatEntry) => {
-        console.log(user);
         navigation.navigate("chat", { userId: user.user_id, profile_image: user.profile_image, username: user.username, last_seen: '' });
 
     }, []);

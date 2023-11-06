@@ -58,7 +58,7 @@ const Username = () => {
     <Box flex={1} marginTop='xl'>
       <CustomText variant='subheader'>Hi there! Sign up and start diskoxing</CustomText>
 
-      <CustomTextInput name='username' placeholder='Enter your username' label='Username'  containerStyle={{ marginTop: 20 }}  />
+      <CustomTextInput name='username' placeholder='Enter your username' label='Username' removeSpecialCharater  containerStyle={{ marginTop: 20 }}  />
       <CustomTextInput name='email' placeholder='Enter your email address' label='Email'  containerStyle={{ marginTop: 20 }}  />
 
       <Box height={20} />

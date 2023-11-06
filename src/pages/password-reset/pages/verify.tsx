@@ -33,7 +33,6 @@ const Verify = () => {
             alert(error.message);
         },
         onSuccess: (data) => {
-            console.log(data.data);
             setAll({ stage: 2 });
         }
     });
@@ -48,7 +47,6 @@ const Verify = () => {
             alert(error.message);
         },
         onSuccess: (data) => {
-            console.log(data.data);
             setResending(true);
             setTimer(59);
            handleTimer();
@@ -58,7 +56,6 @@ const Verify = () => {
     const handleInputChange = React.useCallback((code: string) => {
         // if (code.length === 4) {
         //     // make api call
-        //     console.log(`this is the code ${code}`);
         //     mutate(code);
         // } else {
         //     setCode(code);

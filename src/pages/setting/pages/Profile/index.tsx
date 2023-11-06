@@ -86,8 +86,6 @@ const Profile = ({
       navigation.goBack();
     },
     onError: (error: any) => {
-      console.log(`this is the error`);
-      console.log(error);
       toast.show("An error occured", { type: "error" });
     },
   });

@@ -52,7 +52,6 @@ const Post = ({
         alert(error.message);
       },
       onSuccess: (data) => {
-        console.log(data.data.data);
         setPost(data.data.data);
       },
     }
@@ -76,7 +75,6 @@ const Post = ({
       alert(error.message);
     },
     onSuccess: (data) => {
-      console.log(data.data);
       if (data.data.message) {
         alert(data.data.message);
         setPost((prev) => ({ ...prev, has_voted_poll: 1 }));

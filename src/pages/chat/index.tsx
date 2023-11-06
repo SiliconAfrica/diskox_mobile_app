@@ -56,7 +56,6 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   // query
   const getMessages = useQuery(['getMessages', userId], () => httpService.get(`${URLS.GET_CHAT_MESSAGES}/${userId}`), {
     onSuccess: (data) => {
-      // console.log(data.data);
       setChats(data.data.data);
     },
   });
@@ -64,7 +63,6 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
 
   const getUser = useQuery(['getChatUser', userId], () => httpService.get(`${URLS.GET_USER_BY_USERNAME}/${username}`), {
     onSuccess: (data) => {
-      console.log(data.data);
     },
   });
 

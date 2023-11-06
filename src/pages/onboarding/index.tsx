@@ -50,7 +50,6 @@ const Onboarding = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: string) => httpService.post(`${URLS.GOOGLE_AUTH}/${data}`),
     onSuccess: (data) => {
-      console.log(data);
     },
     onError: (error: any) => {
       toast.show(error.message,{ type: 'error' })
@@ -60,7 +59,6 @@ const Onboarding = ({
   React.useEffect(() => {
     if (response?.type === 'success') {
       // Handle successful authentication
-      console.log(response.authentication.accessToken);
       mutate(response.authentication?.accessToken);
     }
   }, [response]);
@@ -122,7 +120,7 @@ const Onboarding = ({
             borderWidth: 1,
             borderColor: theme.colors.primaryColor,
             borderRadius: 50,
-            height: 45,
+            height: 52,
             width: "100%",
             justifyContent: "flex-start",
             alignItems: "center",
@@ -162,7 +160,7 @@ const Onboarding = ({
           style={{
             backgroundColor: theme.colors.primaryColor,
             borderRadius: 50,
-            height: 45,
+            height: 52,
             width: "100%",
             justifyContent: "center",
             alignItems: "center",

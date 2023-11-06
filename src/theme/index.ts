@@ -15,6 +15,8 @@ const COLOR_PALLET = {
   transparent: "#000000b9",
   yellowGreen: "#A8B60C",
   error: "#FA2019",
+  inputBorderColorLight: '#B8B8B8',
+  whiteText:'#FCFCFC'
 };
 
 const theme = createTheme({
@@ -70,7 +72,7 @@ export const darkTheme: Theme = {
     mainBackGroundColor: "rgb(21, 21, 21)",
     secondaryBackGroundColor: "rgb(33, 33, 33)",
     headerTextColor: COLOR_PALLET.white,
-    textColor: COLOR_PALLET.whitesmoke,
+    textColor: COLOR_PALLET.whiteText,
     black: "white",
     white: "black",
   },

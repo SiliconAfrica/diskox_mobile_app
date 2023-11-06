@@ -56,7 +56,6 @@ const Password = () => {
       }
       updateUser({ ...data.data.user, token: data.data.authorisation.token });
       await SecureStore.setItemAsync("token", data.data.authorisation.token);
-      console.log(data.data);
       setAll({ showSignup: false });
       navigation.navigate("verify-email");
     },
@@ -84,7 +83,6 @@ const Password = () => {
     mutate(obj);
   }, []);
 
-  console.log("addderrr", addAccount);
   return renderForm(
     <Box flex={1} marginTop="xl">
       <CustomText variant="subheader">
@@ -108,6 +106,7 @@ const Password = () => {
 
       <Box height={20} />
       <SubmitButton
+      width={'100%'}
         label="Continue"
         onSubmit={navigate}
         isLoading={isLoading}

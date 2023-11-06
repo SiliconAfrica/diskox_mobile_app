@@ -101,7 +101,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     {
       onError: () => {},
       onSuccess: (data) => {
-        console.log(data?.data);
       },
     }
   );
@@ -110,7 +109,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     mutationFn: () =>
       httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${userId}`),
     onSuccess: (data) => {
-      //console.log(toast);
       toast.show(data?.data?.message, { type: "success" });
     },
   });
@@ -119,7 +117,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.UPDATE_COVER_PHOTO}`, data),
     onSuccess: (data) => {
-      //console.log(toast);
       queryClient.invalidateQueries(["getDetails", userId]);
       toast.show(data?.data?.message, { type: "success" });
     },

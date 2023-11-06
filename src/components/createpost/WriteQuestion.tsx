@@ -23,7 +23,6 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
   const handleChange = (text: string) => {
     setDescription(text);
     const val = description.match(/#\w+/g);
-    console.log(val);
   }
 
   return (

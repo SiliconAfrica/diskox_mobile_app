@@ -56,7 +56,6 @@ const PollCard = (props: IPost& IProps) => {
     },
       onSuccess: (data) => {
         setPost(data.data.data);
-        console.log(data.data.data);
         
       }
     });

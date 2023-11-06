@@ -31,7 +31,6 @@ const PageTwo = ({next}: {
           allowsMultipleSelection: false,
         });
     
-        console.log(result);
     
         if (!result.canceled) {
          setAll({ government_id: result.assets[0] });

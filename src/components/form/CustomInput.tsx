@@ -16,6 +16,7 @@ interface IProps {
     containerStyle?: ViewStyle;
     label?: string;
     showLabel?: boolean;
+    removeSpecialCharater?: boolean;
 }
 
 export const CustomTextInput = (props: IProps & TextInputProps) => {
@@ -40,11 +41,16 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
         }}
         name={props.name}
         render={({ field: { onChange, value  }}) => {
+            const handleInputChange = (text: string) => {
+                // Remove special characters using a regular expression
+                const filteredText = text.replace(/[^\w\s]/gi, '');
+                onChange(filteredText);
+            };
             return (
-                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : 'lightgrey', }]}>
+                <Box style={[Style.parent, { borderColor: focused && !errors[props.name] ? theme.colors.primaryColor : errors[props.name] ? Colors.red10 : theme.colors.inputBorderColorLight, }]}>
                     <Box style={{ flex: 1, justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 10 }}>
                         {/* {focused && <Text variant='xs'>{props.placeholder || props.name}</Text>} */}
-                        <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={onChange} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular' }} />
+                        <TextInput {...props} placeholderTextColor={theme.colors.textColor} cursorColor={theme.colors.textColor}  placeholder={!focused ? props.placeholder || props.name: ''} value={value} onChangeText={ (e) => {props.removeSpecialCharater ? handleInputChange(e): onChange(e) }} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}  secureTextEntry={props.isPassword ? showPassword : false} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular' }} />
 
                        
                     </Box>

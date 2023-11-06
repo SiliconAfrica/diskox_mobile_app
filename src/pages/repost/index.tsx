@@ -32,7 +32,6 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
         alert(error.message);
       },
       onSuccess: (data) => {
-        console.log(data.data.data);
         setPost(data.data.data);
       }
     });

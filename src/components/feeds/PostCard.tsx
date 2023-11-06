@@ -27,6 +27,7 @@ import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 import { useToast } from "react-native-toast-notifications";
 import { useDetailsState } from "../../states/userState";
 import { colorizeHashtags } from "../../utils/colorizeText";
+import { Message, ArrowUp, ArrowUp2, ArrowUp3, Heart } from 'iconsax-react-native';
 
 const WIDTH = Dimensions.get("screen").width;
 
@@ -73,7 +74,6 @@ const PostCard = (props: IPost & IProps) => {
       onSuccess: (data) => {
         const p: IPost = data.data.data;
         setPost(data.data.data);
-        console.log(`Is following ------- ${p.user.isFollowing}`)
       },
     }
   );
@@ -114,7 +114,6 @@ const PostCard = (props: IPost & IProps) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      console.log(`The upvote : = ${post.has_upvoted}`);
       queryClient.invalidateQueries([`getPost${id}`]);
     },
   });
@@ -513,7 +512,7 @@ const PostCard = (props: IPost & IProps) => {
                 }}
                 onPress={() => handleReaction("love")}
               >
-                <Ionicons
+                {/* <Ionicons
                   name="heart-outline"
                   size={20}
                   color={
@@ -521,7 +520,12 @@ const PostCard = (props: IPost & IProps) => {
                       ? theme.colors.primaryColor
                       : theme.colors.textColor
                   }
-                />
+                /> */}
+                <Heart size={20}  color={
+                    post.has_reacted.length > 0
+                      ? theme.colors.primaryColor
+                      : theme.colors.textColor
+                  } />
                 <CustomText variant="body">{reactions_count}</CustomText>
               </Pressable>
 
@@ -533,11 +537,7 @@ const PostCard = (props: IPost & IProps) => {
                   marginHorizontal: 10,
                 }}
               >
-                <Ionicons
-                  name="chatbox-ellipses-outline"
-                  size={20}
-                  color={theme.colors.textColor}
-                />
+                  <Message size={20} color={theme.colors.textColor} />
                 <CustomText variant="body">{post.comments_count}</CustomText>
               </Pressable>
             </Box>

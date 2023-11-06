@@ -88,7 +88,6 @@ const CountryPicker = ({ onPicked }: { onPicked: (data: ICountry) => void}) => {
     renderPicker={() => <CustomPicker {...selected} />}
     value={val}
     placeholder={'Placeholder'}
-    onChange={(value) => console.log(value)}
     renderCustomModal={(props: any) => (
       <>
         { props.visible && <CustomModal {...props} handleSelect={handleSelect} />}
