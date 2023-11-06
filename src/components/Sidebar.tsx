@@ -59,6 +59,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
   const { switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const toast = useToast();
+
   return (
     <Box
       style={{
@@ -196,6 +197,34 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
     },
     [isDarkMode]
   );
+
+  const getFollowCount = useQuery(
+    ["getFollowerCount", userId],
+    () =>
+      httpService.get(
+        `${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${userId}`
+      ),
+    {
+      onError: () => {},
+      onSuccess: (data) => {},
+    }
+  );
+  const { isLoading: isLoadingRequirements } = useQuery(
+    ["verification_monetization_requirements"],
+    () =>
+      httpService.get(`${URLS.GET_VERIFICATION_AND_MONETIZATION_REQUIREMENT}`),
+    {
+      onError: () => {},
+      onSuccess: async (data) => {
+        if (
+          Number(getFollowCount.data?.data.followers_count) >=
+          Number(data?.data?.data?.monitization_followers)
+        ) {
+          setShowMonetization(true);
+        }
+      },
+    }
+  );
   return (
     <Box flex={1} backgroundColor="secondaryBackGroundColor" marginTop="xl">
       <View
@@ -287,25 +316,27 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                 title="Verify account"
                 action={() => navigation.navigate("verification")}
               />
-              <Item
-                icon={
-                  <Box
-                    borderWidth={1}
-                    paddingHorizontal="s"
-                    paddingVertical="s"
-                    borderRadius={5}
-                    style={{ borderColor: theme.colors.textColor }}
-                  >
-                    <FontAwesome
-                      name="dollar"
-                      size={10}
-                      color={theme.colors.textColor}
-                    />
-                  </Box>
-                }
-                title="Monetization"
-                action={() => setModal({ showMonetization: true })}
-              />
+              {showMonetization && (
+                <Item
+                  icon={
+                    <Box
+                      borderWidth={1}
+                      paddingHorizontal="s"
+                      paddingVertical="s"
+                      borderRadius={5}
+                      style={{ borderColor: theme.colors.textColor }}
+                    >
+                      <FontAwesome
+                        name="dollar"
+                        size={10}
+                        color={theme.colors.textColor}
+                      />
+                    </Box>
+                  }
+                  title="Monetization"
+                  action={() => setModal({ showMonetization: true })}
+                />
+              )}
             </>
           )}
         </Box>
