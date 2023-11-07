@@ -97,4 +97,5 @@ export const URLS = {
   DELETE_COMMENT: '/delete_comment',
   DELETE_POST: 'delete_post',
   GET_FOLLOWING: '/following_posts',
+  VERIFY_ACCOUNT: '/request_for_verification'
 };

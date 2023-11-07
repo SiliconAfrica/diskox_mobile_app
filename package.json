@@ -2,6 +2,9 @@
   "name": "diskos",
   "version": "1.0.0",
   "scripts": {
+    "start": "expo start ",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -28,6 +31,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "eas-cli": "^5.6.0",
+    "expo": "~48.0.21",
     "expo": "~48.0.21",
     "expo-auth-session": "~4.0.3",
     "expo-av": "~13.2.1",
