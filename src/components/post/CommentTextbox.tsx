@@ -66,7 +66,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
 
   const theme = useTheme<Theme>();
   const { isLoggedIn } = useUtilState((state) => state);
-  const { profile_image: profile_pic} = useDetailsState((state) => state)
+  const { profile_image: profile_pic } = useDetailsState((state) => state);
 
   //query
   const { isLoading } = useQuery(
@@ -143,12 +143,12 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
   });
 
   const handleReaction = () => {
-    const formData = new FormData()
-    formData.append('comment_id', comment.id.toString());
-    formData.append('type', 'like');
+    const formData = new FormData();
+    formData.append("comment_id", comment.id.toString());
+    formData.append("type", "like");
 
     reacttocomment.mutate(formData);
-  }
+  };
 
   const handleTextChange = React.useCallback((coment: string) => {
     // do regex to gext mentioned users
@@ -447,11 +447,15 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                 )}
                 {!upvote.isLoading && (
                   <>
-                     <Image
-                        source={comment.has_upvoted === 1 ? require("../../../assets/images/arrows/upfilled.png"):require("../../../assets/images/arrows/up.png")}
-                        contentFit="cover"
-                        style={{ width: 20, height: 20 }}
-                      />
+                    <Image
+                      source={
+                        comment.has_upvoted === 1
+                          ? require("../../../assets/images/arrows/upfilled.png")
+                          : require("../../../assets/images/arrows/up.png")
+                      }
+                      contentFit="cover"
+                      style={{ width: 20, height: 20 }}
+                    />
 
                     <CustomText variant="xs">
                       {comment?.upvotes_count} Upvote
@@ -513,7 +517,11 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             <Ionicons
               name="heart-outline"
               size={20}
-              color={comment.user?.has_reacted?.length > 0 ? theme.colors.primaryColor:theme.colors.textColor}
+              color={
+                comment.user?.has_reacted?.length > 0
+                  ? theme.colors.primaryColor
+                  : theme.colors.textColor
+              }
             />
             <CustomText variant="body">{comment.reactions_count}</CustomText>
           </Pressable>
@@ -580,12 +588,22 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
             position="relative"
             zIndex={5}
           >
-            { isLoggedIn && (
-            <Box width={32} height={32} borderRadius={17} overflow="hidden">
-              <Image source={{ uri: `${IMAGE_BASE}${profile_pic}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
-            </Box>
-        )}
-        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
+            {isLoggedIn && (
+              <Box width={32} height={32} borderRadius={17} overflow="hidden">
+                <Image
+                  source={{ uri: `${IMAGE_BASE}${profile_pic}` }}
+                  contentFit="cover"
+                  style={{ width: "100%", height: "100%", borderRadius: 17 }}
+                />
+              </Box>
+            )}
+            {!isLoggedIn && (
+              <Ionicons
+                name="person"
+                size={30}
+                color={theme.colors.textColor}
+              />
+            )}
 
             <Box
               flex={0.9}
@@ -825,12 +843,26 @@ const CommentTextbox = ({ postId }: { postId: number }) => {
         borderBottomWidth={1}
         borderBottomColor="secondaryBackGroundColor"
       >
-        { isLoggedIn && (
-            <Box width={32} height={32} borderRadius={17} overflow="hidden">
-              <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit="cover" style={{ width: '100%', height: '100%', borderRadius: 17}} />
-            </Box>
+        {isLoggedIn && (
+          <Box width={32} height={32} borderRadius={17} overflow="hidden">
+            {profile_image ? (
+              <Image
+                source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                contentFit="cover"
+                style={{ width: "100%", height: "100%", borderRadius: 17 }}
+              />
+            ) : (
+              <Ionicons
+                name="person"
+                size={30}
+                color={theme.colors.textColor}
+              />
+            )}
+          </Box>
         )}
-        { !isLoggedIn && <Ionicons name="person" size={30} color={theme.colors.textColor} />}
+        {!isLoggedIn && (
+          <Ionicons name="person" size={30} color={theme.colors.textColor} />
+        )}
 
         <Box
           flex={0.9}
