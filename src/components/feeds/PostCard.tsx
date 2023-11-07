@@ -139,7 +139,7 @@ const PostCard = (props: IPost & IProps) => {
   const handleShare = React.useCallback(() => {
     const check = checkloggedInState();
     if (check) {
-      setAll({ postId: id, showShare: true });
+      setAll({ postId: id, showShare: true, activePost: post });
     }
   }, [id]);
 
@@ -147,6 +147,13 @@ const PostCard = (props: IPost & IProps) => {
     const check = checkloggedInState();
     if (check) {
       upvote.mutate();
+    }
+  };
+
+  const handleNavigate = () => {
+    const check = checkloggedInState();
+    if (check) {
+      navigation.navigate("profile", { userId })
     }
   };
 
@@ -195,7 +202,7 @@ const PostCard = (props: IPost & IProps) => {
           <Box flexDirection="row" alignItems="center">
 
             <Pressable
-              onPress={() => navigation.navigate("profile", { userId })}
+              onPress={handleNavigate}
               style={{
                 width: 32,
                 height: 32,

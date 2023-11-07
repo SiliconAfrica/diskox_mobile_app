@@ -24,6 +24,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const redirectUri = AuthSession.makeRedirectUri();
 
+
 const Onboarding = ({
   route,
 }: NativeStackScreenProps<RootStackParamList, "onboarding">) => {

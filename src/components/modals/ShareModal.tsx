@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, Share } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import ModalWrapper from '../ModalWrapper'
 import Login from '../../pages/login'
@@ -12,6 +12,7 @@ import { Theme } from '../../theme'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../navigation/MainNavigation'
+
 
 const ShareChip = ({
     icon,
@@ -31,7 +32,7 @@ const ShareChip = ({
 }
 
 const ShareModal = () => {
-    const [setAll, postId] = useModalState((state) => [state.setAll, state.postId]);
+    const [setAll, postId, activePost] = useModalState((state) => [state.setAll, state.postId, state.activePost]);
     const ref = useRef<BottomSheetModal>();
     const theme = useTheme<Theme>();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'post'>>();
@@ -67,6 +68,30 @@ const ShareModal = () => {
         }
     }, []);
 
+    const handleShare = async () => {
+        try {
+          const result = await Share.share({
+            message: `Checkout this post by ${activePost.user.username} on Diskox https://test404.diskox.com/post/${activePost.slug}`,
+            url: `https://test404.diskox.com/posts/${activePost.slug}`,
+          });
+      
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // Shared with specific activity type
+              console.log(`Shared with ${result.activityType}`);
+            } else {
+              // Shared
+              console.log('Shared');
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // Dismissed
+            console.log('Dismissed');
+          }
+        } catch (error) {
+          console.error(error.message);
+        }
+      };
+
     const handleRepost = () => {
         navigation.navigate('repost', { id: postId })
         setAll({ showShare: false, postId: 0 });
@@ -77,7 +102,7 @@ const ShareModal = () => {
     }, [])
   return (
     <ModalWrapper
-        onClose={() => setAll({ showShare: false, postId: 0 })}
+        onClose={() => setAll({ showShare: false, postId: 0, activePost: null })}
         shouldScrroll
         snapPoints={['50%']}
         ref={ref}
@@ -91,7 +116,7 @@ const ShareModal = () => {
             />
         </Box>
         {medias.map((item, i) => (
-            <ShareChip key={i} icon={<Ionicons name={name(item).name as any} size={25} color={name(item).color} />} label={item} action={() => {}} />
+            <ShareChip key={i} icon={<Ionicons name={name(item).name as any} size={25} color={name(item).color} />} label={item} action={handleShare} />
         ))}
     </ModalWrapper>
   )

@@ -6,7 +6,8 @@ export interface IType {
     government_id: ImagePickerAsset | null;
     self_with_id: ImagePickerAsset | null;
     video: string;
-    setAll: (data: Partial<IType>) => void
+    setAll: (data: Partial<IType>) => void,
+    clearAll: () => void,
 }
 
 export const useVerificationState = create<IType>((set) => ({
@@ -14,5 +15,6 @@ export const useVerificationState = create<IType>((set) => ({
     government_id: null,
     self_with_id: null,
     video: '',
-    setAll: (data) => set((state) => ({ ...state, ...data}))
+    setAll: (data) => set((state) => ({ ...state, ...data})),
+    clearAll: () => set(() => ({ category: '', government_id: null, self_with_id: null, video: '' }))
 }));

@@ -1,11 +1,10 @@
 {
   "name": "diskos",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start ",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "tsc": "tsc"
   },
@@ -27,7 +26,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "eas-cli": "^5.6.0",
-    "expo": "~48.0.18",
+    "expo": "~48.0.21",
     "expo-auth-session": "~4.0.3",
     "expo-av": "~13.2.1",
     "expo-camera": "~13.2.1",
@@ -58,7 +57,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.1",
-    "react-native": "0.71.13",
+    "react-native": "0.71.14",
     "react-native-emoji-modal": "^0.2.4",
     "react-native-emoji-selector": "^0.2.0",
     "react-native-flags": "^1.0.0",

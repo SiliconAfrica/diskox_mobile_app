@@ -109,15 +109,17 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
           marginBottom="m"
           position="relative"
         >
-          <CustomTextInput name="name" required placeholder="Community title" />
+          <CustomTextInput name="name" removeSpecialCharater required placeholder="Community title" />
           <Box height={20} />
           <CustomTextInput
+          removeSpecialCharater
             name="username"
             required
             placeholder="Community Username"
           />
           <Box height={20} />
           <CustomTextarea
+            removeSpecialCharater
             name="description"
             required
             placeholder="Description"
