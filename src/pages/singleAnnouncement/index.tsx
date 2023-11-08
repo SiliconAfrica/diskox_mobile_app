@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -16,7 +16,7 @@ export default function SingleAnnouncement({ route }) {
   const navigation = useNavigation<PageType>();
   const slug = route.params.announcementId;
   const [announcement, setAnnouncement] = useState<IAnnouncement>();
-  const { isLoading, refetch } = useQuery(
+  const { isLoading, isFetching, refetch } = useQuery(
     [`announcement_${slug}`],
     () => httpService.get(`${URLS.FETCH_SINGLE_ANOUNCEMENT}${slug}`),
     {
@@ -37,6 +37,9 @@ export default function SingleAnnouncement({ route }) {
         title="Announcement"
         handleArrowPressed={() => navigation.goBack()}
       />
+      {(isLoading || isFetching) && (
+        <ActivityIndicator size="large" style={{ marginVertical: 20 }} />
+      )}
       <ScrollView>
         <Box px="s" py="m">
           <CustomText variant="xs">

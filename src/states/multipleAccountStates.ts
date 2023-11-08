@@ -12,7 +12,8 @@ interface IMultipleAccount {
   switchAccount: (
     username: any,
     token: string,
-    updateFn: (data: Partial<IUserState>) => void
+    updateFn: (data: Partial<IUserState>) => void,
+    queryClient: any
   ) => void;
   refreshAccounts: (userData: IUserState) => void;
   removeAccount: (username: any) => void;
@@ -42,7 +43,7 @@ export const useMultipleAccounts = create<IMultipleAccount>((set) => ({
       };
     }),
 
-  switchAccount: (username, token, updateFn) =>
+  switchAccount: (username, token, updateFn, queryClient) =>
     set((state) => {
       const accountToUse = state.accounts.filter((account) => {
         return account.username === username;
@@ -64,7 +65,7 @@ export const useMultipleAccounts = create<IMultipleAccount>((set) => ({
         );
       };
       updateStore();
-
+      queryClient.refetchQueries();
       const newAccountsArr = [accountToUse[0], ...otherAccounts];
 
       return { ...state, accounts: newAccountsArr };

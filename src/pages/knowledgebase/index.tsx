@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -12,9 +12,11 @@ import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useEffect, useState } from "react";
 import { TKnowledge } from "../../types/MenuPageTypes";
+import useToast from "../../hooks/useToast";
 
 export default function KnowledgeBase() {
   const navigation = useNavigation<PageType>();
+  const toast = useToast();
   const [knowledgebase, setKnowledgebase] = useState<TKnowledge[]>([]);
   const [fetchMore, setFetchMore] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -35,7 +37,10 @@ export default function KnowledgeBase() {
       },
 
       onError: (error: any) => {
-        alert(error.message);
+        // alert(error.message);
+        toast.show("No more records", {
+          type: "info",
+        });
       },
     }
   );
@@ -46,7 +51,6 @@ export default function KnowledgeBase() {
   }, [page]);
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
-
       <SettingsHeader
         showSave={false}
         title="Knowledge Base"
@@ -63,14 +67,12 @@ export default function KnowledgeBase() {
                 transition={1000}
               />
             </Box>
-            <CustomText variant="subheader" textAlign="center" py="s" mt='l'>
+            <CustomText variant="subheader" textAlign="center" py="s" mt="l">
               Diskox Knowledge Base
             </CustomText>
           </>
         )}
-
         contentContainerStyle={{ paddingHorizontal: 0 }}
-
         keyExtractor={(item, index) => item.id.toString()}
         estimatedItemSize={100}
         data={knowledgebase}
@@ -83,11 +85,20 @@ export default function KnowledgeBase() {
         onEndReached={() => {
           setPage((prev) => (prev += 1));
         }}
-        ListEmptyComponent={() => (
-          <CustomText textAlign="center" style={{ paddingVertical: 100 }}>
-            We will let you know when something amazing comes up.
-          </CustomText>
-        )}
+        ListEmptyComponent={
+          !isLoading &&
+          !isFetching &&
+          !isRefetching && (
+            <CustomText textAlign="center" style={{ paddingVertical: 100 }}>
+              We will let you know when something amazing comes up.
+            </CustomText>
+          )
+        }
+        ListFooterComponent={
+          (isLoading || isFetching || isRefetching) && (
+            <ActivityIndicator size="large" style={{ marginTop: 10 }} />
+          )
+        }
         renderItem={({ item }) => <KnowledgeTab knowledge={item} />}
       />
     </Box>

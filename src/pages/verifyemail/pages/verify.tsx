@@ -8,7 +8,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../theme";
 import NormalButton from "../../../components/general/NormalButton";
 import { useVerifyState } from "../state";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../../utils/httpService";
 import { URLS } from "../../../services/urls";
 import { useSignupState } from "../../signup/state";
@@ -22,6 +22,7 @@ import { useMultipleAccounts } from "../../../states/multipleAccountStates";
 const Verify = () => {
   const [code, setCode] = React.useState("");
   const ref = React.useRef();
+  const queryClient = useQueryClient();
   const theme = useTheme<Theme>();
   const [setAll] = useVerifyState((state) => [state.setAll]);
   const { addAccount } = useModalState();
@@ -51,7 +52,7 @@ const Verify = () => {
     onSuccess: async (data) => {
       if (addAccount) {
         addAccountFn(oldUser, { ...user, token: undefined }); //this adds old user account to accounts arr
-        switchAccount(username, state.token, updateDetails);
+        switchAccount(username, state.token, updateDetails, queryClient);
         //save old user token we are switching from to the local using their username
         const oldToken = await SecureStorage.getItemAsync("token");
         await SecureStorage.setItemAsync(

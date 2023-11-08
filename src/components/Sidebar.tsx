@@ -19,11 +19,13 @@ import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
-import { BASE_URL, IMAGE_BASE } from "../utils/httpService";
+import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useModalState } from "../states/modalState";
+import { useQuery, useQueryClient } from "react-query";
+import { URLS } from "../services/urls";
 
 const Item = ({
   icon,
@@ -55,6 +57,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
   const { switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const toast = useToast();
+  const queryClient = useQueryClient();
+
   return (
     <Box
       style={{
@@ -105,7 +109,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                             switchAccount(
                               user.username,
                               switchToken,
-                              updateDetails
+                              updateDetails,
+                              queryClient
                             );
                             toast.show(`Logged in as "@${user.username}"`, {
                               type: "success",
@@ -172,6 +177,8 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   ]);
   const { accounts } = useMultipleAccounts((state) => state);
   const { setAll: setModal } = useModalState((state) => state);
+  const { id: userId } = useDetailsState((state) => state);
+  const [showMonetization, setShowMonetization] = React.useState(false);
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -182,6 +189,34 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       );
     },
     [isDarkMode]
+  );
+
+  const getFollowCount = useQuery(
+    ["getFollowerCount", userId],
+    () =>
+      httpService.get(
+        `${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${userId}`
+      ),
+    {
+      onError: () => {},
+      onSuccess: (data) => {},
+    }
+  );
+  const { isLoading: isLoadingRequirements } = useQuery(
+    ["verification_monetization_requirements"],
+    () =>
+      httpService.get(`${URLS.GET_VERIFICATION_AND_MONETIZATION_REQUIREMENT}`),
+    {
+      onError: () => {},
+      onSuccess: async (data) => {
+        if (
+          Number(getFollowCount.data?.data.followers_count) >=
+          Number(data?.data?.data?.monitization_followers)
+        ) {
+          setShowMonetization(true);
+        }
+      },
+    }
   );
   return (
     <Box flex={1} backgroundColor="secondaryBackGroundColor" marginTop="xl">
@@ -274,25 +309,27 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                 title="Verify account"
                 action={() => navigation.navigate("verification")}
               />
-              <Item
-                icon={
-                  <Box
-                    borderWidth={1}
-                    paddingHorizontal="s"
-                    paddingVertical="s"
-                    borderRadius={5}
-                    style={{ borderColor: theme.colors.textColor }}
-                  >
-                    <FontAwesome
-                      name="dollar"
-                      size={10}
-                      color={theme.colors.textColor}
-                    />
-                  </Box>
-                }
-                title="Monetization"
-                action={() => setModal({ showMonetization: true })}
-              />
+              {showMonetization && (
+                <Item
+                  icon={
+                    <Box
+                      borderWidth={1}
+                      paddingHorizontal="s"
+                      paddingVertical="s"
+                      borderRadius={5}
+                      style={{ borderColor: theme.colors.textColor }}
+                    >
+                      <FontAwesome
+                        name="dollar"
+                        size={10}
+                        color={theme.colors.textColor}
+                      />
+                    </Box>
+                  }
+                  title="Monetization"
+                  action={() => setModal({ showMonetization: true })}
+                />
+              )}
             </>
           )}
         </Box>
