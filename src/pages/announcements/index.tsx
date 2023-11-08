@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -12,9 +12,11 @@ import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
 import { URLS } from "../../services/urls";
 import { IAnnouncement } from "../../types/MenuPageTypes";
+import useToast from "../../hooks/useToast";
 
 export default function Announcements() {
   const navigation = useNavigation<PageType>();
+  const toast = useToast();
   const [announcements, setAnnouncements] = useState<IAnnouncement[]>();
   const [page, setPage] = useState<number>(1);
   const [fetchMore, setFetchMore] = useState<boolean>(false);
@@ -33,7 +35,10 @@ export default function Announcements() {
         }
       },
       onError: (error: any) => {
-        alert(error.message);
+        // alert(error.message);
+        toast.show("No more records", {
+          type: "info",
+        });
       },
     }
   );
@@ -44,9 +49,7 @@ export default function Announcements() {
     }
   }, [page]);
   return (
-
     <Box backgroundColor="mainBackGroundColor" flex={1}>
-
       <SettingsHeader
         showSave={false}
         title="Announcement"
@@ -55,7 +58,10 @@ export default function Announcements() {
       <FlashList
         ListHeaderComponent={() => (
           <>
-            <Box backgroundColor="mainBackGroundColor" style={{ width: "100%", height: 200 }}>
+            <Box
+              backgroundColor="mainBackGroundColor"
+              style={{ width: "100%", height: 200 }}
+            >
               <Image
                 source={require("../../../assets/images/announcementBanner.png")}
                 style={styles.banner}
@@ -63,15 +69,12 @@ export default function Announcements() {
                 transition={1000}
               />
             </Box>
-            <CustomText variant="subheader" textAlign="center" py="s" mt='l'>
-
+            <CustomText variant="subheader" textAlign="center" py="s" mt="l">
               Announcement
             </CustomText>
           </>
         )}
-
-        contentContainerStyle={{  }}
-
+        contentContainerStyle={{}}
         keyExtractor={(item, index) => index.toString()}
         estimatedItemSize={100}
         data={announcements}
@@ -84,11 +87,20 @@ export default function Announcements() {
         onEndReached={() => {
           setPage((prev) => (prev += 1));
         }}
-        ListEmptyComponent={() => (
-          <CustomText textAlign="center" style={{ paddingVertical: 100 }}>
-            We will let you know when something amazing comes up.
-          </CustomText>
-        )}
+        ListEmptyComponent={
+          !isLoading &&
+          !isFetching &&
+          !isRefetching && (
+            <CustomText textAlign="center" style={{ paddingVertical: 100 }}>
+              We will let you know when something amazing comes up.
+            </CustomText>
+          )
+        }
+        ListFooterComponent={
+          (isLoading || isFetching || isRefetching) && (
+            <ActivityIndicator size="large" style={{ marginTop: 10 }} />
+          )
+        }
         renderItem={({ item }) => <AnnouncementTab announcement={item} />}
       />
     </Box>
