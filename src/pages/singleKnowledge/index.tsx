@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
@@ -16,7 +16,7 @@ export default function SingleKnowledge({ route }) {
   const navigation = useNavigation<PageType>();
   const slug = route.params.knowledgeId;
   const [knowledge, setKnowledge] = useState<Partial<TKnowledge>>({});
-  const { isLoading, refetch } = useQuery(
+  const { isLoading, isFetching, refetch } = useQuery(
     [`knowledge_${slug}`],
     () => httpService.get(`${URLS.FETCH_SINGLE_KNOWLEDGE_BASE}${slug}`),
     {
@@ -38,6 +38,9 @@ export default function SingleKnowledge({ route }) {
         title="Knowledge Base"
         handleArrowPressed={() => navigation.goBack()}
       />
+      {(isLoading || isFetching) && (
+        <ActivityIndicator size="large" style={{ marginVertical: 20 }} />
+      )}
       <ScrollView>
         <Box px="s" py="m">
           <CustomText variant="xs">
