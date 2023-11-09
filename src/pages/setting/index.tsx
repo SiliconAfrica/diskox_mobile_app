@@ -210,18 +210,6 @@ const Setting = ({
           title="Security"
           action={() => nav("security")}
         />
-        <NavItem
-          forDarkModa={false}
-          icon={
-            <FontAwesome
-              name="money"
-              size={25}
-              color={theme.colors.textColor}
-            />
-          }
-          title="Refer & Earn"
-          action={() => nav("referrals")}
-        />
 
         <NavItem
           forDarkModa={false}

@@ -377,6 +377,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
         <Box paddingHorizontal="m">
           <Item
             icon={
+              <FontAwesome
+                name="user-circle-o"
+                size={24}
+                color={theme.colors.textColor}
+              />
+            }
+            action={() => navigation.navigate("referrals")}
+            title="Refer & Earn"
+          />
+          <Item
+            icon={
               <MaterialCommunityIcons
                 name="bullhorn"
                 size={24}
