@@ -10,6 +10,7 @@ import EarningsBox from "./EarningsBox";
 import TotalReferrals from "./totalReferrals";
 import ReferralList from "./ReferralList";
 import { ScrollView } from "react-native";
+import TotalWithdrawals from "./totalWithdrawals";
 
 export default function Referrals() {
   const navigation = useNavigation<PageType>();
@@ -24,6 +25,7 @@ export default function Referrals() {
         />
         <EarningsBox />
         <TotalReferrals />
+        <TotalWithdrawals />
         <ReferralList />
       </ScrollView>
     </Box>
