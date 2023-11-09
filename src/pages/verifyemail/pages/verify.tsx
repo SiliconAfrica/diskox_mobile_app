@@ -18,12 +18,14 @@ import {
 } from "../../../states/userState";
 import { useModalState } from "../../../states/modalState";
 import { useMultipleAccounts } from "../../../states/multipleAccountStates";
+import useToast from "../../../hooks/useToast";
 
 const Verify = () => {
   const [code, setCode] = React.useState("");
   const ref = React.useRef();
   const queryClient = useQueryClient();
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const [setAll] = useVerifyState((state) => [state.setAll]);
   const { addAccount } = useModalState();
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
@@ -47,7 +49,8 @@ const Verify = () => {
         }
       ),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger" });
     },
     onSuccess: async (data) => {
       if (addAccount) {
@@ -81,7 +84,8 @@ const Verify = () => {
         }
       ),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger" });
     },
     onSuccess: (data) => {
       setResending(true);
@@ -181,7 +185,7 @@ const Verify = () => {
               mr="m"
               onPress={handleResend}
             >
-              Resending Code
+              Resend Code
             </CustomText>
             {resendCode.isLoading && (
               <ActivityIndicator color={theme.colors.textColor} size="small" />
