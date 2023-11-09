@@ -21,6 +21,7 @@ import {
 } from "../../../states/userState";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
+import useToast from "../../../hooks/useToast";
 
 type RegisterPayload = {
   email: string;
@@ -31,6 +32,7 @@ type RegisterPayload = {
 
 const Password = () => {
   const navigation = useNavigation<any>();
+  const toast = useToast();
   const [setAll] = useModalState((state) => [state.setAll]);
   const { addAccount } = useModalState();
   const {
@@ -48,7 +50,8 @@ const Password = () => {
     mutationFn: (data: RegisterPayload) =>
       httpService.post(`/auth/register`, data),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger", placement: "top" });
     },
     onSuccess: async (data) => {
       if (addAccount) {
@@ -106,7 +109,7 @@ const Password = () => {
 
       <Box height={20} />
       <SubmitButton
-      width={'100%'}
+        width={"100%"}
         label="Continue"
         onSubmit={navigate}
         isLoading={isLoading}

@@ -9630,6 +9630,13 @@ react-native-codegen@^0.71.6:
     jscodeshift "^0.14.0"
     nullthrows "^1.1.1"
 
+react-native-element-dropdown@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-element-dropdown/-/react-native-element-dropdown-2.10.0.tgz#f4ec2310b37ff3ba64927286ab775c0ed28b681e"
+  integrity sha512-aFjw0JbUIKGkqklHxDm8aDCZW6Q1GICP7pIHc0sllvpWpEamItzOwAMV4G1mBIKxED77Mp+nkq9p0Dhsr/faVw==
+  dependencies:
+    lodash "^4.17.21"
+
 react-native-emoji-modal@^0.2.4:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/react-native-emoji-modal/-/react-native-emoji-modal-0.2.4.tgz#3fdaac43f7bbd3117ac95b0ecb7544e9c745f14d"

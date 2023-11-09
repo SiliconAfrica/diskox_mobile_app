@@ -16,6 +16,7 @@ import CustomPicker from "../../components/form/CustomPicker";
 import GenderPicker from "../../components/form/GenderPicker";
 import { ICountry } from "../../models/country";
 import States from "../../utils/states.json";
+import Countries from "../../utils/countries.json";
 import { IState } from "../../models/state";
 import DateTimePicker, {
   DateTimePickerEvent,
@@ -29,6 +30,8 @@ import { useUtilState } from "../../states/util";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import PopupModal from "./PopupModal";
+import CustomDropdown from "../../components/form/CustomDropdown";
+import useToast from "../../hooks/useToast";
 
 const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
   const [selected, setSelected] = React.useState<ICountry>({
@@ -42,6 +45,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     flag_emoji: "",
   });
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const image = useImage({ width: 70, height: 70 });
   const [date, setDate] = React.useState("");
   const [showDate, setShowDate] = React.useState(false);
@@ -54,7 +58,8 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     mutationFn: (data: any) =>
       httpService.post(`${URLS.UPDATE_COUNTRY_SATE}`, data),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger", placement: "top" });
     },
     onSuccess: (data: any) => {
       setShowModal(true);
@@ -62,14 +67,22 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     },
   });
 
-  const handleSelect = (item: ICountry) => {
+  // const handleSelect = (item: ICountry) => {
+  //   setSelected(item);
+  // };
+  const handleSelect = (item) => {
     setSelected(item);
   };
 
+  // const renderStates = React.useCallback(() => {
+  //   return (States as IState[])
+  //     .filter((item) => item.country_id === selected.id)
+  //     .map((item) => item.name);
+  // }, [selected.id]);
   const renderStates = React.useCallback(() => {
     return (States as IState[])
       .filter((item) => item.country_id === selected.id)
-      .map((item) => item.name);
+      .map((item) => ({ label: item.name }));
   }, [selected.id]);
 
   const handleDateChange = (event: DateTimePickerEvent, selectedDate: Date) => {
@@ -80,7 +93,11 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
 
   const handleSubmit = React.useCallback(() => {
     if (state === "" || date === "" || gender === "") {
-      alert("Please fill out the form");
+      // alert("Please fill out the form");
+      toast.show("Please fill out the form", {
+        type: "danger",
+        placement: "top",
+      });
       return;
     }
     const obj = {
@@ -111,13 +128,29 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
         </Box>
         <CustomText variant="subheader">Where are you from?</CustomText>
 
-        <CountryPicker onPicked={handleSelect} />
+        {/* <CountryPicker onPicked={handleSelect} /> */}
+        <CustomDropdown
+          label="Country"
+          options={Countries}
+          labelField="name"
+          valueField="name"
+          placeholder="Nigeria"
+          onChange={handleSelect}
+          search
+        />
+        <CustomDropdown
+          label="State"
+          options={renderStates()}
+          labelField="label"
+          onChange={(data) => setState(data.label)}
+          search
+        />
 
-        <CustomPicker
+        {/* <CustomPicker
           onPicked={(data) => setState(data)}
           data={renderStates()}
           label="State"
-        />
+        /> */}
 
         <GenderPicker onChange={(gen: string) => setGender(gen)} />
 
@@ -166,7 +199,11 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       </Box>
 
       <Box flex={0.2}>
-        <NormalButton label="Next" action={handleSubmit} isLoading={isLoading} />
+        <NormalButton
+          label="Next"
+          action={handleSubmit}
+          isLoading={isLoading}
+        />
       </Box>
     </Box>
   );
