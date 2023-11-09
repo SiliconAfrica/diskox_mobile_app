@@ -60,7 +60,7 @@ export default function EarningsBox() {
 
   return (
     <Box backgroundColor="primaryColor" mx="s" borderRadius={10} py="m" px="m">
-      <CustomText variant="body" color="whitesmoke">
+      <CustomText variant="body" fontFamily="RedBold" color="whitesmoke">
         Total Earnings
       </CustomText>
       <Box width="100%" flexDirection="row" alignItems="center">
@@ -90,6 +90,19 @@ export default function EarningsBox() {
           backgroundColor="white"
           height={"100%"}
         ></Box>
+      </Box>
+      <CustomText
+        variant="body"
+        fontFamily="RedBold"
+        color="whitesmoke"
+        marginTop="m"
+      >
+        Available Balance
+      </CustomText>
+      <Box width="100%" flexDirection="row" alignItems="center">
+        <CustomText variant="header" color="whitesmoke">
+          &#8358; {refPoints?.balance?.toLocaleString()}
+        </CustomText>
       </Box>
       <CustomText color="whitesmoke" mt="l" variant="body">
         Referral link
