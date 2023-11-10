@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 // import CountrySelectDropdown from "react-native-searchable-country-dropdown"
 import Box from "../../components/general/Box";
 import CustomText from "../../components/general/CustomText";
@@ -52,6 +52,19 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
   const { isDarkMode, setAll } = useUtilState((state) => state);
   const [gender, setGender] = React.useState("male");
   const [state, setState] = React.useState("");
+  const [years, setYears] = React.useState<{ value: string }[]>([]);
+  const [months, setMonths] = React.useState<
+    { label: String; value: string }[]
+  >([]);
+  const [days, setDays] = React.useState<{ value: string }[]>([]);
+  const [selectedDate, setSelectedDate] = React.useState({
+    year:
+      years.length > 0
+        ? years[years.length - 1].value
+        : Number(new Date().getFullYear()) - 13,
+    month: months.length > 0 ? months[0].value : 0,
+    day: 1,
+  });
   const [showModal, setShowModal] = React.useState(false);
 
   const { isLoading, mutate } = useMutation({
@@ -107,8 +120,84 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       gender: gender,
     };
     mutate(obj);
-  }, [date, gender, selected, state]);
+  }, [date, selectedDate, gender, selected, state]);
 
+  const handleSelectDate = (type: "year" | "month" | "day", value) => {
+    if (type === "year") {
+      setSelectedDate({ ...selectedDate, year: value });
+    } else if (type === "month") {
+      setSelectedDate({ ...selectedDate, month: value });
+    } else if (type === "day") {
+      setSelectedDate({ ...selectedDate, day: value });
+    }
+  };
+
+  const getYears = () => {
+    const currentYear = new Date().getFullYear();
+    const eligibleYearStart = Number(currentYear) - 13;
+    const eligibleYearEnd = Number(currentYear) - 110;
+    let theYears = [];
+    for (let i = eligibleYearStart; i > eligibleYearEnd; i--) {
+      theYears = [...theYears, { value: i }];
+    }
+    setYears([...theYears]);
+  };
+
+  const getMonths = () => {
+    const month = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    let theMonths = [];
+    for (let i = 0; i < 12; i++) {
+      theMonths = [...theMonths, { label: month[i], value: i }];
+    }
+    setMonths([...theMonths]);
+  };
+  const getDays = () => {
+    let theDays = [];
+    for (let i = 1; i < 32; i++) {
+      if (selectedDate.month === 1 && i === 30) {
+        break;
+      } else if (
+        (selectedDate.month === 3 ||
+          selectedDate.month === 5 ||
+          selectedDate.month === 8 ||
+          selectedDate.month === 10) &&
+        i === 31
+      ) {
+        break;
+      }
+      theDays = [...theDays, { value: i }];
+    }
+    setDays([...theDays]);
+  };
+  useEffect(() => {
+    getYears();
+    getMonths();
+    getDays();
+  }, []);
+  useEffect(() => {
+    const yyyy = Number(selectedDate.year);
+    const mm = Number(selectedDate.month);
+    const dd = Number(selectedDate.day);
+
+    const theDate = new Date(yyyy, mm, dd);
+    setDate(theDate.toDateString());
+  }, [selectedDate]);
+  useEffect(() => {
+    getDays();
+  }, [selectedDate.month]);
   return (
     <Box
       backgroundColor="mainBackGroundColor"
@@ -142,6 +231,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
           label="State"
           options={renderStates()}
           labelField="label"
+          valueField="label"
           onChange={(data) => setState(data.label)}
           search
         />
@@ -158,7 +248,33 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
           Date of birth
         </CustomText>
 
-        <Box
+        <Box flexDirection="row" justifyContent="space-between">
+          <CustomDropdown
+            boxStyle={{ width: "30%" }}
+            options={years}
+            labelField="value"
+            valueField="value"
+            placeholder={years.length > 0 ? years[0].value : ""}
+            onChange={(value) => handleSelectDate("year", value.value)}
+          />
+          <CustomDropdown
+            boxStyle={{ width: "35%" }}
+            options={months}
+            labelField="label"
+            valueField="value"
+            placeholder={months.length > 0 && months[0].label.toString()}
+            onChange={(value) => handleSelectDate("month", value.value)}
+          />
+          <CustomDropdown
+            boxStyle={{ width: "30%" }}
+            options={days}
+            labelField="value"
+            valueField="value"
+            placeholder={days.length > 0 && days[0].value}
+            onChange={(value) => handleSelectDate("day", value.value)}
+          />
+        </Box>
+        {/* <Box
           width="100%"
           height={50}
           borderRadius={10}
@@ -195,7 +311,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
             value={new Date()}
             themeVariant={isDarkMode ? "dark" : "light"}
           />
-        )}
+        )} */}
       </Box>
 
       <Box flex={0.2}>

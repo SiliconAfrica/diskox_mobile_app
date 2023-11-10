@@ -1,12 +1,6 @@
 import { Dropdown } from "react-native-element-dropdown";
 import Box from "../general/Box";
-import {
-  StyleProp,
-  StyleSheetProperties,
-  View,
-  Text,
-  ViewStyle,
-} from "react-native";
+import { StyleProp, ViewStyle } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
@@ -14,23 +8,25 @@ import { StyleSheet } from "react-native";
 import CustomText from "../general/CustomText";
 
 interface IDropdown {
-  label: string | undefined;
-  placeholder: string | undefined;
+  label?: string;
+  placeholder?: string;
   options: any[];
   onChange: any;
-  labelField: string | undefined;
-  valueField: string | undefined;
-  style: StyleProp<ViewStyle> | undefined;
-  selectedTextStyle: StyleProp<ViewStyle> | undefined;
-  placeholderStyle: StyleProp<ViewStyle> | undefined;
-  value: any | undefined;
-  search: boolean;
+  labelField?: string;
+  valueField?: string;
+  style?: StyleProp<ViewStyle>;
+  boxStyle?: StyleProp<ViewStyle>;
+  selectedTextStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<ViewStyle>;
+  value?: any;
+  search?: boolean;
 }
 
 export default function CustomDropdown({
   value,
   label,
   style,
+  boxStyle,
   selectedTextStyle,
   placeholderStyle,
   placeholder = "Select",
@@ -51,7 +47,7 @@ export default function CustomDropdown({
   };
 
   return (
-    <Box marginTop="s">
+    <Box marginTop="s" style={boxStyle}>
       <CustomText variant="body">{label}</CustomText>
       <Box
         width="100%"

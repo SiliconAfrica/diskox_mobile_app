@@ -115,7 +115,10 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Screen name="referrals" component={Referrals} />
         <RootStackNavigation.Screen name="settings" component={setting} />
         <RootStackNavigation.Screen name="security" component={Security} />
-        <RootStackNavigation.Screen name="verification" component={VerifyAccount} />
+        <RootStackNavigation.Screen
+          name="verification"
+          component={VerifyAccount}
+        />
         <RootStackNavigation.Screen
           name="notifications"
           component={notifications}
@@ -134,10 +137,7 @@ const MainNavigation = (): JSX.Element => {
           name="community-settings"
           component={CommunitySettings}
         />
-        <RootStackNavigation.Screen
-          name="categories"
-          component={Interests}
-        />
+        <RootStackNavigation.Screen name="categories" component={Interests} />
       </RootStackNavigation.Group>
 
       {/* UNAUTHENTICATED FLOW */}
