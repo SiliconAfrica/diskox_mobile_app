@@ -70,11 +70,15 @@ export type RootStackParamList = {
   "notifications-settings": undefined;
   list: undefined;
   categories: undefined;
-  community: { id: number, data: ICommunity };
-  "community-members": { id: number, username: string };
-  "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
-  "verification": { id: number },
-  "bookmark": undefined;
+  community: { id: number; data: ICommunity };
+  "community-members": { id: number; username: string };
+  "community-settings": {
+    id: number;
+    username: string;
+    type: COMMUNITY_SETTING_TYPE;
+  };
+  verification: { id: number };
+  bookmark: undefined;
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -111,7 +115,10 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Screen name="referrals" component={Referrals} />
         <RootStackNavigation.Screen name="settings" component={setting} />
         <RootStackNavigation.Screen name="security" component={Security} />
-        <RootStackNavigation.Screen name="verification" component={VerifyAccount} />
+        <RootStackNavigation.Screen
+          name="verification"
+          component={VerifyAccount}
+        />
         <RootStackNavigation.Screen
           name="notifications"
           component={notifications}
@@ -130,10 +137,7 @@ const MainNavigation = (): JSX.Element => {
           name="community-settings"
           component={CommunitySettings}
         />
-        <RootStackNavigation.Screen
-          name="categories"
-          component={Interests}
-        />
+        <RootStackNavigation.Screen name="categories" component={Interests} />
       </RootStackNavigation.Group>
 
       {/* UNAUTHENTICATED FLOW */}
@@ -172,10 +176,7 @@ const MainNavigation = (): JSX.Element => {
           name="singleKnowledge"
           component={SingleKnowledge}
         />
-         <RootStackNavigation.Screen
-          name="bookmark"
-          component={Bookmarks}
-        />
+        <RootStackNavigation.Screen name="bookmark" component={Bookmarks} />
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   );
