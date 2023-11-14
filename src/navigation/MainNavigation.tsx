@@ -35,6 +35,7 @@ import { ICommunity } from "../models/Community";
 import Interests from "../pages/interests";
 import VerifyAccount from "../pages/verifyAccount";
 import Bookmarks from "../pages/bookmarks";
+import Register from "../pages/register";
 
 export type RootStackParamList = {
   home: undefined;
@@ -148,6 +149,7 @@ const MainNavigation = (): JSX.Element => {
           component={CompleteSetup}
         />
         {/* <RootStackNavigation.Screen name='login' component={Login} /> */}
+        <RootStackNavigation.Screen name="register" component={Register} />
         <RootStackNavigation.Screen
           name="verify-email"
           component={VerifyEmail}
