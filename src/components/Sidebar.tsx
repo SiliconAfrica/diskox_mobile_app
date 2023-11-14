@@ -269,12 +269,13 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Add an account"
-                action={() =>
-                  navigation.navigate("onboarding", {
-                    showModal: 1,
-                    addAccount: true,
-                  })
-                }
+                action={() => navigation.navigate("sign-in")}
+                // action={() =>
+                //   navigation.navigate("onboarding", {
+                //     showModal: 1,
+                //     addAccount: true,
+                //   })
+                // }
               />
               <Item
                 icon={

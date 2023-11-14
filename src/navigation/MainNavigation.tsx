@@ -38,6 +38,7 @@ import Bookmarks from "../pages/bookmarks";
 import Hashtag from "../pages/hashtag";
 import TrendingHashtags from "../pages/TrendingHastags";
 import Register from "../pages/register";
+import SignIn from "../pages/signin";
 
 export type RootStackParamList = {
   home: undefined;
@@ -64,6 +65,8 @@ export type RootStackParamList = {
     last_seen: string;
   };
   post: { postId: number };
+  register: undefined;
+  "sign-in": undefined;
   "verify-email": undefined;
   "complete-setup": undefined;
   "reset-password": undefined;
@@ -150,6 +153,7 @@ const MainNavigation = (): JSX.Element => {
         />
         {/* <RootStackNavigation.Screen name='login' component={Login} /> */}
         <RootStackNavigation.Screen name="register" component={Register} />
+        <RootStackNavigation.Screen name="sign-in" component={SignIn} />
         <RootStackNavigation.Screen
           name="verify-email"
           component={VerifyEmail}
