@@ -14,21 +14,22 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import { useModalState } from "../../states/modalState";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import useToast from "../../hooks/useToast";
-
 // google auth
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import * as SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { CustomTextInput } from "../../components/form/CustomInput";
 import useForm from "../../hooks/useForm";
 import { useSignupState } from "../signup/state";
 import {
+  loginSchema,
   registerSchema,
   usernameSelectSchema,
 } from "../../services/validations";
@@ -39,38 +40,28 @@ import {
 } from "../../states/userState";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
+import { useMultipleAccounts } from "../../states/multipleAccountStates";
+import { handlePromise } from "../../utils/handlePomise";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const redirectUri = AuthSession.makeRedirectUri();
-type RegisterPayload = {
-  email: string;
-  username: string;
-  password: string;
-  password_confirmation: string;
-  referral_code: string;
-};
 
-const Register = ({
+const SignIn = ({
   route,
 }: NativeStackScreenProps<RootStackParamList, "onboarding">) => {
+  const queryClient = useQueryClient();
   const [isDarkMode] = useUtilState((state) => [state.isDarkMode]);
   const { addAccount } = useModalState();
-  const [setAll, values] = useSignupState((state) => [
-    state.setAll,
-    {
-      username: state.username,
-      email: state.email,
-      password: state.password,
-      password_confirmation: state.password_confirmation,
-      referral_code: state.referral_code,
-    },
-  ]);
+  const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
+  const [setAll] = useModalState((state) => [state.setAll]);
+  const userData = useDetailsState((state) => state);
   const { setAll: updateOldUser } = useUserStateBeforeAddingByRegistration(
     (state) => state
   );
+  const { setAll: updateUtil } = useUtilState((state) => state);
   const oldUser = useDetailsState((state) => state);
-  const { setAll: updateUser } = useDetailsState((state) => state);
+  const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const [googleSigninLoading, setGoogleSignInLoading] = React.useState(false);
   //   const { showModal, addAccount } = route.params;
   const theme = useTheme<Theme>();
@@ -92,21 +83,47 @@ const Register = ({
     scopes: ["profile", "email"],
   });
 
-  const { isLoading: isSigningUp, mutate: register } = useMutation({
-    mutationFn: (data: RegisterPayload) =>
-      httpService.post(`/auth/register`, data),
+  const { isLoading: isLoggingIn, mutate: login } = useMutation({
+    mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
-      // alert(error.message);
-      toast.show(error.message, { type: "danger", placement: "top" });
+      toast.show(error.message, { type: "error" });
     },
     onSuccess: async (data) => {
       if (addAccount) {
-        updateOldUser({ ...oldUser });
+        addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
+        switchAccount(
+          data.data.user.username,
+          data.data.authorisation.token,
+          updateDetails,
+          queryClient
+        );
+      } else {
+        updateDetails({
+          ...data.data.user,
+          token: data.data.authorisation.token,
+        });
       }
-      updateUser({ ...data.data.user, token: data.data.authorisation.token });
+      //save logged in user in local
+      await SecureStorage.setItemAsync(
+        `---${data.data.user.username}---token`,
+        data.data.authorisation.token
+      );
       await SecureStorage.setItemAsync("token", data.data.authorisation.token);
-
-      navigation.navigate("verify-email");
+      // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
+      const [saveUser, saveUserErr] = await handlePromise(
+        AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
+      );
+      updateUtil({ isLoggedIn: true });
+      setAll({ showLogin: false });
+      if (data.data?.user?.email_verified_at) {
+        navigation.navigate("home");
+        return;
+      } else {
+        toast.show("Please verify your email", { type: "danger" });
+        setAll({ showLogin: false });
+        navigation.navigate("verify-email");
+        return;
+      }
     },
   });
 
@@ -127,37 +144,15 @@ const Register = ({
     }
   }, [response]);
 
-  const navigate = React.useCallback(
-    (data: any) => {
-      const obj: RegisterPayload = {
-        email: data.email,
-        username: data.username.toLowerCase(),
-        password: data.password,
-        password_confirmation: data.password_confirmation,
-        referral_code: data.referral_code,
-      };
-      console.log(values, "ppp");
-      setAll({
-        password: data.password,
-        password_confirmation: data.password_confirmation,
-      });
-      register(obj);
-    },
-    [values]
-  );
-
   const signInWithGoogleAsync = async () => {
     promptAsync({ useProxy: true, projectNameForProxy: "@dandolla98/diskos" });
   };
   const { renderForm } = useForm({
     defaultValues: {
-      username: values.username,
-      email: values.email,
-      password: values.password,
-      password_confirmation: values.password_confirmation,
-      referral_code: values.referral_code,
+      email: "",
+      password: "",
     },
-    validationSchema: registerSchema,
+    validationSchema: loginSchema,
   });
   return renderForm(
     <Box
@@ -173,14 +168,14 @@ const Register = ({
             marginTop="l"
             alignItems="center"
             justifyContent="center"
-            paddingTop="l"
+            paddingVertical="l"
           >
             <CustomText variant="header" textAlign="center">
-              Join The Conversation With Millions Of People
+              Login to continue
             </CustomText>
           </Box>
 
-          <Box width="100%" alignItems="center" paddingTop="s">
+          <Box width="100%" alignItems="center" paddingVertical="s">
             <Pressable
               style={{
                 borderWidth: 1,
@@ -238,14 +233,6 @@ const Register = ({
           </Box>
           <Box>
             <CustomTextInput
-              name="username"
-              placeholder="Enter your username"
-              label="Username"
-              removeSpecialCharater
-              removeSpaces
-              containerStyle={{ marginTop: 20 }}
-            />
-            <CustomTextInput
               name="email"
               placeholder="Enter your email address"
               label="Email"
@@ -258,47 +245,30 @@ const Register = ({
               label="Password"
               containerStyle={{ marginTop: 20 }}
             />
-            <CustomTextInput
-              name="password_confirmation"
-              placeholder="Confirm Password"
-              label="Confirm Password"
-              isPassword
-              containerStyle={{ marginTop: 20 }}
-            />
-            <CustomTextInput
-              name="referral_code"
-              placeholder="Enter your referral code"
-              label="Referral Code (Optional)"
-              containerStyle={{ marginVertical: 20 }}
-            />
             <Box width="100%" paddingVertical="m" justifyContent="center">
-              <CustomText variant="xs" textAlign="center">
-                By continuing, you agree to Diskos{" "}
-                <CustomText variant="xs" color="textBlue">
-                  User Agreement
-                </CustomText>{" "}
-                and acknowledge that you’ve read our{" "}
-                <CustomText variant="xs" color="textBlue">
-                  Privacy Policy
-                </CustomText>
-                .
+              <CustomText
+                variant="xs"
+                textAlign="left"
+                onPress={() => navigation.navigate("reset-password")}
+              >
+                Forgot Password?{" "}
               </CustomText>
             </Box>
             <SubmitButton
               width={"100%"}
               label="Continue"
-              onSubmit={navigate}
-              isLoading={isSigningUp}
+              onSubmit={(data) => login(data)}
+              isLoading={isLoggingIn}
             />
             <Box width="100%" paddingVertical="m" justifyContent="center">
               <CustomText variant="xs" textAlign="center">
-                Already a member?{" "}
+                New here?{" "}
                 <CustomText
                   variant="xs"
                   color="textBlue"
-                  onPress={() => navigation.navigate("sign-in")}
+                  onPress={() => navigation.navigate("register")}
                 >
-                  Login
+                  Sign up
                 </CustomText>
               </CustomText>
             </Box>
@@ -309,4 +279,4 @@ const Register = ({
   );
 };
 
-export default Register;
+export default SignIn;
