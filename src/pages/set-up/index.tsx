@@ -224,6 +224,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
           labelField="name"
           valueField="name"
           placeholder="Nigeria"
+          value={selected.name}
           onChange={handleSelect}
           search
         />
@@ -232,6 +233,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
           options={renderStates()}
           labelField="label"
           valueField="label"
+          value={state}
           onChange={(data) => setState(data.label)}
           search
         />

@@ -1,4 +1,10 @@
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import Box from "../../components/general/Box";
 import { Image } from "expo-image";
@@ -157,129 +163,136 @@ const Register = ({
     <Box
       backgroundColor="mainBackGroundColor"
       flex={1}
-      paddingHorizontal="m"
       paddingTop="xl"
       paddingBottom="l"
     >
-      <Box
-        width="100%"
-        marginTop="l"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <CustomText variant="header" textAlign="center">
-          Join The Conversation With Millions Of People
-        </CustomText>
-      </Box>
+      <ScrollView>
+        <Box paddingHorizontal="m">
+          <Box
+            width="100%"
+            marginTop="l"
+            alignItems="center"
+            justifyContent="center"
+            paddingTop="l"
+          >
+            <CustomText variant="header" textAlign="center">
+              Join The Conversation With Millions Of People
+            </CustomText>
+          </Box>
 
-      <Box width="100%" alignItems="center" paddingTop="s">
-        <Pressable
-          style={{
-            borderWidth: 1,
-            borderColor: theme.colors.primaryColor,
-            borderRadius: 50,
-            height: 52,
-            width: "100%",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            flexDirection: "row",
-            paddingHorizontal: 20,
-          }}
-          onPress={signInWithGoogleAsync}
-        >
-          <Box flex={0.3}>
-            <Image
-              source={require("../../../assets/images/googlelogo.png")}
-              contentFit="contain"
-              style={{ width: 30, height: 30 }}
+          <Box width="100%" alignItems="center" paddingTop="s">
+            <Pressable
+              style={{
+                borderWidth: 1,
+                borderColor: theme.colors.primaryColor,
+                borderRadius: 50,
+                height: 52,
+                width: "100%",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                flexDirection: "row",
+                paddingHorizontal: 20,
+              }}
+              onPress={signInWithGoogleAsync}
+            >
+              <Box flex={0.3}>
+                <Image
+                  source={require("../../../assets/images/googlelogo.png")}
+                  contentFit="contain"
+                  style={{ width: 30, height: 30 }}
+                />
+              </Box>
+              <Box flex={0.7}>
+                {!isLoading && (
+                  <CustomText variant="header" style={{ fontSize: 16 }}>
+                    Continue with Google
+                  </CustomText>
+                )}
+                {isLoading && (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.textColor}
+                  />
+                )}
+              </Box>
+            </Pressable>
+          </Box>
+          <Box
+            paddingVertical="m"
+            width={"100%"}
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box
+              borderBottomWidth={2}
+              style={{ borderBottomColor: theme.colors.black }}
+              width={"40%"}
+            ></Box>
+            <CustomText>OR</CustomText>
+            <Box
+              borderBottomWidth={2}
+              style={{ borderBottomColor: theme.colors.black }}
+              width={"40%"}
+            ></Box>
+          </Box>
+          <Box>
+            <CustomTextInput
+              name="username"
+              placeholder="Enter your username"
+              label="Username"
+              removeSpecialCharater
+              removeSpaces
+              containerStyle={{ marginTop: 20 }}
+            />
+            <CustomTextInput
+              name="email"
+              placeholder="Enter your email address"
+              label="Email"
+              containerStyle={{ marginTop: 20 }}
+            />
+            <CustomTextInput
+              name="password"
+              placeholder="Password"
+              isPassword
+              label="Password"
+              containerStyle={{ marginTop: 20 }}
+            />
+            <CustomTextInput
+              name="password_confirmation"
+              placeholder="Confirm Password"
+              label="Confirm Password"
+              isPassword
+              containerStyle={{ marginTop: 20 }}
+            />
+            <CustomTextInput
+              name="referral_code"
+              placeholder="Enter your referral code"
+              label="Referral Code (Optional)"
+              containerStyle={{ marginVertical: 20 }}
+            />
+            <SubmitButton
+              width={"100%"}
+              label="Continue"
+              onSubmit={navigate}
+              isLoading={isSigningUp}
             />
           </Box>
-          <Box flex={0.7}>
-            {!isLoading && (
-              <CustomText variant="header" style={{ fontSize: 16 }}>
-                Continue with Google
+          <Box width="100%" height="15%" justifyContent="center">
+            <CustomText variant="xs" textAlign="center">
+              By continuing, you agree to Diskos{" "}
+              <CustomText variant="xs" color="textBlue">
+                User Agreement
+              </CustomText>{" "}
+              and acknowledge that you’ve read our{" "}
+              <CustomText variant="xs" color="textBlue">
+                Privacy Policy
               </CustomText>
-            )}
-            {isLoading && (
-              <ActivityIndicator size="small" color={theme.colors.textColor} />
-            )}
+              .
+            </CustomText>
           </Box>
-        </Pressable>
-      </Box>
-      <Box
-        paddingVertical="m"
-        width={"100%"}
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Box
-          borderBottomWidth={2}
-          style={{ borderBottomColor: theme.colors.black }}
-          width={"40%"}
-        ></Box>
-        <CustomText>OR</CustomText>
-        <Box
-          borderBottomWidth={2}
-          style={{ borderBottomColor: theme.colors.black }}
-          width={"40%"}
-        ></Box>
-      </Box>
-      <Box>
-        <CustomTextInput
-          name="username"
-          placeholder="Enter your username"
-          label="Username"
-          removeSpecialCharater
-          removeSpaces
-          containerStyle={{ marginTop: 20 }}
-        />
-        <CustomTextInput
-          name="email"
-          placeholder="Enter your email address"
-          label="Email"
-          containerStyle={{ marginTop: 20 }}
-        />
-        <CustomTextInput
-          name="password"
-          placeholder="Password"
-          isPassword
-          label="Password"
-          containerStyle={{ marginTop: 20 }}
-        />
-        <CustomTextInput
-          name="password_confirmation"
-          placeholder="Confirm Password"
-          label="Confirm Password"
-          isPassword
-          containerStyle={{ marginTop: 20 }}
-        />
-        <CustomTextInput
-          name="referral_code"
-          placeholder="Enter your referral code"
-          label="Referral Code (Optional)"
-          containerStyle={{ marginVertical: 20 }}
-        />
-        <SubmitButton
-          width={"100%"}
-          label="Continue"
-          onSubmit={navigate}
-          isLoading={isSigningUp}
-        />
-      </Box>
-      <Box width="100%" height="15%" justifyContent="center">
-        <CustomText variant="xs" textAlign="center">
-          By continuing, you agree to Diskos{" "}
-          <CustomText variant="xs" color="textBlue">
-            User Agreement
-          </CustomText>{" "}
-          and acknowledge that you’ve read our{" "}
-          <CustomText variant="xs" color="textBlue">
-            Privacy Policy
-          </CustomText>
-          .
-        </CustomText>
-      </Box>
+        </Box>
+      </ScrollView>
     </Box>
   );
 };
