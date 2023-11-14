@@ -87,7 +87,7 @@ const Login = () => {
       );
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
-      if (data.data?.email_verified_at) {
+      if (data.data?.user?.email_verified_at) {
         navigation.navigate("home");
         return;
       } else {
