@@ -4,6 +4,7 @@ import {
   useWindowDimensions,
   Pressable,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import React, { memo } from "react";
 import Box from "../../../../components/general/Box";
@@ -23,16 +24,19 @@ import { RootBottomTabParamList } from "../../../../navigation/BottomTabs";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CommunityStackParamList } from "..";
 import { ICommunity } from "../../../../models/Community";
-import { useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
 import { Image } from "expo-image";
+import PrimaryButton from "../../../../components/general/PrimaryButton";
+import useToast from "../../../../hooks/useToast";
 
 const Community = () => {
   const theme = useTheme<Theme>();
   const WIDTH = useWindowDimensions().width;
   const [active, setActive] = React.useState(1);
-
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const navigation = useNavigation<PageType>();
   const route = useRoute<RouteProp<CommunityStackParamList, "community">>();
 
@@ -48,6 +52,26 @@ const Community = () => {
       },
     }
   );
+
+  const { isLoading: isJoining, mutate } = useMutation({
+    mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
+    onSuccess: (data) => {
+      // alert(`You've successfully join ${name} community`);
+      console.log(data?.data);
+      toast.show(`${data?.data?.message}`, {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity", id]);
+    },
+    onError: (e) => {
+      // alert("An error occured");
+      console.log(e, "errrr");
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
 
   const switchPages = React.useCallback(() => {
     switch (active) {
@@ -153,7 +177,14 @@ const Community = () => {
 
         <Box alignItems="center" style={{ marginTop: 70 }}>
           <CustomText variant="subheader">{details?.name}</CustomText>
-          <CustomText>c/{details?.username}</CustomText>
+          <CustomText marginBottom="m">c/{details?.username}</CustomText>
+          {details?.is_member === 0 && (
+            <PrimaryButton
+              title={"Join"}
+              isLoading={isJoining}
+              onPress={() => mutate()}
+            />
+          )}
         </Box>
 
         {/* TABVIEW         */}

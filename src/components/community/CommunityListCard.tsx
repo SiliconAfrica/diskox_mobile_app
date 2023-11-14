@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import React from "react";
 import Box from "../general/Box";
 import PrimaryButton from "../general/PrimaryButton";
@@ -11,6 +10,9 @@ import httpService, { IMAGE_BASE } from "../../utils/httpService";
 import { useMutation, useQueryClient } from "react-query";
 import { URLS } from "../../services/urls";
 import useToast from "../../hooks/useToast";
+import ErrorButton from "../general/ErrorButton";
+import { ActivityIndicator, Pressable } from "react-native";
+import theme from "../../theme";
 
 const CommunityListCard = (props: ICommunity) => {
   const { name, description, profile_image, id, is_member } = props;
@@ -22,27 +24,51 @@ const CommunityListCard = (props: ICommunity) => {
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {
       // alert(`You've successfully join ${name} community`);
-      toast.show(`You've successfully join ${name} community`, {
-        type: "success",
-      });
+      if (
+        data?.data?.message === "you have successfully joined this community"
+      ) {
+        toast.show(`You have successfully joined ${name} community`, {
+          type: "success",
+        });
+        navigation.navigate("community", { id, data: props });
+      } else if (data?.data?.message === "you have left the community") {
+        toast.show(`You have left ${name} community`, {
+          type: "success",
+        });
+      } else {
+        toast.show(data?.data?.message, {
+          type: "success",
+        });
+      }
       queryClient.invalidateQueries(["getCommunities"]);
-      navigation.navigate("community", { id, data: props });
     },
-    onError: () => {
-      alert("An error occured");
+    onError: (e) => {
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
     },
   });
-  console.log(name, is_member);
   return (
-    <Box
-      width={"100%"}
-      height={100}
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="center"
-      paddingHorizontal="m"
-      borderBottomColor="secondaryBackGroundColor"
-      borderBottomWidth={2}
+    <Pressable
+      onPress={() => navigation.navigate("community", { id, data: props })}
+      style={{
+        width: "100%",
+        height: 100,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: theme.spacing.m,
+        borderBottomColor: theme.colors.secondaryBackGroundColor,
+        borderBottomWidth: 2,
+      }}
+      // width={"100%"}
+      // height={100}
+      // flexDirection="row"
+      // justifyContent="space-between"
+      // alignItems="center"
+      // paddingHorizontal="m"
+      // borderBottomColor="secondaryBackGroundColor"
+      // borderBottomWidth={2}
     >
       <Box flexDirection="row" flex={0.6} alignItems="center">
         <Box
@@ -71,23 +97,24 @@ const CommunityListCard = (props: ICommunity) => {
         </Box>
       </Box>
 
-      {is_member === 0 && (
+      {is_member === 0 ? (
         <PrimaryButton
-          title="Join"
+          title={"Join"}
+          isLoading={isLoading}
           onPress={() => mutate()}
           height={35}
           width={70}
         ></PrimaryButton>
-      )}
-      {is_member !== 0 && (
-        <PrimaryButton
-          title="View"
-          onPress={() => navigation.navigate("community", { id, data: props })}
+      ) : (
+        <ErrorButton
+          title={"Leave"}
+          onPress={() => mutate()}
           height={35}
+          isLoading={isLoading}
           width={70}
-        ></PrimaryButton>
+        ></ErrorButton>
       )}
-    </Box>
+    </Pressable>
   );
 };
 

@@ -21,7 +21,7 @@ const CommunityList = () => {
   const { isLoading, isError, data } = useQuery(["getCommunities"], () =>
     httpService.get(`${URLS.GET_COMMUNITIES}`)
   );
-  console.log(data.data.data.data, "lll");
+  // console.log(data.data.data.data, "lllxxxxxx");
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       {/* MODALS */}
