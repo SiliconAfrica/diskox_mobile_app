@@ -122,27 +122,29 @@ const Community = () => {
                 />
               </Box>
 
-              <Box
-                width={40}
-                height={40}
-                borderRadius={20}
-                justifyContent="center"
-                alignItems="center"
-                bg="fadedButtonBgColor"
-              >
-                <Feather
-                  name="settings"
-                  size={25}
-                  color={theme.colors.primaryColor}
-                  onPress={() =>
-                    navigation.navigate("community-settings", {
-                      id: details.id,
-                      username: details.username,
-                      type: COMMUNITY_SETTING_TYPE.DEFAULT,
-                    })
-                  }
-                />
-              </Box>
+              {details?.is_member === 1 && (
+                <Box
+                  width={40}
+                  height={40}
+                  borderRadius={20}
+                  justifyContent="center"
+                  alignItems="center"
+                  bg="fadedButtonBgColor"
+                >
+                  <Feather
+                    name="settings"
+                    size={25}
+                    color={theme.colors.primaryColor}
+                    onPress={() =>
+                      navigation.navigate("community-settings", {
+                        id: details.id,
+                        username: details.username,
+                        type: COMMUNITY_SETTING_TYPE.DEFAULT,
+                      })
+                    }
+                  />
+                </Box>
+              )}
             </Box>
 
             <Box
