@@ -37,6 +37,7 @@ import VerifyAccount from "../pages/verifyAccount";
 import Bookmarks from "../pages/bookmarks";
 import Hashtag from "../pages/hashtag";
 import TrendingHashtags from "../pages/TrendingHastags";
+import Register from "../pages/register";
 
 export type RootStackParamList = {
   home: undefined;
@@ -148,6 +149,7 @@ const MainNavigation = (): JSX.Element => {
           component={CompleteSetup}
         />
         {/* <RootStackNavigation.Screen name='login' component={Login} /> */}
+        <RootStackNavigation.Screen name="register" component={Register} />
         <RootStackNavigation.Screen
           name="verify-email"
           component={VerifyEmail}

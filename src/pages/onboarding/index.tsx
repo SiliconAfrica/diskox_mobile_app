@@ -19,6 +19,8 @@ import * as AuthSession from "expo-auth-session";
 import { useMutation } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
+import { useNavigation } from "@react-navigation/native";
+import { PageType } from "../login";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -33,6 +35,7 @@ const Onboarding = ({
   const [googleSigninLoading, setGoogleSignInLoading] = React.useState(false);
   const { showModal, addAccount } = route.params;
   const theme = useTheme<Theme>();
+  const navigation = useNavigation<PageType>();
   const toast = useToast();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -152,12 +155,13 @@ const Onboarding = ({
         </Pressable>
 
         <Pressable
-          onPress={() =>
-            setAll({
-              showSignup: true,
-              addAccount: addAccount || false,
-            })
-          }
+          // onPress={() =>
+          //   setAll({
+          //     showSignup: true,
+          //     addAccount: addAccount || false,
+          //   })
+          // }
+          onPress={() => navigation.navigate("register")}
           style={{
             backgroundColor: theme.colors.primaryColor,
             borderRadius: 50,
