@@ -226,7 +226,7 @@ const Register = ({
             </Pressable>
           </Box>
           <Box
-            paddingVertical="m"
+            paddingVertical="l"
             width={"100%"}
             flexDirection="row"
             justifyContent="space-between"
@@ -251,7 +251,7 @@ const Register = ({
               label="Username"
               removeSpecialCharater
               removeSpaces
-              containerStyle={{ marginTop: 20 }}
+              containerStyle={{ marginTop: 5 }}
             />
             <CustomTextInput
               name="email"
