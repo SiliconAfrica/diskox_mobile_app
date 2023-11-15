@@ -49,7 +49,7 @@ const redirectUri = AuthSession.makeRedirectUri();
 
 const SignIn = ({
   route,
-}: NativeStackScreenProps<RootStackParamList, "onboarding">) => {
+}: NativeStackScreenProps<RootStackParamList, "sign-in">) => {
   const queryClient = useQueryClient();
   const [isDarkMode] = useUtilState((state) => [state.isDarkMode]);
   const { addAccount } = useModalState();
@@ -63,7 +63,7 @@ const SignIn = ({
   const oldUser = useDetailsState((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const [googleSigninLoading, setGoogleSignInLoading] = React.useState(false);
-  //   const { showModal, addAccount } = route.params;
+  const params = route.params;
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   const toast = useToast();
@@ -171,7 +171,9 @@ const SignIn = ({
             paddingVertical="l"
           >
             <CustomText variant="header" textAlign="center">
-              Login to continue
+              {params?.isAddingAccount === true
+                ? "Add another account"
+                : "Login to continue"}
             </CustomText>
           </Box>
 

@@ -154,13 +154,13 @@ const Onboarding = ({
         </Pressable>
 
         <Pressable
-          // onPress={() =>
-          //   setAll({
-          //     showSignup: true,
-          //     addAccount: addAccount || false,
-          //   })
-          // }
-          onPress={() => navigation.navigate("register")}
+          onPress={() =>
+            setAll({
+              showSignup: true,
+              addAccount: addAccount || false,
+            })
+          }
+          // onPress={() => navigation.navigate("register")}
           style={{
             backgroundColor: theme.colors.primaryColor,
             borderRadius: 50,

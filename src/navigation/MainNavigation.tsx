@@ -64,7 +64,7 @@ export type RootStackParamList = {
   };
   post: { postId: number };
   register: undefined;
-  "sign-in": undefined;
+  "sign-in": { isAddingAccount: boolean };
   "verify-email": undefined;
   "complete-setup": undefined;
   "reset-password": undefined;

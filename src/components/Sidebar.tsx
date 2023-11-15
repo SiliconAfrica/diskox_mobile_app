@@ -259,7 +259,9 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Add an account"
-                action={() => navigation.navigate("sign-in")}
+                action={() =>
+                  navigation.navigate("sign-in", { isAddingAccount: true })
+                }
                 // action={() =>
                 //   navigation.navigate("onboarding", {
                 //     showModal: 1,
