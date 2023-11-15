@@ -19,6 +19,7 @@ import useToast from "../../hooks/useToast";
 
 // google auth
 import * as WebBrowser from "expo-web-browser";
+import { AntDesign } from "@expo/vector-icons";
 import * as Google from "expo-auth-session/providers/google";
 import * as SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
@@ -168,12 +169,19 @@ const Register = ({
     >
       <ScrollView>
         <Box paddingHorizontal="m">
+          <AntDesign
+            name="arrowleft"
+            size={30}
+            color={theme.colors.textColor}
+            onPress={navigation.goBack}
+            style={{ paddingTop: 30 }}
+          />
           <Box
             width="100%"
-            marginTop="l"
+            marginTop="s"
             alignItems="center"
             justifyContent="center"
-            paddingTop="l"
+            paddingTop="s"
           >
             <CustomText variant="header" textAlign="center">
               Join The Conversation With Millions Of People
