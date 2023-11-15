@@ -28,6 +28,7 @@ import { URLS } from "../../services/urls";
 import { CustomTextInput } from "../../components/form/CustomInput";
 import useForm from "../../hooks/useForm";
 import { useSignupState } from "../signup/state";
+import { AntDesign } from "@expo/vector-icons";
 import {
   loginSchema,
   registerSchema,
@@ -163,12 +164,19 @@ const SignIn = ({
     >
       <ScrollView>
         <Box paddingHorizontal="m">
+          <AntDesign
+            name="arrowleft"
+            size={30}
+            color={theme.colors.textColor}
+            onPress={navigation.goBack}
+            style={{ paddingTop: 20 }}
+          />
           <Box
             width="100%"
-            marginTop="l"
+            marginTop="s"
             alignItems="center"
             justifyContent="center"
-            paddingVertical="l"
+            paddingVertical="s"
           >
             <CustomText variant="header" textAlign="center">
               {params?.isAddingAccount === true
