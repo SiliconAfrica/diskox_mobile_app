@@ -64,9 +64,10 @@ const Header = ({
 
       {!isLoggedIn && (
         <Pressable
-          onPress={() =>
-            navigation.navigate("onboarding", { showModal: undefined })
-          }
+          onPress={() => navigation.navigate("sign-in")}
+          // onPress={() =>
+          //   navigation.navigate("onboarding", { showModal: undefined })
+          // }
           style={{
             width: 80,
             height: 32,
