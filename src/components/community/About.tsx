@@ -178,9 +178,15 @@ const AboutCommunity = () => {
             <PrimaryButton
               title="Create a post"
               width="100%"
-              onPress={function (): void {
-                throw new Error("Function not implemented.");
-              }}
+              // onPress={function (): void {
+              //   throw new Error("Function not implemented.");
+              // }}
+              onPress={() =>
+                navigation.navigate("create-post", {
+                  origin: "community",
+                  communityId: id,
+                })
+              }
             />
           )}
         </Box>

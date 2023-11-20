@@ -46,7 +46,7 @@ export type RootStackParamList = {
   login: undefined;
   "sign-up": undefined;
   "set-up": undefined;
-  "create-post": undefined;
+  "create-post": { origin?: string; communityId?: number };
   profile: { userId: number };
   "profile-setting": undefined;
   referrals: undefined;
