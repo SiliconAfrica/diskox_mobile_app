@@ -69,11 +69,12 @@ const SignIn = ({
   const navigation = useNavigation<PageType>();
   const toast = useToast();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     // androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
     // iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
     // redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
     // expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
+
     androidClientId:
       "304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com",
     iosClientId:
@@ -84,55 +85,57 @@ const SignIn = ({
     scopes: ["profile", "email"],
   });
 
+  const loginSuccessFn = async (data) => {
+    if (addAccount) {
+      addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
+      switchAccount(
+        data.data.user.username,
+        data.data.authorisation.token,
+        updateDetails,
+        queryClient
+      );
+    } else {
+      updateDetails({
+        ...data.data.user,
+        token: data.data.authorisation.token,
+      });
+    }
+    //save logged in user in local
+    await SecureStorage.setItemAsync(
+      `---${data.data.user.username}---token`,
+      data.data.authorisation.token
+    );
+    await SecureStorage.setItemAsync("token", data.data.authorisation.token);
+    // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
+    const [saveUser, saveUserErr] = await handlePromise(
+      AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
+    );
+    updateUtil({ isLoggedIn: true });
+    setAll({ showLogin: false });
+    if (data.data?.user?.email_verified_at) {
+      navigation.navigate("home");
+      return;
+    } else {
+      toast.show("Please verify your email", { type: "danger" });
+      setAll({ showLogin: false });
+      navigation.navigate("verify-email");
+      return;
+    }
+  };
+
   const { isLoading: isLoggingIn, mutate: login } = useMutation({
     mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
       toast.show(error.message, { type: "error" });
     },
-    onSuccess: async (data) => {
-      if (addAccount) {
-        addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
-        switchAccount(
-          data.data.user.username,
-          data.data.authorisation.token,
-          updateDetails,
-          queryClient
-        );
-      } else {
-        updateDetails({
-          ...data.data.user,
-          token: data.data.authorisation.token,
-        });
-      }
-      //save logged in user in local
-      await SecureStorage.setItemAsync(
-        `---${data.data.user.username}---token`,
-        data.data.authorisation.token
-      );
-      await SecureStorage.setItemAsync("token", data.data.authorisation.token);
-      // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
-      const [saveUser, saveUserErr] = await handlePromise(
-        AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
-      );
-      updateUtil({ isLoggedIn: true });
-      setAll({ showLogin: false });
-      if (data.data?.user?.email_verified_at) {
-        navigation.navigate("home");
-        return;
-      } else {
-        toast.show("Please verify your email", { type: "danger" });
-        setAll({ showLogin: false });
-        navigation.navigate("verify-email");
-        return;
-      }
-    },
+    onSuccess: loginSuccessFn,
   });
 
   // google signup mutation
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: string) =>
       httpService.post(`${URLS.GOOGLE_AUTH}/${data}`),
-    onSuccess: (data) => {},
+    onSuccess: (data) => console.log(data.data.user, "pl"),
     onError: (error: any) => {
       toast.show(error.message, { type: "error" });
     },
@@ -141,7 +144,8 @@ const SignIn = ({
   React.useEffect(() => {
     if (response?.type === "success") {
       // Handle successful authentication
-      mutate(response.authentication?.accessToken);
+      // mutate(response.authentication?.accessToken);
+      mutate(response.params?.id_token);
     }
   }, [response]);
 
