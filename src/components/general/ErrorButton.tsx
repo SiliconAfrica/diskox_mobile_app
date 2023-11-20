@@ -1,4 +1,4 @@
-import React, { JSXElementConstructor } from "react";
+import React from "react";
 import { ActivityIndicator, Pressable } from "react-native";
 import CustomText from "./CustomText";
 import { useTheme } from "@shopify/restyle";
@@ -13,7 +13,7 @@ interface IProps {
   borderRadius?: number;
 }
 
-const PrimaryButton = ({
+const ErrorButton = ({
   title,
   onPress,
   width = 120,
@@ -26,7 +26,7 @@ const PrimaryButton = ({
     <Pressable
       onPress={onPress}
       style={{
-        backgroundColor: theme.colors.primaryColor,
+        backgroundColor: theme.colors.error,
         borderWidth: 0,
         borderColor: theme.colors.primaryColor,
         borderRadius: borderRadius,
@@ -51,4 +51,4 @@ const PrimaryButton = ({
   );
 };
 
-export default PrimaryButton;
+export default ErrorButton;

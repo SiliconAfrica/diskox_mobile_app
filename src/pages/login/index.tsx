@@ -30,6 +30,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../utils/handlePomise";
 import useToast from "../../hooks/useToast";
 import CustomButton from "../../components/general/CustomButton";
+import { useSignupState } from "../signup/state";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -53,7 +54,7 @@ const Login = () => {
     },
     validationSchema: loginSchema,
   });
-
+  //
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
@@ -86,7 +87,15 @@ const Login = () => {
       );
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
-      navigation.navigate("home");
+      if (data.data?.user?.email_verified_at) {
+        navigation.navigate("home");
+        return;
+      } else {
+        toast.show("Please verify your email", { type: "danger" });
+        setAll({ showLogin: false });
+        navigation.navigate("verify-email");
+        return;
+      }
     },
   });
   return renderForm(

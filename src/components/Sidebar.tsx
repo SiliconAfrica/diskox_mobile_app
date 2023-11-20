@@ -260,11 +260,14 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                 }
                 title="Add an account"
                 action={() =>
-                  navigation.navigate("onboarding", {
-                    showModal: 1,
-                    addAccount: true,
-                  })
+                  navigation.navigate("sign-in", { isAddingAccount: true })
                 }
+                // action={() =>
+                //   navigation.navigate("onboarding", {
+                //     showModal: 1,
+                //     addAccount: true,
+                //   })
+                // }
               />
               <Item
                 icon={
@@ -365,6 +368,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           />
         </Box>
         <Box paddingHorizontal="m">
+          <Item
+            icon={
+              <FontAwesome
+                name="user-circle-o"
+                size={24}
+                color={theme.colors.textColor}
+              />
+            }
+            action={() => navigation.navigate("referrals")}
+            title="Refer & Earn"
+          />
           <Item
             icon={
               <MaterialCommunityIcons
