@@ -46,6 +46,7 @@ const FeedCard = ({
     const [showComment, setShowComment] = React.useState(false);
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({ ...activePost });
+    const [images, setImages] = React.useState(activePost.post_images.map((item) => item.image_path));
 
     const toast = useToast();
    
@@ -76,7 +77,6 @@ const FeedCard = ({
         user: { name, profile_image, id: userId, username, isFollowing },
       } = post;
 
-      console.log(post_images);
 
       // Queries
       const getData = useQuery(
@@ -265,14 +265,24 @@ const FeedCard = ({
        {post_images.length > 0 && (
          <Box width='100%' height={300} flexDirection='row' position='relative' marginBottom='l'>
          { post.post_images.length === 1 && (
-             <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}`}} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+             <Pressable style={{ width: '100%', height: '100%'}} onPress={() => {
+              setAll({ activeImages: images, imageViewer: true })
+             }}>
+              <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}`}} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+             </Pressable>
          )}
          {
             post.post_images.length === 2 && (
             <Box flexDirection='row' width='100%' height={'100%'}>
                 {
                 post_images.map((image, index) => (
-                        <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }} key={index} contentFit='cover' style={{ width: '50%', height: '100%'}} />
+                        <Pressable key={index.toString()} style={{ width: '50%', height: '100%' }} 
+                          onPress={() => {
+                            setAll({ activeImages: images, imageViewer: true })
+                          }}
+                        >
+                          <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }} key={index} contentFit='cover' style={{ width: '100%', height: '100%'}} />
+                        </Pressable>
                     ))
                 }
             </Box>
@@ -281,11 +291,23 @@ const FeedCard = ({
          {
              post.post_images.length === 3  && (
                  <>
-                     <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}` }} contentFit='cover' style={{ flex: 0.6, height: '100%'}} />
+                     <Pressable style={{ flex: 0.6, height: '100%' }} 
+                      onPress={() => {
+                        setAll({ activeImages: images, imageViewer: true })
+                      }}                     
+                     >
+                       <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}` }} contentFit='cover' style={{ flex: 1, height: '100%'}} />
+                     </Pressable>
                      { post.post_images.length === 3 && (
                          <Box width={'30%'} height={'100%'} flex={0.4}>
                              { post.post_images.slice(1, post_images.length).map((image, index) => (
-                                 <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }} key={index} contentFit='cover' style={{ width: '100%', height: '50%'}} />
+                                 <Pressable key={index} style={{ width: '100%', height: '50%'}} 
+                                  onPress={() => {
+                                    setAll({ activeImages: images, imageViewer: true })
+                                  }} 
+                                 >
+                                  <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }}  contentFit='cover' style={{ width: '100%', height: '100%'}} />
+                                 </Pressable>
                              ))}
                          </Box>
                      )}
@@ -295,11 +317,23 @@ const FeedCard = ({
          {
              post.post_images.length > 3  && (
                  <>
-                     <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}` }} contentFit='cover' style={{ flex: 0.6, height: '100%'}} />
+                     <Pressable style={{ flex: 0.6, height: '100%' }} 
+                      onPress={() => {
+                        setAll({ activeImages: images, imageViewer: true })
+                      }}                     
+                     >
+                       <Image source={{ uri: `${IMAGE_BASE}${post?.post_images[0].image_path}` }} contentFit='cover' style={{ flex: 1, height: '100%'}} />
+                     </Pressable>
                      { post.post_images.length >= 3 && (
                          <Box width={'30%'} height={'100%'} flex={0.4}>
                              { post.post_images.slice(1, post_images.length > 3 ? 3:2).map((image, index) => (
-                                 <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }} key={index} contentFit='cover' style={{ width: '100%', height: '50%'}} />
+                                 <Pressable key={index} style={{ width: '100%', height: '50%'}} 
+                                    onPress={() => {
+                                      setAll({ activeImages: images, imageViewer: true })
+                                    }} 
+                                    >
+                                    <Image source={{ uri: `${IMAGE_BASE}${image.image_path}` }}  contentFit='cover' style={{ width: '100%', height: '100%'}} />
+                                </Pressable>
                              ))}
                          </Box>
                      )}
@@ -366,7 +400,7 @@ const FeedCard = ({
                                         style={{ width: 20, height: 20 }}
                                         />
                                     )}
-                                    <CustomText variant='xs' fontSize={12} marginLeft='s'>{post.upvotes_count > 0 && post.upvotes_count} UPVOTE</CustomText>
+                                    <CustomText variant='xs' fontSize={12} marginLeft='s' color={post.has_upvoted !== 0 ? 'primaryColor':'textColor'}>{post.upvotes_count > 0 && post.upvotes_count} UPVOTE</CustomText>
                                 </>
                             )}
                         </Pressable>
@@ -471,7 +505,7 @@ const FeedCard = ({
         </Box>
 
         {/* COMMENT SECTION */}
-       { showComment &&  <CommentSection /> }
+       { showComment &&  <CommentSection postId={post.id} /> }
 
     </Box>
   )

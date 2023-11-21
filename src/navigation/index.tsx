@@ -16,6 +16,9 @@ import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Updates from "expo-updates";
+import Box from "../components/general/Box";
+import ImagesViewer from "../components/modals/ImagesViewer";
+import { useModalState } from "../states/modalState";
 // import pusher from "../utils/pusher";
 // import { PusherEvent } from "pusher-js/types/src/core/connection/protocol/message-types";
 
@@ -28,6 +31,7 @@ const Navigation = () => {
   ]);
   const { setAll: setDetails } = useDetailsState((state) => state);
   const { initiateAccount } = useMultipleAccounts((state) => state);
+  const { imageViewer } = useModalState((state) => state)
 
   const checkForUpdates = async () => {
     try {
@@ -91,7 +95,7 @@ const Navigation = () => {
 
   }, []);
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, position: 'relative' }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
           <NavigationContainer>
@@ -111,6 +115,8 @@ const Navigation = () => {
             >
               <MainNavigation />
               {renderModal()}
+              {/* IMAGES VIEWER MODAL */}
+              {imageViewer && <ImagesViewer /> }
             </ToastProvider>
           </NavigationContainer>
         </ThemeProvider>
