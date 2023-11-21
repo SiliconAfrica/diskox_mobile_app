@@ -71,6 +71,16 @@ const Navigation = () => {
     }
   };
 
+  // React.useEffect(() => {
+  //   pusher.subscribe({
+  //     channelName: 'test.event',
+  //     onEvent: (event: any) => {
+  //       console.log(`this is working`);
+  //       console.log(event)
+  //     }
+  //   })
+  // }, [pusher])
+
   React.useEffect(() => {
     (async function(){
       // const pusher = Pusher.getInstance();

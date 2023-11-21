@@ -20,6 +20,7 @@ import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
 import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
+import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";

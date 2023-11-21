@@ -9,6 +9,7 @@ export interface IType {
     setAll: (data: Partial<IType>) => void,
     clearAll: () => void,
     video: string;
+    video: string|null;
     setAll: (data: Partial<IType>) => void,
     clearAll: () => void,
 }
@@ -21,6 +22,7 @@ export const useVerificationState = create<IType>((set) => ({
     setAll: (data) => set((state) => ({ ...state, ...data})),
     clearAll: () => set(() => ({ category: '', government_id: null, self_with_id: null, video: '' }))
     video: '',
+    video: null,
     setAll: (data) => set((state) => ({ ...state, ...data})),
     clearAll: () => set(() => ({ category: '', government_id: null, self_with_id: null, video: '' }))
 }));

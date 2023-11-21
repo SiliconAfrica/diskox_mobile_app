@@ -98,4 +98,7 @@ export const URLS = {
   DELETE_POST: 'delete_post',
   GET_FOLLOWING: '/following_posts',
   VERIFY_ACCOUNT: '/request_for_verification'
+  VERIFY_ACCOUNT: '/request_for_verification',
+  GET_POPULAR_HASTAGS: '/fetch_popular_hashtags',
+  FETCH_POSTS_BY_HASHTAG: '/fetch_posts_by_hashtag'
 };
