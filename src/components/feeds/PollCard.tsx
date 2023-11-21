@@ -21,6 +21,7 @@ import useCheckLoggedInState from '../../hooks/useCheckLoggedInState'
 import useToast from '../../hooks/useToast'
 import { colorizeHashtags } from '../../utils/colorizeText'
 import { useDetailsState } from '../../states/userState'
+import { Save2, SaveAdd, SaveMinus } from 'iconsax-react-native'
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -194,6 +195,19 @@ const PollCard = (props: IPost& IProps) => {
         }
       }
 
+      const { mutate, isLoading } = useMutation({
+        mutationFn: () => httpService.post(`${URLS.BOOKMARK_POST}/${post.id}`),
+        onSuccess: (data) => {
+          toast.show(data.data.message, { type: 'success' });
+          setPost({ ...post, is_bookmarked: post.is_bookmarked === 1 ?0:1 })
+          //setAll({ activePost: { ...activePost, is_bookmarked: activePost.is_bookmarked === 1 ?0:1 } });
+        },
+        onError: (error: any) => {
+          toast.show(error.message, { type: 'error' });
+  
+        },
+      });
+
 
   return (
     <Box width='100%' backgroundColor={isDarkMode ? "secondaryBackGroundColor" : "mainBackGroundColor"
@@ -203,12 +217,12 @@ const PollCard = (props: IPost& IProps) => {
         <Box flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' paddingTop='m'>
             <Box flexDirection='row' alignItems='center'>
 
-                <Box flexDirection='row'>
+                <Box flexDirection='row' justifyContent='flex-start'>
                     <View style={{ width: 32, height: 32, borderRadius: 25, borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: theme.colors.secondaryBackGroundColor, overflow: 'hidden' }} >
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} contentFit='contain' style={{ width: '100%', height: '100%', borderRadius: 25 }} />
                     </View>
 
-                    <Box marginLeft="s" justifyContent="center">
+                    <Box marginLeft="s" justifyContent="center" alignItems='flex-start'>
                         <Box flexDirection="row" >
                             <CustomText variant="body" color="black">
                             {name?.length > 5 ? 
@@ -216,8 +230,28 @@ const PollCard = (props: IPost& IProps) => {
                                 name
                             }
                             </CustomText>
-                            <CustomText variant="body" color="grey">@{username}</CustomText>
+                            <CustomText variant="body" color="grey">@{username?.length > 5 ?
+                            username?.substring(0, 5) + '...': username}</CustomText>
                         </Box>
+                          { myId !== userId && (
+                            <Pressable style={{
+                              backgroundColor: theme.colors.mainBackGroundColor,
+                              padding: 5,
+                              width: 100,
+                              borderRadius: 20,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginVertical: 5
+                            }}
+                              onPress={handleFollow}
+                            >
+                              { follow.isLoading ? (
+                                <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
+                              ): (
+                                <CustomText variant="header" fontSize={14} color="textColor">{ isFollowing === 1 ? 'Following':'Follow'}</CustomText>
+                              )}
+                            </Pressable>
+                          )}
                         <CustomText
                             variant="xs"
                             onPress={() => navigation.navigate("post", { postId: id })}
@@ -227,27 +261,12 @@ const PollCard = (props: IPost& IProps) => {
                         </Box>
                 </Box>
 
-                { myId !== userId && (
-              <Pressable style={{
-                backgroundColor: theme.colors.fadedButtonBgColor,
-                padding: 5,
-                
-                borderRadius: 20,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 20
-              }}
-                onPress={handleFollow}
-              >
-                { follow.isLoading ? (
-                  <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
-                ): (
-                  <CustomText variant="header" fontSize={14} color="primaryColor">{ isFollowing === 1 ? 'Following':'Follow'}</CustomText>
-                )}
-              </Pressable>
-            )}
             </Box>
-            <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} />
+            <Box flexDirection='row'>
+              { post.is_bookmarked === 1 && myId !== userId ? 
+              <SaveMinus size={20} color={theme.colors.primaryColor} style={{ marginRight: 10 }} onPress={() => mutate()} />: <SaveAdd  size={20} color={theme.colors.textColor} style={{ marginRight: 10 }} onPress={() => mutate()} /> }
+              <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} />
+            </Box>
         </Box>
 
         {/* CONTENT SECTION */}

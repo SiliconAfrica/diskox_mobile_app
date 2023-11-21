@@ -123,19 +123,19 @@ const PostActionModal = () => {
         />
       ),
     },
-    {
-      id: 2,
-      isLoading: isLoading,
-      label: activePost.is_bookmarked === 1 ? 'Remove post':"Save post",
-      action: () => handleSave(),
-      icon: (
-        <Ionicons
-          name="bookmark-outline"
-          size={20}
-          color={activePost.is_bookmarked === 1 ? theme.colors.primaryColor:theme.colors.textColor}
-        />
-      ),
-    },
+    // {
+    //   id: 2,
+    //   isLoading: isLoading,
+    //   label: activePost.is_bookmarked === 1 ? 'Remove post':"Save post",
+    //   action: () => handleSave(),
+    //   icon: (
+    //     <Ionicons
+    //       name="bookmark-outline"
+    //       size={20}
+    //       color={activePost.is_bookmarked === 1 ? theme.colors.primaryColor:theme.colors.textColor}
+    //     />
+    //   ),
+    // },
     {
       id: 3,
       label: "Copy link",

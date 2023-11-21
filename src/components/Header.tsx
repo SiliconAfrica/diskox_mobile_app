@@ -13,7 +13,11 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useDetailsState } from "../states/userState";
 import { IMAGE_BASE } from "../utils/httpService";
 
-const Header = () => {
+const Header = ({
+  showMenuButton = true
+}: {
+  showMenuButton?: boolean
+}) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>();
   const [isDarkMode, isLoggedIn] = useUtilState((state) => [
@@ -35,12 +39,12 @@ const Header = () => {
       borderBottomColor="secondaryBackGroundColor"
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Feather
+        { showMenuButton && <Feather
           name="menu"
           size={25}
           color={theme.colors.textColor}
           onPress={() => navigation.openDrawer()}
-        />
+        />}
         <Image
           source={
             isDarkMode

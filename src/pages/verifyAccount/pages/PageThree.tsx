@@ -47,7 +47,7 @@ const PageThree = ({next}: {
 
       const navigate = () => {
         if (self_with_id === null) {
-            toast.show('You have to select an image to continue', { type: 'warning'});
+            toast.show('You have to select an image to continue', { type: 'warning', placement: 'top', style: { marginTop: 50 } });
             return;
         }
         next(4);

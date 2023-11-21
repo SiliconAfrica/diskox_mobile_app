@@ -16,6 +16,8 @@ import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Updates from "expo-updates";
+// import pusher from "../utils/pusher";
+// import { PusherEvent } from "pusher-js/types/src/core/connection/protocol/message-types";
 
 const queryClient = new QueryClient();
 const Navigation = () => {
@@ -42,9 +44,23 @@ const Navigation = () => {
     }
   };
 
+  // React.useEffect(() => {
+  //   pusher.subscribe({
+  //     channelName: 'test.event',
+  //     onEvent: (event: any) => {
+  //       console.log(`this is working`);
+  //       console.log(event)
+  //     }
+  //   })
+  // }, [pusher])
+
   React.useEffect(() => {
-    checkForUpdates();
+    // checkForUpdates();
+  
+  
     (async function () {
+  
+    
       // const data = await SecureStorage.getItemAsync("user");
       const [data, dataErr] = await handlePromise(AsyncStorage.getItem("user"));
       const isDark = await SecureStorage.getItemAsync("darkMode");
@@ -72,6 +88,7 @@ const Navigation = () => {
       }
       await SplashScreen.hideAsync();
     })();
+
   }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
