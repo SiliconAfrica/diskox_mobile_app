@@ -19,6 +19,7 @@ export interface IUserState {
   name: string;
   phone_number: string;
   profile_image: string;
+  community_privilege: number;
   state: string;
   ad_sharing: number;
   suspended_at: string;
@@ -44,6 +45,7 @@ export const useDetailsState = create<IUserState>((set) => ({
   state: "",
   suspended_at: "",
   suspension_expired_at: "",
+  community_privilege: 0,
   ad_sharing: 0,
   updated_at: "",
   created_at: "",
@@ -72,6 +74,7 @@ export const useUserStateBeforeAddingByRegistration = create<IUserState>(
     state: "",
     suspended_at: "",
     suspension_expired_at: "",
+    community_privilege: 0,
     ad_sharing: 0,
     updated_at: "",
     created_at: "",
