@@ -45,7 +45,7 @@ export type RootStackParamList = {
   onboarding: { showModal: 1 | 2 | undefined; addAccount?: boolean };
   login: undefined;
   "sign-up": undefined;
-  "set-up": { showUsername?: boolean; userId: number };
+  "set-up": { showUsername?: boolean; userId?: number };
   "create-post": { origin?: string; communityId?: number };
   profile: { userId: number };
   "profile-setting": undefined;

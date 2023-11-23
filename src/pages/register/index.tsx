@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import Box from "../../components/general/Box";
 import { Image } from "expo-image";
@@ -23,7 +24,7 @@ import { AntDesign } from "@expo/vector-icons";
 import * as Google from "expo-auth-session/providers/google";
 import * as SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { CustomTextInput } from "../../components/form/CustomInput";
@@ -40,6 +41,8 @@ import {
 } from "../../states/userState";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
+import { handlePromise } from "../../utils/handlePomise";
+import { useMultipleAccounts } from "../../states/multipleAccountStates";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -57,6 +60,10 @@ const Register = ({
 }: NativeStackScreenProps<RootStackParamList, "onboarding">) => {
   const [isDarkMode] = useUtilState((state) => [state.isDarkMode]);
   const { addAccount } = useModalState();
+  const { addAccountFn, switchAccount } = useMultipleAccounts();
+  const userData = useDetailsState((state) => state);
+  const { setAll: updateDetails, username } = useDetailsState((state) => state);
+  const queryClient = useQueryClient();
   const [setAll, values] = useSignupState((state) => [
     state.setAll,
     {
@@ -78,11 +85,12 @@ const Register = ({
   const navigation = useNavigation<PageType>();
   const toast = useToast();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     // androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
     // iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
     // redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
     // expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
+
     androidClientId:
       "304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com",
     iosClientId:
@@ -111,20 +119,68 @@ const Register = ({
     },
   });
 
+  const loginSuccessFn = async (data, proceedToSetup) => {
+    if (addAccount && data.data.user.username) {
+      addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
+
+      switchAccount(
+        data.data.user.username,
+        data.data.authorisation.token,
+        updateDetails,
+        queryClient
+      );
+    } else if (!addAccount && data.data.user.username) {
+      updateDetails({
+        ...data.data.user,
+        token: data.data.authorisation.token,
+      });
+    }
+    //save logged in user in local
+    await SecureStorage.setItemAsync(
+      `---${data.data.user.username}---token`,
+      data.data.authorisation.token
+    );
+    await SecureStorage.setItemAsync("token", data.data.authorisation.token);
+    // await SecureStorage.setItemAsync("user", JSON.stringify(data.data.user));
+    const [saveUser, saveUserErr] = await handlePromise(
+      AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
+    );
+    if (proceedToSetup === true) {
+      navigation.navigate("set-up", {
+        showUsername: true,
+        userId: data.data.user.id,
+      });
+      return true;
+    } else if (proceedToSetup !== true && data.data?.user?.email_verified_at) {
+      navigation.navigate("home");
+      return true;
+    } else if (proceedToSetup !== true && !data.data?.user?.email_verified_at) {
+      toast.show("Please verify your email", { type: "danger" });
+      navigation.navigate("verify-email");
+      return true;
+    }
+  };
+
   // google signup mutation
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: string) =>
       httpService.post(`${URLS.GOOGLE_AUTH}/${data}`),
-    onSuccess: (data) => {},
+    onSuccess: (data) => {
+      if (!data.data.user.username) {
+        loginSuccessFn(data, true);
+      } else {
+        loginSuccessFn(data, false);
+      }
+    },
     onError: (error: any) => {
-      toast.show(error.message, { type: "error" });
+      toast.show(error.message, { type: "danger" });
     },
   });
 
   React.useEffect(() => {
     if (response?.type === "success") {
       // Handle successful authentication
-      mutate(response.authentication?.accessToken);
+      mutate(response.params?.id_token);
     }
   }, [response]);
 
@@ -150,6 +206,7 @@ const Register = ({
   const signInWithGoogleAsync = async () => {
     promptAsync({ useProxy: true, projectNameForProxy: "@dandolla98/diskos" });
   };
+
   const { renderForm } = useForm({
     defaultValues: {
       username: values.username,

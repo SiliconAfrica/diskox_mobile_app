@@ -39,11 +39,12 @@ import { da } from "date-fns/locale";
 import { useModalState } from "../../states/modalState";
 import { useMultipleAccounts } from "../../states/multipleAccountStates";
 import { useDetailsState } from "../../states/userState";
+import { useVerifyState } from "../verifyemail/state";
 
 const Setup = ({
   navigation,
   route,
-}: NativeStackScreenProps<RootStackParamList>) => {
+}: NativeStackScreenProps<RootStackParamList, "set-up">) => {
   const [selected, setSelected] = React.useState<ICountry>({
     id: 158,
     name: "Nigeria",
@@ -57,9 +58,10 @@ const Setup = ({
   const theme = useTheme<Theme>();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const showUsername = true;
+  const showUsername = route.params?.showUsername;
   const image = useImage({ width: 70, height: 70 });
   const { addAccount } = useModalState((state) => state);
+  const { setAll: setVerified } = useVerifyState((state) => state);
   const { addAccountFn, switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails } = useDetailsState((state) => state);
   const [date, setDate] = React.useState("");
@@ -149,7 +151,24 @@ const Setup = ({
   };
 
   const handleSubmit = React.useCallback(() => {
-    if (state === "" || date === "" || gender === "") {
+    if (
+      (showUsername &&
+        (payload.username === "" || payload.phone_number === "")) ||
+      state === "" ||
+      date === "" ||
+      gender === ""
+    ) {
+      // alert("Please fill out the form");
+      toast.show("Please fill out the form", {
+        type: "danger",
+        placement: "top",
+      });
+      return;
+    }
+    if (
+      showUsername === true &&
+      (payload.username === "" || payload.phone_number === "")
+    ) {
       // alert("Please fill out the form");
       toast.show("Please fill out the form", {
         type: "danger",
@@ -231,6 +250,7 @@ const Setup = ({
     getYears();
     getMonths();
     getDays();
+    setVerified({ stage: 1 });
   }, []);
   useEffect(() => {
     const yyyy = Number(selectedDate.year);
@@ -269,7 +289,10 @@ const Setup = ({
                 required
                 containerStyle={{ marginTop: theme.spacing.m }}
                 onChangeText={(val) =>
-                  setPayload((prev) => ({ ...prev, username: val }))
+                  setPayload((prev) => ({
+                    ...prev,
+                    username: val.toLowerCase(),
+                  }))
                 }
               />
               <CustomTextInputWithoutForm
