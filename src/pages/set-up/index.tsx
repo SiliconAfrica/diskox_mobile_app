@@ -184,7 +184,7 @@ const Setup = ({
       ...(showUsername ? payload : {}),
     };
     mutate(obj);
-  }, [date, selectedDate, gender, selected, state]);
+  }, [date, selectedDate, gender, selected, state, payload]);
 
   const handleSelectDate = (type: "year" | "month" | "day", value) => {
     if (type === "year") {
