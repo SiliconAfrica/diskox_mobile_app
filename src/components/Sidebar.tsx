@@ -161,8 +161,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
               <CustomText
                 style={{ fontSize: 10, width: "100%", textAlign: "center" }}
               >
-                @{user?.username.substring(0, 7)}
-                {user?.username.length > 5 && "..."}
+                @{user?.username?.substring(0, 7)}
+                {user?.username?.length > 5 && "..."}
               </CustomText>
             </Box>
           ))}
@@ -269,9 +269,10 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Add an account"
-                action={() =>
-                  navigation.navigate("sign-in", { isAddingAccount: true })
-                }
+                action={() => {
+                  setModal({ addAccount: true });
+                  navigation.navigate("sign-in", { isAddingAccount: true });
+                }}
                 // action={() =>
                 //   navigation.navigate("onboarding", {
                 //     showModal: 1,
