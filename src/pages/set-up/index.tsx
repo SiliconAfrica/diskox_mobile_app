@@ -1,5 +1,6 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ScrollView } from "react-native";
 import React, { useEffect } from "react";
+import * as SecureStorage from "expo-secure-store";
 // import CountrySelectDropdown from "react-native-searchable-country-dropdown"
 import Box from "../../components/general/Box";
 import CustomText from "../../components/general/CustomText";
@@ -23,7 +24,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import moment from "moment";
 import NormalButton from "../../components/general/NormalButton";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useUtilState } from "../../states/util";
@@ -32,8 +33,18 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import PopupModal from "./PopupModal";
 import CustomDropdown from "../../components/form/CustomDropdown";
 import useToast from "../../hooks/useToast";
+import { CustomTextInput } from "../../components/form/CustomInput";
+import { CustomTextInputWithoutForm } from "../../components/form/CustomInputWithoutForm";
+import { da } from "date-fns/locale";
+import { useModalState } from "../../states/modalState";
+import { useMultipleAccounts } from "../../states/multipleAccountStates";
+import { useDetailsState } from "../../states/userState";
+import { useVerifyState } from "../verifyemail/state";
 
-const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
+const Setup = ({
+  navigation,
+  route,
+}: NativeStackScreenProps<RootStackParamList, "set-up">) => {
   const [selected, setSelected] = React.useState<ICountry>({
     id: 158,
     name: "Nigeria",
@@ -46,11 +57,21 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
   });
   const theme = useTheme<Theme>();
   const toast = useToast();
+  const queryClient = useQueryClient();
+  const showUsername = route.params?.showUsername;
   const image = useImage({ width: 70, height: 70 });
+  const { addAccount } = useModalState((state) => state);
+  const { setAll: setVerified } = useVerifyState((state) => state);
+  const { addAccountFn, switchAccount } = useMultipleAccounts((state) => state);
+  const { setAll: updateDetails } = useDetailsState((state) => state);
   const [date, setDate] = React.useState("");
   const [showDate, setShowDate] = React.useState(false);
   const { isDarkMode, setAll } = useUtilState((state) => state);
   const [gender, setGender] = React.useState("male");
+  const [payload, setPayload] = React.useState({
+    username: "",
+    phone_number: "",
+  });
   const [state, setState] = React.useState("");
   const [years, setYears] = React.useState<{ value: string }[]>([]);
   const [months, setMonths] = React.useState<
@@ -67,16 +88,41 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
   });
   const [showModal, setShowModal] = React.useState(false);
 
-  const { isLoading, mutate } = useMutation({
+  const { mutate: refetchProfile } = useMutation({
     mutationFn: (data: any) =>
-      httpService.post(`${URLS.UPDATE_COUNTRY_SATE}`, data),
+      httpService.get(URLS.GET_AUTH_USER_DETAILS, data),
     onError: (error: any) => {
       // alert(error.message);
       toast.show(error.message, { type: "danger", placement: "top" });
     },
-    onSuccess: (data: any) => {
+    onSuccess: async (data: any) => {
+      const token = await SecureStorage.getItemAsync("token");
+      if (addAccount && data.data?.data?.username) {
+        addAccountFn(data.data.data, data.data.data); //this adds old user account to accounts arr
+
+        switchAccount(
+          data.data.data.username,
+          token,
+          updateDetails,
+          queryClient
+        );
+      } else if (!addAccount && data?.data?.data?.username) {
+        updateDetails({
+          ...data.data.data,
+          token: token,
+        });
+      }
       setShowModal(true);
       setAll({ isLoggedIn: true });
+    },
+  });
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (data: any) => httpService.post(URLS.UPDATE_COUNTRY_SATE, data),
+    onError: (error: any) => {
+      toast.show(error.message, { type: "danger", placement: "top" });
+    },
+    onSuccess: (data: any) => {
+      refetchProfile({});
     },
   });
 
@@ -105,7 +151,24 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
   };
 
   const handleSubmit = React.useCallback(() => {
-    if (state === "" || date === "" || gender === "") {
+    if (
+      (showUsername &&
+        (payload.username === "" || payload.phone_number === "")) ||
+      state === "" ||
+      date === "" ||
+      gender === ""
+    ) {
+      // alert("Please fill out the form");
+      toast.show("Please fill out the form", {
+        type: "danger",
+        placement: "top",
+      });
+      return;
+    }
+    if (
+      showUsername === true &&
+      (payload.username === "" || payload.phone_number === "")
+    ) {
       // alert("Please fill out the form");
       toast.show("Please fill out the form", {
         type: "danger",
@@ -118,9 +181,10 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       state,
       birthday: date,
       gender: gender,
+      ...(showUsername ? payload : {}),
     };
     mutate(obj);
-  }, [date, selectedDate, gender, selected, state]);
+  }, [date, selectedDate, gender, selected, state, payload]);
 
   const handleSelectDate = (type: "year" | "month" | "day", value) => {
     if (type === "year") {
@@ -138,7 +202,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     const eligibleYearEnd = Number(currentYear) - 110;
     let theYears = [];
     for (let i = eligibleYearStart; i > eligibleYearEnd; i--) {
-      theYears = [...theYears, { value: i }];
+      theYears = [...theYears, { value: i.toString() }];
     }
     setYears([...theYears]);
   };
@@ -178,7 +242,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
       ) {
         break;
       }
-      theDays = [...theDays, { value: i }];
+      theDays = [...theDays, { value: i.toString() }];
     }
     setDays([...theDays]);
   };
@@ -186,6 +250,7 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     getYears();
     getMonths();
     getDays();
+    setVerified({ stage: 1 });
   }, []);
   useEffect(() => {
     const yyyy = Number(selectedDate.year);
@@ -199,84 +264,109 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
     getDays();
   }, [selectedDate.month]);
   return (
-    <Box
-      backgroundColor="mainBackGroundColor"
-      flex={1}
-      paddingTop="xl"
-      paddingHorizontal="m"
-    >
-      <PopupModal visible={showModal} />
-      <Box flex={1}>
-        <Box
-          width="100%"
-          height={100}
-          justifyContent="center"
-          alignItems="center"
-        >
-          {image()}
-        </Box>
-        <CustomText variant="subheader">Where are you from?</CustomText>
+    <Box backgroundColor="mainBackGroundColor" flex={1} paddingTop="xl">
+      <ScrollView style={{ paddingHorizontal: theme.spacing.m }}>
+        <PopupModal visible={showModal} />
+        <Box flex={1}>
+          <Box
+            width="100%"
+            height={100}
+            justifyContent="center"
+            alignItems="center"
+          >
+            {image()}
+          </Box>
+          <CustomText variant="subheader">Where are you from?</CustomText>
 
-        {/* <CountryPicker onPicked={handleSelect} /> */}
-        <CustomDropdown
-          label="Country"
-          options={Countries}
-          labelField="name"
-          valueField="name"
-          placeholder="Nigeria"
-          value={selected.name}
-          onChange={handleSelect}
-          search
-        />
-        <CustomDropdown
-          label="State"
-          options={renderStates()}
-          labelField="label"
-          valueField="label"
-          value={state}
-          onChange={(data) => setState(data.label)}
-          search
-        />
+          {/* <CountryPicker onPicked={handleSelect} /> */}
+          {showUsername && (
+            <>
+              <CustomTextInputWithoutForm
+                name="username"
+                placeholder="Enter your username"
+                value={payload.username}
+                label="Username"
+                required
+                containerStyle={{ marginTop: theme.spacing.m }}
+                onChangeText={(val) =>
+                  setPayload((prev) => ({
+                    ...prev,
+                    username: val.toLowerCase(),
+                  }))
+                }
+              />
+              <CustomTextInputWithoutForm
+                name="phone_number"
+                placeholder="Enter your phone number"
+                value={payload.phone_number}
+                label="Phone Number"
+                required
+                containerStyle={{ marginTop: theme.spacing.m }}
+                onChangeText={(val) =>
+                  setPayload((prev) => ({ ...prev, phone_number: val }))
+                }
+              />
+            </>
+          )}
+          <CustomDropdown
+            label="Country"
+            options={Countries}
+            labelField="name"
+            valueField="name"
+            placeholder="Nigeria"
+            value={selected.name}
+            onChange={handleSelect}
+            search
+          />
+          <CustomDropdown
+            label="State"
+            options={renderStates()}
+            labelField="label"
+            valueField="label"
+            value={state}
+            onChange={(data) => setState(data.label)}
+            search
+          />
 
-        {/* <CustomPicker
+          {/* <CustomPicker
           onPicked={(data) => setState(data)}
           data={renderStates()}
           label="State"
         /> */}
 
-        <GenderPicker onChange={(gen: string) => setGender(gen)} />
+          <GenderPicker onChange={(gen: string) => setGender(gen)} />
 
-        <CustomText variant="body" mt="l">
-          Date of birth
-        </CustomText>
+          <CustomText variant="body" mt="l">
+            Date of birth
+          </CustomText>
 
-        <Box flexDirection="row" justifyContent="space-between">
-          <CustomDropdown
-            boxStyle={{ width: "30%" }}
-            options={years}
-            labelField="value"
-            valueField="value"
-            placeholder={years.length > 0 ? years[0].value : ""}
-            onChange={(value) => handleSelectDate("year", value.value)}
-          />
-          <CustomDropdown
-            boxStyle={{ width: "35%" }}
-            options={months}
-            labelField="label"
-            valueField="value"
-            placeholder={months.length > 0 && months[0].label.toString()}
-            onChange={(value) => handleSelectDate("month", value.value)}
-          />
-          <CustomDropdown
-            boxStyle={{ width: "30%" }}
-            options={days}
-            labelField="value"
-            valueField="value"
-            placeholder={days.length > 0 && days[0].value}
-            onChange={(value) => handleSelectDate("day", value.value)}
-          />
-        </Box>
-        {/* <Box
+          <Box flexDirection="row" justifyContent="space-between">
+            <CustomDropdown
+              boxStyle={{ width: "30%" }}
+              options={years}
+              labelField="value"
+              valueField="value"
+              placeholder={years.length > 0 ? years[0].value : ""}
+              onChange={(value) => handleSelectDate("year", value.value)}
+            />
+            <CustomDropdown
+              boxStyle={{ width: "35%" }}
+              options={months}
+              labelField="label"
+              valueField="value"
+              placeholder={months.length > 0 && months[0].label.toString()}
+              onChange={(value) => handleSelectDate("month", value.value)}
+            />
+            <CustomDropdown
+              boxStyle={{ width: "30%" }}
+              options={days}
+              labelField="value"
+              valueField="value"
+              placeholder={days.length > 0 && days[0].value}
+              onChange={(value) => handleSelectDate("day", value.value)}
+            />
+          </Box>
+          {/* <Box
           width="100%"
           height={50}
           borderRadius={10}
@@ -314,15 +404,16 @@ const Setup = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => {
             themeVariant={isDarkMode ? "dark" : "light"}
           />
         )} */}
-      </Box>
+        </Box>
 
-      <Box flex={0.2}>
-        <NormalButton
-          label="Next"
-          action={handleSubmit}
-          isLoading={isLoading}
-        />
-      </Box>
+        <Box flex={0.2} marginBottom="xl">
+          <NormalButton
+            label="Next"
+            action={handleSubmit}
+            isLoading={isLoading}
+          />
+        </Box>
+      </ScrollView>
     </Box>
   );
 };

@@ -85,16 +85,17 @@ const SignIn = ({
     scopes: ["profile", "email"],
   });
 
-  const loginSuccessFn = async (data) => {
-    if (addAccount) {
+  const loginSuccessFn = async (data, proceedToSetup) => {
+    if (addAccount && data.data.user.username) {
       addAccountFn(userData, data.data.user); //this adds old user account to accounts arr
+
       switchAccount(
         data.data.user.username,
         data.data.authorisation.token,
         updateDetails,
         queryClient
       );
-    } else {
+    } else if (!addAccount && data.data.user.username) {
       updateDetails({
         ...data.data.user,
         token: data.data.authorisation.token,
@@ -112,14 +113,20 @@ const SignIn = ({
     );
     updateUtil({ isLoggedIn: true });
     setAll({ showLogin: false });
-    if (data.data?.user?.email_verified_at) {
+    if (proceedToSetup === true) {
+      navigation.navigate("set-up", {
+        showUsername: true,
+        userId: data.data.user.id,
+      });
+      return true;
+    } else if (proceedToSetup !== true && data.data?.user?.email_verified_at) {
       navigation.navigate("home");
-      return;
-    } else {
+      return true;
+    } else if (proceedToSetup !== true && !data.data?.user?.email_verified_at) {
       toast.show("Please verify your email", { type: "danger" });
       setAll({ showLogin: false });
       navigation.navigate("verify-email");
-      return;
+      return true;
     }
   };
 
@@ -135,7 +142,13 @@ const SignIn = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: string) =>
       httpService.post(`${URLS.GOOGLE_AUTH}/${data}`),
-    onSuccess: (data) => console.log(data.data.user, "pl"),
+    onSuccess: async (data) => {
+      if (!data.data.user.username) {
+        loginSuccessFn(data, true);
+      } else {
+        loginSuccessFn(data, false);
+      }
+    },
     onError: (error: any) => {
       toast.show(error.message, { type: "error" });
     },

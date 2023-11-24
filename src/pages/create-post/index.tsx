@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "../../components/general/Box";
 import SettingsHeader from "../../components/settings/Header";
 import { useDetailsState } from "../../states/userState";
@@ -30,10 +30,13 @@ import { Follower } from "../../models/Follower";
 
 const CreatePost = ({
   navigation,
+  route,
 }: NativeStackScreenProps<RootStackParamList, "create-post">) => {
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
+  const theOrigin = route.params.origin;
+  const communityId = route.params.communityId;
   const { setAll, visibility } = useModalState((state) => state);
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -47,10 +50,18 @@ const CreatePost = ({
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
+  const [origin, setOrigin] = React.useState("post");
 
   const theme = useTheme<Theme>();
   const toast = useToast();
 
+  useEffect(() => {
+    if (theOrigin && theOrigin === "community") {
+      setOrigin("community");
+    } else {
+      setOrigin("post");
+    }
+  }, []);
   // functions
   const editPoll = React.useCallback(
     (e: string, i: number) => {
@@ -176,7 +187,9 @@ const CreatePost = ({
 
   const handleSubmit = React.useCallback(async () => {
     const formData = new FormData();
-
+    if (origin === "community") {
+      formData.append("community_id", communityId.toString());
+    }
     if (activeTab === TAB_BAR_ENUM.POST) {
       formData.append("description", value);
       formData.append("post_type", "post");
