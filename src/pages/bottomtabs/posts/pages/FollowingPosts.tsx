@@ -223,7 +223,7 @@ const FollowingPost = ({
   // react query
   const { isLoading, isError, error, refetch } = useQuery(
     ["GetFolllowersPosts", currentPage],
-    () => httpService.get(`${URLS.GET_POST}`, {
+    () => httpService.get(`${URLS.GET_FOLLOWING}`, {
       params: {
         page: currentPage,
       }
@@ -327,7 +327,7 @@ const FollowingPost = ({
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
         extraData={posts}
-        renderItem={({ item }) => <PostCard {...item} showStats />}
+        renderItem={({ item }) => <FeedCard post={item} showReactions />}
         data={posts}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">

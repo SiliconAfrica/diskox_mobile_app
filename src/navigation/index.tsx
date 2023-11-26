@@ -71,15 +71,77 @@ const Navigation = () => {
     }
   };
 
-  // React.useEffect(() => {
-  //   pusher.subscribe({
-  //     channelName: 'test.event',
-  //     onEvent: (event: any) => {
-  //       console.log(`this is working`);
-  //       console.log(event)
-  //     }
-  //   })
-  // }, [pusher])
+  React.useEffect(() => {
+    (async function(){
+      // const pusher = Pusher.getInstance();
+      // await pusher.init({
+      //   apiKey: PUSHER_APP_KEY,
+      //   cluster: pusherConfig.cluster,
+      //   onError: (error) => {
+      //     console.log(error)
+      //   },
+      //   onConnectionStateChange: (curr, prev) => {
+      //     console.log(curr);
+      //     console.log(prev);
+      //   }
+      // });
+
+    // await pusher.connect();
+    //   await pusher.subscribe({
+    //     channelName: "test.event", 
+    //     onEvent: (event: PusherEvent) => {
+    //       console.log(`Event received: ${event}`);
+    //     }
+    //   });
+    
+      // let echo = new Echo({
+      //   broadcaster: 'pusher',
+      //   client: pusher,
+      //   host: 'https://test404.diskox.com',
+      //   endpoint: 'https://test404.diskox.com/api/broadcasting/auth',
+      // });
+
+            
+      // const ee = echo.channel('test.event').listen('test-event', (e: any) => {
+      //   console.log(e);
+      // });
+
+      // console.log(ee);
+
+    })()
+    // let PusherClient = new Pusher(PUSHER_APP_KEY, {
+    //   cluster: pusherConfig.cluster,
+      
+    //   // wsHost: 'test404.diskox.com/',
+    //   // authEndpoint: 'https://test404.diskox.com/api/broadcasting/auth',
+    //   // enabledTransports: ['ws', 'wss'],
+    //   forceTLS: false,
+    // });
+
+    // const channel = PusherClient.subscribe('test.event');
+ 
+    // PusherClient.bind('subscription.error', (data: any) => {
+    //     console.log(data);
+    // })
+
+    // channel.bind('subscription.succeeded', () => {
+    //   console.log('Successfully subscribed to channel');
+    //   console.log('Subscribed:', channel.subscribed); // This should be true
+    // });
+
+    //   let echo = new Echo({
+    //     broadcaster: 'pusher',
+    //     client: PusherClient,
+    //     host: 'https://test404.diskox.com',
+    //     endpoint: 'https://test404.diskox.com/api/broadcasting/auth',
+    //   });
+      
+    //   const ee = echo.channel('test.event').listen('test-event', (e: any) => {
+    //     console.log(e);
+    //   });
+      
+  }, [])
+
 
   React.useEffect(() => {
     (async function(){

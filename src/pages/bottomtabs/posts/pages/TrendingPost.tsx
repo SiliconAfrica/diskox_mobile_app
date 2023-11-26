@@ -327,7 +327,7 @@ const TrendingPost = ({
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
         extraData={posts}
-        renderItem={({ item }) => <PostCard {...item} showStats />}
+        renderItem={({ item }) => <FeedCard post={item} showReactions />}
         data={posts}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">
