@@ -8,11 +8,13 @@ import { Feather } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import * as ImagePicker from 'expo-image-picker';
+import { IFile } from '../../pages/chat'
+import CustomText from '../general/CustomText'
 
 
 
 interface IProps {
-    file: ImagePicker.ImagePickerAsset;
+    file: IFile;
     index: number;
     onDelete: (data:{ index?: number, clearAll?: boolean}) => void;
     width?: number | string;
@@ -23,13 +25,19 @@ const MediaCard = ({ file, index, onDelete, width = 150, height = '90%' }: IProp
     const theme = useTheme<Theme>();
 
     const RenderItem = React.useCallback(() => {
-            if (file.type === 'image') {
+            if (file.type.includes('image')) {
                 return (
                     <Image source={{ uri: file.uri }} contentFit='cover' style={{ width: '100%', height: '100%' }} />
                 )
-            } else {
+            } else if (file.type.includes('video')) {
                 return (
                     <Video source={{ uri: `${file.uri}` }} usePoster  resizeMode={ResizeMode.COVER} useNativeControls videoStyle={{ width: '100%', height: '100%', borderRadius: 15, backgroundColor: 'grey' }} isLooping={false} style={{ width: '100%', height: '100%', borderRadius: 15, backgroundColor: 'grey', overflow: 'hidden' }} />
+                )
+            } else {
+                return (
+                    <Box width='100%' style={{ backgroundColor: 'red' }} height={'100%'} justifyContent='center' alignItems='center'>
+                        <CustomText variant='header' fontSize={14}>{file.type.split('/')[1].toUpperCase()}</CustomText>
+                    </Box>
                 )
             }
     }, [file]);
@@ -49,7 +57,7 @@ const style = StyleSheet.create({
         position: 'absolute',
         right: 0,
         bottom: -1,
-        height: 40,
+        height: 30,
         width: '100%',
         borderRadius: 0,
         justifyContent: 'center',

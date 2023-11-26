@@ -28,6 +28,8 @@ interface State {
   showReportPost: boolean;
   showBlockUser: boolean,
   showDeleteConvo: boolean,
+  imageViewer: boolean,
+  activeImages: string[],
   activeChat: { userId: number, username: string }| null;
   setAll: (data: Partial<State>) => void;
 }
@@ -53,6 +55,8 @@ export const useModalState = create<State>((set) => ({
   showBlockUser: false,
   activeChat: null,
   showDeleteConvo: false,
+  imageViewer: false,
+  activeImages: [],
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

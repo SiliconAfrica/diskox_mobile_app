@@ -10,7 +10,19 @@ import { POST_FILTERR } from "../../enums/Postfilters";
 import { useUtilState } from "../../states/util";
 import { Image } from "expo-image";
 
-const FilterTopbar = () => {
+export enum FILTER_BAR_ENUM {
+  NEW = 'NEW',
+  FOLLOWING = 'FOLLOWING',
+  TRENDING = 'TRENDING'
+}
+
+const FilterTopbar = ({
+  activeTab,
+  onActive
+}: {
+  activeTab?: FILTER_BAR_ENUM,
+  onActive?: (data: FILTER_BAR_ENUM) => void
+}) => {
   const theme = useTheme<Theme>();
   const { setAll, filterBy } = useModalState((state) => state);
   const { isDarkMode } = useUtilState((state) => state)
@@ -19,7 +31,7 @@ const FilterTopbar = () => {
     <Box
       borderBottomWidth={1}
       borderBottomColor="secondaryBackGroundColor"
-      height={80}
+      height={60}
       borderTopWidth={1}
       borderTopColor="secondaryBackGroundColor"
       backgroundColor={ isDarkMode ? "secondaryBackGroundColor":'mainBackGroundColor'}
@@ -28,87 +40,91 @@ const FilterTopbar = () => {
       justifyContent="space-between"
       alignItems="center"
       paddingHorizontal="m"
-      marginVertical="s"
     >
-      <Pressable
-        onPress={() => setAll({ showFilter: true })}
-        style={{
-          height: 35,
-          width: "35%",
-          borderRadius: 30,
-          backgroundColor: "#F7FCF9",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {filterBy !== POST_FILTERR.ALL &&
-          filterBy !== POST_FILTERR.TOP_STORIES && (
-            <CustomText variant="subheader" fontSize={15} color="primaryColor" >
-              {filterBy}
-            </CustomText>
-          )}
-        {filterBy === POST_FILTERR.ALL && (
-          <CustomText variant="subheader" color="primaryColor" fontSize={16}>
-            SortBy
-          </CustomText>
-        )}
-        <Ionicons
-          name="chevron-down-outline"
-          size={15}
-          color={theme.colors.primaryColor}
-          style={{ marginLeft: 6, marginTop: 3 }}
-        />
-      </Pressable>
 
       <Pressable
-        onPress={() => setAll({ filterBy: POST_FILTERR.ALL })}
+        onPress={() => onActive(FILTER_BAR_ENUM.NEW)}
         style={{
           height: 40,
           borderRadius: 30,
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
+          paddingHorizontal: 10,
+          backgroundColor: activeTab === FILTER_BAR_ENUM.NEW ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
         <Ionicons
           name="flash-outline"
           size={25}
           color={
-            filterBy === POST_FILTERR.ALL
-              ? theme.colors.primaryColor
-              : theme.colors.textColor
+            activeTab === FILTER_BAR_ENUM.NEW
+              ? theme.colors.textColor
+              : theme.colors.lightGrey
           }
           style={{ marginRight: 4 }}
         />
         <CustomText
           variant="subheader"
           fontSize={16}
-          color={filterBy === POST_FILTERR.ALL ? "primaryColor" : "textColor"}
+          color={activeTab === FILTER_BAR_ENUM.NEW ? "textColor" : "lightGrey"}
         >
           New
         </CustomText>
       </Pressable>
 
       <Pressable
-        onPress={() => setAll({ filterBy: POST_FILTERR.TOP_STORIES })}
+        onPress={() => onActive(FILTER_BAR_ENUM.FOLLOWING)}
         style={{
           height: 40,
           borderRadius: 30,
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
+          paddingHorizontal: 10,
+          backgroundColor: activeTab === FILTER_BAR_ENUM.FOLLOWING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
-        <Image source={require('../../../assets/images/arrows/up.png')} contentFit="contain" style={{ width: 20, height: 20, marginRight: 5 }} />
+        <Ionicons
+          name="checkmark-circle-outline"
+          size={25}
+          color={
+            activeTab === FILTER_BAR_ENUM.FOLLOWING
+              ? theme.colors.textColor
+              : theme.colors.lightGrey
+          }
+          style={{ marginRight: 4 }}
+        />
+        <CustomText
+          variant="subheader"
+          fontSize={16}
+          color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "textColor" : "lightGrey"}
+        >
+          Following
+        </CustomText>
+      </Pressable>
+
+      <Pressable
+        onPress={() => onActive(FILTER_BAR_ENUM.TRENDING)}
+        style={{
+          height: 40,
+          borderRadius: 30,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 10,
+          backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
+        }}
+      >
+        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? theme.colors.textColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
         <CustomText
           variant="subheader"
           fontSize={16}
           color={
-            filterBy === POST_FILTERR.TOP_STORIES ? "primaryColor" : "textColor"
+            activeTab === FILTER_BAR_ENUM.TRENDING ? "textColor" : "lightGrey"
           }
         >
-          Top Stories
+          Trending
         </CustomText>
       </Pressable>
     </Box>

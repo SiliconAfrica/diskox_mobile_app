@@ -14,10 +14,13 @@ const useCheckLoggedInState = () => {
     if (isLoggedIn) {
       return true;
     } else {
-      toast.show("You have to login to carryout this action", {
+      toast.show("You have to be logged in to be able to like, upvote, downvote or comment on a post", {
         type: "warning",
+        placement: 'top',
+        style: { marginTop: 50 },
+        duration: 5000,
       });
-      navigation.navigate("onboarding", { showModal: 1 });
+      // navigation.navigate("onboarding", { showModal: 1 });
       return false;
     }
   }, [isLoggedIn]);

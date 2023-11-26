@@ -12,6 +12,12 @@ import { IMAGE_BASE } from '../../utils/httpService'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
 import { useModalState } from '../../states/modalState'
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+  } from 'react-native-popup-menu';
 
 const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Partial<IUser> & { userId: number }) => {
     const { setAll } = useModalState((state) => state)
@@ -34,7 +40,28 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
             </Box>
         </Box>
 
-        <Ionicons name='ellipsis-vertical-outline' size={30} color={theme.colors.textColor} onPress={() => setShowMenu(prev => !prev)} />
+       <Menu >
+            <MenuTrigger>
+                <Ionicons name='ellipsis-vertical-outline' size={30} color={theme.colors.textColor} />
+            </MenuTrigger>
+            <MenuOptions customStyles={{
+                optionsContainer: {
+                    backgroundColor: theme.colors.secondaryBackGroundColor,
+                    paddingVertical: 10
+                },
+               
+            }}>
+                <MenuOption  onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: true, showDeleteConvo: false })}>
+                    <Box flexDirection='row'>
+                        <Feather name='slash' size={20} color={theme.colors.textColor} />
+                        <CustomText variant="body" marginLeft='s'>Block this person</CustomText>
+                    </Box>
+                </MenuOption>
+                <MenuOption onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: false, showDeleteConvo: true })}>
+                    <CustomText variant="body" marginLeft='s'>Delete conversation</CustomText>
+                </MenuOption>
+            </MenuOptions>
+       </Menu>
        {
         showMenu && (
             <Box  elevation={4} position='absolute' height={150} backgroundColor='secondaryBackGroundColor' borderRadius={10} zIndex={100} right={20} bottom={-120} padding='m'>
@@ -45,8 +72,7 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
                         showDeleteConvo: false,
                     })
                 }}>
-                    <Feather name='slash' size={20} color={theme.colors.textColor} />
-                    <CustomText variant="body" marginLeft='s'>Block this person</CustomText>
+                   
                 </Pressable>
 
                 <Pressable style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }} onPress={() => {

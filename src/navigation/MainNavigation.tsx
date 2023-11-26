@@ -35,6 +35,9 @@ import { ICommunity } from "../models/Community";
 import Interests from "../pages/interests";
 import VerifyAccount from "../pages/verifyAccount";
 import Bookmarks from "../pages/bookmarks";
+import Hashtag from "../pages/hashtag";
+import TrendingHashtags from "../pages/TrendingHastags";
+
 import Register from "../pages/register";
 import SignIn from "../pages/signin";
 
@@ -74,15 +77,14 @@ export type RootStackParamList = {
   "notifications-settings": undefined;
   list: undefined;
   categories: undefined;
-  community: { id: number; data: ICommunity };
-  "community-members": { id: number; username: string };
-  "community-settings": {
-    id: number;
-    username: string;
-    type: COMMUNITY_SETTING_TYPE;
-  };
-  verification: { id: number };
-  bookmark: undefined;
+  community: { id: number, data: ICommunity };
+  "community-members": { id: number, username: string };
+  "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
+  "verification": { id: number },
+  "bookmark": undefined;
+  "hashtag": { hashTag: string },
+  "trending-hashtags": undefined;
+
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -182,7 +184,19 @@ const MainNavigation = (): JSX.Element => {
           name="singleKnowledge"
           component={SingleKnowledge}
         />
-        <RootStackNavigation.Screen name="bookmark" component={Bookmarks} />
+         <RootStackNavigation.Screen
+          name="bookmark"
+          component={Bookmarks}
+        />
+        <RootStackNavigation.Screen
+          name="hashtag"
+          component={Hashtag}
+        />
+        <RootStackNavigation.Screen
+          name="trending-hashtags"
+          component={TrendingHashtags}
+        />
+
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   );

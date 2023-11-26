@@ -9,9 +9,33 @@ import PageOne from './pages/PageOne'
 import PageTwo from './pages/PageTwo'
 import PageThree from './pages/PageThree'
 import PageFour from './pages/PageFour'
+import { useVerificationState } from './state'
+import { BackHandler } from 'react-native';
+
 
 const VerifyAccount = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'verification'>) => { 
     const [step, setStep] = React.useState(1);
+    const { clearAll } = useVerificationState((state) => state);
+
+    React.useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if(step > 1) {
+                setStep(step - 1);
+            } else {
+                navigation.goBack();
+            }
+            return true;
+          });
+        return () => {
+            backHandler.remove();
+        }
+    }, [step]);
+
+    React.useEffect(() => {
+        return () => {
+            clearAll();
+        }
+    }, [])
 
     const handlePage = React.useCallback(() => {
         switch(step) {
@@ -29,10 +53,16 @@ const VerifyAccount = ({ navigation }: NativeStackScreenProps<RootStackParamList
             }
         }
     }, [step])
+
+    const handleBack = () => {
+        if(step > 1) {
+            setStep(step - 1)
+        }
+    }
     
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-        <SettingsHeader title='Verify Account' showSave={false} />
+        <SettingsHeader title='Verify Account' showSave={false} handleArrowPressed={handleBack} />
         <Box flex={1} backgroundColor='secondaryBackGroundColor' padding='m'>
             <CustomText variant='subheader' fontSize={16} style={{ color: 'grey'}}>STEP {step} OF 4</CustomText>
             {handlePage()}

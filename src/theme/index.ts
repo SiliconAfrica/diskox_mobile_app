@@ -7,7 +7,7 @@ const COLOR_PALLET = {
   fadedWhite: "#FCFCFC80",
   grey: "grey",
   whitesmoke: "whitesmoke",
-  lightGrey: "#D3D3D3",
+  lightGrey: "#949E97",
   fadedButtonBgColor: "#F3FBF5",
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
@@ -16,7 +16,8 @@ const COLOR_PALLET = {
   yellowGreen: "#A8B60C",
   error: "#FA2019",
   inputBorderColorLight: '#B8B8B8',
-  whiteText:'#FCFCFC'
+  whiteText:'#FCFCFC',
+  transparent2: 'transparent',
 };
 
 const theme = createTheme({
