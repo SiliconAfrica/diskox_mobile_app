@@ -10,6 +10,7 @@ import { URLS } from '../../../services/urls'
 import PostCard from '../../../components/feeds/PostCard'
 import { ScrollView } from 'react-native-gesture-handler'
 import PollCard from '../../../components/feeds/PollCard'
+import FeedCard from '../../../components/feeds/FeedCard'
 
 interface IProps {
     id: number;
@@ -22,7 +23,6 @@ const Polls = ({ id }: IProps) => {
             alert(error.message);
         },
         onSuccess: (data) => {
-            console.log(data.data);
             if (data.data.data) {
                 setPosts(data.data.data.data);
             } else {
@@ -31,7 +31,7 @@ const Polls = ({ id }: IProps) => {
         },
     });
   return (
-    <Box flex={1} bg='secondaryBackGroundColor'>
+    <Box flex={1} bg='mainBackGroundColor'>
         {/* STATS SECTIONS */}
 
        <ScrollView>
@@ -39,7 +39,7 @@ const Polls = ({ id }: IProps) => {
        {
            !getPosts.isLoading && posts.length < 1 && (
                <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
-                <CustomText variant='subheader' color='primaryColor'>No Post found</CustomText>
+                <CustomText variant='subheader' fontSize={18} color='primaryColor'>No polls</CustomText>
                </Box>
            )
        }
@@ -57,7 +57,7 @@ const Polls = ({ id }: IProps) => {
                 <>
                     <Box height={20} />
                     { posts.map(post => (
-                        <PollCard key={post.id} {...post} showStats />
+                        <FeedCard key={post.id} post={post} showReactions />
                     ))}
                 </>
              )

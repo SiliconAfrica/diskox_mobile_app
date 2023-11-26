@@ -8,7 +8,7 @@ import { CustomTextInput } from "../../components/form/CustomInput";
 import { SubmitButton } from "../../components/form/SubmittButton";
 import LightBgButton from "../../components/general/LightBgButton";
 import { useModalState } from "../../states/modalState";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useDetailsState } from "../../states/userState";
@@ -30,6 +30,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../utils/handlePomise";
 import useToast from "../../hooks/useToast";
 import CustomButton from "../../components/general/CustomButton";
+import { useSignupState } from "../signup/state";
 
 export type PageType = CompositeNavigationProp<
   BottomTabNavigationProp<RootBottomTabParamList>,
@@ -44,6 +45,7 @@ const Login = () => {
   const { switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
   const { setAll: updateUtil } = useUtilState((state) => state);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { renderForm } = useForm({
     defaultValues: {
@@ -52,7 +54,7 @@ const Login = () => {
     },
     validationSchema: loginSchema,
   });
-
+  //
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
@@ -64,7 +66,8 @@ const Login = () => {
         switchAccount(
           data.data.user.username,
           data.data.authorisation.token,
-          updateDetails
+          updateDetails,
+          queryClient
         );
       } else {
         updateDetails({
@@ -84,7 +87,15 @@ const Login = () => {
       );
       updateUtil({ isLoggedIn: true });
       setAll({ showLogin: false });
-      navigation.navigate("home");
+      if (data.data?.user?.email_verified_at) {
+        navigation.navigate("home");
+        return;
+      } else {
+        toast.show("Please verify your email", { type: "danger" });
+        setAll({ showLogin: false });
+        navigation.navigate("verify-email");
+        return;
+      }
     },
   });
   return renderForm(
@@ -110,13 +121,15 @@ const Login = () => {
         isLoading={isLoading}
         width={"100%"}
       />
-     
-     <Box width='100%' marginTop="m" alignItems="center">
-      <CustomButton
+
+      <Box width="100%" marginTop="m" alignItems="center">
+        <CustomButton
+          color="#D0F1D9"
+          textColor="#34A853"
           title="Signup"
           onPress={() => setAll({ showLogin: false, showSignup: true })}
         />
-     </Box>
+      </Box>
 
       <CustomText
         variant="body"

@@ -10,6 +10,7 @@ export interface IComment {
   upvotes_count: number;
   downvotes_count: number;
   reactions_count: number;
+  has_reacted: any[];
   replies_count: number;
   has_upvoted: number;
   has_downvoted: number;
@@ -26,8 +27,8 @@ export interface IComment {
     following_count: number;
     followers_count: number;
     isFollowing: number;
+    has_reacted: any[];
   };
-  has_reacted: any[];
 }
 
 export interface IReply {

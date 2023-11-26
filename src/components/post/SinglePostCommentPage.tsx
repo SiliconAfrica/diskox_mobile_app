@@ -71,12 +71,10 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
 
   //query
   const { isLoading } = useQuery(
-    ["getReplies", comment.id],
+    [`getReplies-${comment.id}`, comment.id],
     () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
     {
-      onError: (error: any) => {
-        toast.show(error.message, { type: "error" });
-      },
+      onError: () => {},
       onSuccess: (data) => {
         if (data?.data) {
           setComments(data?.data?.data?.data || []);
@@ -584,7 +582,7 @@ const CommentBox = ({ comment }: { comment: IComment }) => {
                   name="heart-outline"
                   size={20}
                   color={
-                    comment.has_reacted.length > 0
+                    comment?.user?.has_reacted?.length > 0
                       ? theme.colors.primaryColor
                       : theme.colors.textColor
                   }

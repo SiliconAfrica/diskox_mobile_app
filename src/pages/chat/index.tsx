@@ -14,7 +14,7 @@ import httpService from '../../utils/httpService';
 import { URLS } from '../../services/urls';
 import CustomText from '../../components/general/CustomText';
 import { FlashList } from '@shopify/flash-list';
-import { IChatMessage, IPost_Image } from '../../models/chatmessages';
+import { IChatContainer, IChatMessage, IPost_Image, UNsentMessage } from '../../models/chatmessages';
 import MessageBubble from '../../components/chats/messageBubble';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -24,10 +24,22 @@ import { extract_day } from '../../utils/utils';
 import moment from 'moment';
 import ViewImageModal from '../../components/modals/ViewImageModal';
 import { useDetailsState } from '../../states/userState';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 
 enum FILE_TYPE {
   IMAGE,
   DOC
+}
+
+export type IFile = {
+  type: string;
+  name: string;
+  uri: string;
 }
 
 const currentDate = moment(); // Current date
@@ -45,19 +57,22 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
   const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>([]);
   const [chats, setChats] = React.useState<Array<IChatMessage>>([]);
   const [search, setSearch] = React.useState('');
-  const [files, setFiles] = React.useState([]);
+  const [files, setFiles] = React.useState<IFile[]>([]);
   const [showPickerModal, setShowPickerModal] = React.useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
   const [fileType, setFileType] = React.useState(FILE_TYPE.IMAGE);
   const [showImagesModal, setShowImagesModals] = React.useState(false);
   const [activeImages, setActiveImages] = React.useState<Array<IPost_Image>>([]);
+  const [unsent, seetUnsent] = React.useState<UNsentMessage[]>([])
+
   const { id: loggedUser } = useDetailsState((state) => state);
 
   // query
   const getMessages = useQuery(['getMessages', userId], () => httpService.get(`${URLS.GET_CHAT_MESSAGES}/${userId}`), {
     onSuccess: (data) => {
-      // console.log(data.data);
-      setChats(data.data.data);
+      const chats: IChatMessage[] = data.data.data;
+      //const manipulatedChat: IChatContainer[] = chats.map((item) => ({ isSent: true, chat: item, message: '', files: [], created_at: '' }))
+      setChats(chats);
     },
   });
 
@@ -87,6 +102,7 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     setActiveImages(data);
     setShowImagesModals(true)
   }, [])
+
   const filterMessages = React.useCallback(() => {
     if (chats?.length < 1) {
       return [];
@@ -127,6 +143,7 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     if (result.type === 'success') {
       const name = result.name;
       const type = mime.getType(result.uri);
+      console.log(type);
       const uri = result.uri;
       setFiles(prev => [...prev, { name, type, uri}]);
       setFileType(FILE_TYPE.DOC);
@@ -149,11 +166,11 @@ const Chat = ({ route }: NativeStackScreenProps<RootStackParamList, 'chat'>) => 
     formData.append('receiver_id', userId.toString());
     if (fileType === FILE_TYPE.IMAGE) {
       files.map((item, i) => {
-        formData.append('chat_images[]', item);
+        formData.append('chat_images[]', item as any);
       })
     } else {
       files.map((item, i) => {
-        formData.append('chat_files[]', item);
+        formData.append('chat_files[]', item as any);
       })
     }
     // if (image.length > 0) {

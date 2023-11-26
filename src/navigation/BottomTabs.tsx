@@ -164,7 +164,7 @@ const BottomTabs = (): JSX.Element => {
           ),
         }}
       />
-      <RootBottomTabs.Screen
+      {/* <RootBottomTabs.Screen
         name="trending"
         component={TrendingPosts}
         options={{
@@ -175,7 +175,7 @@ const BottomTabs = (): JSX.Element => {
             <ActiveIconTab focused={focused} routeName="trending" />
           ),
         }}
-      />
+      /> */}
       <RootBottomTabs.Screen
         name="polls"
         component={Polls}

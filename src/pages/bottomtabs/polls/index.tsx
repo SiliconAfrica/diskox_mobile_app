@@ -20,6 +20,7 @@ import useToast from "../../../hooks/useToast";
 import _ from 'lodash'
 import { FlatList } from "react-native-gesture-handler";
 import PollCard from "../../../components/feeds/PollCard";
+import FeedCard from "../../../components/feeds/FeedCard";
 
 const Polls = () => {
   const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
@@ -83,8 +84,6 @@ const Polls = () => {
       toast.show(error.message, { type: 'error'});
     },
     onSuccess: (data) => {
-      console.log(ids);
-      console.log(`current page -> ${currentPage}`);
     },
   });
 
@@ -131,7 +130,7 @@ const Polls = () => {
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
         extraData={posts}
-        renderItem={({ item }) => <PollCard {...item} showStats />}
+        renderItem={({ item }) => <FeedCard post={item} showReactions />}
         ListHeaderComponent={() => (
           <>
             {isLoggedIn && <Searchbar />}

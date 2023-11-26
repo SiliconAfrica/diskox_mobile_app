@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "../../components/general/Box";
 import SettingsHeader from "../../components/settings/Header";
 import { useDetailsState } from "../../states/userState";
@@ -30,10 +30,13 @@ import { Follower } from "../../models/Follower";
 
 const CreatePost = ({
   navigation,
+  route,
 }: NativeStackScreenProps<RootStackParamList, "create-post">) => {
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
+  const theOrigin = route?.params?.origin;
+  const communityId = route?.params?.communityId;
   const { setAll, visibility } = useModalState((state) => state);
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -47,10 +50,18 @@ const CreatePost = ({
   const [showEmoji, setShowEmoji] = React.useState(false);
   const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
+  const [origin, setOrigin] = React.useState("post");
 
   const theme = useTheme<Theme>();
   const toast = useToast();
 
+  useEffect(() => {
+    if (theOrigin && theOrigin === "community") {
+      setOrigin("community");
+    } else {
+      setOrigin("post");
+    }
+  }, []);
   // functions
   const editPoll = React.useCallback(
     (e: string, i: number) => {
@@ -101,7 +112,6 @@ const CreatePost = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post("/create_post", data),
     onSuccess: (data) => {
-      console.log(data.data);
       toast.show("Post created", { type: "success" });
       // clean up
       setFiles([]);
@@ -122,7 +132,7 @@ const CreatePost = ({
             description={value}
             setDescription={setValues}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
           />
         );
@@ -133,7 +143,7 @@ const CreatePost = ({
             description={question}
             setDescription={setQuestion}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
           />
         );
@@ -145,7 +155,7 @@ const CreatePost = ({
             setDescription={setPollQuestion}
             onDelete={handleMediaDelete}
             files={files}
-            handlePicker={handleDocumentPicker}
+            handlePicker={handleDocumentPicker as any}
             polls={polls}
             setPolls={editPoll}
             addPoll={addPoll}
@@ -177,7 +187,9 @@ const CreatePost = ({
 
   const handleSubmit = React.useCallback(async () => {
     const formData = new FormData();
-
+    if (origin === "community") {
+      formData.append("community_id", communityId.toString());
+    }
     if (activeTab === TAB_BAR_ENUM.POST) {
       formData.append("description", value);
       formData.append("post_type", "post");
@@ -249,7 +261,7 @@ const CreatePost = ({
   const handleDocumentPicker = React.useCallback(
     async (documentType: "All" | "Images" | "Videos" | null) => {
       if (files.length === 10) {
-        alert(`You can't add more than 5 files!`);
+        alert(`You can't add more than 10 files!`);
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -259,7 +271,6 @@ const CreatePost = ({
       });
 
       if (!result.canceled) {
-        console.log(result.assets[0]);
         const formData = new FormData();
         const name = result.assets[0].uri.split("/").pop();
         const mimeType = mime.getType(result.assets[0].uri);

@@ -31,7 +31,6 @@ const Search = ({ navigation }: NativeStackScreenProps<RootStackParamList, 'noti
     const { isLoading, isError, refetch} = useQuery(['search', search], () => httpService.get(`${URLS.SEARCH}/${search}`), {
       enabled: search.length > 0,
       onSuccess: (data) => {
-        console.log(data.data);
         if (data.data.code === 1) {
           setCommunities(data.data.data.communities.data);
           setUsers(data.data.data.users.data);

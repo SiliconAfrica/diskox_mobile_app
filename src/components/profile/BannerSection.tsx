@@ -59,6 +59,7 @@ interface IProps {
 
 const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const [user, setUser] = React.useState<IUser | null>(null);
+  const [showMonetization, setShowMonetization] = React.useState(false);
   const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>(
     []
   );
@@ -81,7 +82,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     {
       onError: () => {},
       onSuccess: async (data) => {
-        console.log(data?.data?.data);
         setUser(data?.data?.data);
         const [saveUser, saveUserErr] = await handlePromise(
           AsyncStorage.setItem(`user`, JSON.stringify(data.data.data))
@@ -101,7 +101,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     {
       onError: () => {},
       onSuccess: (data) => {
-        console.log(data?.data);
       },
     }
   );
@@ -110,7 +109,6 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     mutationFn: () =>
       httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${userId}`),
     onSuccess: (data) => {
-      //console.log(toast);
       toast.show(data?.data?.message, { type: "success" });
     },
   });
@@ -119,11 +117,27 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.UPDATE_COVER_PHOTO}`, data),
     onSuccess: (data) => {
-      //console.log(toast);
       queryClient.invalidateQueries(["getDetails", userId]);
       toast.show(data?.data?.message, { type: "success" });
     },
   });
+
+  const { isLoading: isLoadingRequirements } = useQuery(
+    ["verification_monetization_requirements"],
+    () =>
+      httpService.get(`${URLS.GET_VERIFICATION_AND_MONETIZATION_REQUIREMENT}`),
+    {
+      onError: () => {},
+      onSuccess: async (data) => {
+        if (
+          Number(getFollowCount.data?.data.followers_count) >=
+          Number(data?.data?.data?.monitization_followers)
+        ) {
+          setShowMonetization(true);
+        }
+      },
+    }
+  );
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -343,21 +357,23 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               Edit Profile
             </CustomText>
           </Pressable>
-          <Pressable onPress={() => setAll({ showMonetization: true })}>
-            <Box
-              borderWidth={2}
-              paddingHorizontal="s"
-              paddingVertical="s"
-              borderRadius={10}
-              style={{ borderColor: theme.colors.yellowGreen }}
-            >
-              <FontAwesome
-                name="dollar"
-                size={10}
-                color={theme.colors.yellowGreen}
-              />
-            </Box>
-          </Pressable>
+          {showMonetization && (
+            <Pressable onPress={() => setAll({ showMonetization: true })}>
+              <Box
+                borderWidth={2}
+                paddingHorizontal="s"
+                paddingVertical="s"
+                borderRadius={10}
+                style={{ borderColor: theme.colors.yellowGreen }}
+              >
+                <FontAwesome
+                  name="dollar"
+                  size={10}
+                  color={theme.colors.yellowGreen}
+                />
+              </Box>
+            </Pressable>
+          )}
           {/* <Box width={50} height={50} borderRadius={25} borderWidth={2} borderColor='secondaryBackGroundColor' alignItems='center' justifyContent='center'>
             <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
           </Box> */}
@@ -397,7 +413,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     marginLeft="s"
                     color="white"
                     style={{
-                      color: 'white'
+                      color: "white",
                     }}
                   >
                     Following
@@ -407,7 +423,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     <Ionicons
                       name="person-add-outline"
                       size={25}
-                      color={'white'}
+                      color={"white"}
                     />
                     <CustomText
                       variant="header"
@@ -415,7 +431,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                       marginLeft="s"
                       color="white"
                       style={{
-                        color: 'white'
+                        color: "white",
                       }}
                     >
                       Follow

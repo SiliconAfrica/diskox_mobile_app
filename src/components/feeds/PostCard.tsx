@@ -27,6 +27,11 @@ import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 import { useToast } from "react-native-toast-notifications";
 import { useDetailsState } from "../../states/userState";
 import { colorizeHashtags } from "../../utils/colorizeText";
+import { Message, ArrowUp, ArrowUp2, ArrowUp3, Heart } from 'iconsax-react-native';
+import { Save2, SaveAdd, SaveMinus, ArchiveAdd, ArchiveTick } from 'iconsax-react-native'
+import MentionTextInput from "../general/MentionTextBox";
+import PrimaryButton from "../general/PrimaryButton";
+
 
 const WIDTH = Dimensions.get("screen").width;
 
@@ -38,6 +43,8 @@ const PostCard = (props: IPost & IProps) => {
   const toast = useToast();
   const [showAll, setShowAll] = React.useState(false);
   const [post, setPost] = React.useState<IPost>({ ...props });
+  const [showComments, setShowComments] = React.useState(false);
+
   const { setAll } = useModalState((state) => state);
   const { isDarkMode } = useUtilState((state) => state);
   const theme = useTheme<Theme>();
@@ -73,7 +80,6 @@ const PostCard = (props: IPost & IProps) => {
       onSuccess: (data) => {
         const p: IPost = data.data.data;
         setPost(data.data.data);
-        console.log(`Is following ------- ${p.user.isFollowing}`)
       },
     }
   );
@@ -114,7 +120,6 @@ const PostCard = (props: IPost & IProps) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      console.log(`The upvote : = ${post.has_upvoted}`);
       queryClient.invalidateQueries([`getPost${id}`]);
     },
   });
@@ -140,7 +145,7 @@ const PostCard = (props: IPost & IProps) => {
   const handleShare = React.useCallback(() => {
     const check = checkloggedInState();
     if (check) {
-      setAll({ postId: id, showShare: true });
+      setAll({ postId: id, showShare: true, activePost: post });
     }
   }, [id]);
 
@@ -148,6 +153,13 @@ const PostCard = (props: IPost & IProps) => {
     const check = checkloggedInState();
     if (check) {
       upvote.mutate();
+    }
+  };
+
+  const handleNavigate = () => {
+    const check = checkloggedInState();
+    if (check) {
+      navigation.navigate("profile", { userId })
     }
   };
 
@@ -175,6 +187,20 @@ const PostCard = (props: IPost & IProps) => {
       follow.mutate();
     }
   }
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: () => httpService.post(`${URLS.BOOKMARK_POST}/${post.id}`),
+    onSuccess: (data) => {
+      toast.show(data.data.message, { type: 'success' });
+      setPost({ ...post, is_bookmarked: post.is_bookmarked === 1 ?0:1 })
+      //setAll({ activePost: { ...activePost, is_bookmarked: activePost.is_bookmarked === 1 ?0:1 } });
+    },
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error' });
+
+    },
+  });
+
   return (
     <Box
       width="100%"
@@ -193,10 +219,10 @@ const PostCard = (props: IPost & IProps) => {
       >
         <Box flex={0.9} flexDirection="row" flexWrap="wrap">
 
-          <Box flexDirection="row" alignItems="center">
+          <Box flexDirection="row" alignItems="flex-start">
 
             <Pressable
-              onPress={() => navigation.navigate("profile", { userId })}
+              onPress={handleNavigate}
               style={{
                 width: 32,
                 height: 32,
@@ -222,8 +248,28 @@ const PostCard = (props: IPost & IProps) => {
                     post.user.name
                 }
                 </CustomText>
-                <CustomText variant="body" color="grey">@{post.user.username}</CustomText>
+                <CustomText variant="body" color="grey">@{username?.length > 5 ?
+                  username?.substring(0, 5) + '...': username}</CustomText>
               </Box>
+              { myId !== userId && (
+              <Pressable style={{
+                backgroundColor: theme.colors.mainBackGroundColor,
+                height: 22,
+                paddingHorizontal: 3,
+                borderRadius: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 5
+              }}
+                onPress={handleFollow}
+              >
+                { follow.isLoading ? (
+                  <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
+                ): (
+                  <CustomText variant="header" fontSize={12} color="textColor">{ post.user.isFollowing === 1 ? 'Following':'Follow'}</CustomText>
+                )}
+              </Pressable>
+            )}
               <CustomText
                 variant="xs"
                 onPress={() => navigation.navigate("post", { postId: id })}
@@ -232,31 +278,12 @@ const PostCard = (props: IPost & IProps) => {
               </CustomText>
             </Box>
 
-            { myId !== userId && (
-              <Pressable style={{
-                backgroundColor: theme.colors.fadedButtonBgColor,
-                height: 24,
-                paddingHorizontal: 3,
-                borderRadius: 20,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginLeft: 20
-              }}
-                onPress={handleFollow}
-              >
-                { follow.isLoading ? (
-                  <ActivityIndicator color={theme.colors.primaryColor} size={'small'} />
-                ): (
-                  <CustomText variant="header" fontSize={14} color="primaryColor">{ post.user.isFollowing === 1 ? 'Following':'Follow'}</CustomText>
-                )}
-              </Pressable>
-            )}
 
           </Box>
 
         </Box>
 
-       <Box flex={0.1} alignItems="flex-end">
+       {/* <Box flex={0.1} alignItems="flex-end">
         <Ionicons
             name="ellipsis-vertical"
             size={20}
@@ -265,7 +292,13 @@ const PostCard = (props: IPost & IProps) => {
               setModalState({ activePost: post, showPostAction: true })
             }
           />
-       </Box>
+       </Box> */}
+
+       <Box flexDirection='row'>
+              { post.is_bookmarked === 1 && myId !== userId ? 
+              <ArchiveTick size={20} color={theme.colors.primaryColor} style={{ marginRight: 10 }} onPress={() => mutate()} />: <ArchiveAdd  size={20} color={theme.colors.textColor} style={{ marginRight: 10 }} onPress={() => mutate()} /> }
+              <Ionicons name='ellipsis-vertical' size={20} color={theme.colors.textColor} />
+            </Box>
 
       </Box>
 
@@ -513,7 +546,7 @@ const PostCard = (props: IPost & IProps) => {
                 }}
                 onPress={() => handleReaction("love")}
               >
-                <Ionicons
+                {/* <Ionicons
                   name="heart-outline"
                   size={20}
                   color={
@@ -521,23 +554,24 @@ const PostCard = (props: IPost & IProps) => {
                       ? theme.colors.primaryColor
                       : theme.colors.textColor
                   }
-                />
+                /> */}
+                <Heart size={20}  color={
+                    post.has_reacted.length > 0
+                      ? theme.colors.primaryColor
+                      : theme.colors.textColor
+                  } />
                 <CustomText variant="body">{reactions_count}</CustomText>
               </Pressable>
 
               <Pressable
-                onPress={() => navigation.navigate("post", { postId: id })}
+                onPress={() => setShowComments(prev => !prev)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
                   marginHorizontal: 10,
                 }}
               >
-                <Ionicons
-                  name="chatbox-ellipses-outline"
-                  size={20}
-                  color={theme.colors.textColor}
-                />
+                  <Message size={20} color={theme.colors.textColor} />
                 <CustomText variant="body">{post.comments_count}</CustomText>
               </Pressable>
             </Box>
@@ -557,7 +591,32 @@ const PostCard = (props: IPost & IProps) => {
         </Box>
       )}
 
-      <CommentTextbox postId={post.id} />
+      { showComments && (
+        <Box width='100%' height={300} zIndex={0}>
+
+          <Box flex={1} zIndex={0}></Box>
+
+          <Box paddingHorizontal="m" elevation={1} shadowColor={'secondaryBackGroundColor'} shadowOpacity={0.6} shadowOffset={{ width: 0, height: 0 }} shadowRadius={4} zIndex={1} width='100%' height={100} justifyContent="center" borderTopWidth={0.6} borderTopColor="secondaryBackGroundColor">
+
+            <Box width={'100%'} height={80} bg='secondaryBackGroundColor' borderWidth={1} borderColor="secondaryBackGroundColor" borderRadius={15} paddingHorizontal='m' paddingBottom="s" >
+
+              <TextInput multiline placeholder="Type your comment here..." style={{ width: '100%', fontFamily: 'RedRegular', fontSize: 14, flex: 1 }}>
+                
+              </TextInput>
+
+              <Box flexDirection="row" justifyContent="space-between">
+                <Box flexDirection="row">
+                  <Ionicons name='images-outline' size={20} color={theme.colors.lightGrey} />
+                  <Ionicons name='happy-outline' size={20} color={theme.colors.lightGrey} style={{ marginLeft: 10 }} />
+                </Box>
+
+                <PrimaryButton title="Post" height={32} width={50} onPress={() => {}} />
+              </Box>
+            </Box>
+
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };

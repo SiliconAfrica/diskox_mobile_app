@@ -68,7 +68,6 @@ const Reply = ({
   //   {
   //     onError: () => {},
   //     onSuccess: (data) => {
-  //       console.log(data.data);
   //       if (data?.data) {
   //         setReply({...reply, ...data?.data?.data});
   //       }
@@ -85,8 +84,6 @@ const Reply = ({
   //     onError: () => {},
   //     onSuccess: (data) => {
   //       if (data?.data) {
-  //         console.log('---RELPY---')
-  //         console.log(data?.data?.data.data[0]);
   //         setComments(data?.data?.data?.data || []);
   //       }
   //     },
@@ -137,7 +134,6 @@ const Reply = ({
       queryClient.invalidateQueries([`getReplies-${reply.comment_id}`]);
     },
   });
-  console.log(reply, "rep");
   const deletereply = useMutation({
     mutationFn: () => httpService.post(`${URLS.DELETE_REPLY}/${reply.id}`),
     onError: (error: any) => {

@@ -72,7 +72,6 @@ const CustomPicker = ({ onPicked, data, label }: { onPicked: (data: string) => v
     renderPicker={() => <CustomPickerHeader {...selected} name={val || data[0]} label={label} />}
     value={val}
     placeholder={'Placeholder'}
-    onChange={(value) => console.log(value)}
     renderCustomModal={(props: any) => (
       <>
         { props.visible && <CustomModal {...props} handleSelect={handleSelect} data={data} />}

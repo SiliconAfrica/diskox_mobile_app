@@ -17,6 +17,7 @@ import { useMultipleAccounts } from "../../states/multipleAccountStates";
 import { handlePromise } from "../../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useToast } from "react-native-toast-notifications";
+import { useQueryClient } from "react-query";
 
 const NavItem = ({
   icon,
@@ -96,6 +97,7 @@ const Setting = ({
   const nav = (route: string) => {
     navigation.navigate(route as any);
   };
+  const queryClient = useQueryClient();
 
   const logout = async () => {
     const [loggedInUser, loggedInUserErr] = await handlePromise(
@@ -120,7 +122,12 @@ const Setting = ({
         const [saveUser, saveUserErr] = await handlePromise(
           AsyncStorage.setItem(`user`, JSON.stringify(accountToSwitchTo))
         );
-        switchAccount(accountToSwitchTo.username, token, updateDetails);
+        switchAccount(
+          accountToSwitchTo.username,
+          token,
+          updateDetails,
+          queryClient
+        );
         toast.show(`Account switched to "@${accountToSwitchTo.username}"`, {
           type: "success",
         });
@@ -202,18 +209,6 @@ const Setting = ({
           }
           title="Security"
           action={() => nav("security")}
-        />
-        <NavItem
-          forDarkModa={false}
-          icon={
-            <FontAwesome
-              name="money"
-              size={25}
-              color={theme.colors.textColor}
-            />
-          }
-          title="Refer & Earn"
-          action={() => nav("referrals")}
         />
 
         <NavItem

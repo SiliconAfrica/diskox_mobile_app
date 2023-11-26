@@ -25,7 +25,6 @@ const WritePost = ({files, handlePicker, onDelete, description, setDescription }
   const handleChange = (text: string) => {
     setDescription(text);
     const val = description.match(/#\w+/g);
-    console.log(val);
   }
 
   return (

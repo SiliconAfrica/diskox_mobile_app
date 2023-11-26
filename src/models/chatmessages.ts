@@ -1,3 +1,6 @@
+import { ImagePickerAsset } from "expo-image-picker";
+import { IFile } from "../pages/chat";
+
 export type IChatMessage = {
     chat_code: string;
     created_at: string;
@@ -58,4 +61,19 @@ export type IPost_Image = {
     image_path: string; 
     processed: number; 
     type: string; 
+}
+
+export type IChatContainer = {
+    chat: IChatMessage,
+    isSent: boolean,
+    message: string;
+    files: ImagePickerAsset[];
+    created_at: string;
+}
+
+export type UNsentMessage = {
+    message: string;
+    files: IFile[];
+    docs: IFile[];
+    created_at: string;
 }

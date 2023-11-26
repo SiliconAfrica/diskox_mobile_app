@@ -8,7 +8,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../theme";
 import NormalButton from "../../../components/general/NormalButton";
 import { useVerifyState } from "../state";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../../utils/httpService";
 import { URLS } from "../../../services/urls";
 import { useSignupState } from "../../signup/state";
@@ -18,11 +18,14 @@ import {
 } from "../../../states/userState";
 import { useModalState } from "../../../states/modalState";
 import { useMultipleAccounts } from "../../../states/multipleAccountStates";
+import useToast from "../../../hooks/useToast";
 
 const Verify = () => {
   const [code, setCode] = React.useState("");
   const ref = React.useRef();
+  const queryClient = useQueryClient();
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const [setAll] = useVerifyState((state) => [state.setAll]);
   const { addAccount } = useModalState();
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
@@ -46,12 +49,13 @@ const Verify = () => {
         }
       ),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger" });
     },
     onSuccess: async (data) => {
       if (addAccount) {
         addAccountFn(oldUser, { ...user, token: undefined }); //this adds old user account to accounts arr
-        switchAccount(username, state.token, updateDetails);
+        switchAccount(username, state.token, updateDetails, queryClient);
         //save old user token we are switching from to the local using their username
         const oldToken = await SecureStorage.getItemAsync("token");
         await SecureStorage.setItemAsync(
@@ -64,7 +68,6 @@ const Verify = () => {
           state.token
         );
       }
-      console.log(data.data);
       setAll({ stage: 2 });
     },
   });
@@ -81,10 +84,10 @@ const Verify = () => {
         }
       ),
     onError: (error: any) => {
-      alert(error.message);
+      // alert(error.message);
+      toast.show(error.message, { type: "danger" });
     },
     onSuccess: (data) => {
-      console.log(data.data);
       setResending(true);
       setTimer(59);
       handleTimer();
@@ -95,7 +98,6 @@ const Verify = () => {
     (code: string) => {
       if (code.length === 4) {
         // make api call
-        console.log(`this is the code ${code}`);
         mutate(code);
       } else {
         setCode(code);
@@ -183,7 +185,7 @@ const Verify = () => {
               mr="m"
               onPress={handleResend}
             >
-              Resending Code
+              Resend Code
             </CustomText>
             {resendCode.isLoading && (
               <ActivityIndicator color={theme.colors.textColor} size="small" />

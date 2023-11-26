@@ -1,7 +1,9 @@
+import React from 'react';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
 import { useCallback, useEffect } from 'react'
 import Navigation from './src/navigation';
+// import Echo from 'laravel-echo';
 /**
 + * Renders the main App component.
 + *
@@ -10,11 +12,24 @@ import Navigation from './src/navigation';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { View } from 'react-native';
+import pusher from './src/utils/pusher';
 /**
 + * Renders the main App component.
 + *
 + * @return {JSX.Element} The Navigation component.
 + */
+
+
+
+// const NewEcho = new Echo({
+//   broadcaster: 'pusher',
+//   key: 'f5d4f2be017648807ffe',
+//   cluster: 'ap2',
+//   forceTLS: true
+// });
+
+
+
 
 SplashScreen.preventAutoHideAsync();
 export default function App(): JSX.Element {
@@ -32,6 +47,7 @@ export default function App(): JSX.Element {
   if (!fontsLoaded) {
     return null;
   }
+
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>

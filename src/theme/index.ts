@@ -7,13 +7,17 @@ const COLOR_PALLET = {
   fadedWhite: "#FCFCFC80",
   grey: "grey",
   whitesmoke: "whitesmoke",
-  lightGrey: "#D3D3D3",
+  lightGrey: "#949E97",
   fadedButtonBgColor: "#F3FBF5",
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
   whatsappGreen: "#25D366",
   transparent: "#000000b9",
   yellowGreen: "#A8B60C",
+  error: "#FA2019",
+  inputBorderColorLight: '#B8B8B8',
+  whiteText:'#FCFCFC',
+  transparent2: 'transparent',
 };
 
 const theme = createTheme({
@@ -69,7 +73,7 @@ export const darkTheme: Theme = {
     mainBackGroundColor: "rgb(21, 21, 21)",
     secondaryBackGroundColor: "rgb(33, 33, 33)",
     headerTextColor: COLOR_PALLET.white,
-    textColor: COLOR_PALLET.whitesmoke,
+    textColor: COLOR_PALLET.whiteText,
     black: "white",
     white: "black",
   },

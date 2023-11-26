@@ -51,7 +51,6 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
       }
     },
     onError: (error: any) => {
-      console.log(error.message);
       toast.show(error.message, { type: "error", swipeEnabled: true });
     },
   });
@@ -67,7 +66,6 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
   const handleSubmit = React.useCallback(
     (data: { name: string; username: string; description: string }) => {
       const obj = { ...data, type: type.toLowerCase() };
-      console.log(obj);
       const formData = new FormData();
       formData.append("topics", obj.name);
       Object.keys(obj).forEach((key) => {
@@ -111,15 +109,17 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
           marginBottom="m"
           position="relative"
         >
-          <CustomTextInput name="name" required placeholder="Community title" />
+          <CustomTextInput name="name" removeSpecialCharater required placeholder="Community title" />
           <Box height={20} />
           <CustomTextInput
+          removeSpecialCharater
             name="username"
             required
             placeholder="Community Username"
           />
           <Box height={20} />
           <CustomTextarea
+            removeSpecialCharater
             name="description"
             required
             placeholder="Description"

@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React from "react";
 import Box from "./general/Box";
 import { useTheme } from "@shopify/restyle";
@@ -10,6 +10,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
   Foundation,
+  FontAwesome,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
@@ -18,10 +19,15 @@ import { ScrollView, Switch } from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
-import { BASE_URL, IMAGE_BASE } from "../utils/httpService";
+import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useModalState } from "../states/modalState";
+import { useQuery, useQueryClient } from "react-query";
+import { IHashTag } from "../models/Hashtag";
+import { URLS } from "../services/urls";
+import { CUSTOM_STATUS_CODE } from "../enums/CustomCodes";
 
 const Item = ({
   icon,
@@ -53,6 +59,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
   const { switchAccount } = useMultipleAccounts((state) => state);
   const { setAll: updateDetails, username } = useDetailsState((state) => state);
   const toast = useToast();
+  const queryClient = useQueryClient();
+
   return (
     <Box
       style={{
@@ -103,7 +111,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                             switchAccount(
                               user.username,
                               switchToken,
-                              updateDetails
+                              updateDetails,
+                              queryClient
                             );
                             toast.show(`Logged in as "@${user.username}"`, {
                               type: "success",
@@ -151,8 +160,8 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
               <CustomText
                 style={{ fontSize: 10, width: "100%", textAlign: "center" }}
               >
-                @{user?.username.substring(0, 7)}
-                {user?.username.length > 5 && "..."}
+                @{user?.username?.substring(0, 7)}
+                {user?.username?.length > 5 && "..."}
               </CustomText>
             </Box>
           ))}
@@ -163,12 +172,24 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
 
 const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   const theme = useTheme<Theme>();
+  const [hashtags, setHashtag] = React.useState<IHashTag[]>([]);
   const [isLoggedIn, isDarkMode, setAll] = useUtilState((state) => [
     state.isLoggedIn,
     state.isDarkMode,
     state.setAll,
   ]);
   const { accounts } = useMultipleAccounts((state) => state);
+  const { setAll: setModal } = useModalState((state) => state);
+  const { id: userId } = useDetailsState((state) => state);
+  const [showMonetization, setShowMonetization] = React.useState(false);
+
+  const { isLoading, isError } = useQuery(['get_trending_hashtags'], () => httpService.get(`${URLS.GET_POPULAR_HASTAGS}`), {
+    onSuccess: (data) => {
+      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+          setHashtag(data.data.data);
+      }
+    }
+  });
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -179,6 +200,34 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       );
     },
     [isDarkMode]
+  );
+
+  const getFollowCount = useQuery(
+    ["getFollowerCount", userId],
+    () =>
+      httpService.get(
+        `${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${userId}`
+      ),
+    {
+      onError: () => {},
+      onSuccess: (data) => {},
+    }
+  );
+  const { isLoading: isLoadingRequirements } = useQuery(
+    ["verification_monetization_requirements"],
+    () =>
+      httpService.get(`${URLS.GET_VERIFICATION_AND_MONETIZATION_REQUIREMENT}`),
+    {
+      onError: () => {},
+      onSuccess: async (data) => {
+        if (
+          Number(getFollowCount.data?.data.followers_count) >=
+          Number(data?.data?.data?.monitization_followers)
+        ) {
+          setShowMonetization(true);
+        }
+      },
+    }
   );
   return (
     <Box flex={1} backgroundColor="secondaryBackGroundColor" marginTop="xl">
@@ -221,12 +270,16 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   />
                 }
                 title="Add an account"
-                action={() =>
-                  navigation.navigate("onboarding", {
-                    showModal: 1,
-                    addAccount: true,
-                  })
-                }
+                action={() => {
+                  setModal({ addAccount: true });
+                  navigation.navigate("sign-in", { isAddingAccount: true });
+                }}
+                // action={() =>
+                //   navigation.navigate("onboarding", {
+                //     showModal: 1,
+                //     addAccount: true,
+                //   })
+                // }
               />
               <Item
                 icon={
@@ -271,6 +324,27 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                 title="Verify account"
                 action={() => navigation.navigate("verification")}
               />
+              {showMonetization && (
+                <Item
+                  icon={
+                    <Box
+                      borderWidth={1}
+                      paddingHorizontal="s"
+                      paddingVertical="s"
+                      borderRadius={5}
+                      style={{ borderColor: theme.colors.textColor }}
+                    >
+                      <FontAwesome
+                        name="dollar"
+                        size={10}
+                        color={theme.colors.textColor}
+                      />
+                    </Box>
+                  }
+                  title="Monetization"
+                  action={() => setModal({ showMonetization: true })}
+                />
+              )}
             </>
           )}
         </Box>
@@ -308,6 +382,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
         <Box paddingHorizontal="m">
           <Item
             icon={
+              <FontAwesome
+                name="user-circle-o"
+                size={24}
+                color={theme.colors.textColor}
+              />
+            }
+            action={() => navigation.navigate("referrals")}
+            title="Refer & Earn"
+          />
+          <Item
+            icon={
               <MaterialCommunityIcons
                 name="bullhorn"
                 size={24}
@@ -329,39 +414,46 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             title="Knowledge Base"
           />
         </Box>
-        {/* <Box paddingHorizontal="m" paddingTop="l">
+        <Box paddingHorizontal="m" paddingTop="l" paddingBottom='xl'>
           <CustomText variant="subheader" fontSize={18}>
             Explore Popular Tags
           </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #house
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #Politics
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #Politics
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #LpMustWin
-          </CustomText>
+          { isLoading && (
+            <ActivityIndicator size='large' color={theme.colors.primaryColor} />
+          )}
+          {
+            !isLoading && isError && (
+              <CustomText variant="body">
+                An Error occured while getting hashtags
+              </CustomText>
+            )
+          }
+          { !isLoading && hashtags.length > 0 && hashtags.map((item, index) => (
+            <CustomText key={index.toString()} variant="body" marginTop="m" onPress={() => navigation.navigate('hashtag', { hashTag: item.name })}>
+              #{item.name}
+            </CustomText>
+            ))}
+        
 
-          <Pressable
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 15,
-              height: 20,
-            }}
-          >
-            <CustomText variant="body">View More</CustomText>
-            <Feather
-              name="chevron-right"
-              size={25}
-              color={theme.colors.textColor}
-            />
-          </Pressable>
-        </Box> */}
+         { !isLoading && !isError && (
+           <Pressable
+           style={{
+             flexDirection: "row",
+             alignItems: "center",
+             marginTop: 15,
+             height: 20,
+           }}
+           onPress={() => navigation.navigate('trending-hashtags')}
+         >
+           <CustomText variant="body">View More</CustomText>
+           <Feather
+             name="chevron-right"
+             size={25}
+             color={theme.colors.textColor}
+           />
+         </Pressable>
+         )}
+        </Box>
       </ScrollView>
     </Box>
   );

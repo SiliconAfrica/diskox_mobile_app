@@ -9,6 +9,7 @@ import httpService from '../../../utils/httpService'
 import { URLS } from '../../../services/urls'
 import PostCard from '../../../components/feeds/PostCard'
 import { ScrollView } from 'react-native-gesture-handler'
+import FeedCard from '../../../components/feeds/FeedCard'
 
 interface IProps {
     id: number;
@@ -21,7 +22,6 @@ const Comments = ({ id }: IProps) => {
             alert(error.message);
         },
         onSuccess: (data) => {
-            console.log(data.data);
             if (data.data.data) {
                 setPosts(data.data.data.data);
             } else {
@@ -30,10 +30,18 @@ const Comments = ({ id }: IProps) => {
         },
     });
   return (
-    <Box flex={1} bg='secondaryBackGroundColor'>
+    <Box flex={1} bg='mainBackGroundColor'>
         {/* STATS SECTIONS */}
 
        <ScrollView>
+
+       {
+           !getPosts.isLoading && posts.length < 1 && (
+               <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
+                <CustomText variant='subheader' fontSize={18} color='primaryColor'>You have not commented on any post</CustomText>
+               </Box>
+           )
+       }
         
        {
            getPosts.isLoading && (
@@ -47,7 +55,7 @@ const Comments = ({ id }: IProps) => {
              !getPosts.isLoading && posts.length > 0 && (
                 <>
                     { posts.map(post => (
-                        <PostCard key={post.id} {...post} showStats />
+                        <FeedCard key={post.id} post={post} showReactions />
                     ))}
                 </>
              )

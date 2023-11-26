@@ -1,3 +1,5 @@
+import { ICommunity } from './Community';
+import { ITag } from './Tag';
 import { IUser, UserStats } from './user';
 
 export type IPost = {
@@ -27,7 +29,7 @@ export type IPost = {
   is_bookmarked: number;
   has_downvoted: number;
   has_voted_poll: number;
-  tags: any[];
+  tags: ITag[];
   last_two_comments: any[];
   polls: IPoll[];
   post_images: MediaPost[];
@@ -35,6 +37,8 @@ export type IPost = {
   user: IUser & UserStats;
   reposted_post: any[];
   has_reacted: any[];
+  community_id: number;
+  community?: ICommunity;
 };
 
 export type MediaPost = {
