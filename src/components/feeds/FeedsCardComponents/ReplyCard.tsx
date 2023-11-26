@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons'
 import { Heart, Message } from 'iconsax-react-native'
 import CommentTextBox from './CommentTextBox'
 import { ImagePickerAsset } from 'expo-image-picker'
-import { IComment, IReply } from '../../../models/comments'
+import { IReply } from '../../../models/comments'
 import httpService, { IMAGE_BASE } from '../../../utils/httpService'
 import moment from 'moment'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
@@ -23,20 +23,16 @@ import {
 } from 'react-native-popup-menu';
 import ImageBox from './ImageBox'
 import mime from 'mime'
-import { PaginatedResponse } from '../../../models/PaginatedResponse'
-import { CUSTOM_STATUS_CODE } from '../../../enums/CustomCodes'
-import ReplyCard from './ReplyCard'
-import { useModalState } from '../../../states/modalState'
+import EmojiSelector from 'react-native-emoji-selector'
 
 
-const CommentCard = ({
+const ReplyCard = ({
   comment: activeComment
 }: {
-  comment: IComment
+  comment: IReply
 }) => {
   const [reply, setReply] = React.useState(false);
   const [text, setText] = React.useState('');
-  const [modalImages, setModalImages] = React.useState<string[]>(activeComment.post_images.map((item) => item.image_path));
   const [comment, setComment] = React.useState(activeComment);
   const [images, setImages] = React.useState<ImagePickerAsset[]>([]);
   const [showMenu, setShowMenu] = React.useState(false);
@@ -45,32 +41,19 @@ const CommentCard = ({
   const [editedImage, setEditedImage] = React.useState<ImagePickerAsset[]>([]);
   const [editImage, setEditImage] = React.useState<string[]>([]);
   const [editComment, setEditComment] = React.useState('');
-  const [newImage, setNewImage] = React.useState<ImagePickerAsset[]>([]);
-  const [replies, setReplies] = React.useState<IReply[]>([]);
-  const [showEmoji, setShowEmoji] = React.useState(false);
+  const [newImage, setNewImage] = React.useState<ImagePickerAsset[]>([])
 
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { setAll } = useModalState((state) =>  state)
 
-  // query
-
-  const getReply = useQuery([`getSingleComment-${activeComment.id}`, comment.id], () => httpService.get(`${URLS.GET_SINGLE_COMMENT}/${comment.id}`), {
+  // get reply
+  const getReply = useQuery([`getSingleReply-${comment.id}`, comment.id], () => httpService.get(`${URLS.GET_SINGLE_REPLY}/${comment.id}`), {
     onSuccess: (data) => {
-      setComment({  ...comment, comment: data.data.data.comment });
+      setComment({  ...comment, reply: data.data.data.reply });
       //console.log(data.data.data);
     },
     onError: (error) => {}
   });
-
-  const getReplies = useQuery([`getReplies-${activeComment.id}`, comment.id], () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`), {
-    onSuccess: (data) => {
-      const item: PaginatedResponse<IReply> = data.data;
-      if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
-        setReplies(item.data.data);
-      }
-    }
-  })
 
   //mutations
 
@@ -80,7 +63,7 @@ const CommentCard = ({
       toast.show(error?.message, { type: "error" });
     },
     onSuccess: (data) => {
-      const obj: IComment = comment.has_downvoted === 1 ? {
+      const obj: IReply = comment.has_downvoted === 1 ? {
         ...comment,
         has_upvoted: comment.has_upvoted === 0 ? 1 : 0,
         upvotes_count: comment.has_upvoted === 1 ? comment.upvotes_count - 1 : comment.upvotes_count + 1,
@@ -91,8 +74,7 @@ const CommentCard = ({
         upvotes_count: comment.has_upvoted === 1 ? comment.upvotes_count - 1 : comment.upvotes_count + 1,
       }
       setComment(obj);
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
-      queryClient.invalidateQueries([`getNewPosts`]);
+      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
     },
   });
 
@@ -103,7 +85,7 @@ const CommentCard = ({
       alert(error.message);
     },
     onSuccess: (data) => {
-      const obj: IComment = comment.has_upvoted === 1 ? {
+      const obj: IReply = comment.has_upvoted === 1 ? {
         ...comment,
         has_downvoted: comment.has_downvoted === 0 ? 1 : 0,
         has_upvoted: 0,
@@ -112,25 +94,23 @@ const CommentCard = ({
         has_downvoted: comment.has_downvoted === 0 ? 1 : 0,
       }
       setComment(obj);
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
-      queryClient.invalidateQueries([`getNewPosts`]);
+      queryClient.invalidateQueries([`getComments-${comment.post_id}`]);
     },
   });
 
   const reacttocomment = useMutation({
     mutationFn: (data: FormData) =>
-      httpService.post(`${URLS.REACT_TO_COMMENT}`, data),
+      httpService.post(`${URLS.REACT_TO_REPLY}`, data),
     onError: (error: any) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      const obj: IComment = {
+      const obj: IReply = {
         ...comment,
         has_reacted: comment.has_reacted.length > 0 ? [] : [1],
       }
       setComment(obj);
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
-      queryClient.invalidateQueries([`getNewPosts`]);
+      queryClient.invalidateQueries([`getReplies-${comment.comment_id}`]);
     },
   });
 
@@ -140,20 +120,21 @@ const CommentCard = ({
       toast.show("Something went wrong while updating yoour comment", { type: "error" });
     },
     onSuccess: (data) => {
-      toast.show("Comment deleted successfully", { type: "success" });
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
+      toast.show("Comment created successfully", { type: "success" });
+      queryClient.invalidateQueries([`getReplies-${comment.comment_id}`]);
       setShowMenu(false);
     },
   });
 
   const updateComment = useMutation({
-    mutationFn: (data: FormData) => httpService.post(`${URLS.UPDATE_COMMENT}/${comment.id}`, data),
+    mutationFn: (data: FormData) => httpService.post(`${URLS.UPDATED_REPLY}/${comment.id}`, data),
     onError: (error: any) => {
       
     },
     onSuccess: (data) => {
       toast.show("Comment updated successfully", { type: "success",  });
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
+      queryClient.invalidateQueries([`getReplies-${comment.comment_id}`]);
+      queryClient.invalidateQueries([`getSingleReply-${comment.id}`]);
       setText(editComment);
       if (removedImages.length > 0)  {
         setNewImage(editedImage);
@@ -164,14 +145,13 @@ const CommentCard = ({
   });
 
   const createReply = useMutation({
-    mutationFn: (data: FormData) => httpService.post(`${URLS.CREATE_REPLY}`, data),
+    mutationFn: (data: FormData) => httpService.post(`${URLS.CREATE_REPLY}/`, data),
     onError: (error: any) => {
       toast.show("Something went wrong when trying to create your reply, try again", { type: "error",  });
     },
     onSuccess: (data) => {
       toast.show("Comment updated successfully", { type: "success",  });
-      // queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
-      queryClient.invalidateQueries([`getReplies-${activeComment.id}`]);
+      queryClient.invalidateQueries([`getReplies-${comment.comment_id}`]);
       setText(editComment);
       if (removedImages.length > 0)  {
         setNewImage(editedImage);
@@ -183,7 +163,7 @@ const CommentCard = ({
 
   const handleReaction = () => {
     const formData = new FormData()
-    formData.append('comment_id', comment.id.toString());
+    formData.append('reply_id', comment.id.toString());
     formData.append('type', 'like');
 
     reacttocomment.mutate(formData);
@@ -229,7 +209,7 @@ const CommentCard = ({
     if (editingMode) {
       setEditingMode(false);
     } else {
-      setEditComment(activeComment.comment);
+      setEditComment(activeComment.reply);
       setEditImage(activeComment.post_images.map((item) => item.image_path));
       setEditingMode(true);
     }
@@ -241,10 +221,10 @@ const CommentCard = ({
     }
     const formData = new FormData();
 
-    formData.append('comment', editComment);
-    formData.append('post_id', comment.post_id.toString());
+    formData.append('reply', editComment);
+    formData.append('comment_id', comment.comment_id.toString());
     if (editedImage.length > 0 ) {
-      formData.append('comment_images[]', { name: editedImage[0].fileName, type: mime.getType(editedImage[0].uri), uri: editedImage[0].uri } as any);
+      formData.append('reply_images[]', { name: editedImage[0].fileName, type: mime.getType(editedImage[0].uri), uri: editedImage[0].uri } as any);
     }
     if (removeEditImage.length > 0) {
       formData.append('removed_images[]', removeEditImage[0]);
@@ -252,36 +232,10 @@ const CommentCard = ({
 
     updateComment.mutate(formData)
   }
-
-  const handleOpenModal = () => {
-    console.log(modalImages);
-    setAll({ activeImages: modalImages, imageViewer: true })
-  }
-
-  const handleSubmit = React.useCallback(() => {
-    if (createReply.isLoading) return;
-    const formData = new FormData();
-    formData.append("comment_id", comment.id as any),
-      formData.append("reply", text);
-    if (images.length > 0) {
-      for (let i = 0; i < images.length; i++) {
-        const name = images[i].uri.split("/").pop();
-        const mimeType = mime.getType(images[i].uri);
-        formData.append("reply_images[]", {
-          uri: images[i].uri,
-          type: mimeType,
-          name,
-        } as any);
-      }
-    }
-    //formData.append('mentioned_users', [].toString());
-    createReply.mutate(formData);
-  }, [text, comment, createReply]);
   return (
     <Box width='100%' borderBottomWidth={0.5} borderBottomColor='grey' marginBottom='m'>
-      
 
-      {/* IF EDITING MODE IS TRUE */}
+     
       {
         !editingMode && (
           <>
@@ -326,7 +280,7 @@ const CommentCard = ({
             <Box width={'100%'} paddingLeft='m' paddingBottom='s'>
               {/* TEXT AND IMAGE SECTION */}
               <Box width={'100%'} paddingHorizontal='m'>
-                <CustomText variant='body' color='grey' fontSize={16}>{comment.comment}</CustomText>
+                <CustomText variant='body' color='grey' fontSize={16}>{comment.reply}</CustomText>
               </Box>
 
               {/* generate random image of a dog */}
@@ -334,9 +288,7 @@ const CommentCard = ({
                 <Box width={'100%'} height={80} borderRadius={10}>
                   <ScrollView horizontal contentContainerStyle={{ alignItems: 'center' }}>
                     {comment.post_images.map((item, index) => (
-                      <Pressable  key={index.toString()} onPress={handleOpenModal}>
-                        <Image source={{ uri: `${IMAGE_BASE}${item.image_path}` }} contentFit='cover' style={{ width: 60, height: 60, borderRadius: 10, marginRight: 10 }} />
-                      </Pressable>
+                      <Image key={index.toString()} source={{ uri: `${IMAGE_BASE}${item.image_path}` }} contentFit='cover' style={{ width: 60, height: 60, borderRadius: 10, marginRight: 10 }} />
                     ))}
                   </ScrollView>
                 </Box>
@@ -412,37 +364,16 @@ const CommentCard = ({
                     )}
                   </Pressable>
 
-                  <CustomText onPress={() => setReply(prev => !prev)} variant='body' marginLeft='m' color={reply ? 'primaryColor' : 'grey'}>Reply</CustomText>
+                  {/* <CustomText onPress={() => setReply(prev => !prev)} variant='body' marginLeft='m' color={reply ? 'primaryColor' : 'grey'}>Reply</CustomText> */}
                 </Box>
 
               </Box>
 
               {reply && (
-                <Box width='100%' maxHeight={400} >
-
+                <Box width='100%' minHeight={50} maxHeight={400} >
                   {/* REPLY SECTIONS */}
-                  <Box width={'100%'} maxHeight={300}>
-
-                    { getReplies.isLoading && (
-                      <Box width={'100%'} height={30} justifyContent='center' alignItems='center'>
-                        <ActivityIndicator size={'small'} color={theme.colors.primaryColor} />
-                      </Box>
-                    )}
-
-                    { !getReplies.isLoading && replies.length < 1 && (
-                      <Box width={'100%'} height={30} justifyContent='center' alignItems='center'>
-                        <CustomText variant='subheader' fontSize={16}>No replies</CustomText>
-                      </Box>
-                    )}
-
-                    { !getReplies.isLoading && replies.length > 0 && (
-                      <ScrollView>
-                        { replies.map((item,index) => (
-                          <ReplyCard comment={item} key={index.toString()} />
-                        ))}
-                      </ScrollView>
-                    )}
-
+                  <Box flex={1}>
+                    
                   </Box>
                   {images.length > 0 && (
                     <Box width='100%' height={90}>
@@ -453,13 +384,14 @@ const CommentCard = ({
                       </ScrollView>
                     </Box>
                   )}
-                  <CommentTextBox buttonText='Reply' onImagePicked={handleImagePicked} onTextChange={(e) => setText(e)} text={text} isReply username={comment.user.username} onSubmit={handleSubmit} isLoading={createReply.isLoading} />
+                  <CommentTextBox buttonText='Reply' onImagePicked={handleImagePicked} onTextChange={(e) => setText(e)} text={text} />
                 </Box>
               )}
             </Box></>
         )
       }
 
+       {/* IF EDITING MODE IS TRUE */}
       {
         editingMode && (
           <Box width='100%'>
@@ -467,7 +399,7 @@ const CommentCard = ({
               <Box width='100%' height={90}>
                 <ScrollView style={{ width: '100%' }} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }} horizontal>
                   {editImage.length > 0 && editImage.map((item, index) => (
-                    <ImageBox onImagePressed={handleOpenModal} key={index.toString()} type='FROM_URL' uri={item} index={index} onRemove={removeEditImage} />
+                    <ImageBox key={index.toString()} type='FROM_URL' uri={item} index={index} onRemove={removeEditImage} />
                   ))}
                 </ScrollView>
               </Box>
@@ -494,8 +426,9 @@ const CommentCard = ({
         )
       }
 
+
     </Box>
   )
 }
 
-export default CommentCard
+export default ReplyCard

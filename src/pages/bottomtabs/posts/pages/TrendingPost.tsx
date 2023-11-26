@@ -20,6 +20,7 @@ import useToast from "../../../../hooks/useToast";
 import _ from 'lodash'
 import { FlatList } from "react-native-gesture-handler";
 import { CUSTOM_STATUS_CODE } from "../../../../enums/CustomCodes";
+import FeedCard from "../../../../components/feeds/FeedCard";
 
 const TrendingPost = ({
   activeTab,
@@ -150,7 +151,7 @@ const TrendingPost = ({
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
         extraData={posts}
-        renderItem={({ item }) => <PostCard {...item} showStats />}
+        renderItem={({ item }) => <FeedCard post={item} showReactions />}
         data={posts}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">

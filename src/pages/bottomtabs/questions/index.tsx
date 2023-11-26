@@ -19,6 +19,7 @@ import AnnouncementBox from "../../../components/announcements/announcementBox";
 import useToast from "../../../hooks/useToast";
 import _ from 'lodash'
 import { FlatList } from "react-native-gesture-handler";
+import FeedCard from "../../../components/feeds/FeedCard";
 
 const Questions = () => {
   const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
@@ -127,7 +128,7 @@ const Questions = () => {
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
         extraData={posts}
-        renderItem={({ item }) => <PostCard {...item} showStats />}
+        renderItem={({ item }) => <FeedCard post={item} showReactions />}
         ListHeaderComponent={() => (
           <>
             {isLoggedIn && <Searchbar />}

@@ -4,6 +4,9 @@
 //   PusherChannel,
 //   PusherEvent,
 // } from '@pusher/pusher-websocket-react-native';
+import Pusher from 'pusher-js/react-native';
+import Echo from 'laravel-echo';
+import { BASE_URL } from './httpService';
 
 let pusher ;
 // = Pusher.getInstance();
@@ -22,37 +25,20 @@ const pusherConfig = {
   encrypted: true, // optional, depending on your requirements
 };
 
-// try {
-//   (async function() {
-//     await pusher.init({
-//       apiKey: PUSHER_APP_KEY,
-//       cluster: pusherConfig.cluster,
-//        authEndpoint: 'https://test404.diskox.com',
-//       onConnectionStateChange: (current: string, prrevious: string) => {
-//           console.log(`Currrent state ${current}`);
-//           console.log(`previous state ${prrevious}`);
-//       },
-//       // onError,
-//       // onEvent,
-//       onSubscriptionSucceeded: (channelName, data) => {
-//         console.log(`Channel name ${channelName}`);
-//         console.log(`data ${data}`);
-//       },
-//       // onSubscriptionError,
-//       // onDecryptionFailure,
-//       // onMemberAdded,
-//       // onMemberRemoved,
-//       // onSubscriptionCount,
-//     });
-//   })()
+Pusher.logToConsole = true;
 
-//   await pusher.subscribe({ channelName: 'test.event' });
-//   await pusher.connect();
-// } catch (e) {
-//   console.log(`ERROR: ${e}`);
-// }
+let PusherrClient = new Pusher(PUSHER_APP_KEY, {
+  cluster: pusherConfig.cluster,
+  wsHost: BASE_URL,
+  wsPort: 6001,
+  enabledTransports: ['ws'],
+  forceTLS: false,
+});
+
+let echo = new Echo({
+  brroadcaster: 'pusher',
+  client: PusherrClient,
+})
 
 
-
-
-export default pusher;
+export default echo;

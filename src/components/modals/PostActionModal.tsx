@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React, { useEffect, useRef } from "react";
 import ModalWrapper from "../ModalWrapper";
 import Login from "../../pages/login";
@@ -22,6 +22,8 @@ import { URLS } from "../../services/urls";
 import { useToast } from "react-native-toast-notifications";
 import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
 import * as Clipboard from 'expo-clipboard';
+import { useDetailsState } from "../../states/userState";
+import { useDeletePostState } from "../../states/deleteedPost";
 
 
 const ActionChip = ({
@@ -79,23 +81,29 @@ const PostActionModal = () => {
   const toast = useToast();
   const { isLoggedIn } = useUtilState((state) => state);
   const { checkloggedInState } = useCheckLoggedInState();
+  const { id } = useDetailsState((state) => state);
+  const { setAll: deletePost } = useDeletePostState((state) => state);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "post">>();
 
+    
+
     const { mutate, isLoading } = useMutation({
-      mutationFn: () => httpService.post(`${URLS.BOOKMARK_POST}/${activePost.id}`),
+      mutationFn: () => httpService.delete(`${URLS.DELETE_POST}/${activePost.id}`),
       onSuccess: (data) => {
         toast.show(data.data.message, { type: 'success' });
-        setAll({ activePost: { ...activePost, is_bookmarked: activePost.is_bookmarked === 1 ?0:1 } });
+        deletePost(activePost.id);
+        setAll({ showPostAction: false, activePost: null, });
+        
       },
       onError: (error: any) => {
         toast.show(error.message, { type: 'error' });
-
+        
       },
     });
 
     const copyToClipboard = async () => {
-      await Clipboard.setStringAsync(`https://test404.diskox.com/post/${activePost.id}`);
+      await Clipboard.setStringAsync(`https://test404.diskox.com/post/${activePost.slug}`);
       toast.show('Post copied to clipboard', { type: 'success' });
     };
   
@@ -123,19 +131,6 @@ const PostActionModal = () => {
         />
       ),
     },
-    // {
-    //   id: 2,
-    //   isLoading: isLoading,
-    //   label: activePost.is_bookmarked === 1 ? 'Remove post':"Save post",
-    //   action: () => handleSave(),
-    //   icon: (
-    //     <Ionicons
-    //       name="bookmark-outline"
-    //       size={20}
-    //       color={activePost.is_bookmarked === 1 ? theme.colors.primaryColor:theme.colors.textColor}
-    //     />
-    //   ),
-    // },
     {
       id: 3,
       label: "Copy link",
@@ -148,7 +143,8 @@ const PostActionModal = () => {
         />
       ),
     },
-    {
+    
+    activePost !== null && id !== activePost.user.id && {
       id: 4,
       label: "Report post",
       action: () => handleReport(),
@@ -158,6 +154,31 @@ const PostActionModal = () => {
           size={20}
           color={theme.colors.textColor}
         />
+      ),
+    },
+    activePost !== null && id === activePost.user.id && {
+      id: 5,
+      label: "Edit Post",
+      action: () => {},
+      icon: (
+        <Feather
+          name="edit"
+          size={20}
+          color={theme.colors.textColor}
+        />
+      ),
+    },
+    activePost !== null && id === activePost.user.id && {
+      id: 5,
+      label: "Delete Post",
+      action: () => mutate(),
+      isLoading: isLoading,
+      icon: (
+        isLoading ? <ActivityIndicator size={'small'} color={theme.colors.primaryColor} />:<Feather
+        name="trash-2"
+        size={20}
+        color={theme.colors.textColor}
+      />
       ),
     },
   ];
@@ -178,20 +199,6 @@ const PostActionModal = () => {
       snapPoints={["40%"]}
       ref={ref}
     >
-      <Box
-        width="100%"
-        height={40}
-        paddingHorizontal="m"
-        flexDirection="row"
-        justifyContent="flex-end"
-      >
-        <Feather
-          name="x"
-          size={25}
-          color={theme.colors.textColor}
-          onPress={() => setAll({ showPostAction: false, activePost: null })}
-        />
-      </Box>
 
       {obj.filter((item) => {
         if(isLoggedIn) {

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
 import { ArchiveAdd, ArchiveMinus, ArchiveTick, Eye, Heart, Message,  } from 'iconsax-react-native'
@@ -22,18 +22,8 @@ import { useDetailsState } from '../../states/userState'
 import { URLS } from '../../services/urls'
 import httpService, { IMAGE_BASE } from '../../utils/httpService'
 import moment from 'moment'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
-const Text = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur alias Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur alias Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur alias Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur alias #onelove #lovejesus'
-
-// generrate 5 random images in an array
-const images = [
-    'https://picsum.photos/id/237/200/300',
-    'https://picsum.photos/id/238/200/300',
-    'https://picsum.photos/id/239/200/300',
-    'https://picsum.photos/id/240/200/300',
-    'https://picsum.photos/id/241/200/300',
-    'https://picsum.photos/id/242/200/300',
-]
 
 const FeedCard = ({
     post: activePost
@@ -47,6 +37,7 @@ const FeedCard = ({
     const [showAll, setShowAll] = React.useState(false);
     const [post, setPost] = React.useState<IPost>({ ...activePost });
     const [images, setImages] = React.useState(activePost.post_images.map((item) => item.image_path));
+    const [showMoreTitle, setShowMoreTitle]= React.useState(false);
 
     const toast = useToast();
    
@@ -74,6 +65,8 @@ const FeedCard = ({
         replies_count,
         repost_count,
         comments_count,
+        tags,
+        community_id,
         user: { name, profile_image, id: userId, username, isFollowing },
       } = post;
 
@@ -154,6 +147,23 @@ const FeedCard = ({
             },
           });
 
+          const votepoll = useMutation({
+            mutationFn: (data: any) => httpService.post(`${URLS.VOTE_POLL}`, data),
+            onError: (error: any) => {
+              toast.show(error.message, { type: 'status' });
+            },
+            onSuccess: (data) => {
+                if (data.data.message) {
+                    toast.show(data.data?.message, { type: 'success' });
+                    setPost(prev => ({ ...prev, has_voted_poll: 1 }));
+                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                    return;
+                } else {
+                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                }
+            }
+        });
+
           // functions
           const handleReaction = React.useCallback((type: "love" | "upvote") => {
             const check = checkloggedInState();
@@ -200,6 +210,37 @@ const FeedCard = ({
               imageVideoSliderData: [...theData],
             });
           };
+
+          const getDate = () => {
+            const today = moment();
+            const targetData = moment(created_at).add(post.poll_duration, 'days');
+            const daysToGo = targetData.diff(today, 'days');
+            return daysToGo;
+        }
+    
+        const vote = (poll_id: number) =>  {
+            const check = checkloggedInState();
+            if (check) {
+                if (getDate() < 1) {
+                    toast.show('Poll has ended you cannot vote anymore', {type: 'warning' });
+                    return;
+                }
+                const obj = {
+                    post_id: id,
+                    post_poll_id: poll_id
+                }
+                votepoll.mutate(obj);
+            }
+        }
+
+        const handleBookmark = () =>  {
+          const check = checkloggedInState();
+          if (check) {
+              if (!isLoading) {
+                mutate();
+              }
+          }
+      }
         
           const handleFollow = () => {
             const check = checkloggedInState();
@@ -209,27 +250,48 @@ const FeedCard = ({
           }
 
   return (
-    <Box width="100%"  marginBottom='s' bg='mainBackGroundColor'>
+    <Box width="100%"  marginBottom='s' bg='secondaryBackGroundColor'>
 
         {/* HEADER SECTION */}
         <Box flexDirection='row' alignItems='flex-start' width='100%'  justifyContent='space-between' paddingHorizontal='s' paddingVertical='m'>
             
            <Box flexDirection='row' flex={0.8} width='100%'>
                  {/* IMAGE BOX */}
-                <Box width={32} height={32} borderRadius={17} borderWidth={1} borderColor='primaryColor' overflow='hidden'>
-                    <Image source={{ uri: `${IMAGE_BASE}/${profile_image}` }} contentFit='cover' style={{
-                        width: '100%',
-                        height: '100%'
-                    }} />
-                </Box>
+                <Pressable
+                  onPress={() => handleNavigate()}
+                >
+                  <Box width={32} height={32} borderRadius={17} borderWidth={1} borderColor='primaryColor' overflow='hidden'>
+                      <Image source={{ uri: `${IMAGE_BASE}/${profile_image}` }} contentFit='cover' style={{
+                          width: '100%',
+                          height: '100%'
+                      }} />
+                  </Box>
+                </Pressable>
 
                 {/* DETAILS BOX */}
                 <Box width={'100%'}  marginLeft='s' overflow='hidden'>
-                    <Box width={'100%'} flexWrap='wrap' flexDirection='row'>
-                        <CustomText marginBottom='s' variant='xs' style={{ width: '100%', flexWrap: 'wrap' }}>{name} @{username}</CustomText>
-                        { myId !== userId && (
-                            <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={26} width={80} onPress={handleFollow} color={theme.colors.fadedButtonBgColor} textColor={theme.colors.primaryColor} />
-                        )}
+                    <Box width={'100%'} flexWrap='wrap' flexDirection='row' alignItems='center'>
+                        <CustomText marginRight='s' variant='xs' >{name} @{username}
+                          {community_id === null && tags.length===1 && (
+                            <>
+                              tagged  <CustomText variant='subheader' fontSize={14}>{tags[0].user.name } </CustomText>
+                            </>
+                          )}
+                          {community_id === null && tags.length > 1 && (
+                            <>
+                             <CustomText variant='xs'> tagged </CustomText> <CustomText variant='subheader' fontSize={14}>{tags[0].user.username} and {tags.length - 1} others</CustomText>
+                            </>
+                          )}
+                          { community_id !== null && (
+                            <>
+                              <CustomText variant='xs'> Posted in </CustomText>
+                              <CustomText variant='subheader' fontSize={14}> {post?.community?.name}</CustomText>
+                            </>
+                          )}
+                        </CustomText>
+                          { myId !== userId && (
+                              <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={22} width={65} spinnerColor={theme.colors.textColor} onPress={handleFollow} color={theme.colors.mainBackGroundColor} textColor={theme.colors.textColor} />
+                          )}
                     </Box>
                     <CustomText variant='xs' marginTop='s'>{moment(created_at).fromNow()}</CustomText>
                 </Box>
@@ -238,16 +300,24 @@ const FeedCard = ({
            <Box flexDirection='row'>
             { myId !== userId && (
                <>
-                { post.is_bookmarked === 1 &&  <ArchiveMinus size={25} color={theme.colors.primaryColor} onPress={() => mutate()} /> }
-                { post.is_bookmarked === 0 &&  <ArchiveAdd size={25} color={theme.colors.textColor} onPress={() => mutate()} /> }
+                <ArchiveAdd size={25} color={post.is_bookmarked === 1 ? theme.colors.primaryColor : theme.colors.textColor} onPress={handleBookmark} variant={post.is_bookmarked === 1 ? 'Bold':'Outline'} /> 
                </>
             )}
-            <Feather name='more-vertical' size={30} color={theme.colors.textColor} style={{ marginLeft: 10 }} onPress={() => setAll({ activePost: post, showPostAction : true })} />
+            <Feather name='more-vertical' size={25} color={theme.colors.textColor} style={{ marginLeft: 10 }} onPress={() => setAll({ activePost: post, showPostAction : true })} />
            </Box>
         </Box>
 
         {/* TEXTBOX */}
         <Box paddingHorizontal='s' flexDirection='row' width={'100%'} flexWrap='wrap' marginBottom='m'>
+          {post.post_type === 'question' && (
+            <>
+              { showMoreTitle ? <CustomText variant='header' fontSize={16}>{post.title}</CustomText> : post.title?.length > 150 ? <CustomText variant='header' fontSize={16}>{`${post.title?.slice(0, 150)}...`}</CustomText> :  <CustomText variant='header' fontSize={16}>{post.title}</CustomText> }
+              { post.title?.length > 150 && <CustomText style={{ width: '100%'}} onPress={() => setShowMoreTitle(!showMoreTitle)} color={showMoreTitle ? 'lightGrey':'primaryColor'}>{ showMoreTitle ? 'Read less':'Read more'}</CustomText>}
+            </>
+          )}
+          {post.title !== null && (
+            <Box height={10} width='100%'/>
+          )}
             { showMore ? colorizeHashtags(post?.description ?? '') : post?.description?.length > 150 ? colorizeHashtags(`${post?.description?.slice(0, 150)}...`) : colorizeHashtags(post?.description) }
            { post?.description?.length > 150 &&  <CustomText style={{ width: '100%'}} onPress={() => setShowMore(!showMore)} color={showMore ? 'lightGrey':'primaryColor'}>{ showMore ? 'Read less':'Read more'}</CustomText> }
         </Box>
@@ -350,9 +420,43 @@ const FeedCard = ({
         </Box>
        )}
 
+      <Box paddingHorizontal='s' marginBottom='m'>
+
+         {/* Poll SECTION */}
+         {post.polls?.length > 0 && (
+                <Box flexDirection='row' justifyContent='space-between' marginTop='m' maxHeight={300} width={'100%'}>
+
+                    <ScrollView  showsHorizontalScrollIndicator={false} contentContainerStyle={{ width: '100%' }}>
+                    
+                        {post.polls.map((poll, index) => (
+                            <Box key={index.toString()} width='100%' height={40} position='relative' overflow='hidden' borderRadius={25} marginBottom='s'>
+                                { post.has_voted_poll === 1 && (
+                                    <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
+                                )}
+                                {
+                                    getDate() < 1 && (
+                                        <Box position='absolute' width={`${poll.vote_count}%`} top={0} height='100%' zIndex={1} backgroundColor='fadedButtonBgColor' />
+                                    )
+                                }
+                                <Pressable onPress={() => vote(poll.id)}  style={{ zIndex: 2, width: '100%', height: 40, borderRadius: 25, borderWidth: 0.8, borderColor: theme.colors.primaryColor, paddingHorizontal: 20, justifyContent: 'center', marginBottom: 10 }}>
+                                    <CustomText variant='header' fontSize={13} color='primaryColor'>{poll.subject} ({poll.vote_count}%)</CustomText>
+                                </Pressable>
+                            </Box>
+                        ))}
+                   
+                    </ScrollView>
+                </Box>
+              )}
+
+             { post.polls?.length > 0 && (
+                <CustomText>{getDate() > 0 ? `${getDate()} days left` : 'Final result'  } </CustomText>
+             )}
+
+      </Box>
+
         {/* REACTIOONS */}
 
-        <Box width='100%' paddingHorizontal='m'>
+        <Box width='100%' paddingHorizontal='s'>
             <Box width={'100%'} borderTopWidth={0.5} borderTopColor='lightGrey'>
 
                 {/* VIEW SECTION */}

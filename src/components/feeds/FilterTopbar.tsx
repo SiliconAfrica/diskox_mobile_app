@@ -31,7 +31,7 @@ const FilterTopbar = ({
     <Box
       borderBottomWidth={1}
       borderBottomColor="secondaryBackGroundColor"
-      height={80}
+      height={60}
       borderTopWidth={1}
       borderTopColor="secondaryBackGroundColor"
       backgroundColor={ isDarkMode ? "secondaryBackGroundColor":'mainBackGroundColor'}
@@ -59,7 +59,7 @@ const FilterTopbar = ({
           size={25}
           color={
             activeTab === FILTER_BAR_ENUM.NEW
-              ? theme.colors.primaryColor
+              ? theme.colors.textColor
               : theme.colors.lightGrey
           }
           style={{ marginRight: 4 }}
@@ -67,7 +67,7 @@ const FilterTopbar = ({
         <CustomText
           variant="subheader"
           fontSize={16}
-          color={activeTab === FILTER_BAR_ENUM.NEW ? "primaryColor" : "lightGrey"}
+          color={activeTab === FILTER_BAR_ENUM.NEW ? "textColor" : "lightGrey"}
         >
           New
         </CustomText>
@@ -90,7 +90,7 @@ const FilterTopbar = ({
           size={25}
           color={
             activeTab === FILTER_BAR_ENUM.FOLLOWING
-              ? theme.colors.primaryColor
+              ? theme.colors.textColor
               : theme.colors.lightGrey
           }
           style={{ marginRight: 4 }}
@@ -98,7 +98,7 @@ const FilterTopbar = ({
         <CustomText
           variant="subheader"
           fontSize={16}
-          color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "primaryColor" : "lightGrey"}
+          color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "textColor" : "lightGrey"}
         >
           Following
         </CustomText>
@@ -116,12 +116,12 @@ const FilterTopbar = ({
           backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
-        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
+        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? theme.colors.textColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
         <CustomText
           variant="subheader"
           fontSize={16}
           color={
-            activeTab === FILTER_BAR_ENUM.TRENDING ? "primaryColor" : "lightGrey"
+            activeTab === FILTER_BAR_ENUM.TRENDING ? "textColor" : "lightGrey"
           }
         >
           Trending

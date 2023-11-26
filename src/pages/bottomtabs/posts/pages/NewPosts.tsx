@@ -21,6 +21,7 @@ import _ from 'lodash'
 import { FlatList } from "react-native-gesture-handler";
 import { CUSTOM_STATUS_CODE } from "../../../../enums/CustomCodes";
 import FeedCard from "../../../../components/feeds/FeedCard";
+import { useDeletePostState } from "../../../../states/deleteedPost";
 
 const NewPost = ({
   activeTab,
@@ -34,6 +35,7 @@ const NewPost = ({
   const theme = useTheme<Theme>();
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = React.useState(false);
+  const { ids: DeletedIds } = useDeletePostState((state) => state);
   const toast = useToast();
 
   // states
@@ -44,12 +46,52 @@ const NewPost = ({
   const [perPage, setPerPage] = React.useState(0);
   const [noMore, setNoMore] = React.useState(false);
 
-  // react query
-  const { isLoading, isError, error, refetch } = useQuery(
-    ["GetAllPosts", currentPage],
-    () => httpService.get(`${URLS.GET_POST}`, {
+  React.useEffect(() => {
+    alert('its changing')
+    setPosts(posts.filter((item) => DeletedIds.indexOf(item.id) === -1));
+  }, [DeletedIds])
+
+  // muatation
+  const paginatedMutation = useMutation({
+    mutationFn: () =>  httpService.get(`${URLS.GET_POST}`, {
       params: {
         page: currentPage,
+      }
+    }),
+    onSuccess: (data) => {
+      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        if (posts.length > 0) {
+          if (data.data?.data !== undefined) {
+            const uniqArr = _.uniqBy<IPost>([...posts, ...data.data?.data?.data], 'id')
+            setPosts(uniqArr);
+            const postData: IPost[] = data.data?.data?.data as IPost[];
+            const postids = postData.map((item) => item.id);
+            setIds(postids);
+          } else {
+            setNoMore(true);
+            //toast.show(data.data?.message, { type: 'success'});
+          }
+        } else {
+          setPosts(data.data.data.data);
+          setTotal(data.data.data.total);
+          const postData: IPost[] = data.data.data.data as IPost[];
+          const postids = postData.map((item) => item.id);
+          setIds(postids);
+          setPerPage(data.data.data.per_page);
+        }
+      }
+    },
+    onError: (error: any) => {
+      toast.show(error.message, { type: 'error'})
+    }
+  })
+
+  // react query
+  const { isLoading, isError, error, refetch } = useQuery(
+    ["GetNewPosts"],
+    () => httpService.get(`${URLS.GET_POST}`, {
+      params: {
+        page: 1,
       }
     }),
     {
@@ -60,11 +102,8 @@ const NewPost = ({
         if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
           if (posts.length > 0) {
             if (data.data?.data !== undefined) {
-              const uniqArr = _.uniqBy<IPost>([...posts, ...data.data?.data?.data], 'id')
+              const uniqArr = _.uniqBy<IPost>([...data.data?.data?.data, ...posts, ], 'id')
               setPosts(uniqArr);
-              const postData: IPost[] = data.data?.data?.data as IPost[];
-              const postids = postData.map((item) => item.id);
-              setIds(postids);
             } else {
               setNoMore(true);
               //toast.show(data.data?.message, { type: 'success'});
@@ -105,6 +144,7 @@ const NewPost = ({
         if (currentPage < endIndex && posts.length > 0 && noMore === false && !isLoading) {
           // markasViewed.mutate({ posts_id: ids });
           setCurrentPage(prev => prev+1);
+          paginatedMutation.mutate();
       }
   }, [currentPage, ids, perPage, total, noMore, isLoading]);
 
@@ -117,7 +157,7 @@ const NewPost = ({
   return (
     <Box
       backgroundColor={
-        "secondaryBackGroundColor"
+        "mainBackGroundColor"
       }
       flex={1}
     >
@@ -149,19 +189,25 @@ const NewPost = ({
       )}
         // estimatedItemSize={1000}
         keyExtractor={(item, index) => item.id.toString()}
-        extraData={posts}
+        extraData={DeletedIds}
         renderItem={({ item }) => <FeedCard post={item} showReactions />}
         data={posts}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">
-            {isLoading && (
+            {isLoading &&  (
+              <ActivityIndicator
+                size="small"
+                color={theme.colors.primaryColor}
+              />
+            )}
+            {paginatedMutation.isLoading &&  (
               <ActivityIndicator
                 size="small"
                 color={theme.colors.primaryColor}
               />
             )}
             {
-              !isLoading && noMore && (
+              !paginatedMutation.isLoading && noMore && (
                 <CustomText textAlign="center">Thats all for now</CustomText>
               )
             }

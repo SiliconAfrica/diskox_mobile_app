@@ -88,8 +88,13 @@ export const URLS = {
   REPORT_USER: "/report_post",
   GOOGLE_AUTH: "/login_or_register_with_google",
   GET_SINGLE_REPLY: "/get_single_reply",
+  GET_SINGLE_COMMENT: "/get_single_comment",
   REACT_TO_REPLY: "/react_to_reply",
   VERIFY_ACCOUNT: '/request_for_verification',
   GET_POPULAR_HASTAGS: '/fetch_popular_hashtags',
-  FETCH_POSTS_BY_HASHTAG: '/fetch_posts_by_hashtag'
+  FETCH_POSTS_BY_HASHTAG: '/fetch_posts_by_hashtag',
+  UPDATE_COMMENT: '/update_comment',
+  DELETE_COMMENT: '/delete_comment',
+  DELETE_POST: 'delete_post',
+  GET_FOLLOWING: '/following_posts',
 };

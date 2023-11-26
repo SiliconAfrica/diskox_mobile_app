@@ -66,7 +66,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
     })
  
   return (
-    <Box zIndex={10} maxWidth='70%' minWidth='30%' marginBottom='m' borderTopRightRadius={10} borderTopLeftRadius={10} borderBottomLeftRadius={sender_id !== id ? 0 : 10} borderBottomRightRadius={sender_id === id ? 0 : 10} alignSelf={ sender_id === id ? 'flex-end' : 'flex-start'} padding='s' backgroundColor={ sender_id === id ? 'secondaryBackGroundColor':'fadedButtonBgColor'}>
+    <Box zIndex={10} maxWidth='70%' minWidth='30%' marginBottom='m' borderTopRightRadius={10} borderTopLeftRadius={10} borderBottomLeftRadius={sender_id !== id ? 0 : 10} borderBottomRightRadius={sender_id === id ? 0 : 10} alignSelf={ sender_id === id ? 'flex-end' : 'flex-start'} padding='s' backgroundColor={ sender_id === id ? 'secondaryBackGroundColor': isDarkMode ? 'fadedButtonBgColor':'fadedButtonBgColor'} >
 
       {/* MODALS */}
       <DeleteMessageModal isVisisble={showDleteModal} onClose={() => setDeleteModal(false)} message_id={message_id}  />
@@ -74,7 +74,9 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
       {
         deleted_by === null && (
           <Box width='100%' alignItems='flex-end' alignContent='flex-end' marginBottom='m'>
-            <Feather name={showDropdown ? 'chevron-up':'chevron-down'} onPress={() => setShowDropdown(true)} size={15} color={theme.colors.textColor} />
+            <Feather name={showDropdown ? 'chevron-up':'chevron-down'} onPress={() => setShowDropdown(prev => !prev)} size={15} color={
+              sender_id === id ? theme.colors.textColor : 'black'
+            } />
           </Box>
         )
       }
@@ -160,7 +162,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
           <>
             <CustomText variant='body' fontSize={15} style={{ color: sender_id === id ? isDarkMode ?  'white':'black':'black'}} color={sender_id === id ?'white':
           'black'}>{message}</CustomText>
-            <CustomText textAlign={ sender_id === id ? 'right':'left'} variant='xs' marginTop='s'>
+            <CustomText color='grey' textAlign={ sender_id === id ? 'right':'right'} variant='xs' marginTop='s'>
                 {moment(created_at).format("hh:mm a")}
             </CustomText>
           </>
@@ -168,7 +170,7 @@ const MessageBubble = ({ created_at, message, sender_id, post_images, id: messag
 
         { deleted_by !== null && (
           <>
-            <CustomText variant='body'>{message}</CustomText>
+            <CustomText variant='body' fontStyle='italic' style={{ fontStyle: 'italic' }}>{message}</CustomText>
           </>
         )}
     </Box>
