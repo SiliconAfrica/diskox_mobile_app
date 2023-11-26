@@ -9,6 +9,7 @@ import httpService from '../../../utils/httpService'
 import { URLS } from '../../../services/urls'
 import PostCard from '../../../components/feeds/PostCard'
 import { ScrollView } from 'react-native-gesture-handler'
+import FeedCard from '../../../components/feeds/FeedCard'
 
 interface IProps {
     id: number;
@@ -29,7 +30,7 @@ const Upvotes = ({ id }: IProps) => {
         },
     });
   return (
-    <Box flex={1} bg='secondaryBackGroundColor'>
+    <Box flex={1} bg='mainBackGroundColor'>
         {/* STATS SECTIONS */}
 
        <ScrollView>
@@ -37,7 +38,7 @@ const Upvotes = ({ id }: IProps) => {
        {
            !getPosts.isLoading && posts.length < 1 && (
                <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
-                <CustomText variant='subheader' color='primaryColor'>No Post found</CustomText>
+                <CustomText variant='subheader' fontSize={18} color='primaryColor'>You have not upvoted any post</CustomText>
                </Box>
            )
        }
@@ -54,7 +55,7 @@ const Upvotes = ({ id }: IProps) => {
              !getPosts.isLoading && posts.length > 0 && (
                 <>
                     { posts.map(post => (
-                        <PostCard key={post.id} {...post} showStats />
+                        <FeedCard key={post.id} post={post} showReactions />
                     ))}
                 </>
              )
