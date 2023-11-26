@@ -17,6 +17,7 @@ import PostCard from '../../components/feeds/PostCard'
 import PollCard from '../../components/feeds/PollCard'
 import Header from '../../components/Header'
 import useDebounce from '../../hooks/useDebounce'
+import FeedCard from '../../components/feeds/FeedCard'
 
 const Hashtag = ({
     route,
@@ -75,9 +76,9 @@ const Hashtag = ({
     }
   }
   return (
-    <Box flex={1} backgroundColor='secondaryBackGroundColor'>
+    <Box flex={1} backgroundColor='mainBackGroundColor'>
         <Header showMenuButton={false} />
-        <Box flexDirection='row' width='100%' alignItems='center' paddingHorizontal='l' height={60}>
+        <Box marginBottom='s' flexDirection='row' width='100%' alignItems='center' paddingHorizontal='l' height={60}>
             <ArrowLeft onPress={() => navigation.goBack()} size={20} color={theme.colors.textColor} />
             <TextInput value={hashTag} onChangeText={(e) => setHashtag(e)} style={{ flex: 1, height: 40, borderRadius: 20, borderWidth: 1, borderColor: theme.colors.inputBorderColorLight, marginLeft: 20, color: theme.colors.textColor, paddingHorizontal: 20, fontFamily: 'RedRegular' }} />
         </Box>
@@ -106,7 +107,7 @@ const Hashtag = ({
         extraData={posts}
         renderItem={({ item }) => (
             <>
-                { item.post_type === 'poll' ? <PollCard showStats {...item} />:<PostCard {...item} showStats />}
+              <FeedCard showReactions post={item} />
             </>
         )}
         ListHeaderComponent={() => (

@@ -10,6 +10,7 @@ import { URLS } from "../../../services/urls";
 import PostCard from "../../../components/feeds/PostCard";
 import { ScrollView } from "react-native-gesture-handler";
 import { IanalysisPayload } from "../../../models/analysisPayload";
+import FeedCard from "../../../components/feeds/FeedCard";
 
 interface IProps {
   id: number;
@@ -51,7 +52,7 @@ const Overview = ({ id }: IProps) => {
     }
   );
   return (
-    <Box flex={1} bg="secondaryBackGroundColor">
+    <Box flex={1} bg="mainBackGroundColor">
       {/* STATS SECTIONS */}
 
       <ScrollView>
@@ -137,7 +138,7 @@ const Overview = ({ id }: IProps) => {
         {!getPosts.isLoading && posts.length > 0 && (
           <>
             {posts.map((post) => (
-              <PostCard key={post.id} {...post} showStats />
+              <FeedCard key={post.id} post={post} showReactions />
             ))}
           </>
         )}

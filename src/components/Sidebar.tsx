@@ -20,14 +20,12 @@ import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
 import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
-import httpService, { BASE_URL, IMAGE_BASE } from "../utils/httpService";
 import { useToast } from "react-native-toast-notifications";
 import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useModalState } from "../states/modalState";
 import { useQuery, useQueryClient } from "react-query";
 import { IHashTag } from "../models/Hashtag";
-import { useQuery } from "react-query";
 import { URLS } from "../services/urls";
 import { CUSTOM_STATUS_CODE } from "../enums/CustomCodes";
 
