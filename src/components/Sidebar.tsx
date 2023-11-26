@@ -182,6 +182,8 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   ]);
   const { accounts } = useMultipleAccounts((state) => state);
   const { setAll: setModal } = useModalState((state) => state);
+  const { id: userId } = useDetailsState((state) => state);
+  const [showMonetization, setShowMonetization] = React.useState(false);
 
   const { isLoading, isError } = useQuery(['get_trending_hashtags'], () => httpService.get(`${URLS.GET_POPULAR_HASTAGS}`), {
     onSuccess: (data) => {

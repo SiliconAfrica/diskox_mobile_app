@@ -12,7 +12,6 @@ import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../pages/login'
 import { useUtilState } from '../states/util'
 import { VideoSquare, } from 'iconsax-react-native'
-
 import { TextInput } from "react-native";
 import React from "react";
 import Box from "./general/Box";

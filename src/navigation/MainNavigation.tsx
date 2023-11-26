@@ -37,6 +37,7 @@ import VerifyAccount from "../pages/verifyAccount";
 import Bookmarks from "../pages/bookmarks";
 import Hashtag from "../pages/hashtag";
 import TrendingHashtags from "../pages/TrendingHastags";
+
 import Register from "../pages/register";
 import SignIn from "../pages/signin";
 
@@ -83,6 +84,7 @@ export type RootStackParamList = {
   "bookmark": undefined;
   "hashtag": { hashTag: string },
   "trending-hashtags": undefined;
+
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -194,6 +196,7 @@ const MainNavigation = (): JSX.Element => {
           name="trending-hashtags"
           component={TrendingHashtags}
         />
+
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   );
