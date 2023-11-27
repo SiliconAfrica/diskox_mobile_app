@@ -4,6 +4,7 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
+  Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
@@ -25,7 +26,7 @@ import * as Google from "expo-auth-session/providers/google";
 import * as SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
 import { useMutation, useQueryClient } from "react-query";
-import httpService from "../../utils/httpService";
+import httpService, { FRONTEND_BASE_URL } from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { CustomTextInput } from "../../components/form/CustomInput";
 import useForm from "../../hooks/useForm";
@@ -193,7 +194,6 @@ const Register = ({
         password_confirmation: data.password_confirmation,
         referral_code: data.referral_code,
       };
-      console.log(values, "ppp");
       setAll({
         password: data.password,
         password_confirmation: data.password_confirmation,
@@ -339,11 +339,23 @@ const Register = ({
             <Box width="100%" paddingVertical="m" justifyContent="center">
               <CustomText variant="xs" textAlign="center">
                 By continuing, you agree to Diskos{" "}
-                <CustomText variant="xs" color="textBlue">
-                  User Agreement
+                <CustomText
+                  variant="xs"
+                  color="textBlue"
+                  onPress={() =>
+                    Linking.openURL(`${FRONTEND_BASE_URL}terms-and-conditions`)
+                  }
+                >
+                  Terms and Conditions
                 </CustomText>{" "}
                 and acknowledge that you’ve read our{" "}
-                <CustomText variant="xs" color="textBlue">
+                <CustomText
+                  variant="xs"
+                  color="textBlue"
+                  onPress={() =>
+                    Linking.openURL(`${FRONTEND_BASE_URL}privacy-policy`)
+                  }
+                >
                   Privacy Policy
                 </CustomText>
                 .
