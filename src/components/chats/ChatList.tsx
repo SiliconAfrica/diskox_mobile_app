@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, ActivityIndicator } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
 import ChatHeader from './ChatHeader'
@@ -20,6 +20,8 @@ import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
 import { Ionicons } from '@expo/vector-icons'
 import useDebounce from '../../hooks/useDebounce'
+import useToast from '../../hooks/useToast'
+import { PaginatedResponse } from '../../models/PaginatedResponse'
 
 
 interface IProps {
@@ -63,13 +65,15 @@ const ChatList = () => {
     const [searchText, setSearchText] = React.useState('');
 
     const debounceValue = useDebounce(searchText);
+    const toast = useToast();
 
-    const { isLoading } = useQuery(['getChatedUsers'], () => httpService.get(`${URLS.CHATTED_USER}`), {
+    const { isLoading } = useQuery(['getChattedUsers'], () => httpService.get(`${URLS.CHATTED_USER}`), {
         onSuccess: (data) => {
+            const item: PaginatedResponse<ChatEntry> = data.data;
             setChats(data.data.data.data);
         },
         onError: (error: any) => {
-            alert(error.message);
+            toast.show(error.message, { type: 'error' });
         }
     });
 
@@ -91,10 +95,19 @@ const ChatList = () => {
                 contentContainerStyle={{ paddingHorizontal: 20 }}
                 ListEmptyComponent={() => (
                     <Box flex={1} justifyContent='center' alignItems='center'>
-                        <CustomText variant='body'>You have not started any chat</CustomText>
-                        <Box width='60%'>
-                            <NormalButton label='Chat someone' action={() => setAll({ showModal: true })} />
-                        </Box>
+                       { !isLoading && (
+                        <>
+                             <CustomText variant='body'>You have not started any chat</CustomText>
+                            <Box width='60%'>
+                                <NormalButton label='Chat someone' action={() => setAll({ showModal: true })} />
+                            </Box>
+                        </>
+                       )}
+                    </Box>
+                )}
+                ListFooterComponent={() => (
+                    <Box width='100%' height={40} justifyContent='center' alignItems='center'>
+                        { isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} />}
                     </Box>
                 )}
                 keyExtractor={(item, index) => index.toString()}

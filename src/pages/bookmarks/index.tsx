@@ -12,6 +12,7 @@ import { FlashList } from '@shopify/flash-list';
 import PostCard from '../../components/feeds/PostCard';
 import { FlatList, RefreshControl } from 'react-native-gesture-handler';
 import _ from 'lodash';
+import FeedCard from '../../components/feeds/FeedCard';
 
 // import { Container } from './styles';
 
@@ -60,7 +61,7 @@ const Bookmarks: React.FC = () => {
                 data={posts}
                 keyExtractor={(item: IPost, index) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <PostCard {...item} showStats />
+                    <FeedCard post={item} showReactions />
                 )}
                 refreshControl={<RefreshControl onRefresh={refetch} refreshing={isLoading} />}
                 ListFooterComponent={() => (

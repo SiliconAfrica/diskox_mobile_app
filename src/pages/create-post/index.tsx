@@ -35,8 +35,8 @@ const CreatePost = ({
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
-  const theOrigin = route.params.origin;
-  const communityId = route.params.communityId;
+  const theOrigin = route?.params?.origin;
+  const communityId = route?.params?.communityId;
   const { setAll, visibility } = useModalState((state) => state);
   const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);

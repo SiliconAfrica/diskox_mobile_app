@@ -10,6 +10,7 @@ export interface IComment {
   upvotes_count: number;
   downvotes_count: number;
   reactions_count: number;
+  has_reacted: any[];
   replies_count: number;
   has_upvoted: number;
   has_downvoted: number;

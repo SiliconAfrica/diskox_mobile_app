@@ -9,6 +9,7 @@ import { useUtilState } from '../../../states/util'
 import PrimaryButton from '../../../components/general/PrimaryButton'
 import { Pressable } from 'react-native';
 import { useVerificationState } from '../state'
+import useToast from '../../../hooks/useToast'
 
 const items = [
     'Celebrity',
@@ -42,11 +43,21 @@ const PageOne = ({next}: {
     next: (num: number) => void
 }) => {
     const theme = useTheme<Theme>();
+    const toast = useToast();
 
     const { setAll, category } = useVerificationState((state) => state);
 
     const handlePress = (text: string) => {
         setAll({ category: text });
+    }
+
+    const handleNext = () => {
+        if (category === '' || category === null) {
+            toast.show('Please select a category to continue', { type: 'warning', placement: 'top', duration: 5000, style: { marginTop: 50 } });
+            return;
+        }else {
+            next(2);
+        }
     }
   return (
     <Box flex={1} paddingTop='m'>
@@ -66,7 +77,7 @@ const PageOne = ({next}: {
         ))}
 
         <Box width={'100%'} flex={1} justifyContent='center' alignItems='flex-end'>
-            <PrimaryButton width={100} height={44} title='Next' onPress={() => next(2)} borderRadius={10} />
+            <PrimaryButton width={100} height={44} title='Next' onPress={handleNext} borderRadius={10} />
         </Box>
     </Box>
   )

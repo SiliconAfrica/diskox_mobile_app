@@ -13,6 +13,7 @@ import VideoImageGallery from "../components/feeds/videoImageGallery";
 import ReportPost from "../components/modals/ReportPost";
 import BlockUserModal from "../components/modals/BlockUserModal";
 import DeleteConversationModal from "../components/modals/DeleteConversationModal";
+import VerificationModal from "../components/modals/VerificationModal";
 
 const renderModals = () => {
   const {
@@ -26,7 +27,8 @@ const renderModals = () => {
     showImageVideoSlider,
     showReportPost,
     showBlockUser,
-    showDeleteConvo
+    showDeleteConvo,
+    showVerification
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -44,6 +46,7 @@ const renderModals = () => {
         {showReportPost && <ReportPost />}
         {showBlockUser && <BlockUserModal />}
         {showDeleteConvo && <DeleteConversationModal />}
+        {showVerification && <VerificationModal />}
       </>
     );
   }, [
@@ -57,7 +60,8 @@ const renderModals = () => {
     showImageVideoSlider,
     showReportPost,
     showBlockUser,
-    showDeleteConvo
+    showDeleteConvo,
+    showVerification
   ]);
 
   return {

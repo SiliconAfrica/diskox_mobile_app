@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React from "react";
 import Box from "./general/Box";
 import { useTheme } from "@shopify/restyle";
@@ -25,7 +25,9 @@ import { handlePromise } from "../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useModalState } from "../states/modalState";
 import { useQuery, useQueryClient } from "react-query";
+import { IHashTag } from "../models/Hashtag";
 import { URLS } from "../services/urls";
+import { CUSTOM_STATUS_CODE } from "../enums/CustomCodes";
 
 const Item = ({
   icon,
@@ -170,6 +172,7 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
 
 const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   const theme = useTheme<Theme>();
+  const [hashtags, setHashtag] = React.useState<IHashTag[]>([]);
   const [isLoggedIn, isDarkMode, setAll] = useUtilState((state) => [
     state.isLoggedIn,
     state.isDarkMode,
@@ -179,6 +182,14 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   const { setAll: setModal } = useModalState((state) => state);
   const { id: userId } = useDetailsState((state) => state);
   const [showMonetization, setShowMonetization] = React.useState(false);
+
+  const { isLoading, isError } = useQuery(['get_trending_hashtags'], () => httpService.get(`${URLS.GET_POPULAR_HASTAGS}`), {
+    onSuccess: (data) => {
+      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+          setHashtag(data.data.data);
+      }
+    }
+  });
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -403,39 +414,46 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             title="Knowledge Base"
           />
         </Box>
-        {/* <Box paddingHorizontal="m" paddingTop="l">
+        <Box paddingHorizontal="m" paddingTop="l" paddingBottom='xl'>
           <CustomText variant="subheader" fontSize={18}>
             Explore Popular Tags
           </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #house
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #Politics
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #Politics
-          </CustomText>
-          <CustomText variant="body" marginTop="m">
-            #LpMustWin
-          </CustomText>
+          { isLoading && (
+            <ActivityIndicator size='large' color={theme.colors.primaryColor} />
+          )}
+          {
+            !isLoading && isError && (
+              <CustomText variant="body">
+                An Error occured while getting hashtags
+              </CustomText>
+            )
+          }
+          { !isLoading && hashtags.length > 0 && hashtags.map((item, index) => (
+            <CustomText key={index.toString()} variant="body" marginTop="m" onPress={() => navigation.navigate('hashtag', { hashTag: item.name })}>
+              #{item.name}
+            </CustomText>
+            ))}
+        
 
-          <Pressable
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 15,
-              height: 20,
-            }}
-          >
-            <CustomText variant="body">View More</CustomText>
-            <Feather
-              name="chevron-right"
-              size={25}
-              color={theme.colors.textColor}
-            />
-          </Pressable>
-        </Box> */}
+         { !isLoading && !isError && (
+           <Pressable
+           style={{
+             flexDirection: "row",
+             alignItems: "center",
+             marginTop: 15,
+             height: 20,
+           }}
+           onPress={() => navigation.navigate('trending-hashtags')}
+         >
+           <CustomText variant="body">View More</CustomText>
+           <Feather
+             name="chevron-right"
+             size={25}
+             color={theme.colors.textColor}
+           />
+         </Pressable>
+         )}
+        </Box>
       </ScrollView>
     </Box>
   );
