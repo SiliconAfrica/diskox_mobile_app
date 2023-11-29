@@ -25,7 +25,7 @@ const FilterTopbar = ({
 }) => {
   const theme = useTheme<Theme>();
   const { setAll, filterBy } = useModalState((state) => state);
-  const { isDarkMode } = useUtilState((state) => state)
+  const { isDarkMode, isLoggedIn } = useUtilState((state) => state)
 
   return (
     <Box
@@ -45,6 +45,7 @@ const FilterTopbar = ({
       <Pressable
         onPress={() => onActive(FILTER_BAR_ENUM.NEW)}
         style={{
+          flex: 1,
           height: 40,
           borderRadius: 30,
           flexDirection: "row",
@@ -73,40 +74,44 @@ const FilterTopbar = ({
         </CustomText>
       </Pressable>
 
-      <Pressable
-        onPress={() => onActive(FILTER_BAR_ENUM.FOLLOWING)}
-        style={{
-          height: 40,
-          borderRadius: 30,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingHorizontal: 10,
-          backgroundColor: activeTab === FILTER_BAR_ENUM.FOLLOWING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
-        }}
-      >
-        <Ionicons
-          name="checkmark-circle-outline"
-          size={25}
-          color={
-            activeTab === FILTER_BAR_ENUM.FOLLOWING
-              ? theme.colors.textColor
-              : theme.colors.lightGrey
-          }
-          style={{ marginRight: 4 }}
-        />
-        <CustomText
-          variant="subheader"
-          fontSize={16}
-          color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "textColor" : "lightGrey"}
+      { isLoggedIn && (
+          <Pressable
+          onPress={() => onActive(FILTER_BAR_ENUM.FOLLOWING)}
+          style={{
+            flex: 1,
+            height: 40,
+            borderRadius: 30,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 10,
+            backgroundColor: activeTab === FILTER_BAR_ENUM.FOLLOWING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
+          }}
         >
-          Following
-        </CustomText>
-      </Pressable>
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={25}
+            color={
+              activeTab === FILTER_BAR_ENUM.FOLLOWING
+                ? theme.colors.textColor
+                : theme.colors.lightGrey
+            }
+            style={{ marginRight: 4 }}
+          />
+          <CustomText
+            variant="subheader"
+            fontSize={16}
+            color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "textColor" : "lightGrey"}
+          >
+            Following
+          </CustomText>
+        </Pressable>
+      )}
 
       <Pressable
         onPress={() => onActive(FILTER_BAR_ENUM.TRENDING)}
         style={{
+          flex: 1,
           height: 40,
           borderRadius: 30,
           flexDirection: "row",

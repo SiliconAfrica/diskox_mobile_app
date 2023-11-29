@@ -47,7 +47,6 @@ const NewPost = ({
   const [noMore, setNoMore] = React.useState(false);
 
   React.useEffect(() => {
-    alert('its changing')
     setPosts(posts.filter((item) => DeletedIds.indexOf(item.id) === -1));
   }, [DeletedIds])
 
