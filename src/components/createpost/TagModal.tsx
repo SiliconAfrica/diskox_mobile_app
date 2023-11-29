@@ -1,4 +1,4 @@
-import { View, Text, Modal, TextInput, StyleSheet, Platform } from 'react-native'
+import { View, Text, Modal, TextInput, StyleSheet, Platform, Pressable } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
 import { useTheme } from '@shopify/restyle'
@@ -24,13 +24,12 @@ type Follower = {
 
 const TagCard = ({ user, isChecked, onChecked }: {
     user: Partial<Follower>,
-    onChecked: (user: number, val: boolean) => void,
+    onChecked: (user: number) => void,
     isChecked: boolean
 }) => {
     const theme = useTheme<Theme>();
-    const [c, setC] = React.useState(isChecked);
-    const handleChecked = React.useCallback((val: boolean) => {
-        onChecked(user.follower.id, val);
+    const handleChecked = React.useCallback(() => {
+        onChecked(user.follower_id);
     },[])
     return (
         <Box width='100%' height={70} flexDirection='row' alignItems='center' justifyContent='space-between'>
@@ -42,7 +41,22 @@ const TagCard = ({ user, isChecked, onChecked }: {
                 <CustomText variant='body' color='black' marginLeft='s'>{user.follower.name}</CustomText>
                 <CustomText variant='xs' color='grey' marginLeft='s'>@{user.follower.username}</CustomText>
             </Box>
-            <Checkbox value={isChecked}  onValueChange={handleChecked} color={isChecked ? theme.colors.primaryColor : theme.colors.textColor}   />
+            <Pressable 
+                onPress={() => handleChecked()}
+                style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 3,
+                    borderWidth: 1,
+                    borderColor: theme.colors.textColor,
+                    backgroundColor: isChecked ? theme.colors.primaryColor:theme.colors.transparent2,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    { isChecked && <Feather name="check" size={8} color={'white'} /> }
+                </Pressable>
+            {/* <Box width={20} height={20} borderRadius={3} borderWidth={1} borderColor='textColor' bg={isChecked ? 'primaryColor':'transparent2'} />
+            <Checkbox value={isChecked}  onValueChange={handleChecked} color={isChecked ? theme.colors.primaryColor : theme.colors.textColor}   /> */}
         </Box>
     )
 }
@@ -51,7 +65,7 @@ const TagModal = ({ open, onClose, tags, setTags }: {
     open: boolean,
     onClose: () => void,
     tags: number[],
-    setTags: (tags: number, val: boolean) => void
+    setTags: (tags: number) => void
 }) => {
     const theme = useTheme<Theme>();
     const [followers, setFollowers] = React.useState<Follower[]>([]);
@@ -61,7 +75,7 @@ const TagModal = ({ open, onClose, tags, setTags }: {
     const { id } = useDetailsState((state) => state);
 
     React.useEffect(() => {
-        setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)));
+        setSelectedUsers(followers.filter((item) => tags.includes(item.follower_id)));
     }, [tags])
 
     const { isLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
@@ -79,8 +93,8 @@ const TagModal = ({ open, onClose, tags, setTags }: {
     //     return setSelectedUsers(followers.filter((item) => tags.includes(item.follower.id)))
     // }, [tags, followers]);
 
-    const handleChange = React.useCallback((valid: number, val: boolean) => {
-        setTags(valid, val);
+    const handleChange = React.useCallback((valid: number) => {
+        setTags(valid);
     }, []);
    
 
@@ -119,7 +133,7 @@ const TagModal = ({ open, onClose, tags, setTags }: {
                 <ScrollView>
                     {
                         followers.map((item, index) => (
-                            <TagCard key={index.toString()} user={item} onChecked={handleChange} isChecked={tags.includes(item.follower.id)} />
+                            <TagCard key={index.toString()} user={item} onChecked={handleChange} isChecked={tags.includes(item.follower_id)} />
 
                         ))
                     }

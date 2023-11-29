@@ -29,9 +29,9 @@ const WritePost = ({files, handlePicker, onDelete, description, setDescription }
 
   return (
     <Box flex={1}>
-     <ScrollView contentContainerStyle={{ flex: 1 }}>
-    <Box flex={1}>
-      <TextInput value={description} onChangeText={setDescription} style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 18, color: theme.colors.textColor, padding: 20 }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`Let's Diskox it...`} textAlignVertical='top'  />
+     <ScrollView contentContainerStyle={{ flex: 1, marginBottom: 0 }}>
+    <Box flex={1} height={100}>
+      <TextInput value={description} onChangeText={setDescription} style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 18, color: theme.colors.textColor, padding: 20, height: 120 }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`Let's Diskox it...`} textAlignVertical='top'  />
     </Box>
 
       {
@@ -44,25 +44,25 @@ const WritePost = ({files, handlePicker, onDelete, description, setDescription }
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
               {files.map((file, index) => (
-                <MediaCard file={file} index={index} onDelete={onDelete} key={index} />
+                <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
               ))}
-            {files.length < 10 && (
-              <Pressable style={{
-                marginLeft: 20,
-                width: 150, height: '90%',
-                borderRadius: 15,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 2,
-                borderColor: theme.colors.secondaryBackGroundColor,
-              }}
-                onPress={() => handlePicker()}
-              >
-                <CustomText variant='body'>Add Media File</CustomText>
-                <Feather name='image' size={40} color={theme.colors.textColor} />
-              </Pressable>
-            )}
-      </ScrollView>
+                {files.length < 10 && (
+                  <Pressable style={{
+                    marginLeft: 20,
+                    width: 150, height: '90%',
+                    borderRadius: 15,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderWidth: 2,
+                    borderColor: theme.colors.secondaryBackGroundColor,
+                  }}
+                    onPress={() => handlePicker()}
+                  >
+                    <CustomText variant='body'>Add Media File</CustomText>
+                    <Feather name='image' size={40} color={theme.colors.textColor} />
+                  </Pressable>
+                )}
+          </ScrollView>
     </Box>
   )
 }

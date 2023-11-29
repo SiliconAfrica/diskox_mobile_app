@@ -208,7 +208,6 @@ const CreatePost = ({
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
       formData.append("description", question);
       formData.append("post_type", "question");
-      formData.append('title', title)
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {

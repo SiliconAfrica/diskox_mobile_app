@@ -24,6 +24,8 @@ import {
 import ImageBox from './ImageBox'
 import mime from 'mime'
 import EmojiSelector from 'react-native-emoji-selector'
+import { useDetailsState } from '../../../states/userState'
+import { useModalState } from '../../../states/modalState'
 
 
 const ReplyCard = ({
@@ -45,6 +47,8 @@ const ReplyCard = ({
 
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { id } = useDetailsState((state) => state);
+  const { setAll } = useModalState((state) => state)
 
   // get reply
   const getReply = useQuery([`getSingleReply-${comment.id}`, comment.id], () => httpService.get(`${URLS.GET_SINGLE_REPLY}/${comment.id}`), {
@@ -232,6 +236,11 @@ const ReplyCard = ({
 
     updateComment.mutate(formData)
   }
+
+  const handleReport = () => {
+    setAll({ activeComment_id: activeComment.id, showReportComment: true });
+  }
+  
   return (
     <Box width='100%' borderBottomWidth={0.5} borderBottomColor='grey' marginBottom='m'>
 
@@ -265,6 +274,27 @@ const ReplyCard = ({
                     width: 120,
                   }
                 }}>
+                   { id === activeComment.user.id && (
+                    <MenuOption onSelect={() => editMode()}>
+                      <CustomText variant='subheader' fontSize={14}>Edit Post</CustomText>
+                    </MenuOption>
+                  )}
+
+                  { id === activeComment.user.id && (
+                    <MenuOption onSelect={() => deleteComment.mutate()}>
+                    { !deleteComment.isLoading && <CustomText variant='subheader' fontSize={14}>Delete Post</CustomText>}
+                    { deleteComment.isLoading && <ActivityIndicator color={theme.colors.textColor} size={'small'} />}
+                  </MenuOption>
+                  )}
+                  
+                  {
+                    id !== activeComment.user.id && (
+                      <MenuOption>
+                        <CustomText onPress={() => handleReport()} variant='subheader' fontSize={14}>Report Post</CustomText>
+                      </MenuOption>
+                    )
+                  }
+
                   <MenuOption onSelect={() => editMode()}>
                     <CustomText variant='subheader' fontSize={14}>Edit Post</CustomText>
                   </MenuOption>
