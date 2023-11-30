@@ -27,6 +27,7 @@ import { PaginatedResponse } from '../../../models/PaginatedResponse'
 import { CUSTOM_STATUS_CODE } from '../../../enums/CustomCodes'
 import ReplyCard from './ReplyCard'
 import { useModalState } from '../../../states/modalState'
+import { useDetailsState } from '../../../states/userState'
 
 
 const CommentCard = ({
@@ -51,7 +52,8 @@ const CommentCard = ({
 
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { setAll } = useModalState((state) =>  state)
+  const { setAll } = useModalState((state) =>  state);
+  const { id } = useDetailsState((state) => state);
 
   // query
 
@@ -277,11 +279,15 @@ const CommentCard = ({
     //formData.append('mentioned_users', [].toString());
     createReply.mutate(formData);
   }, [text, comment, createReply]);
+
+  const handleReport = () => {
+    setAll({ activeComment_id: activeComment.id, showReportComment: true });
+  }
   return (
     <Box width='100%' borderBottomWidth={0.5} borderBottomColor='grey' marginBottom='m'>
       
 
-      {/* IF EDITING MODE IS TRUE */}
+      {/* IF EDITING MODE IS NOT TRUE */}
       {
         !editingMode && (
           <>
@@ -311,14 +317,26 @@ const CommentCard = ({
                     width: 120,
                   }
                 }}>
-                  <MenuOption onSelect={() => editMode()}>
-                    <CustomText variant='subheader' fontSize={14}>Edit Post</CustomText>
-                  </MenuOption>
+                  { id === activeComment.user_id && (
+                    <MenuOption onSelect={() => editMode()}>
+                      <CustomText variant='subheader' fontSize={14}>Edit Post</CustomText>
+                    </MenuOption>
+                  )}
 
-                  <MenuOption onSelect={() => deleteComment.mutate()}>
+                  { id === activeComment.user_id && (
+                    <MenuOption onSelect={() => deleteComment.mutate()}>
                     { !deleteComment.isLoading && <CustomText variant='subheader' fontSize={14}>Delete Post</CustomText>}
                     { deleteComment.isLoading && <ActivityIndicator color={theme.colors.textColor} size={'small'} />}
                   </MenuOption>
+                  )}
+                  
+                  {
+                    id !== activeComment.user_id && (
+                      <MenuOption>
+                        <CustomText onPress={() => handleReport()} variant='subheader' fontSize={14}>Report Post</CustomText>
+                      </MenuOption>
+                    )
+                  }
                 </MenuOptions>
               </Menu>
             </Box>

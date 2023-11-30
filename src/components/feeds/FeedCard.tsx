@@ -156,10 +156,10 @@ const FeedCard = ({
                 if (data.data.message) {
                     toast.show(data.data?.message, { type: 'success' });
                     setPost(prev => ({ ...prev, has_voted_poll: 1 }));
-                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                    queryClient.invalidateQueries([`getPost${id}`]);
                     return;
                 } else {
-                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                  queryClient.invalidateQueries([`getPost${id}`]);
                 }
             }
         });
