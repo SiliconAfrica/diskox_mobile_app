@@ -183,13 +183,17 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   const { id: userId } = useDetailsState((state) => state);
   const [showMonetization, setShowMonetization] = React.useState(false);
 
-  const { isLoading, isError } = useQuery(['get_trending_hashtags'], () => httpService.get(`${URLS.GET_POPULAR_HASTAGS}`), {
-    onSuccess: (data) => {
-      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+  const { isLoading, isError } = useQuery(
+    ["get_trending_hashtags"],
+    () => httpService.get(`${URLS.GET_POPULAR_HASTAGS}`),
+    {
+      onSuccess: (data) => {
+        if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
           setHashtag(data.data.data);
-      }
+        }
+      },
     }
-  });
+  );
 
   const handleDarkMode = React.useCallback(
     async (dark: boolean) => {
@@ -414,45 +418,51 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             title="Knowledge Base"
           />
         </Box>
-        <Box paddingHorizontal="m" paddingTop="l" paddingBottom='xl'>
+        <Box paddingHorizontal="m" paddingTop="l" paddingBottom="xl">
           <CustomText variant="subheader" fontSize={18}>
             Explore Popular Tags
           </CustomText>
-          { isLoading && (
-            <ActivityIndicator size='large' color={theme.colors.primaryColor} />
+          {isLoading && (
+            <ActivityIndicator size="large" color={theme.colors.primaryColor} />
           )}
-          {
-            !isLoading && isError && (
-              <CustomText variant="body">
-                An Error occured while getting hashtags
-              </CustomText>
-            )
-          }
-          { !isLoading && hashtags.length > 0 && hashtags.map((item, index) => (
-            <CustomText key={index.toString()} variant="body" marginTop="m" onPress={() => navigation.navigate('hashtag', { hashTag: item.name })}>
-              #{item.name}
+          {!isLoading && isError && (
+            <CustomText variant="body">
+              An Error occured while getting hashtags
             </CustomText>
+          )}
+          {!isLoading &&
+            hashtags.length > 0 &&
+            hashtags.map((item, index) => (
+              <CustomText
+                key={index.toString()}
+                variant="body"
+                marginTop="m"
+                onPress={() =>
+                  navigation.navigate("hashtag", { hashTag: item.name })
+                }
+              >
+                #{item.name}
+              </CustomText>
             ))}
-        
 
-         { !isLoading && !isError && (
-           <Pressable
-           style={{
-             flexDirection: "row",
-             alignItems: "center",
-             marginTop: 15,
-             height: 20,
-           }}
-           onPress={() => navigation.navigate('trending-hashtags')}
-         >
-           <CustomText variant="body">View More</CustomText>
-           <Feather
-             name="chevron-right"
-             size={25}
-             color={theme.colors.textColor}
-           />
-         </Pressable>
-         )}
+          {!isLoading && !isError && (
+            <Pressable
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 15,
+                height: 20,
+              }}
+              onPress={() => navigation.navigate("trending-hashtags")}
+            >
+              <CustomText variant="body">View More</CustomText>
+              <Feather
+                name="chevron-right"
+                size={25}
+                color={theme.colors.textColor}
+              />
+            </Pressable>
+          )}
         </Box>
       </ScrollView>
     </Box>

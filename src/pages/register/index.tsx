@@ -188,11 +188,11 @@ const Register = ({
   const navigate = React.useCallback(
     (data: any) => {
       const obj: RegisterPayload = {
-        email: data.email,
+        email: data.email.toLowerCase(),
         username: data.username.toLowerCase(),
         password: data.password,
         password_confirmation: data.password_confirmation,
-        referral_code: data.referral_code,
+        referral_code: data.referral_code.toLowerCase(),
       };
       setAll({
         password: data.password,

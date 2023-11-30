@@ -133,7 +133,7 @@ const Interests = ({
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
-        title="Select Interets"
+        title="Select Interests"
         showSave={false}
         handleArrowPressed={() => navigation.goBack()}
       />
