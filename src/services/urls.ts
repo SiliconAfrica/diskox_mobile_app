@@ -86,6 +86,8 @@ export const URLS = {
   REACT_TO_COMMENT: "/react_to_comment",
   GET_BOOKMARK_POSTS: "/fetch_bookmarked_post",
   REPORT_USER: "/report_post",
+  REPORT_COMMENT: '/report_comment',
+  REPORT_REPLY: '/report_reply',
   GOOGLE_AUTH: "/auth/login_or_register_with_google",
   GET_SINGLE_REPLY: "/get_single_reply",
   GET_SINGLE_COMMENT: "/get_single_comment",

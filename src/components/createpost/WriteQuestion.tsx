@@ -15,9 +15,11 @@ interface IProps {
   onDelete: (data: { index?: number, clearAll?: boolean }) => void;
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
+  title: string;
+  setTitle: (e: string) => void;
 }
 
-const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription }: IProps) => {
+const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription, title, setTitle }: IProps) => {
   const theme = useTheme<Theme>();
 
   const handleChange = (text: string) => {
@@ -28,8 +30,16 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
   return (
     <Box flex={1}>
       <ScrollView contentContainerStyle={{ flex: 1 }}>
-        <Box flex={1}>
-          <TextInput value={description} onChangeText={setDescription} style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 18, color: theme.colors.textColor, padding: 20 }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`what do you want to ask?`} textAlignVertical='top' />
+        <Box flex={1} height={250} paddingTop='m' paddingHorizontal='m'>
+         
+         <Box marginBottom='m' width={'100%'} flexDirection='row' justifyContent='space-between'  height={60} alignItems='center' borderRadius={10} padding='s' borderWidth={1} borderColor='grey'>
+
+          <TextInput value={title} onChangeText={setTitle} style={{ width: '80%', fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`Question Title`} textAlignVertical='top' />
+
+          <CustomText variant='xs'>{title.length}/200</CustomText>
+         </Box>
+
+          <TextInput value={description} onChangeText={setDescription} style={{  fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, padding: 20 }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`what do you want to ask?`} textAlignVertical='top' />
         </Box>
 
         {
@@ -42,7 +52,7 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
                 {files.map((file, index) => (
-                  <MediaCard file={file} index={index} onDelete={onDelete} key={index} />
+                  <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
                 {files.length < 5 && (
                   <Pressable style={{
