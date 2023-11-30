@@ -9,3 +9,7 @@
 - Show interests page on sign up
 - Fix success message on interest page
 - Fix google signin/signup with multiple accounts
+
+To fix:
+
+- Community posts duplication
