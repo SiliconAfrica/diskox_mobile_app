@@ -49,6 +49,7 @@ const Verify = () => {
         }
       ),
     onError: (error: any) => {
+      console.log(error, "veri err");
       // alert(error.message);
       toast.show(error.message, { type: "danger" });
     },

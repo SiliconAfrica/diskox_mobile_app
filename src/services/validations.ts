@@ -16,6 +16,7 @@ const registerSchema = z.object({
     .string()
     .nonempty("Password cannot be empty")
     .min(8, "Password must be at least 8 characters long"),
+  referral_code: z.string(),
 });
 
 const usernameSelectSchema = z.object({

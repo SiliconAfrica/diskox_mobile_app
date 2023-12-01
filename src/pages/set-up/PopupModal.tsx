@@ -9,7 +9,13 @@ import { Theme } from "../../theme";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 
-const PopupModal = ({ visible = false }: { visible: boolean }) => {
+const PopupModal = ({
+  visible = false,
+  setVisible,
+}: {
+  visible: boolean;
+  setVisible: any;
+}) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   return (
@@ -60,7 +66,10 @@ const PopupModal = ({ visible = false }: { visible: boolean }) => {
             I'll do this later
           </CustomText>
           <NormalButton
-            action={() => navigation.navigate("categories")}
+            action={() => {
+              setVisible(false);
+              navigation.navigate("categories");
+            }}
             label="Continue"
           />
         </View>

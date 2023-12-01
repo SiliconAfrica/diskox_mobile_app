@@ -266,7 +266,7 @@ const Setup = ({
   return (
     <Box backgroundColor="mainBackGroundColor" flex={1} paddingTop="xl">
       <ScrollView style={{ paddingHorizontal: theme.spacing.m }}>
-        <PopupModal visible={showModal} />
+        <PopupModal visible={showModal} setVisible={setShowModal} />
         <Box flex={1}>
           <Box
             width="100%"
