@@ -70,11 +70,6 @@ export default function ReferralList() {
                   Username
                 </CustomText>
               </Box>
-              <Box width={180} padding={"s"}>
-                <CustomText variant="body" fontFamily="RedBold" color="black">
-                  Name
-                </CustomText>
-              </Box>
             </Box>
             {tableData.map((item, index) => (
               <Box key={index} flexDirection="row">
@@ -84,11 +79,6 @@ export default function ReferralList() {
                 <Box width={180} padding={"s"}>
                   <CustomText variant="body" color="primaryColor">
                     {item.username}
-                  </CustomText>
-                </Box>
-                <Box width={180} padding={"s"}>
-                  <CustomText variant="body" color="black">
-                    {item.name}
                   </CustomText>
                 </Box>
               </Box>

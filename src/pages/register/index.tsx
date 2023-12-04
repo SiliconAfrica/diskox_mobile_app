@@ -368,10 +368,10 @@ const Register = ({
               isLoading={isSigningUp}
             />
             <Box width="100%" paddingVertical="m" justifyContent="center">
-              <CustomText variant="xs" textAlign="center">
+              <CustomText variant="body" textAlign="center">
                 Already a member?{" "}
                 <CustomText
-                  variant="xs"
+                  variant="body"
                   color="textBlue"
                   onPress={() => navigation.navigate("sign-in")}
                 >

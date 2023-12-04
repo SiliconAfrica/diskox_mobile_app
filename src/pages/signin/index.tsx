@@ -274,7 +274,7 @@ const SignIn = ({
             />
             <Box width="100%" paddingVertical="m" justifyContent="center">
               <CustomText
-                variant="xs"
+                variant="body"
                 textAlign="left"
                 onPress={() => navigation.navigate("reset-password")}
               >
@@ -288,10 +288,10 @@ const SignIn = ({
               isLoading={isLoggingIn}
             />
             <Box width="100%" paddingVertical="m" justifyContent="center">
-              <CustomText variant="xs" textAlign="center">
+              <CustomText variant="body" textAlign="center">
                 New here?{" "}
                 <CustomText
-                  variant="xs"
+                  variant="body"
                   color="textBlue"
                   onPress={() => navigation.navigate("register")}
                 >
