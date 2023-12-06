@@ -121,17 +121,7 @@ const CommunityType = () => {
         // navigation.goBack();
         const item: ICommunity = data?.data?.data;
         setAll({
-          id: item?.id,
-          username: item?.username,
-          title: item?.name,
-          description: item?.description,
-          topics: item?.topics,
           type: item?.type,
-          banner_image: item?.banner_image,
-          profile_image: item?.profile_image,
-          restricted: item?.restricted,
-          status: item?.status,
-          user_id: item?.user_id,
         });
       }
       if (data.data?.code === CUSTOM_STATUS_CODE.INTERNAL_SERVER_ERROR) {

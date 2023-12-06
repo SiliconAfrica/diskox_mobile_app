@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import Box from "../../../../components/general/Box";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../../navigation/MainNavigation";
@@ -32,11 +32,12 @@ const CommunitySettings = ({
   const { id, type, username } = route.params;
   const { setAll } = useCommunityDetailsState((state) => state);
 
-  const { isError, isLoading } = useQuery(
+  const { isError, isLoading, refetch } = useQuery(
     ["getCommunityDetails", username],
     () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${username}`),
     {
       onSuccess: (data) => {
+        console.log(data.data?.data);
         const item: ICommunity = data?.data?.data;
         setAll({
           id: item?.id,
