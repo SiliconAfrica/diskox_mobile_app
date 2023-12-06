@@ -48,6 +48,7 @@ const CommunitySettings = ({
           banner_image: item?.banner_image,
           profile_image: item?.profile_image,
           restricted: item?.restricted,
+          post_approval: item?.post_approval,
           status: item?.status,
           user_id: item?.user_id,
         });

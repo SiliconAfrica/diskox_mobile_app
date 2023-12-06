@@ -11,11 +11,6 @@ import { PageType } from "../../../../login";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { ScrollView } from "react-native-gesture-handler";
 import { RootStackParamList } from "../../../../../navigation/MainNavigation";
-import { useQuery } from "react-query";
-import httpService from "../../../../../utils/httpService";
-import { ICommunity } from "../../../../../models/Community";
-import { useCommunityDetailsState } from "../../states/Settings.state";
-import { URLS } from "../../../../../services/urls";
 
 const SectionHeader = ({
   icon,
@@ -87,30 +82,7 @@ const ListItem = ({
 const Settings = () => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
-  const { setAll } = useCommunityDetailsState((state) => state);
 
-  // const { isError, isLoading, refetch } = useQuery(
-  //     ["getCommunityDetails", username],
-  //     () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${username}`),
-  //     {
-  //       onSuccess: (data) => {
-  //         const item: ICommunity = data?.data?.data;
-  //         setAll({
-  //           id: item?.id,
-  //           username: item?.username,
-  //           title: item?.name,
-  //           description: item?.description,
-  //           topics: item?.topics,
-  //           type: item?.type,
-  //           banner_image: item?.banner_image,
-  //           profile_image: item?.profile_image,
-  //           restricted: item?.restricted,
-  //           status: item?.status,
-  //           user_id: item?.user_id,
-  //         });
-  //       },
-  //     }
-  //   );
   return (
     <Box flex={1}>
       <SettingsHeader

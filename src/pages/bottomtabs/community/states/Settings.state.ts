@@ -14,6 +14,7 @@ interface State {
   status: string;
   banner_image: string;
   restricted: number;
+  post_approval: number;
   rules: Array<IRule>;
   setAll: (data: Partial<State>) => void;
 }
@@ -31,6 +32,7 @@ export const useCommunityDetailsState = create<State>((set) => ({
   status: "",
   banner_image: "",
   restricted: 0,
+  post_approval: 0,
   rules: [],
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
