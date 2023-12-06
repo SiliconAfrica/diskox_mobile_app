@@ -37,7 +37,6 @@ const CommunitySettings = ({
     () => httpService.get(`${URLS.GET_SINGLE_COMMUNITY}/${username}`),
     {
       onSuccess: (data) => {
-        console.log(data.data?.data);
         const item: ICommunity = data?.data?.data;
         setAll({
           id: item?.id,
