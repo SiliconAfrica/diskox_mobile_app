@@ -183,7 +183,7 @@ const Members = () => {
             )}
             ListFooterComponent={() => (
               <>
-                {isLoading && (
+                {(isLoading || isFetching || isFetchingNextPage) && (
                   <Box>
                     <ActivityIndicator
                       size="large"
