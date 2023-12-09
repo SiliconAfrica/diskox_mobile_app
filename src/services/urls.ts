@@ -62,6 +62,7 @@ export const URLS = {
   GET_COMMUNITY_POSTS: "fetch_single_community_posts",
   GET_COMMUNITY_MEMBERS: "/fetch_community_members",
   SEARCH_COMMUNITY_MEMBERS_BY_USERNAME: "/search_community_member_by_username",
+  GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
   GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT:
     "/fetch_user_followings_and_followers_count",
   FOLLOW_OR_UNFOLLOW_USER: "/follow_unfollow_user",

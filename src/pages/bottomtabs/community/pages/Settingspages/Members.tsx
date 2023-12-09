@@ -20,8 +20,6 @@ import { useToast } from "react-native-toast-notifications";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
 
-const testArray = [2, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3];
-
 const MemberCard = ({ id, name, username, profile_image }: Partial<IUser>) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
