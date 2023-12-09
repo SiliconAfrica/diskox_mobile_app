@@ -63,10 +63,13 @@ export const URLS = {
   GET_COMMUNITY_MEMBERS: "/fetch_community_members",
   SEARCH_COMMUNITY_MEMBERS_BY_USERNAME: "/search_community_member_by_username",
   GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
+  APPROVE_COMMUNITY_POST: "/approve_community_post",
+  DECLINE_COMMUNITY_POST: "/decline_community_post",
   GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT:
     "/fetch_user_followings_and_followers_count",
   FOLLOW_OR_UNFOLLOW_USER: "/follow_unfollow_user",
   GET_COMMUNITY_MODERATORS: "/fetch_community_moderators",
+  GET_COMMUNITY_PENDING_POSTS: "/fetch_community_pending_posts",
   GET_COMMUNITY_RULES: "/fetch_all_community_rules",
   CREATE_COMMUNITY: "/create_community",
   GET_AUTH_USER_DETAILS: "/get_auth_user_details",

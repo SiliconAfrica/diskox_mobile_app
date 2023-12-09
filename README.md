@@ -13,3 +13,8 @@
 To fix:
 
 - Community posts duplication
+
+For Wisdom:
+
+- Someone that is not part of a community can see the community members
+- The message after declining community post is Post approved

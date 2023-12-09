@@ -1,17 +1,15 @@
-import { View, Text, TextInput, ActivityIndicator } from "react-native";
+import { TextInput, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
 import { useTheme } from "@shopify/restyle";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import FadedButton from "../../../../../components/general/FadedButton";
+import { Feather } from "@expo/vector-icons";
 import CustomButton from "../../../../../components/general/CustomButton";
-import { ScrollView } from "react-native-gesture-handler";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { useInfiniteQuery, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery } from "react-query";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
@@ -20,7 +18,12 @@ import { useToast } from "react-native-toast-notifications";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
 
-const MemberCard = ({ id, name, username, profile_image }: Partial<IUser>) => {
+export const MemberCardSingle = ({
+  id,
+  name,
+  username,
+  profile_image,
+}: Partial<IUser>) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   return (
@@ -96,7 +99,6 @@ const Members = () => {
     `${URLS.GET_COMMUNITY_MEMBERS}/${username}`
   );
   const [search, setSearch] = useState("");
-  const queryClient = useQueryClient();
 
   const {
     isError,
@@ -117,6 +119,9 @@ const Members = () => {
       } else {
         return undefined;
       }
+    },
+    onSuccess: () => {
+      setFetchMore(false);
     },
     onError: (e: any) => {
       toast.show(e.message, { type: "danger" });
@@ -175,15 +180,10 @@ const Members = () => {
         </Box>
 
         <Box flex={1}>
-          {/* <ScrollView>
-            {testArray.map((item, inex) => (
-              <MemberCard key={inex.toString()} />
-            ))}
-                  </ScrollView> */}
           <FlashList
             ListEmptyComponent={() => (
               <>
-                {!isLoading && (
+                {!isLoading && !isFetching && (
                   <Box
                     width="100%"
                     height={40}
@@ -207,7 +207,11 @@ const Members = () => {
                 )}
               </>
             )}
-            data={data?.pages}
+            data={
+              Array.isArray(data?.pages) && data.pages[0].data.data
+                ? data?.pages
+                : []
+            }
             onScrollBeginDrag={() => {
               if (hasNextPage) {
                 setFetchMore(true);
@@ -227,7 +231,7 @@ const Members = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
               item.data.data.data.map((member: IUser) => (
-                <MemberCard
+                <MemberCardSingle
                   key={member.id.toString()}
                   id={member.id}
                   profile_image={member.profile_image}
@@ -235,7 +239,6 @@ const Members = () => {
                 />
               ))
             }
-            // renderItem={({ item }) => <MemberCard {...item} />}
           />
         </Box>
       </Box>
