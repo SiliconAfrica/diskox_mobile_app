@@ -1,5 +1,5 @@
 import { View, Text, TextInput, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
@@ -11,16 +11,20 @@ import { ScrollView } from "react-native-gesture-handler";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { useQuery } from "react-query";
+import { useInfiniteQuery, useQuery } from "react-query";
 import { useCommunityDetailsState } from "../../states/Settings.state";
-import httpService from "../../../../../utils/httpService";
+import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
 import { FlashList } from "@shopify/flash-list";
+import { useToast } from "react-native-toast-notifications";
+import { IUser } from "../../../../../models/user";
+import { Image } from "expo-image";
 
 const testArray = [2, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3];
 
-const MemberCard = () => {
+const MemberCard = ({ id, name, username, profile_image }: Partial<IUser>) => {
   const theme = useTheme<Theme>();
+  const navigation = useNavigation<PageType>();
   return (
     <Box
       width="100%"
@@ -30,14 +34,35 @@ const MemberCard = () => {
       alignItems="center"
     >
       <Box flexDirection="row" alignItems="center">
-        <Box
-          width={30}
-          height={30}
-          borderRadius={15}
-          backgroundColor="fadedButtonBgColor"
-        />
+        {profile_image ? (
+          <Image
+            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+            style={{ width: 30, height: 30, borderRadius: 17 }}
+            contentFit="cover"
+          />
+        ) : (
+          !profile_image && (
+            <Box
+              width={30}
+              height={30}
+              borderRadius={15}
+              backgroundColor="fadedButtonBgColor"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CustomText
+                variant="subheader"
+                color="primaryColor"
+                fontSize={18}
+              >
+                {username[0]?.toUpperCase() ?? ""}
+              </CustomText>
+            </Box>
+          )
+        )}
+
         <CustomText variant="body" marginLeft="s">
-          Nkem owo
+          @{username}
         </CustomText>
       </Box>
 
@@ -46,18 +71,18 @@ const MemberCard = () => {
           title="View Profile"
           color={theme.colors.secondaryBackGroundColor}
           textColor={theme.colors.black}
-          onPress={() => {}}
+          onPress={() => navigation.navigate("profile", { userId: id })}
           height={30}
           width={100}
         />
         <Box width={10} />
-        <CustomButton
+        {/* <CustomButton
           title="Delete"
           onPress={() => {}}
           height={30}
           color="red"
           width={60}
-        />
+        /> */}
       </Box>
     </Box>
   );
@@ -66,22 +91,36 @@ const MemberCard = () => {
 const Members = () => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
+  const toast = useToast();
   const { username } = useCommunityDetailsState((state) => state);
-  const [members, setMembers] = useState([]);
+  const [fetchMore, setFetchMore] = useState(false);
 
-  const { isError, isLoading } = useQuery(
-    ["getCommunityMembers", username],
-    () => httpService.get(`${URLS.GET_COMMUNITY_MEMBERS}/${username}`),
-    {
-      onSuccess: (data) => {
-        if (data.data.code === 1 && members.length < 1) {
-          setMembers(data.data.data.data);
-        } else {
-          setMembers((prev) => [...prev, ...data?.data?.data?.data]);
-        }
-      },
-    }
-  );
+  const {
+    isError,
+    isLoading,
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: [`getCommunityMembers-${username}`],
+    queryFn: ({ pageParam = 1 }) =>
+      httpService.get(
+        `${URLS.GET_COMMUNITY_MEMBERS}/${username}?page=${pageParam}`
+      ),
+    getNextPageParam: (_lastpage, allPages) => {
+      const currentPage = allPages[allPages.length - 1];
+      if (currentPage.data.data.next_page_url) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+    onError: (e) => {
+      toast.show("Fetch error", { type: "error" });
+    },
+  });
 
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
@@ -154,12 +193,34 @@ const Members = () => {
                 )}
               </>
             )}
-            data={[]}
+            data={data?.pages}
+            onScrollBeginDrag={() => {
+              if (hasNextPage) {
+                setFetchMore(true);
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            onEndReached={async () => {
+              if (
+                fetchMore &&
+                hasNextPage &&
+                (!isFetching || !isFetchingNextPage)
+              ) {
+                await fetchNextPage();
+              }
+            }}
             estimatedItemSize={10}
-            keyExtractor={(item, index) => item.id.toString()}
-            renderItem={({ item, index }) => (
-              <MemberCard key={index.toString()} />
-            )}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) =>
+              item.data.data.data.map((member: IUser) => (
+                <MemberCard
+                  key={member.id.toString()}
+                  id={member.id}
+                  profile_image={member.profile_image}
+                  username={member.username}
+                />
+              ))
+            }
             // renderItem={({ item }) => <MemberCard {...item} />}
           />
         </Box>
