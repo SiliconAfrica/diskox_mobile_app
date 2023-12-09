@@ -11,7 +11,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { useInfiniteQuery, useQuery } from "react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "react-query";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
@@ -92,8 +92,13 @@ const Members = () => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   const toast = useToast();
-  const { username } = useCommunityDetailsState((state) => state);
+  const { username, id } = useCommunityDetailsState((state) => state);
   const [fetchMore, setFetchMore] = useState(false);
+  const [queryUrl, setQueryUrl] = useState(
+    `${URLS.GET_COMMUNITY_MEMBERS}/${username}`
+  );
+  const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
 
   const {
     isError,
@@ -104,11 +109,9 @@ const Members = () => {
     isFetchingNextPage,
     isFetching,
   } = useInfiniteQuery({
-    queryKey: [`getCommunityMembers-${username}`],
+    queryKey: [`getCommunityMembers-${username}`, queryUrl],
     queryFn: ({ pageParam = 1 }) =>
-      httpService.get(
-        `${URLS.GET_COMMUNITY_MEMBERS}/${username}?page=${pageParam}`
-      ),
+      httpService.get(`${queryUrl}?page=${pageParam}`),
     getNextPageParam: (_lastpage, allPages) => {
       const currentPage = allPages[allPages.length - 1];
       if (currentPage.data.data.next_page_url) {
@@ -117,10 +120,21 @@ const Members = () => {
         return undefined;
       }
     },
-    onError: (e) => {
-      toast.show("Fetch error", { type: "error" });
+    onError: (e: any) => {
+      toast.show(e.message, { type: "danger" });
     },
   });
+
+  useEffect(() => {
+    const getAll = `${URLS.GET_COMMUNITY_MEMBERS}/${username}`;
+    const searchAll = `${URLS.SEARCH_COMMUNITY_MEMBERS_BY_USERNAME}/${id}/${search}`;
+    // queryClient.invalidateQueries(`getCommunityMembers-${username}`);
+    if (search.length > 0) {
+      setQueryUrl(searchAll);
+    } else {
+      setQueryUrl(getAll);
+    }
+  }, [search]);
 
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
@@ -131,7 +145,7 @@ const Members = () => {
       />
       <Box flex={1} padding="m">
         <CustomText variant="subheader" fontSize={14}>
-          200 members
+          {data?.pages.map((page, i) => page.data.data.total)} members
         </CustomText>
 
         {/* SEARCH BOX */}
@@ -156,6 +170,8 @@ const Members = () => {
               }}
               placeholder="Search for a member"
               placeholderTextColor={theme.colors.textColor}
+              value={search}
+              onChangeText={(val) => setSearch(val)}
             />
           </Box>
         </Box>
