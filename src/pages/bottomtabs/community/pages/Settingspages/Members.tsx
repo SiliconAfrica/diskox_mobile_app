@@ -1,5 +1,6 @@
 import { TextInput, ActivityIndicator, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
@@ -87,24 +88,18 @@ export const MemberCardSingle = ({
             contentFit="cover"
           />
         ) : (
-          !profile_image && (
-            <Box
-              width={30}
-              height={30}
-              borderRadius={15}
-              backgroundColor="fadedButtonBgColor"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <CustomText
-                variant="subheader"
-                color="primaryColor"
-                fontSize={18}
-              >
-                {username[0]?.toUpperCase() ?? ""}
-              </CustomText>
-            </Box>
-          )
+          <Box
+            width={30}
+            height={30}
+            borderRadius={15}
+            backgroundColor="fadedButtonBgColor"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CustomText variant="subheader" color="primaryColor" fontSize={18}>
+              {username[0]?.toUpperCase() ?? ""}
+            </CustomText>
+          </Box>
         )}
 
         <CustomText variant="body" marginLeft="s">
@@ -234,11 +229,24 @@ const Members = () => {
                 {!isLoading && !isFetching && (
                   <Box
                     width="100%"
-                    height={40}
+                    height={350}
+                    paddingHorizontal="s"
                     justifyContent="center"
                     alignItems="center"
                   >
-                    <CustomText>No members</CustomText>
+                    <Ionicons
+                      name="cube"
+                      size={100}
+                      color={theme.colors.primaryColor}
+                    />
+                    <CustomText
+                      variant="subheader"
+                      fontSize={18}
+                      textAlign="center"
+                      marginTop="m"
+                    >
+                      No members yet
+                    </CustomText>
                   </Box>
                 )}
               </>
