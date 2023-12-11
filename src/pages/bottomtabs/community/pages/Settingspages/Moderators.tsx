@@ -15,18 +15,51 @@ import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { Image } from "expo-image";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { FlashList } from "@shopify/flash-list";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { IUser } from "../../../../../models/user";
 import { useModalState } from "../../../../../states/modalState";
+import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
 
 const PostCard = ({ id, username, profile_image, permissions }) => {
   const theme = useTheme<Theme>();
-  const { setAll: setCommunity, single_moderator_permissions } =
-    useCommunityDetailsState((state) => state);
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const {
+    setAll: setCommunity,
+    single_moderator_permissions,
+    id: communityId,
+  } = useCommunityDetailsState((state) => state);
   const { setAll } = useModalState((state) => state);
+
+  const { mutate: revoke_permissions, isLoading } = useMutation({
+    mutationKey: `revoke-community-permissions=${id}`,
+    mutationFn: (data: any) =>
+      httpService.post(`${URLS.REVOKE_COMMUNITY_ROLE}/${communityId}/${id}`),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        setCommunity({
+          single_moderator_permissions: {
+            rules: false,
+            content: false,
+            users: false,
+          },
+          invitation_user_id: 0,
+        });
+        toast.show(res.data.message || "Successfully revoked permissions", {
+          type: "success",
+        });
+        queryClient.invalidateQueries(["getModerators", communityId]);
+        return;
+      }
+      toast.show(res.data.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e.message || "An error occured", { type: "danger" });
+    },
+  });
   useEffect(() => {
     const allPermissionsGiven = permissions.map(
       (permission) => permission.permission
@@ -94,8 +127,9 @@ const PostCard = ({ id, username, profile_image, permissions }) => {
 
       <CustomButton
         title="Revoke"
-        onPress={() => {}}
+        onPress={() => revoke_permissions({})}
         height={30}
+        isLoading={isLoading}
         color={"red"}
         width={100}
       />

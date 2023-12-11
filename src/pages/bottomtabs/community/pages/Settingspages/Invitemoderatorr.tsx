@@ -154,7 +154,7 @@ const InviteModerators = () => {
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
-        title="Modertaros"
+        title="Moderators"
         showSave
         handleArrowPressed={() => navigation.goBack()}
       />
