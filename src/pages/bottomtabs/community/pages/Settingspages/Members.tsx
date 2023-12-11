@@ -1,4 +1,4 @@
-import { TextInput, ActivityIndicator } from "react-native";
+import { TextInput, ActivityIndicator, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
@@ -9,7 +9,7 @@ import CustomButton from "../../../../../components/general/CustomButton";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
@@ -17,15 +17,60 @@ import { FlashList } from "@shopify/flash-list";
 import { useToast } from "react-native-toast-notifications";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
+import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
+import { useDetailsState } from "../../../../../states/userState";
 
 export const MemberCardSingle = ({
   id,
   name,
   username,
   profile_image,
-}: Partial<IUser>) => {
+  communityUsername,
+  communityId,
+}: Partial<IUser & { communityUsername: string; communityId: number }>) => {
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const navigation = useNavigation<PageType>();
+  const queryClient = useQueryClient();
+  const { id: loggedInUserId } = useDetailsState((state) => state);
+  const { mutate, isLoading } = useMutation({
+    mutationKey: `remove_community_member-${communityId}`,
+    mutationFn: (data: any) =>
+      httpService.delete(
+        `${URLS.REMOVE_COMMUNITY_MEMBER}/${communityId}/${id}`,
+        data
+      ),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries([
+          `getCommunityMembers-${communityUsername}`,
+        ]);
+        toast.show(res.data?.message || "Member has been removed", {
+          type: "success",
+        });
+        return;
+      }
+      toast.show(res.data?.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occured", { type: "danger" });
+    },
+  });
+
+  const remove_user = () => {
+    Alert.alert(
+      "Remove user",
+      `Are you sure you want to remove "${username}" from this community?`,
+      [
+        {
+          text: "No",
+          onPress: () => {},
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => mutate({}) },
+      ]
+    );
+  };
   return (
     <Box
       width="100%"
@@ -77,13 +122,16 @@ export const MemberCardSingle = ({
           width={100}
         />
         <Box width={10} />
-        {/* <CustomButton
-          title="Delete"
-          onPress={() => {}}
-          height={30}
-          color="red"
-          width={60}
-        /> */}
+        {id !== loggedInUserId && (
+          <CustomButton
+            title="Remove"
+            onPress={remove_user}
+            isLoading={isLoading}
+            height={30}
+            color="red"
+            width={60}
+          />
+        )}
       </Box>
     </Box>
   );
@@ -236,6 +284,8 @@ const Members = () => {
                   id={member.id}
                   profile_image={member.profile_image}
                   username={member.username}
+                  communityUsername={username}
+                  communityId={id}
                 />
               ))
             }
