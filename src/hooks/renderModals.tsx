@@ -16,6 +16,7 @@ import DeleteConversationModal from "../components/modals/DeleteConversationModa
 import VerificationModal from "../components/modals/VerificationModal";
 import ReportComment from "../components/modals/ReportComment";
 import ReportReply from "../components/modals/ReportReply";
+import InviteModeratorModal from "../components/modals/InviteModeratorModal";
 
 const renderModals = () => {
   const {
@@ -33,6 +34,7 @@ const renderModals = () => {
     showVerification,
     showReportComment,
     showReportReply,
+    showInviteModerator,
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -53,6 +55,7 @@ const renderModals = () => {
         {showVerification && <VerificationModal />}
         {showReportComment && <ReportComment />}
         {showReportReply && <ReportReply />}
+        {showInviteModerator && <InviteModeratorModal />}
       </>
     );
   }, [
@@ -70,6 +73,7 @@ const renderModals = () => {
     showVerification,
     showReportComment,
     showReportReply,
+    showInviteModerator,
   ]);
 
   return {

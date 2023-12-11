@@ -66,6 +66,8 @@ export const URLS = {
   REMOVE_COMMUNITY_MEMBER: "/remove_community_member",
   APPROVE_COMMUNITY_POST: "/approve_community_post",
   DECLINE_COMMUNITY_POST: "/decline_community_post",
+  ASSIGN_COMMUNITY_ROLE: "/assign_community_role",
+  REVOKE_COMMUNITY_ROLE: "/revoke_user_community_role_permissions",
   GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT:
     "/fetch_user_followings_and_followers_count",
   FOLLOW_OR_UNFOLLOW_USER: "/follow_unfollow_user",

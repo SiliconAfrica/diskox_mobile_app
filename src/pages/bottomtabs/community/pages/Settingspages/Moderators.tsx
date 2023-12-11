@@ -1,5 +1,5 @@
 import { View, Text, TextInput, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
@@ -20,9 +20,25 @@ import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { IUser } from "../../../../../models/user";
+import { useModalState } from "../../../../../states/modalState";
 
-const PostCard = ({ id, username, profile_image }) => {
+const PostCard = ({ id, username, profile_image, permissions }) => {
   const theme = useTheme<Theme>();
+  const { setAll: setCommunity, single_moderator_permissions } =
+    useCommunityDetailsState((state) => state);
+  const { setAll } = useModalState((state) => state);
+  useEffect(() => {
+    const allPermissionsGiven = permissions.map(
+      (permission) => permission.permission
+    );
+    setCommunity({
+      single_moderator_permissions: {
+        rules: allPermissionsGiven.includes("rules"),
+        users: allPermissionsGiven.includes("users"),
+        content: allPermissionsGiven.includes("contents"),
+      },
+    });
+  }, [permissions]);
   return (
     <Box
       width="100%"
@@ -36,54 +52,43 @@ const PostCard = ({ id, username, profile_image }) => {
       marginBottom="s"
       paddingHorizontal="m"
     >
-      <Box flexDirection="row">
-        <Box
-          width={30}
-          height={30}
-          borderRadius={15}
-          backgroundColor="primaryColor"
-        />
-        {/* 
-                {profile_image ? (
+      <Box flexDirection="row" paddingVertical="s">
+        {profile_image ? (
           <Image
             source={{ uri: `${IMAGE_BASE}${profile_image}` }}
             style={{ width: 30, height: 30, borderRadius: 17 }}
             contentFit="cover"
           />
-        ) :  (
-            <Box
-              width={30}
-              height={30}
-              borderRadius={15}
-              backgroundColor="fadedButtonBgColor"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <CustomText
-                variant="subheader"
-                color="primaryColor"
-                fontSize={18}
-              >
-                {username[0]?.toUpperCase() ?? ""}
-              </CustomText>
-            </Box>
-          
-        )} */}
+        ) : (
+          <Box
+            width={30}
+            height={30}
+            borderRadius={15}
+            backgroundColor="fadedButtonBgColor"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CustomText variant="subheader" color="primaryColor" fontSize={18}>
+              {username[0]?.toUpperCase() ?? ""}
+            </CustomText>
+          </Box>
+        )}
         <Box marginLeft="m">
-          <Box flexDirection="row">
+          <Box flexDirection="row" alignItems="center">
             <CustomText variant="subheader" fontSize={18}>
-              Ogechukwu Kalu
+              @{username}
             </CustomText>
             <Feather
               name="edit"
               size={20}
               style={{ marginLeft: 10 }}
               color={theme.colors.textColor}
+              onPress={() => {
+                setCommunity({ invitation_user_id: id });
+                setAll({ showInviteModerator: true });
+              }}
             />
           </Box>
-          <CustomText variant="body" fontSize={16} marginTop="s">
-            Controls everything
-          </CustomText>
         </Box>
       </Box>
 
@@ -264,10 +269,11 @@ const Moderators = () => {
             estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
-              item.data.data.data.map((member: IUser) => (
+              item?.data?.data?.map((member: IUser & { permissions: any }) => (
                 <PostCard
                   key={member.id.toString()}
                   id={member.id}
+                  permissions={member.permissions}
                   profile_image={member.profile_image}
                   username={member.username}
                 />

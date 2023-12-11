@@ -28,14 +28,15 @@ interface State {
   showImageVideoSlider: boolean;
   imageVideoSliderData: any[];
   showReportPost: boolean;
-  showBlockUser: boolean,
-  showDeleteConvo: boolean,
-  imageViewer: boolean,
-  activeImages: string[],
+  showBlockUser: boolean;
+  showInviteModerator: boolean;
+  showDeleteConvo: boolean;
+  imageViewer: boolean;
+  activeImages: string[];
   activeComment_id: number;
   activeReply_id: number;
   activeUser_id: number;
-  activeChat: { userId: number, username: string }| null;
+  activeChat: { userId: number; username: string } | null;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -60,6 +61,7 @@ export const useModalState = create<State>((set) => ({
   imageVideoSliderData: [],
   showReportPost: false,
   showBlockUser: false,
+  showInviteModerator: false,
   activeChat: null,
   showDeleteConvo: false,
   imageViewer: false,

@@ -1,4 +1,10 @@
-import { View, Text, TextInput, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
@@ -20,10 +26,12 @@ import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
+import { useModalState } from "../../../../../states/modalState";
 
 const testArray = [2, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3];
 
 const PostCard = ({
+  id,
   username,
   profile_image,
   name,
@@ -31,53 +39,66 @@ const PostCard = ({
   communityId,
 }: Partial<IUser & { communityUsername: string; communityId: number }>) => {
   const theme = useTheme<Theme>();
+  const { setAll: setCommunity } = useCommunityDetailsState((state) => state);
+  const { setAll } = useModalState((state) => state);
   return (
-    <Box
-      width="100%"
-      paddingVertical="m"
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="center"
-      backgroundColor="mainBackGroundColor"
-      borderBottomWidth={0}
-      borderBottomColor="secondaryBackGroundColor"
-      marginBottom="s"
-      paddingHorizontal="m"
+    <Pressable
+      onPress={() => {
+        setCommunity({ invitation_user_id: id });
+        setAll({ showInviteModerator: true });
+      }}
     >
-      <Box flexDirection="row">
-        {/* <Box width={30} height={30} borderRadius={15} backgroundColor='primaryColor' /> */}
-        {profile_image ? (
-          <Image
-            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
-            style={{ width: 30, height: 30, borderRadius: 17 }}
-            contentFit="cover"
-          />
-        ) : (
-          <Box
-            width={30}
-            height={30}
-            borderRadius={15}
-            backgroundColor="fadedButtonBgColor"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <CustomText variant="subheader" color="primaryColor" fontSize={18}>
-              {username[0]?.toUpperCase() ?? ""}
-            </CustomText>
-          </Box>
-        )}
-        <Box marginLeft="m">
-          <Box flexDirection="row">
-            <CustomText variant="subheader" fontSize={18}>
-              {name}
-            </CustomText>
-            <CustomText variant="xs" fontSize={18} marginLeft="s">
-              @{username}
-            </CustomText>
+      <Box
+        width="100%"
+        paddingVertical="m"
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        backgroundColor="mainBackGroundColor"
+        borderBottomWidth={0}
+        borderBottomColor="secondaryBackGroundColor"
+        marginBottom="s"
+        paddingHorizontal="m"
+      >
+        <Box flexDirection="row">
+          {/* <Box width={30} height={30} borderRadius={15} backgroundColor='primaryColor' /> */}
+          {profile_image ? (
+            <Image
+              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+              style={{ width: 30, height: 30, borderRadius: 17 }}
+              contentFit="cover"
+            />
+          ) : (
+            <Box
+              width={30}
+              height={30}
+              borderRadius={15}
+              backgroundColor="fadedButtonBgColor"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CustomText
+                variant="subheader"
+                color="primaryColor"
+                fontSize={18}
+              >
+                {username[0]?.toUpperCase() ?? ""}
+              </CustomText>
+            </Box>
+          )}
+          <Box marginLeft="m">
+            <Box flexDirection="row">
+              <CustomText variant="subheader" fontSize={18}>
+                {name}
+              </CustomText>
+              <CustomText variant="xs" fontSize={18} marginLeft="s">
+                @{username}
+              </CustomText>
+            </Box>
           </Box>
         </Box>
       </Box>
-    </Box>
+    </Pressable>
   );
 };
 
