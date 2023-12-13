@@ -63,7 +63,6 @@ const SuspendMemberModal = () => {
     if (input.duration && input.reason) {
       form.append("duration", input.duration.toString());
       form.append("reason", input.reason);
-      console.log(form, "form");
       mutate(form);
     } else {
       toast.show("All fields are required", { type: "danger" });
