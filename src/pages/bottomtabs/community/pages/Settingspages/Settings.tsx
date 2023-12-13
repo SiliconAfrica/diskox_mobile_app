@@ -141,10 +141,10 @@ const Settings = () => {
           }
         />
         <ListItem title="Rules" type={COMMUNITY_SETTING_TYPE.RULES} />
-        <ListItem
+        {/* <ListItem
           title="Removal reason"
           type={COMMUNITY_SETTING_TYPE.REMOVAL_RREASON}
-        />
+        /> */}
         <ListItem
           title="Content controls"
           type={COMMUNITY_SETTING_TYPE.CONTENT_CONTROL}
