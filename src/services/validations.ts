@@ -93,6 +93,10 @@ const createCommunityValidation = z.object({
   username: z.string().nonempty(),
   description: z.string().nonempty(),
 });
+const addCommunityRuleValidation = z.object({
+  title: z.string().nonempty(),
+  description: z.string().nonempty(),
+});
 
 export {
   loginSchema,
@@ -104,4 +108,5 @@ export {
   changePasswordSchema,
   editCommunity,
   createCommunityValidation,
+  addCommunityRuleValidation,
 };

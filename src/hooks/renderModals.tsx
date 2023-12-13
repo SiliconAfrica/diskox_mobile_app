@@ -19,6 +19,7 @@ import ReportReply from "../components/modals/ReportReply";
 import InviteModeratorModal from "../components/modals/InviteModeratorModal";
 import SuspendMemberModal from "../components/modals/SuspendMemberModal";
 import BlockCommunityMemberModal from "../components/modals/BlockCommunityMemberModal";
+import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 
 const renderModals = () => {
   const {
@@ -39,6 +40,7 @@ const renderModals = () => {
     showInviteModerator,
     showSuspendMemberFromCommunity,
     showBlockMemberFromCommunity,
+    showAddCommunityRule,
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -62,6 +64,7 @@ const renderModals = () => {
         {showInviteModerator && <InviteModeratorModal />}
         {showSuspendMemberFromCommunity && <SuspendMemberModal />}
         {showBlockMemberFromCommunity && <BlockCommunityMemberModal />}
+        {showAddCommunityRule && <AddCommunityRuleModal />}
       </>
     );
   }, [
@@ -82,6 +85,7 @@ const renderModals = () => {
     showInviteModerator,
     showSuspendMemberFromCommunity,
     showBlockMemberFromCommunity,
+    showAddCommunityRule,
   ]);
 
   return {

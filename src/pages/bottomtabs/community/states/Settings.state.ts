@@ -23,6 +23,7 @@ interface State {
     content: boolean;
   };
   rules: Array<IRule>;
+  ruleToActOn: Partial<IRule>;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -43,6 +44,7 @@ export const useCommunityDetailsState = create<State>((set) => ({
   communityUserToTakeActionOn: {},
   single_moderator_permissions: { rules: false, users: false, content: false },
   rules: [],
+  ruleToActOn: {},
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

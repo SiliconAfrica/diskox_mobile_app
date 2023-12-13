@@ -99,9 +99,6 @@ const CommunitySettings = ({
       case COMMUNITY_SETTING_TYPE.UPDATE_RULE: {
         return "Update rule";
       }
-      case COMMUNITY_SETTING_TYPE.ADD_RULE: {
-        return "Add rule";
-      }
       case COMMUNITY_SETTING_TYPE.REMOVAL_RREASON: {
         return "Removal reason";
       }
