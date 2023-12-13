@@ -25,6 +25,7 @@ import httpService from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
 import { ICommunity } from "../../../../models/Community";
 import SuspendMember from "./Settingspages/SuspendMember";
+import BlockMember from "./Settingspages/BlockMember";
 
 const CommunitySettings = ({
   navigation,
@@ -82,6 +83,9 @@ const CommunitySettings = ({
       }
       case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
         return "Blocked";
+      }
+      case COMMUNITY_SETTING_TYPE.BLOCK_MEMBER: {
+        return "BlockMember";
       }
       case COMMUNITY_SETTING_TYPE.INVITE: {
         return "Invite moderators";
@@ -162,6 +166,9 @@ const CommunitySettings = ({
       }
       case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
         return <Blocked />;
+      }
+      case COMMUNITY_SETTING_TYPE.BLOCK_MEMBER: {
+        return <BlockMember />;
       }
       case COMMUNITY_SETTING_TYPE.INVITE_MEMBERS: {
         return <Invites />;

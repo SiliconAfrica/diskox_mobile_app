@@ -31,6 +31,7 @@ interface State {
   showBlockUser: boolean;
   showInviteModerator: boolean;
   showSuspendMemberFromCommunity: boolean;
+  showBlockMemberFromCommunity: boolean;
   showDeleteConvo: boolean;
   imageViewer: boolean;
   activeImages: string[];
@@ -64,6 +65,7 @@ export const useModalState = create<State>((set) => ({
   showBlockUser: false,
   showInviteModerator: false,
   showSuspendMemberFromCommunity: false,
+  showBlockMemberFromCommunity: false,
   activeChat: null,
   showDeleteConvo: false,
   imageViewer: false,
