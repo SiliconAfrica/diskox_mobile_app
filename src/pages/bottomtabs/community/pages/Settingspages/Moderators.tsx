@@ -46,7 +46,7 @@ const PostCard = ({ id, username, profile_image, permissions }) => {
             content: false,
             users: false,
           },
-          invitation_user_id: 0,
+          communityUserToTakeActionOn: { username, id, profile_image },
         });
         toast.show(res.data.message || "Successfully revoked permissions", {
           type: "success",
@@ -117,7 +117,9 @@ const PostCard = ({ id, username, profile_image, permissions }) => {
               style={{ marginLeft: 10 }}
               color={theme.colors.textColor}
               onPress={() => {
-                setCommunity({ invitation_user_id: id });
+                setCommunity({
+                  communityUserToTakeActionOn: { id, username, profile_image },
+                });
                 setAll({ showInviteModerator: true });
               }}
             />

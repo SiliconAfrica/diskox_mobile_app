@@ -18,6 +18,8 @@ import { FlashList } from "@shopify/flash-list";
 import { ActivityIndicator } from "react-native";
 import { MemberCardSingle } from "./Members";
 import { IUser } from "../../../../../models/user";
+import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
+import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
 
 const Suspended = () => {
   const theme = useTheme<Theme>();
@@ -25,7 +27,9 @@ const Suspended = () => {
   const toast = useToast();
   const [fetchMore, setFetchMore] = useState(false);
 
-  const { id } = useCommunityDetailsState((state) => state);
+  const { id, username: communityUsername } = useCommunityDetailsState(
+    (state) => state
+  );
 
   const {
     isError,
@@ -53,7 +57,9 @@ const Suspended = () => {
       setFetchMore(false);
     },
     onError: (e: any) => {
-      toast.show(e.message, { type: "danger" });
+      if (e.code !== CUSTOM_STATUS_CODE.NO_DATA) {
+        toast.show(e.message, { type: "danger" });
+      }
     },
   });
   return (
@@ -62,6 +68,21 @@ const Suspended = () => {
         title="Suspended"
         showSave
         handleArrowPressed={() => navigation.goBack()}
+        RightItem={
+          <CustomText
+            variant="body"
+            color="primaryColor"
+            onPress={() =>
+              navigation.push("community-settings", {
+                id: 23,
+                type: COMMUNITY_SETTING_TYPE.SUSPEND_MEMBER,
+                username: communityUsername,
+              })
+            }
+          >
+            Suspend Member
+          </CustomText>
+        }
       />
       <Box flex={1} padding="m">
         {/* SEARCH BOX */}
@@ -84,7 +105,7 @@ const Suspended = () => {
                 fontFamily: "RedRegular",
                 paddingLeft: 10,
               }}
-              placeholder="Search for a member"
+              placeholder="Search for a suspended member"
               placeholderTextColor={theme.colors.textColor}
             />
           </Box>

@@ -62,6 +62,7 @@ export const URLS = {
   GET_COMMUNITY_POSTS: "fetch_single_community_posts",
   GET_COMMUNITY_MEMBERS: "/fetch_community_members",
   SEARCH_COMMUNITY_MEMBERS_BY_USERNAME: "/search_community_member_by_username",
+  SUSPENDED_COMMUNITY_MEMBER: "/suspend_community_member",
   GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
   REMOVE_COMMUNITY_MEMBER: "/remove_community_member",
   APPROVE_COMMUNITY_POST: "/approve_community_post",

@@ -24,6 +24,7 @@ import { useQuery } from "react-query";
 import httpService from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
 import { ICommunity } from "../../../../models/Community";
+import SuspendMember from "./Settingspages/SuspendMember";
 
 const CommunitySettings = ({
   navigation,
@@ -75,6 +76,9 @@ const CommunitySettings = ({
       }
       case COMMUNITY_SETTING_TYPE.SUSPENDED_MEMBERS: {
         return "Suspended";
+      }
+      case COMMUNITY_SETTING_TYPE.SUSPEND_MEMBER: {
+        return "SuspendMember";
       }
       case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
         return "Blocked";
@@ -152,6 +156,9 @@ const CommunitySettings = ({
       }
       case COMMUNITY_SETTING_TYPE.SUSPENDED_MEMBERS: {
         return <Suspended />;
+      }
+      case COMMUNITY_SETTING_TYPE.SUSPEND_MEMBER: {
+        return <SuspendMember />;
       }
       case COMMUNITY_SETTING_TYPE.BLOCKED_MEMBERS: {
         return <Blocked />;

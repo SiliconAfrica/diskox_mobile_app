@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { IRule } from "../../../../models/Rules";
+import { IUser } from "../../../../models/user";
 
 interface State {
   title: string;
@@ -15,7 +16,7 @@ interface State {
   banner_image: string;
   restricted: number;
   post_approval: number;
-  invitation_user_id: number;
+  communityUserToTakeActionOn: Partial<IUser>;
   single_moderator_permissions: {
     rules: boolean;
     users: boolean;
@@ -39,7 +40,7 @@ export const useCommunityDetailsState = create<State>((set) => ({
   banner_image: "",
   restricted: 0,
   post_approval: 0,
-  invitation_user_id: 0,
+  communityUserToTakeActionOn: {},
   single_moderator_permissions: { rules: false, users: false, content: false },
   rules: [],
   setAll: (data: Partial<Omit<State, "setAll">>) =>

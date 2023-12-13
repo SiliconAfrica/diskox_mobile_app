@@ -20,7 +20,7 @@ const InviteModeratorModal = () => {
   const queryClient = useQueryClient();
   const { setAll, showInviteModerator } = useModalState((state) => state);
   const {
-    invitation_user_id,
+    communityUserToTakeActionOn,
     id: communityId,
     single_moderator_permissions,
   } = useCommunityDetailsState((state) => state);
@@ -37,10 +37,10 @@ const InviteModeratorModal = () => {
     setAll({ showInviteModerator: false });
   }, []);
   const { mutate, isLoading } = useMutation({
-    mutationKey: `invite-moderator-${invitation_user_id}`,
+    mutationKey: `invite-moderator-${communityUserToTakeActionOn.id}`,
     mutationFn: (data: FormData) =>
       httpService.post(
-        `${URLS.ASSIGN_COMMUNITY_ROLE}/${communityId}/${invitation_user_id}`,
+        `${URLS.ASSIGN_COMMUNITY_ROLE}/${communityId}/${communityUserToTakeActionOn.id}`,
         data
       ),
     onSuccess: (res) => {
@@ -98,6 +98,19 @@ const InviteModeratorModal = () => {
         paddingHorizontal="m"
         alignItems="center"
       >
+        <CustomText
+          textAlign="center"
+          style={{
+            width: "50%",
+            backgroundColor: theme.colors.primaryColor,
+            color: theme.colors.white,
+          }}
+          paddingHorizontal="s"
+          paddingVertical="s"
+          marginBottom="m"
+        >
+          {communityUserToTakeActionOn.username}
+        </CustomText>
         <Box
           flexDirection="row"
           justifyContent="space-between"
