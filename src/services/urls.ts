@@ -57,6 +57,7 @@ export const URLS = {
   FETCH_SINGLE_ANOUNCEMENT: "/fetch_single_announcement/",
   SEARCH: "/search_query",
   GET_COMMUNITIES: "/all_communities",
+  GET_JOINED_COMMUNITIES: "/fetch_communities_user_belongs_to",
   GET_SINGLE_COMMUNITY: "/fetch_single_community",
   JOIN_COMMUNITY: "/join_or_leave_community",
   GET_COMMUNITY_POSTS: "fetch_single_community_posts",
