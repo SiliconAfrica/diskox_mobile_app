@@ -57,7 +57,7 @@ const Community = () => {
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {
       // alert(`You've successfully join ${name} community`);
-      console.log(data?.data);
+
       toast.show(`${data?.data?.message}`, {
         type: "success",
       });
@@ -66,7 +66,6 @@ const Community = () => {
     },
     onError: (e) => {
       // alert("An error occured");
-      console.log(e, "errrr");
       toast.show(`An error occured`, {
         type: "danger",
       });

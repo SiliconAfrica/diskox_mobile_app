@@ -133,7 +133,7 @@ const SignIn = ({
   const { isLoading: isLoggingIn, mutate: login } = useMutation({
     mutationFn: (data: any) => httpService.post(`${URLS.LOGIN}`, data),
     onError: (error: any) => {
-      toast.show(error.message, { type: "error" });
+      toast.show(error.message, { type: "danger" });
     },
     onSuccess: loginSuccessFn,
   });

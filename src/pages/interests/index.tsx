@@ -62,7 +62,7 @@ const Interests = ({
   );
 
   const getInterests = useQuery(
-    ["getInterets"],
+    ["getInterests"],
     () => httpService.get(`${URLS.GET_CATEGORIES}`),
     {
       onSuccess: (data) => {

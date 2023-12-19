@@ -12,7 +12,7 @@ import { CustomTextInput } from "../form/CustomInput";
 import { CustomTextarea } from "../form/CustomTextarea";
 import PrimaryButton from "../general/PrimaryButton";
 import { SubmitButton } from "../form/SubmittButton";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
 import { URLS } from "../../services/urls";
@@ -27,6 +27,7 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
   const [description, setDescription] = React.useState("");
   const [showDropdown, setShowDropDown] = React.useState(false);
   const [type, setType] = React.useState("PUBLIC");
+  const queryClient = useQueryClient();
   const toast = useToast();
   const cTypes = ["PUBLIC", "PRIVATE"];
   const theme = useTheme<Theme>();
@@ -48,6 +49,8 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
       }
       if (data?.data?.code === CUSTOM_STATUS_CODE.SUCCESS) {
         toast.show(data?.data?.message, { type: "success" });
+        onClose();
+        queryClient.invalidateQueries(["getCommunities"]);
       }
     },
     onError: (error: any) => {
@@ -109,10 +112,15 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
           marginBottom="m"
           position="relative"
         >
-          <CustomTextInput name="name" removeSpecialCharater required placeholder="Community title" />
+          <CustomTextInput
+            name="name"
+            removeSpecialCharater
+            required
+            placeholder="Community title"
+          />
           <Box height={20} />
           <CustomTextInput
-          removeSpecialCharater
+            removeSpecialCharater
             name="username"
             required
             placeholder="Community Username"

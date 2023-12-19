@@ -11,9 +11,6 @@ import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
 import { useTheme } from "@shopify/restyle";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import FadedButton from "../../../../../components/general/FadedButton";
-import CustomButton from "../../../../../components/general/CustomButton";
-import { ScrollView } from "react-native-gesture-handler";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
@@ -28,15 +25,11 @@ import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
 import { useModalState } from "../../../../../states/modalState";
 
-const testArray = [2, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3];
-
 const PostCard = ({
   id,
   username,
   profile_image,
   name,
-  communityUsername,
-  communityId,
 }: Partial<IUser & { communityUsername: string; communityId: number }>) => {
   const theme = useTheme<Theme>();
   const { setAll: setCommunity } = useCommunityDetailsState((state) => state);
@@ -45,9 +38,9 @@ const PostCard = ({
     <Pressable
       onPress={() => {
         setCommunity({
-          communityUserToTakeActionOn: { id, username, profile_image },
+          communityUserToTakeActionOn: { username, id, profile_image },
         });
-        setAll({ showInviteModerator: true });
+        setAll({ showBlockMemberFromCommunity: true });
       }}
     >
       <Box
@@ -104,7 +97,7 @@ const PostCard = ({
   );
 };
 
-const InviteModerators = () => {
+const BlockMember = () => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   const toast = useToast();
@@ -135,7 +128,7 @@ const InviteModerators = () => {
         return undefined;
       }
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       setFetchMore(false);
     },
     onError: (e: any) => {
@@ -156,7 +149,7 @@ const InviteModerators = () => {
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
-        title="Moderators"
+        title="Block Member"
         showSave
         handleArrowPressed={() => navigation.goBack()}
       />
@@ -193,12 +186,12 @@ const InviteModerators = () => {
 
         <Box flex={1}>
           {/* <ScrollView>
-                        {
-                            testArray.map((item, index) => (
-                                <PostCard key={index.toString()} />
-                            ))
-                        }
-                    </ScrollView> */}
+                            {
+                                testArray.map((item, index) => (
+                                    <PostCard key={index.toString()} />
+                                ))
+                            }
+                        </ScrollView> */}
           <FlashList
             ListEmptyComponent={() => (
               <>
@@ -230,7 +223,7 @@ const InviteModerators = () => {
             ListFooterComponent={() => (
               <>
                 {(isLoading || isFetching || isFetchingNextPage) && (
-                  <Box>
+                  <Box marginTop="m">
                     <ActivityIndicator
                       size="large"
                       color={theme.colors.primaryColor}
@@ -281,4 +274,4 @@ const InviteModerators = () => {
   );
 };
 
-export default InviteModerators;
+export default BlockMember;
