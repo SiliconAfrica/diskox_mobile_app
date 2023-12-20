@@ -66,6 +66,7 @@ export const URLS = {
   SUSPENDED_COMMUNITY_MEMBER: "/suspend_community_member",
   GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
   INVITE_COMMUNITY_MEMBER: "/community_invite_users",
+  FETCH_COMMUNITY_MEMBER_REQUEST: "/fetch_community_members_requests",
   FETCH_ACCEPTED_COMMUNITY_INVITATIONS:
     "/fetch_community_accepted_invitation_requests",
   FETCH_PENDING_COMMUNITY_INVITATIONS:

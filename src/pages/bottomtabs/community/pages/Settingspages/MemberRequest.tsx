@@ -102,10 +102,10 @@ const MemberRequest = () => {
     isFetching,
   } = useInfiniteQuery({
     keepPreviousData: false,
-    queryKey: [`getAcceptedInvitationRequests-${id}`, id],
+    queryKey: [`getMemberRequests`, id],
     queryFn: ({ pageParam = 1 }) =>
       httpService.get(
-        `${URLS.FETCH_ACCEPTED_COMMUNITY_INVITATIONS}/${id}?page=${pageParam}`
+        `${URLS.FETCH_COMMUNITY_MEMBER_REQUEST}/${id}?page=${pageParam}`
       ),
     getNextPageParam: (_lastpage, allPages) => {
       const currentPage = allPages[allPages.length - 1];
@@ -233,7 +233,7 @@ const MemberRequest = () => {
               </>
             )}
             data={
-              Array.isArray(data?.pages) && data.pages[0].data.data
+              Array.isArray(data?.pages) && data.pages[0].data.data?.total
                 ? data?.pages
                 : []
             }
