@@ -191,7 +191,7 @@ const Moderators = () => {
             color="primaryColor"
             onPress={() =>
               navigation.push("community-settings", {
-                id: 23,
+                id: id,
                 type: COMMUNITY_SETTING_TYPE.INVITE,
                 username: communityUsername,
               })

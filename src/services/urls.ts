@@ -65,6 +65,7 @@ export const URLS = {
   SEARCH_COMMUNITY_MEMBERS_BY_USERNAME: "/search_community_member_by_username",
   SUSPENDED_COMMUNITY_MEMBER: "/suspend_community_member",
   GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
+  INVITE_COMMUNITY_MEMBER: "/community_invite_users",
   BLOCK_COMMUNITY_MEMBER: "/block_community_member",
   FETCH_BLOCKED_COMMUNITY_MEMBERS: "/fetch_block_community_members",
   REMOVE_COMMUNITY_MEMBER: "/remove_community_member",
@@ -75,6 +76,8 @@ export const URLS = {
   GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT:
     "/fetch_user_followings_and_followers_count",
   FOLLOW_OR_UNFOLLOW_USER: "/follow_unfollow_user",
+  FETCH_USER_FOLLOWERS: "/fetch_user_followers",
+  SEARCH_USER_FOLLOWERS: "/search_user_followers_by_username",
   GET_COMMUNITY_MODERATORS: "/fetch_community_moderators",
   GET_COMMUNITY_PENDING_POSTS: "/fetch_community_pending_posts",
   ADD_COMMUNITY_RULE: "/add_community_rules",
