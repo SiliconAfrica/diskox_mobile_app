@@ -9,7 +9,7 @@ import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { FlashList } from "@shopify/flash-list";
-import { useInfiniteQuery, useMutation } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { URLS } from "../../../../../services/urls";
@@ -32,6 +32,7 @@ const PostCard = ({
   const theme = useTheme<Theme>();
   const toast = useToast();
   const navigation = useNavigation<PageType>();
+  const queryClient = useQueryClient();
   const { setAll: setCommunity } = useCommunityDetailsState((state) => state);
   const { setAll } = useModalState((state) => state);
 
@@ -44,6 +45,10 @@ const PostCard = ({
         toast.show(res.data?.message || "Invitation sent successfully", {
           type: "success",
         });
+        queryClient.invalidateQueries([
+          `getInvitationRequests-${communityId}-1`,
+          communityId,
+        ]);
         setTimeout(() => {
           navigation.goBack();
         }, 2000);

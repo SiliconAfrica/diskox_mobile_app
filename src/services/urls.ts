@@ -66,6 +66,11 @@ export const URLS = {
   SUSPENDED_COMMUNITY_MEMBER: "/suspend_community_member",
   GET_SUSPENDED_COMMUNITY_MEMBERS: "/fetch_suspended_community_members",
   INVITE_COMMUNITY_MEMBER: "/community_invite_users",
+  FETCH_ACCEPTED_COMMUNITY_INVITATIONS:
+    "/fetch_community_accepted_invitation_requests",
+  FETCH_PENDING_COMMUNITY_INVITATIONS:
+    "/fetch_community_pending_invitation_requests",
+  CANCEL_COMMUNITY_INVITATIONS: "/cancel_community_invitation",
   BLOCK_COMMUNITY_MEMBER: "/block_community_member",
   FETCH_BLOCKED_COMMUNITY_MEMBERS: "/fetch_block_community_members",
   REMOVE_COMMUNITY_MEMBER: "/remove_community_member",

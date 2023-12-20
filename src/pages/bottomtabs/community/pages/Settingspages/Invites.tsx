@@ -1,5 +1,5 @@
-import { View, Text, TextInput, Pressable } from "react-native";
-import React from "react";
+import { TextInput, Pressable, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
 import { Theme } from "../../../../../theme";
@@ -13,11 +13,49 @@ import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { useCommunityDetailsState } from "../../states/Settings.state";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
+import { URLS } from "../../../../../services/urls";
+import useToast from "../../../../../hooks/useToast";
+import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
+import { IUser } from "../../../../../models/user";
+import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
 
-const testArray = [2, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3];
-
-const PostCard = () => {
+const PostCard = ({
+  id,
+  username,
+  profile_image,
+  communityId,
+  active,
+}: Partial<IUser & { communityId: number; active: number }>) => {
   const theme = useTheme<Theme>();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const { mutate, isLoading } = useMutation({
+    mutationKey: ["revoke_community_invitation", id],
+    mutationFn: (data: any) =>
+      httpService.post(
+        `${URLS.CANCEL_COMMUNITY_INVITATIONS}/${communityId}/${id}`,
+        data
+      ),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        toast.show(res.data.message || "Invitation revoked successfully", {
+          type: "success",
+        });
+        queryClient.invalidateQueries([
+          `getPendingInvitationRequests-${communityId}`,
+          communityId,
+        ]);
+        return;
+      }
+      toast.show(res.data.message || "An error occurred", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occurred", { type: "danger" });
+    },
+  });
   return (
     <Box
       width="100%"
@@ -32,40 +70,124 @@ const PostCard = () => {
       paddingHorizontal="m"
     >
       <Box flexDirection="row">
-        <Box
-          width={30}
-          height={30}
-          borderRadius={15}
-          backgroundColor="primaryColor"
-        />
+        {profile_image ? (
+          <Image
+            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+            style={{ width: 30, height: 30, borderRadius: 17 }}
+            contentFit="cover"
+          />
+        ) : (
+          <Box
+            width={30}
+            height={30}
+            borderRadius={15}
+            backgroundColor="fadedButtonBgColor"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CustomText variant="subheader" color="primaryColor" fontSize={18}>
+              {username[0]?.toUpperCase() ?? ""}
+            </CustomText>
+          </Box>
+        )}
 
         <Box marginLeft="m">
           <Box flexDirection="row">
             <CustomText variant="subheader" fontSize={18}>
-              Ogechukwu Kalu
+              @{username}
             </CustomText>
           </Box>
         </Box>
       </Box>
 
-      <CustomButton
-        title="Revoke"
-        onPress={() => {}}
-        height={30}
-        color={"red"}
-        width={100}
-      />
+      {active === 1 && (
+        <CustomButton
+          title="Revoke"
+          onPress={() => mutate({})}
+          height={30}
+          color={"red"}
+          width={100}
+          isLoading={isLoading}
+        />
+      )}
     </Box>
   );
 };
 
 const Invites = () => {
   const theme = useTheme<Theme>();
+  const toast = useToast();
   const navigation = useNavigation<PageType>();
   const { id, username } = useCommunityDetailsState((state) => state);
 
   // state
   const [active, setActive] = React.useState(1);
+  const [fetchMore, setFetchMore] = React.useState(false);
+
+  const {
+    isError,
+    isLoading,
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isFetching,
+  } = useInfiniteQuery({
+    keepPreviousData: false,
+    queryKey: [`getAcceptedInvitationRequests-${id}`, id],
+    queryFn: ({ pageParam = 1 }) =>
+      httpService.get(
+        `${URLS.FETCH_ACCEPTED_COMMUNITY_INVITATIONS}/${id}?page=${pageParam}`
+      ),
+    getNextPageParam: (_lastpage, allPages) => {
+      const currentPage = allPages[allPages.length - 1];
+      if (currentPage.data.data.next_page_url) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+    onSuccess: () => {
+      setFetchMore(false);
+    },
+    onError: (e: any) => {
+      if (e.code !== CUSTOM_STATUS_CODE.NO_DATA) {
+        toast.show(e.message, { type: "danger" });
+      }
+    },
+  });
+  const {
+    isError: isErrorPending,
+    isLoading: isLoadingPending,
+    data: pending,
+    hasNextPage: hasPendingNextPage,
+    fetchNextPage: fetchPendingNextPage,
+    isFetchingNextPage: isFetchingPendingNextPage,
+    isFetching: isFetchingPending,
+  } = useInfiniteQuery({
+    keepPreviousData: false,
+    queryKey: [`getPendingInvitationRequests-${id}`, id],
+    queryFn: ({ pageParam = 1 }) =>
+      httpService.get(
+        `${URLS.FETCH_PENDING_COMMUNITY_INVITATIONS}/${id}?page=${pageParam}`
+      ),
+    getNextPageParam: (_lastpage, allPages) => {
+      const currentPage = allPages[allPages.length - 1];
+      if (currentPage.data.data.next_page_url) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+    onSuccess: () => {
+      setFetchMore(false);
+    },
+    onError: (e: any) => {
+      if (e.code !== CUSTOM_STATUS_CODE.NO_DATA) {
+        toast.show(e.message, { type: "danger" });
+      }
+    },
+  });
 
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
@@ -173,11 +295,162 @@ const Invites = () => {
         </Box>
 
         <Box flex={1}>
-          <ScrollView>
+          {/* <ScrollView>
             {testArray.map((item, index) => (
               <PostCard key={index.toString()} />
             ))}
-          </ScrollView>
+          </ScrollView> */}
+          {active === 1 ? (
+            <FlashList
+              ListEmptyComponent={() => (
+                <>
+                  {!isLoadingPending && (
+                    <Box
+                      width="100%"
+                      height={350}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Ionicons
+                        name="cube"
+                        size={100}
+                        color={theme.colors.primaryColor}
+                      />
+                      <CustomText
+                        variant="subheader"
+                        fontSize={18}
+                        textAlign="center"
+                        marginTop="m"
+                      >
+                        There are no pending invites
+                      </CustomText>
+                    </Box>
+                  )}
+                </>
+              )}
+              ListFooterComponent={() => (
+                <>
+                  {(isLoadingPending ||
+                    isFetchingPending ||
+                    isFetchingPendingNextPage) && (
+                    <ActivityIndicator
+                      size="large"
+                      style={{ marginTop: 20 }}
+                      color={theme.colors.primaryColor}
+                    />
+                  )}
+                </>
+              )}
+              data={
+                Array.isArray(pending?.pages) && pending.pages[0].data.data
+                  ? pending?.pages
+                  : []
+              }
+              onScrollBeginDrag={() => {
+                if (hasPendingNextPage) {
+                  setFetchMore(true);
+                }
+              }}
+              onEndReachedThreshold={0.5}
+              onEndReached={async () => {
+                if (
+                  fetchMore &&
+                  hasPendingNextPage &&
+                  (!isFetchingPending || !isFetchingPendingNextPage)
+                ) {
+                  await fetchPendingNextPage();
+                }
+              }}
+              estimatedItemSize={10}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item, index }) =>
+                item.data.data.data.map((member: IUser) => (
+                  <PostCard
+                    key={member.id.toString()}
+                    id={member.id}
+                    profile_image={member.profile_image}
+                    username={member.username}
+                    communityId={id}
+                    active={active}
+                  />
+                ))
+              }
+            />
+          ) : (
+            <FlashList
+              ListEmptyComponent={() => (
+                <>
+                  {!isLoading && (
+                    <Box
+                      width="100%"
+                      height={350}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Ionicons
+                        name="cube"
+                        size={100}
+                        color={theme.colors.primaryColor}
+                      />
+                      <CustomText
+                        variant="subheader"
+                        fontSize={18}
+                        textAlign="center"
+                        marginTop="m"
+                      >
+                        There are no accepted invites
+                      </CustomText>
+                    </Box>
+                  )}
+                </>
+              )}
+              ListFooterComponent={() => (
+                <>
+                  {(isLoading || isFetching || isFetchingNextPage) && (
+                    <ActivityIndicator
+                      size="large"
+                      style={{ marginTop: 20 }}
+                      color={theme.colors.primaryColor}
+                    />
+                  )}
+                </>
+              )}
+              data={
+                Array.isArray(data?.pages) && data.pages[0].data.data
+                  ? data?.pages
+                  : []
+              }
+              onScrollBeginDrag={() => {
+                if (hasNextPage) {
+                  setFetchMore(true);
+                }
+              }}
+              onEndReachedThreshold={0.5}
+              onEndReached={async () => {
+                if (
+                  fetchMore &&
+                  hasNextPage &&
+                  (!isFetching || !isFetchingNextPage)
+                ) {
+                  await fetchNextPage();
+                }
+              }}
+              estimatedItemSize={10}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item, index }) =>
+                item.data.data.data.map((member: IUser) => (
+                  <PostCard
+                    key={member.id.toString()}
+                    id={member.id}
+                    profile_image={member.profile_image}
+                    username={member.username}
+                    communityId={id}
+                    active={active}
+                  />
+                ))
+              }
+            />
+          )}
         </Box>
       </Box>
     </Box>
