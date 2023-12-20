@@ -123,6 +123,7 @@ const Invites = () => {
   // state
   const [active, setActive] = React.useState(1);
   const [fetchMore, setFetchMore] = React.useState(false);
+  const [fetchMorePending, setFetchMorePending] = useState(false);
 
   const {
     isError,
@@ -180,7 +181,7 @@ const Invites = () => {
       }
     },
     onSuccess: () => {
-      setFetchMore(false);
+      setFetchMorePending(false);
     },
     onError: (e: any) => {
       if (e.code !== CUSTOM_STATUS_CODE.NO_DATA) {
@@ -348,13 +349,13 @@ const Invites = () => {
               }
               onScrollBeginDrag={() => {
                 if (hasPendingNextPage) {
-                  setFetchMore(true);
+                  setFetchMorePending(true);
                 }
               }}
               onEndReachedThreshold={0.5}
               onEndReached={async () => {
                 if (
-                  fetchMore &&
+                  fetchMorePending &&
                   hasPendingNextPage &&
                   (!isFetchingPending || !isFetchingPendingNextPage)
                 ) {
