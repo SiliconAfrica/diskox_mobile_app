@@ -9,7 +9,7 @@ import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { FlashList } from "@shopify/flash-list";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { URLS } from "../../../../../services/urls";
@@ -17,18 +17,54 @@ import useToast from "../../../../../hooks/useToast";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
 import { useModalState } from "../../../../../states/modalState";
+import { useDetailsState } from "../../../../../states/userState";
+import CustomButton from "../../../../../components/general/CustomButton";
+import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
+import { Alert } from "react-native";
 
 const PostCard = ({
   id,
   username,
   profile_image,
   name,
-  communityUsername,
   communityId,
 }: Partial<IUser & { communityUsername: string; communityId: number }>) => {
   const theme = useTheme<Theme>();
+  const toast = useToast();
+  const navigation = useNavigation<PageType>();
+  const queryClient = useQueryClient();
   const { setAll: setCommunity } = useCommunityDetailsState((state) => state);
   const { setAll } = useModalState((state) => state);
+
+  const { mutate, isLoading } = useMutation({
+    mutationKey: ["invite_follower", id],
+    mutationFn: (data: FormData) =>
+      httpService.post(`${URLS.INVITE_COMMUNITY_MEMBER}/${communityId}`, data),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        toast.show(res.data?.message || "Invitation sent successfully", {
+          type: "success",
+        });
+        queryClient.invalidateQueries([
+          `getInvitationRequests-${communityId}-1`,
+          communityId,
+        ]);
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+        return;
+      }
+      toast.show(res.data?.message || "An error occurred", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occurred", { type: "danger" });
+    },
+  });
+  const invite_user = () => {
+    const form = new FormData();
+    form.append("user_ids[]", id.toString());
+    mutate(form);
+  };
   return (
     <Pressable
       onPress={() => {
@@ -51,7 +87,6 @@ const PostCard = ({
         paddingHorizontal="m"
       >
         <Box flexDirection="row">
-          {/* <Box width={30} height={30} borderRadius={15} backgroundColor='primaryColor' /> */}
           {profile_image ? (
             <Image
               source={{ uri: `${IMAGE_BASE}${profile_image}` }}
@@ -76,15 +111,31 @@ const PostCard = ({
               </CustomText>
             </Box>
           )}
-          <Box marginLeft="m">
+          <Box
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="space-between"
+            width={"90%"}
+          >
             <Box flexDirection="row">
-              <CustomText variant="subheader" fontSize={18}>
-                {name}
-              </CustomText>
-              <CustomText variant="xs" fontSize={18} marginLeft="s">
+              <CustomText
+                onPress={() => navigation.navigate("profile", { userId: id })}
+                variant="xs"
+                fontSize={18}
+                marginLeft="s"
+              >
                 @{username}
               </CustomText>
             </Box>
+
+            <CustomButton
+              title="Invite"
+              color={theme.colors.secondaryBackGroundColor}
+              textColor={theme.colors.black}
+              onPress={invite_user}
+              height={30}
+              isLoading={isLoading}
+            />
           </Box>
         </Box>
       </Box>
@@ -92,13 +143,14 @@ const PostCard = ({
   );
 };
 
-const InviteModerators = () => {
+const InviteMembers = () => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   const toast = useToast();
-  const { username, id } = useCommunityDetailsState((state) => state);
+  const { username, id } = useDetailsState((state) => state);
+  const { id: communityId } = useCommunityDetailsState((state) => state);
   const [queryUrl, setQueryUrl] = useState(
-    `${URLS.GET_COMMUNITY_MEMBERS}/${username}`
+    `${URLS.FETCH_USER_FOLLOWERS}/${id}`
   );
   const [search, setSearch] = useState("");
   const [fetchMore, setFetchMore] = useState(false);
@@ -130,10 +182,9 @@ const InviteModerators = () => {
       toast.show(e.message, { type: "danger" });
     },
   });
-
   useEffect(() => {
-    const getAll = `${URLS.GET_COMMUNITY_MEMBERS}/${username}`;
-    const searchAll = `${URLS.SEARCH_COMMUNITY_MEMBERS_BY_USERNAME}/${id}/${search}`;
+    const getAll = `${URLS.FETCH_USER_FOLLOWERS}/${id}`;
+    const searchAll = `${URLS.SEARCH_USER_FOLLOWERS}/${username}`;
     // queryClient.invalidateQueries(`getCommunityMembers-${username}`);
     if (search.length > 0) {
       setQueryUrl(searchAll);
@@ -144,7 +195,7 @@ const InviteModerators = () => {
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
-        title="Moderators"
+        title="Followers"
         showSave
         handleArrowPressed={() => navigation.goBack()}
       />
@@ -170,7 +221,7 @@ const InviteModerators = () => {
                   fontFamily: "RedRegular",
                   paddingLeft: 10,
                 }}
-                placeholder="Search for a member"
+                placeholder="Search for your follower"
                 placeholderTextColor={theme.colors.textColor}
                 value={search}
                 onChangeText={(val) => setSearch(val)}
@@ -180,13 +231,6 @@ const InviteModerators = () => {
         </Box>
 
         <Box flex={1}>
-          {/* <ScrollView>
-                        {
-                            testArray.map((item, index) => (
-                                <PostCard key={index.toString()} />
-                            ))
-                        }
-                    </ScrollView> */}
           <FlashList
             ListEmptyComponent={() => (
               <>
@@ -249,19 +293,20 @@ const InviteModerators = () => {
             }}
             estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) =>
-              item.data.data.data.map((member: IUser) => (
-                <PostCard
-                  key={member.id.toString()}
-                  id={member.id}
-                  profile_image={member.profile_image}
-                  username={member.username}
-                  name={member.name}
-                  communityUsername={username}
-                  communityId={id}
-                />
-              ))
-            }
+            renderItem={({ item, index }) => {
+              return item.data.data.data.map(
+                (user: { user_id: number; follower: IUser }) => (
+                  <PostCard
+                    key={user.follower.id.toString()}
+                    id={user.follower.id}
+                    profile_image={user.follower.profile_image}
+                    username={user.follower.username}
+                    name={user.follower.name}
+                    communityId={communityId}
+                  />
+                )
+              );
+            }}
           />
         </Box>
       </Box>
@@ -269,4 +314,4 @@ const InviteModerators = () => {
   );
 };
 
-export default InviteModerators;
+export default InviteMembers;

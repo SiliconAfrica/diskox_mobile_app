@@ -64,7 +64,6 @@ const CommunityList = () => {
       { type: "danger" }
     );
   };
-  console.log(data?.data?.data?.data[0], "sssdd");
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       {/* MODALS */}

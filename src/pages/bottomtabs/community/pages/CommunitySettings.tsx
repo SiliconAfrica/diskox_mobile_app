@@ -26,6 +26,7 @@ import { URLS } from "../../../../services/urls";
 import { ICommunity } from "../../../../models/Community";
 import SuspendMember from "./Settingspages/SuspendMember";
 import BlockMember from "./Settingspages/BlockMember";
+import InviteMembers from "./Settingspages/InviteMembers";
 
 const CommunitySettings = ({
   navigation,
@@ -117,6 +118,9 @@ const CommunitySettings = ({
       case COMMUNITY_SETTING_TYPE.MEMBERS: {
         return "Members";
       }
+      case COMMUNITY_SETTING_TYPE.INVITE_MEMBERS_FROM_FOLLOWERS: {
+        return "InviteMembers";
+      }
       default: {
         return "Setting Page";
       }
@@ -169,6 +173,9 @@ const CommunitySettings = ({
       }
       case COMMUNITY_SETTING_TYPE.INVITE_MEMBERS: {
         return <Invites />;
+      }
+      case COMMUNITY_SETTING_TYPE.INVITE_MEMBERS_FROM_FOLLOWERS: {
+        return <InviteMembers />;
       }
       case COMMUNITY_SETTING_TYPE.RULES: {
         return <Rules />;

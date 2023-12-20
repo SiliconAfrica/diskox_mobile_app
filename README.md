@@ -18,3 +18,6 @@ For Wisdom:
 
 - Someone that is not part of a community can see the community members
 - The message after declining community post is Post approved
+- Cannot revoke invitation to community
+
+- There's a logic error, you cannot have member request for a private community
