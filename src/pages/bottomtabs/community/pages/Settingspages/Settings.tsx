@@ -150,11 +150,11 @@ const Settings = () => {
           type={COMMUNITY_SETTING_TYPE.CONTENT_CONTROL}
         />
 
-        <SectionHeader
+        {/* <SectionHeader
           title={"DELETE COMMUNITY"}
           icon={<Ionicons name="trash-outline" size={25} color={"red"} />}
           color="red"
-        />
+        /> */}
       </ScrollView>
     </Box>
   );

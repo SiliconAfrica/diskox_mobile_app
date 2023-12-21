@@ -44,16 +44,13 @@ const MemberCardSingle = ({
   const { setAll } = useModalState((state) => state);
 
   const { mutate, isLoading } = useMutation({
-    mutationKey: `unsuspend_community_member-${communityId}`,
+    mutationKey: `unblock_community_member-${communityId}`,
     mutationFn: (data: any) =>
       httpService.put(`${URLS.UNBLOCK_COMMUNITY_MEMBER}/${communityId}/${id}`),
     onSuccess: (res) => {
       if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
-        queryClient.invalidateQueries([
-          `getBlockedCommunityMembers`,
-          communityId,
-        ]);
-        toast.show(res.data?.message || "Member has been unsuspended", {
+        queryClient.invalidateQueries([`getBlockedCommunityMembers`]);
+        toast.show(res.data?.message || "Member has been unblocked", {
           type: "success",
         });
         return;

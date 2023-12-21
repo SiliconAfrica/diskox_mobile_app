@@ -45,10 +45,7 @@ export const MemberCardSingle = ({
       ),
     onSuccess: (res) => {
       if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
-        queryClient.invalidateQueries([
-          `getSuspendedCommunityMembers`,
-          communityId,
-        ]);
+        queryClient.invalidateQueries([`getSuspendedCommunityMembers`]);
         toast.show(res.data?.message || "Member has been unsuspended", {
           type: "success",
         });

@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  useWindowDimensions,
-  Pressable,
-  ImageBackground,
-  ActivityIndicator,
-} from "react-native";
+import { useWindowDimensions, Pressable, ImageBackground } from "react-native";
 import React, { memo } from "react";
 import Box from "../../../../components/general/Box";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -16,11 +9,8 @@ import CustomText from "../../../../components/general/CustomText";
 import Posts from "../../../../components/community/Posts";
 import AboutCommunity from "../../../../components/community/About";
 import Rules from "../../../../components/community/Rules";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../../navigation/MainNavigation";
 import { COMMUNITY_SETTING_TYPE } from "../../../../enums/CommunitySettings";
 import { PageType } from "../../../login";
-import { RootBottomTabParamList } from "../../../../navigation/BottomTabs";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CommunityStackParamList } from "..";
 import { ICommunity } from "../../../../models/Community";
@@ -56,8 +46,6 @@ const Community = () => {
   const { isLoading: isJoining, mutate } = useMutation({
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {
-      // alert(`You've successfully join ${name} community`);
-
       toast.show(`${data?.data?.message}`, {
         type: "success",
       });
@@ -65,7 +53,38 @@ const Community = () => {
       queryClient.invalidateQueries(["getCommunity", id]);
     },
     onError: (e) => {
-      // alert("An error occured");
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const { isLoading: isAccepting, mutate: acceptInvite } = useMutation({
+    mutationFn: () =>
+      httpService.post(`${URLS.ACCEPT_COMMUNITY_INVITATION}/${id}`),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Invitation accepted successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity", id]);
+    },
+    onError: (e) => {
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const { isLoading: isDeclining, mutate: declineInvite } = useMutation({
+    mutationFn: () =>
+      httpService.post(`${URLS.DECLINE_COMMUNITY_INVITATION}/${id}`),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Invitation declined successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity", id]);
+    },
+    onError: (e) => {
       toast.show(`An error occured`, {
         type: "danger",
       });
@@ -182,9 +201,24 @@ const Community = () => {
           {details?.is_member_request_pending === 1 ? (
             <PrimaryButton
               title={"Pending"}
-              onPress={() => {}}
+              onPress={() => mutate()}
+              isLoading={isJoining}
               color={theme.colors.yellowGreen}
             />
+          ) : details?.is_invited === 1 ? (
+            <Box flexDirection="row">
+              <PrimaryButton
+                title={"Accept"}
+                isLoading={isAccepting}
+                onPress={() => acceptInvite()}
+              />
+              <PrimaryButton
+                title={"Decline"}
+                isLoading={isDeclining}
+                onPress={() => declineInvite()}
+                color={theme.colors.error}
+              />
+            </Box>
           ) : (
             details?.is_member === 0 && (
               <PrimaryButton
