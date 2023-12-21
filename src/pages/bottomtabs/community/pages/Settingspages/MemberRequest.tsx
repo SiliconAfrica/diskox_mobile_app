@@ -78,7 +78,7 @@ const PostCard = ({
         title="Accept"
         onPress={() => {}}
         height={30}
-        color={"red"}
+        color={theme.colors.primaryColor}
         width={100}
       />
     </Box>

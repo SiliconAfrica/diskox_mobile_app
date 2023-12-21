@@ -179,12 +179,20 @@ const Community = () => {
         <Box alignItems="center" style={{ marginTop: 70 }}>
           <CustomText variant="subheader">{details?.name}</CustomText>
           <CustomText marginBottom="m">c/{details?.username}</CustomText>
-          {details?.is_member === 0 && (
+          {details?.is_member_request_pending === 1 ? (
             <PrimaryButton
-              title={"Join"}
-              isLoading={isJoining}
-              onPress={() => mutate()}
+              title={"Pending"}
+              onPress={() => {}}
+              color={theme.colors.yellowGreen}
             />
+          ) : (
+            details?.is_member === 0 && (
+              <PrimaryButton
+                title={"Join"}
+                isLoading={isJoining}
+                onPress={() => mutate()}
+              />
+            )
           )}
         </Box>
 

@@ -23,3 +23,5 @@ For Wisdom:
 - There's a logic error, you cannot have member request for a private community
 
 - After unsuspending user, the user is still showing in suspension
+
+is_member_request_pending - value to check before pending
