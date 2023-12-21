@@ -74,6 +74,7 @@ export const URLS = {
     "/fetch_community_pending_invitation_requests",
   CANCEL_COMMUNITY_INVITATIONS: "/cancel_community_invitation",
   BLOCK_COMMUNITY_MEMBER: "/block_community_member",
+  UNBLOCK_COMMUNITY_MEMBER: "/unblock_community_member",
   FETCH_BLOCKED_COMMUNITY_MEMBERS: "/fetch_block_community_members",
   REMOVE_COMMUNITY_MEMBER: "/remove_community_member",
   APPROVE_COMMUNITY_POST: "/approve_community_post",

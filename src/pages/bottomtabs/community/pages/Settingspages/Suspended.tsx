@@ -64,7 +64,7 @@ export const MemberCardSingle = ({
   const unsuspend_user = () => {
     Alert.alert(
       "Unsuspend user",
-      `Are you sure you want to unsuspend "${username}" from this community?`,
+      `Are you sure you want to unsuspend "${username}"?`,
       [
         {
           text: "No",
@@ -84,30 +84,34 @@ export const MemberCardSingle = ({
       alignItems="center"
     >
       <Box flexDirection="row" alignItems="center">
-        {/* <Pressable
+        <Pressable
           onPress={() => navigation.navigate("profile", { userId: id })}
-        > */}
-        {profile_image ? (
-          <Image
-            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
-            style={{ width: 30, height: 30, borderRadius: 17 }}
-            contentFit="cover"
-          />
-        ) : (
-          <Box
-            width={30}
-            height={30}
-            borderRadius={15}
-            backgroundColor="fadedButtonBgColor"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <CustomText variant="subheader" color="primaryColor" fontSize={18}>
-              {username[0]?.toUpperCase() ?? ""}
-            </CustomText>
-          </Box>
-        )}
-        {/* </Pressable> */}
+        >
+          {profile_image ? (
+            <Image
+              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+              style={{ width: 30, height: 30, borderRadius: 17 }}
+              contentFit="cover"
+            />
+          ) : (
+            <Box
+              width={30}
+              height={30}
+              borderRadius={15}
+              backgroundColor="fadedButtonBgColor"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CustomText
+                variant="subheader"
+                color="primaryColor"
+                fontSize={18}
+              >
+                {username[0]?.toUpperCase() ?? ""}
+              </CustomText>
+            </Box>
+          )}
+        </Pressable>
 
         <CustomText variant="body" marginLeft="s">
           @{username}
