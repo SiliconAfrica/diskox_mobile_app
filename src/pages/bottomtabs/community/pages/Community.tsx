@@ -1,5 +1,5 @@
 import { useWindowDimensions, Pressable, ImageBackground } from "react-native";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import Box from "../../../../components/general/Box";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
@@ -25,6 +25,7 @@ const Community = () => {
   const theme = useTheme<Theme>();
   const WIDTH = useWindowDimensions().width;
   const [active, setActive] = React.useState(1);
+  const [showSettings, setShowSettings] = useState(false);
   const queryClient = useQueryClient();
   const toast = useToast();
   const navigation = useNavigation<PageType>();
@@ -39,6 +40,21 @@ const Community = () => {
     {
       onSuccess: (data) => {
         setDetails(data?.data?.data);
+      },
+    }
+  );
+  const { isLoading: isLoadingRole } = useQuery(
+    ["getCommunityRole", id],
+    () => httpService.get(`${URLS.CHECK_COMMUNITY_ROLE}/${id}`),
+    {
+      onSuccess: (res) => {
+        if (
+          Array.isArray(res.data) &&
+          res.data[0].data &&
+          res.data[0].data.permissions
+        ) {
+          setShowSettings(true);
+        }
       },
     }
   );
@@ -140,7 +156,7 @@ const Community = () => {
                 />
               </Box>
 
-              {details?.is_member === 1 && (
+              {details?.is_member === 1 && showSettings && (
                 <Box
                   width={40}
                   height={40}

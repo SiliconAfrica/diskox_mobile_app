@@ -59,6 +59,7 @@ export const URLS = {
   GET_COMMUNITIES: "/all_communities",
   GET_JOINED_COMMUNITIES: "/fetch_communities_user_belongs_to",
   GET_SINGLE_COMMUNITY: "/fetch_single_community",
+  CHECK_COMMUNITY_ROLE: "/check_member_community_role",
   JOIN_COMMUNITY: "/join_or_leave_community",
   GET_COMMUNITY_POSTS: "fetch_single_community_posts",
   GET_COMMUNITY_MEMBERS: "/fetch_community_members",
