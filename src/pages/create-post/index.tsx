@@ -55,7 +55,7 @@ const CreatePost = ({
 
   const theme = useTheme<Theme>();
   const toast = useToast();
-  const { tags, setTags, reset } = useCreatePostState((state) => state)
+  const { tags, setTags, reset } = useCreatePostState((state) => state);
 
   useEffect(() => {
     if (theOrigin && theOrigin === "community") {
@@ -132,7 +132,7 @@ const CreatePost = ({
     } else if (title.length > tit.length) {
       setTitle(tit);
     }
-  }
+  };
 
   const toggleTab = React.useCallback(() => {
     switch (activeTab) {
@@ -188,7 +188,7 @@ const CreatePost = ({
     polls,
     day,
     title,
-    setTitle
+    setTitle,
   ]);
 
   const handleCheck = React.useCallback((val: number) => {
@@ -208,7 +208,7 @@ const CreatePost = ({
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
       formData.append("description", question);
       formData.append("post_type", "question");
-      formData.append('title', title)
+      formData.append("title", title);
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
@@ -383,7 +383,9 @@ const CreatePost = ({
               }}
             >
               <Ionicons
-                name={visibility === 'everyone' ? "globe-outline":'people-outline'}
+                name={
+                  visibility === "everyone" ? "globe-outline" : "people-outline"
+                }
                 size={20}
                 color={theme.colors.textColor}
               />
@@ -408,9 +410,7 @@ const CreatePost = ({
       <TabView setActive={(data) => setActive(data)} />
 
       <Box flex={1}>
-        <ScrollView style={{ flex: 1 }} >
-        {toggleTab()}
-        </ScrollView>
+        <ScrollView style={{ flex: 1 }}>{toggleTab()}</ScrollView>
       </Box>
 
       {/* MEDIA UPLOAD SECTION */}

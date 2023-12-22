@@ -1,4 +1,4 @@
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Alert, Pressable } from "react-native";
 import React, { useState } from "react";
 import Box from "../../../../../components/general/Box";
 import CustomText from "../../../../../components/general/CustomText";
@@ -9,17 +9,124 @@ import PrimaryButton from "../../../../../components/general/PrimaryButton";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { useInfiniteQuery } from "react-query";
-import httpService from "../../../../../utils/httpService";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import useToast from "../../../../../hooks/useToast";
 import { FlashList } from "@shopify/flash-list";
 import { ActivityIndicator } from "react-native";
-import { MemberCardSingle } from "./Members";
+// import { MemberCardSingle } from "./Members";
 import { IUser } from "../../../../../models/user";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
+import CustomButton from "../../../../../components/general/CustomButton";
+import { Image } from "expo-image";
+import { useDetailsState } from "../../../../../states/userState";
+
+export const MemberCardSingle = ({
+  id,
+  name,
+  username,
+  profile_image,
+  communityId,
+}: Partial<IUser & { communityId: number }>) => {
+  console.log(communityId, "lp");
+  const theme = useTheme<Theme>();
+  const toast = useToast();
+  const navigation = useNavigation<PageType>();
+  const queryClient = useQueryClient();
+  const { id: loggedInUserId } = useDetailsState((state) => state);
+  const { mutate, isLoading } = useMutation({
+    mutationKey: `unsuspend_community_member-${communityId}`,
+    mutationFn: (data: any) =>
+      httpService.put(
+        `${URLS.UNSUSPEND_COMMUNITY_MEMBER}/${communityId}/${id}`
+      ),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries([`getSuspendedCommunityMembers`]);
+        toast.show(res.data?.message || "Member has been unsuspended", {
+          type: "success",
+        });
+        return;
+      }
+      toast.show(res.data?.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occured", { type: "danger" });
+    },
+  });
+
+  const unsuspend_user = () => {
+    Alert.alert(
+      "Unsuspend user",
+      `Are you sure you want to unsuspend "${username}"?`,
+      [
+        {
+          text: "No",
+          onPress: () => {},
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => mutate({}) },
+      ]
+    );
+  };
+  return (
+    <Box
+      width="100%"
+      height={60}
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      <Box flexDirection="row" alignItems="center">
+        <Pressable
+          onPress={() => navigation.navigate("profile", { userId: id })}
+        >
+          {profile_image ? (
+            <Image
+              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+              style={{ width: 30, height: 30, borderRadius: 17 }}
+              contentFit="cover"
+            />
+          ) : (
+            <Box
+              width={30}
+              height={30}
+              borderRadius={15}
+              backgroundColor="fadedButtonBgColor"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CustomText
+                variant="subheader"
+                color="primaryColor"
+                fontSize={18}
+              >
+                {username[0]?.toUpperCase() ?? ""}
+              </CustomText>
+            </Box>
+          )}
+        </Pressable>
+
+        <CustomText variant="body" marginLeft="s">
+          @{username}
+        </CustomText>
+      </Box>
+      <Box flexDirection="row" alignItems="center">
+        <CustomButton
+          title="Unsuspend"
+          onPress={unsuspend_user}
+          isLoading={isLoading}
+          height={30}
+          color="red"
+          width={80}
+        />
+      </Box>
+    </Box>
+  );
+};
 
 const Suspended = () => {
   const theme = useTheme<Theme>();
@@ -40,7 +147,7 @@ const Suspended = () => {
     isFetchingNextPage,
     isFetching,
   } = useInfiniteQuery({
-    queryKey: [`getSuspendedCommunityMembers-${id}`, id],
+    queryKey: [`getSuspendedCommunityMembers`, id],
     queryFn: ({ pageParam = 1 }) =>
       httpService.get(
         `${URLS.GET_SUSPENDED_COMMUNITY_MEMBERS}/${id}?page=${pageParam}`
@@ -111,12 +218,7 @@ const Suspended = () => {
           </Box>
         </Box>
 
-        <Box
-          width="100%"
-          height={350}
-          justifyContent="center"
-          alignItems="center"
-        >
+        <Box flex={1}>
           <FlashList
             ListEmptyComponent={() => (
               <>
@@ -184,6 +286,7 @@ const Suspended = () => {
                   id={member.id}
                   profile_image={member.profile_image}
                   username={member.username}
+                  communityId={id}
                 />
               ))
             }

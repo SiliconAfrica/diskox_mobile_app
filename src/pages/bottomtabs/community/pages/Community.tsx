@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  useWindowDimensions,
-  Pressable,
-  ImageBackground,
-  ActivityIndicator,
-} from "react-native";
-import React, { memo } from "react";
+import { useWindowDimensions, Pressable, ImageBackground } from "react-native";
+import React, { memo, useState } from "react";
 import Box from "../../../../components/general/Box";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
@@ -16,11 +9,8 @@ import CustomText from "../../../../components/general/CustomText";
 import Posts from "../../../../components/community/Posts";
 import AboutCommunity from "../../../../components/community/About";
 import Rules from "../../../../components/community/Rules";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../../navigation/MainNavigation";
 import { COMMUNITY_SETTING_TYPE } from "../../../../enums/CommunitySettings";
 import { PageType } from "../../../login";
-import { RootBottomTabParamList } from "../../../../navigation/BottomTabs";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { CommunityStackParamList } from "..";
 import { ICommunity } from "../../../../models/Community";
@@ -35,6 +25,7 @@ const Community = () => {
   const theme = useTheme<Theme>();
   const WIDTH = useWindowDimensions().width;
   const [active, setActive] = React.useState(1);
+  const [showSettings, setShowSettings] = useState(false);
   const queryClient = useQueryClient();
   const toast = useToast();
   const navigation = useNavigation<PageType>();
@@ -52,12 +43,25 @@ const Community = () => {
       },
     }
   );
+  const { isLoading: isLoadingRole } = useQuery(
+    ["getCommunityRole", id],
+    () => httpService.get(`${URLS.CHECK_COMMUNITY_ROLE}/${id}`),
+    {
+      onSuccess: (res) => {
+        if (
+          Array.isArray(res.data) &&
+          res.data[0].data &&
+          res.data[0].data.permissions
+        ) {
+          setShowSettings(true);
+        }
+      },
+    }
+  );
 
   const { isLoading: isJoining, mutate } = useMutation({
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {
-      // alert(`You've successfully join ${name} community`);
-
       toast.show(`${data?.data?.message}`, {
         type: "success",
       });
@@ -65,7 +69,38 @@ const Community = () => {
       queryClient.invalidateQueries(["getCommunity", id]);
     },
     onError: (e) => {
-      // alert("An error occured");
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const { isLoading: isAccepting, mutate: acceptInvite } = useMutation({
+    mutationFn: () =>
+      httpService.post(`${URLS.ACCEPT_COMMUNITY_INVITATION}/${id}`),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Invitation accepted successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity", id]);
+    },
+    onError: (e) => {
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const { isLoading: isDeclining, mutate: declineInvite } = useMutation({
+    mutationFn: () =>
+      httpService.post(`${URLS.DECLINE_COMMUNITY_INVITATION}/${id}`),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Invitation declined successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity", id]);
+    },
+    onError: (e) => {
       toast.show(`An error occured`, {
         type: "danger",
       });
@@ -121,7 +156,7 @@ const Community = () => {
                 />
               </Box>
 
-              {details?.is_member === 1 && (
+              {details?.is_member === 1 && showSettings && (
                 <Box
                   width={40}
                   height={40}
@@ -179,12 +214,35 @@ const Community = () => {
         <Box alignItems="center" style={{ marginTop: 70 }}>
           <CustomText variant="subheader">{details?.name}</CustomText>
           <CustomText marginBottom="m">c/{details?.username}</CustomText>
-          {details?.is_member === 0 && (
+          {details?.is_member_request_pending === 1 ? (
             <PrimaryButton
-              title={"Join"}
-              isLoading={isJoining}
+              title={"Pending"}
               onPress={() => mutate()}
+              isLoading={isJoining}
+              color={theme.colors.yellowGreen}
             />
+          ) : details?.is_invited === 1 ? (
+            <Box flexDirection="row">
+              <PrimaryButton
+                title={"Accept"}
+                isLoading={isAccepting}
+                onPress={() => acceptInvite()}
+              />
+              <PrimaryButton
+                title={"Decline"}
+                isLoading={isDeclining}
+                onPress={() => declineInvite()}
+                color={theme.colors.error}
+              />
+            </Box>
+          ) : (
+            details?.is_member === 0 && (
+              <PrimaryButton
+                title={"Join"}
+                isLoading={isJoining}
+                onPress={() => mutate()}
+              />
+            )
           )}
         </Box>
 

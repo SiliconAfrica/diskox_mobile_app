@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
 import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
@@ -29,7 +29,47 @@ const PostCard = ({
 }: Partial<IUser & { communityId: number }>) => {
   const theme = useTheme<Theme>();
   const toast = useToast();
-
+  const queryClient = useQueryClient();
+  const { mutate: accept, isLoading: isAccepting } = useMutation({
+    mutationKey: `accept-member-request-${communityId}`,
+    mutationFn: (data: any) =>
+      httpService.put(
+        `${URLS.ACCEPT_COMMUNITY_MEMBER_REQUEST}/${communityId}/${id}`
+      ),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries([`getMemberRequests`]);
+        toast.show(res.data?.message || "Request has been accepted", {
+          type: "success",
+        });
+        return;
+      }
+      toast.show(res.data?.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occured", { type: "danger" });
+    },
+  });
+  const { mutate: decline, isLoading: isDeclining } = useMutation({
+    mutationKey: `decline-member-request-${communityId}`,
+    mutationFn: (data: any) =>
+      httpService.delete(
+        `${URLS.DECLINE_COMMUNITY_MEMBER_REQUEST}/${communityId}/${id}`
+      ),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries([`getMemberRequests`]);
+        toast.show(res.data?.message || "Member has been declined", {
+          type: "success",
+        });
+        return;
+      }
+      toast.show(res.data?.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occured", { type: "danger" });
+    },
+  });
   return (
     <Box
       width="100%"
@@ -73,14 +113,25 @@ const PostCard = ({
           </Box>
         </Box>
       </Box>
-
-      <CustomButton
-        title="Accept"
-        onPress={() => {}}
-        height={30}
-        color={"red"}
-        width={100}
-      />
+      <Box flexDirection="row">
+        <CustomButton
+          title="Decline"
+          onPress={() => decline({})}
+          height={30}
+          color={theme.colors.error}
+          width={70}
+          isLoading={isDeclining}
+        />
+        <Box width={5} />
+        <CustomButton
+          title="Accept"
+          onPress={() => accept({})}
+          height={30}
+          isLoading={isAccepting}
+          color={theme.colors.primaryColor}
+          width={70}
+        />
+      </Box>
     </Box>
   );
 };

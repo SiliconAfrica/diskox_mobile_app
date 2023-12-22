@@ -11,6 +11,7 @@ interface IProps {
   onPress: () => void;
   isLoading?: boolean;
   borderRadius?: number;
+  color?: any;
 }
 
 const PrimaryButton = ({
@@ -19,6 +20,7 @@ const PrimaryButton = ({
   width = 120,
   height = 45,
   isLoading = false,
+  color,
   borderRadius = (height as number) / 2 || 25,
 }: IProps) => {
   const theme = useTheme<Theme>();
@@ -26,7 +28,7 @@ const PrimaryButton = ({
     <Pressable
       onPress={onPress}
       style={{
-        backgroundColor: theme.colors.primaryColor,
+        backgroundColor: color || theme.colors.primaryColor,
         borderWidth: 0,
         borderColor: theme.colors.primaryColor,
         borderRadius: borderRadius,

@@ -16,4 +16,5 @@ export interface ICommunity {
   is_member: number;
   is_member_request_pending: number;
   members_count: number;
+  is_invited: number;
 }

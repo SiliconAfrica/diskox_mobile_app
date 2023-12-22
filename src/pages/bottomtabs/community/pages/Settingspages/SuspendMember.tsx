@@ -85,9 +85,6 @@ const PostCard = ({
           )}
           <Box marginLeft="m">
             <Box flexDirection="row">
-              <CustomText variant="subheader" fontSize={18}>
-                {name}
-              </CustomText>
               <CustomText variant="xs" fontSize={18} marginLeft="s">
                 @{username}
               </CustomText>

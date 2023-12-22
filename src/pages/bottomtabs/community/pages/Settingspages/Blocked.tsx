@@ -4,6 +4,7 @@ import {
   TextInput,
   ActivityIndicator,
   Pressable,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import Box from "../../../../../components/general/Box";
@@ -18,7 +19,7 @@ import { PageType } from "../../../../login";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { FlashList } from "@shopify/flash-list";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
 import { useCommunityDetailsState } from "../../states/Settings.state";
@@ -26,39 +27,72 @@ import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
 import { IUser } from "../../../../../models/user";
 import { useModalState } from "../../../../../states/modalState";
 import { Image } from "expo-image";
+import CustomButton from "../../../../../components/general/CustomButton";
 
 const MemberCardSingle = ({
   id,
   username,
   profile_image,
   name,
-}: Partial<IUser & { communityUsername: string; communityId: number }>) => {
+  communityId,
+}: Partial<IUser & { communityId: number }>) => {
   const theme = useTheme<Theme>();
+  const navigation = useNavigation<PageType>();
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const { setAll: setCommunity } = useCommunityDetailsState((state) => state);
   const { setAll } = useModalState((state) => state);
-  return (
-    <Pressable
-      onPress={() => {
-        setCommunity({
-          communityUserToTakeActionOn: { username, id, profile_image },
+
+  const { mutate, isLoading } = useMutation({
+    mutationKey: `unblock_community_member-${communityId}`,
+    mutationFn: (data: any) =>
+      httpService.put(`${URLS.UNBLOCK_COMMUNITY_MEMBER}/${communityId}/${id}`),
+    onSuccess: (res) => {
+      if (res.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries([`getBlockedCommunityMembers`]);
+        toast.show(res.data?.message || "Member has been unblocked", {
+          type: "success",
         });
-        setAll({ showBlockMemberFromCommunity: true });
-      }}
+        return;
+      }
+      toast.show(res.data?.message || "An error occured", { type: "danger" });
+    },
+    onError: (e: any) => {
+      toast.show(e?.message || "An error occured", { type: "danger" });
+    },
+  });
+
+  const unblock_user = () => {
+    Alert.alert(
+      "Unblock user",
+      `Are you sure you want to unblock "${username}"?`,
+      [
+        {
+          text: "No",
+          onPress: () => {},
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => mutate({}) },
+      ]
+    );
+  };
+  return (
+    <Box
+      width="100%"
+      paddingVertical="m"
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="center"
+      backgroundColor="mainBackGroundColor"
+      borderBottomWidth={0}
+      borderBottomColor="secondaryBackGroundColor"
+      marginBottom="s"
+      paddingHorizontal="m"
     >
-      <Box
-        width="100%"
-        paddingVertical="m"
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-        backgroundColor="mainBackGroundColor"
-        borderBottomWidth={0}
-        borderBottomColor="secondaryBackGroundColor"
-        marginBottom="s"
-        paddingHorizontal="m"
-      >
-        <Box flexDirection="row">
-          {/* <Box width={30} height={30} borderRadius={15} backgroundColor='primaryColor' /> */}
+      <Box flexDirection="row" alignItems="center">
+        <Pressable
+          onPress={() => navigation.navigate("profile", { userId: id })}
+        >
           {profile_image ? (
             <Image
               source={{ uri: `${IMAGE_BASE}${profile_image}` }}
@@ -83,19 +117,23 @@ const MemberCardSingle = ({
               </CustomText>
             </Box>
           )}
-          <Box marginLeft="m">
-            <Box flexDirection="row">
-              <CustomText variant="subheader" fontSize={18}>
-                {name}
-              </CustomText>
-              <CustomText variant="xs" fontSize={18} marginLeft="s">
-                @{username}
-              </CustomText>
-            </Box>
-          </Box>
-        </Box>
+        </Pressable>
+
+        <CustomText variant="body" marginLeft="s">
+          @{username}
+        </CustomText>
       </Box>
-    </Pressable>
+      <Box flexDirection="row" alignItems="center">
+        <CustomButton
+          title="Unblock"
+          onPress={unblock_user}
+          isLoading={isLoading}
+          height={30}
+          color="red"
+          width={80}
+        />
+      </Box>
+    </Box>
   );
 };
 
@@ -118,7 +156,7 @@ const Blocked = () => {
     isFetchingNextPage,
     isFetching,
   } = useInfiniteQuery({
-    queryKey: [`getBlockedCommunityMembers-${id}`, id],
+    queryKey: [`getBlockedCommunityMembers`, id],
     queryFn: ({ pageParam = 1 }) =>
       httpService.get(
         `${URLS.FETCH_BLOCKED_COMMUNITY_MEMBERS}/${id}?page=${pageParam}`
@@ -274,10 +312,10 @@ const Blocked = () => {
                 id={member.id}
                 profile_image={member.profile_image}
                 username={member.username}
+                communityId={id}
               />
             ))
           }
-          // renderItem={({ item }) => <MemberCard {...item} />}
         />
       </Box>
     </Box>
