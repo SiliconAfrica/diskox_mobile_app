@@ -1,6 +1,6 @@
 import React from 'react'
 import Box from './Box'
-import { Video } from 'expo-av'
+import { ResizeMode, Video } from 'expo-av'
 import { VolumeCross, VolumeHigh } from 'iconsax-react-native'
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme';
@@ -66,7 +66,7 @@ function CustomVideoplayer({
   return (
    <Box width={'100%'} maxHeight={350} position='relative'>
 
-        <Video onTouchStart={() => handlePlay()} posterSource={{ uri: poster }} source={{ uri: uri }} ref={videoRef} useNativeControls={false} style={{ width: OS === 'android' ? '100%' : WIDTH, height: OS === 'android' ? '100%' : HEIGHT / 100 * 35, aspectRatio: 16 /9 }} onPlaybackStatusUpdate={(status) => setPlayback(status['positionMillis'])} />
+        <Video onTouchStart={() => handlePlay()} posterSource={{ uri: poster }} source={{ uri: uri }} ref={videoRef} useNativeControls={false} style={{ width: '100%', height: 350 }} onPlaybackStatusUpdate={(status) => setPlayback(status['positionMillis'])} resizeMode={ResizeMode.COVER} />
 
 
         <Box position='absolute' bottom={0} bg='transparent2' width={'100%'} height={60} flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m'>

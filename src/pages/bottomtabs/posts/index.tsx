@@ -26,7 +26,7 @@ const Posts = () => {
     }
   }, [activeTab,setActiveTab])
   return (
-    <Box flex={1} bg='secondaryBackGroundColor' paddingTop='s'>
+    <Box flex={1} bg='secondaryBackGroundColor'>
       {handleChange()}
     </Box>
   )

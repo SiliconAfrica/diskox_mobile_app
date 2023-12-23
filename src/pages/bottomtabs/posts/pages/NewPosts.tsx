@@ -156,7 +156,7 @@ const NewPost = ({
   return (
     <Box
       backgroundColor={
-        "mainBackGroundColor"
+       isDarkMode ? "mainBackGroundColor":"secondaryBackGroundColor"
       }
       flex={1}
     >
@@ -181,8 +181,9 @@ const NewPost = ({
           </>
         )}
         ListHeaderComponent={() => (
-          <Box marginBottom="s">
+          <Box bg={isDarkMode ? "mainBackGroundColor":"secondaryBackGroundColor"} style={{ marginBottom: 15 }}>
             { isLoggedIn && <Searchbar /> }
+            <Box height={15}/>
             <FilterTopbar activeTab={activeTab} onActive={(data) => onActive(data)} />
           </Box>
       )}

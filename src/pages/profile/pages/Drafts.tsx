@@ -20,7 +20,7 @@ interface IProps {
     id: number;
 }
 
-const UserPosts = ({ id }: IProps) => {
+const Drafts = ({ id }: IProps) => {
     const [posts, setPosts] = React.useState<IPost[]>([]);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
@@ -30,7 +30,7 @@ const UserPosts = ({ id }: IProps) => {
     const { isDarkMode }= useUtilState((state) => state)
 
 
-    const getPosts = useQuery(['getProfilePosts', id, currentPage], () => httpService.get(`${URLS.GET_PROFILE_POSTS}/${id}`, {
+    const getPosts = useQuery(['getProfilePosts', id, currentPage], () => httpService.get(`${URLS.GET_PROFILE_DRAFTS}`, {
         params: {
             page: currentPage,
         }
@@ -40,6 +40,7 @@ const UserPosts = ({ id }: IProps) => {
         },
         onSuccess: (data) => {
             const item: PaginatedResponse<IPost> = data.data;
+            console
 
             if (item.data) {
                 if (posts.length > 0) {
@@ -80,7 +81,7 @@ const UserPosts = ({ id }: IProps) => {
        {
            !getPosts.isLoading && posts.length < 1 && (
                <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
-                <CustomText variant='subheader' fontSize={18} color='primaryColor'>No Polls</CustomText>
+                <CustomText variant='subheader' fontSize={18} color='primaryColor'>No Drafts</CustomText>
                </Box>
            )
        }
@@ -89,7 +90,7 @@ const UserPosts = ({ id }: IProps) => {
             posts.length > 0 && (
                 <>
                     { posts.map(post => (
-                        <FeedCard key={post.id} post={post} showReactions />
+                        <FeedCard key={post.id} post={post} showReactions={false} />
                     ))}
                 </>
              )
@@ -116,4 +117,4 @@ const UserPosts = ({ id }: IProps) => {
   )
 }
 
-export default UserPosts
+export default Drafts

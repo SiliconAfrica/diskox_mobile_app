@@ -29,6 +29,7 @@ export const URLS = {
   GET_USER_BY_ID: "/get_user",
   GET_PROFILE_POSTS: "/fetch_user_posts",
   GET_PROFILE_POLLS: "/fetch_user_polls",
+  GET_PROFILE_DRAFTS: '/fetch_draft_posts',
   GET_PROFILE_UPVOTES: "/fetch_user_upvoted_posts",
   GET_PROFILE_COMMENTS: "/fetch_user_commented_posts",
   GET_PROFILE_OVERVIEW_POSTS: "/fetch_user_overview_posts",
@@ -99,4 +100,7 @@ export const URLS = {
   DELETE_COMMENT: '/delete_comment',
   DELETE_POST: 'delete_post',
   GET_FOLLOWING: '/following_posts',
+  GET_USER_FOLLOWING: '/fetch_user_following',
+  GET_USERS_FOLLOWERS: '/fetch_user_followers',
+  GET_MENTIONS:'/search_user_mentions'
 };

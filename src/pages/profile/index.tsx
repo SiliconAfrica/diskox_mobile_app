@@ -12,6 +12,7 @@ import UserPosts from './pages/Posts'
 import Upvotes from './pages/Upvotes'
 import Comments from './pages/Comments'
 import Polls from './pages/Polls'
+import Drafts from './pages/Drafts'
 
 
 const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'>) => {
@@ -41,6 +42,9 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
       }
       case ACTIVE_TAB.POLLS: {
         return <Polls id={userId} />
+      }
+      case ACTIVE_TAB.DRAFTS: {
+        return <Drafts id={userId} />
       }
     }
   }, [currentTab]);
