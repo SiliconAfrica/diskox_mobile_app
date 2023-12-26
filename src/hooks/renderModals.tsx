@@ -16,6 +16,10 @@ import DeleteConversationModal from "../components/modals/DeleteConversationModa
 import VerificationModal from "../components/modals/VerificationModal";
 import ReportComment from "../components/modals/ReportComment";
 import ReportReply from "../components/modals/ReportReply";
+import InviteModeratorModal from "../components/modals/InviteModeratorModal";
+import SuspendMemberModal from "../components/modals/SuspendMemberModal";
+import BlockCommunityMemberModal from "../components/modals/BlockCommunityMemberModal";
+import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 
 const renderModals = () => {
   const {
@@ -33,6 +37,10 @@ const renderModals = () => {
     showVerification,
     showReportComment,
     showReportReply,
+    showInviteModerator,
+    showSuspendMemberFromCommunity,
+    showBlockMemberFromCommunity,
+    showAddCommunityRule,
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -53,6 +61,10 @@ const renderModals = () => {
         {showVerification && <VerificationModal />}
         {showReportComment && <ReportComment />}
         {showReportReply && <ReportReply />}
+        {showInviteModerator && <InviteModeratorModal />}
+        {showSuspendMemberFromCommunity && <SuspendMemberModal />}
+        {showBlockMemberFromCommunity && <BlockCommunityMemberModal />}
+        {showAddCommunityRule && <AddCommunityRuleModal />}
       </>
     );
   }, [
@@ -70,6 +82,10 @@ const renderModals = () => {
     showVerification,
     showReportComment,
     showReportReply,
+    showInviteModerator,
+    showSuspendMemberFromCommunity,
+    showBlockMemberFromCommunity,
+    showAddCommunityRule,
   ]);
 
   return {

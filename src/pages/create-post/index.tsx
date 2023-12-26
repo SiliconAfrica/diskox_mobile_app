@@ -64,6 +64,7 @@ const CreatePost = ({
   const { tags, setTags, reset } = useCreatePostState((state) => state);
   const { users, selectedUsers: selectedMentionedUsers, reset: resetMention } = useCommentMentionState((state) => state)
 
+
   useEffect(() => {
     if (theOrigin && theOrigin === "community") {
       setOrigin("community");
@@ -168,7 +169,7 @@ const CreatePost = ({
     } else if (title.length > tit.length) {
       setTitle(tit);
     }
-  }
+  };
 
   const toggleTab = React.useCallback(() => {
     switch (activeTab) {
@@ -224,7 +225,7 @@ const CreatePost = ({
     polls,
     day,
     title,
-    setTitle
+    setTitle,
   ]);
 
   const handleCheck = React.useCallback((val: number) => {
@@ -280,7 +281,6 @@ const CreatePost = ({
       formData.append("post_type", "question");
       formData.append('title', title);
       formData.append('mentioned_users[]', userIds as any);
-
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
@@ -479,7 +479,9 @@ const CreatePost = ({
               }}
             >
               <Ionicons
-                name={visibility === 'everyone' ? "globe-outline":'people-outline'}
+                name={
+                  visibility === "everyone" ? "globe-outline" : "people-outline"
+                }
                 size={20}
                 color={theme.colors.textColor}
               />
@@ -504,9 +506,7 @@ const CreatePost = ({
       <TabView setActive={(data) => setActive(data)} />
 
       <Box flex={1}>
-        <ScrollView style={{ flex: 1 }} >
-        {toggleTab()}
-        </ScrollView>
+        <ScrollView style={{ flex: 1 }}>{toggleTab()}</ScrollView>
       </Box>
 
       {/* MEDIA UPLOAD SECTION */}
