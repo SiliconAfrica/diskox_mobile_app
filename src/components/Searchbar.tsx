@@ -11,7 +11,7 @@ import { IMAGE_BASE } from '../utils/httpService'
 import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../pages/login'
 import { useUtilState } from '../states/util'
-import { VideoSquare, } from 'iconsax-react-native'
+import { Gallery, VideoSquare, } from 'iconsax-react-native'
 
 
 const Searchbar = () => {
@@ -20,7 +20,7 @@ const Searchbar = () => {
     const { profile_image, username } = useDetailsState((state) => state);
     const { isDarkMode } = useUtilState((state) => state)
   return (
-    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.8} borderBottomColor='lightGrey' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s'>
+    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderBottomColor='lightGrey' borderTopWidth={0.3} borderTopColor='lightGrey' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s' style={{ marginTop:15 }}>
          {
                     profile_image && (
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 32, height: 32, borderRadius: 17 }} contentFit='cover' />
@@ -35,7 +35,7 @@ const Searchbar = () => {
         }
         <TextInput 
         placeholder='Lets diskox it...'
-        placeholderTextColor={theme.colors.textColor}
+        placeholderTextColor={theme.colors.lightGrey}
         onChangeText={() => navigation.navigate('create-post')}
         style={{
             flex: 1,
@@ -48,8 +48,8 @@ const Searchbar = () => {
             fontSize: 14,
             color: theme.colors.textColor
         }} />
-        <Ionicons name='image-outline' size={25} color={theme.colors.lightGrey} />
-        <VideoSquare size={25} color={theme.colors.lightGrey} style={{ marginLeft: 10, }} />
+        <VideoSquare size={25} color={theme.colors.textColor} style={{ marginRight: 10, }} />
+        <Gallery size={25} color={theme.colors.textColor} />
     </Box>
   )
 }

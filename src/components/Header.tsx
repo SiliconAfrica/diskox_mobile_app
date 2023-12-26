@@ -35,8 +35,8 @@ const Header = ({
       flexDirection="row"
       justifyContent="space-between"
       alignItems="center"
-      borderBottomWidth={1}
-      borderBottomColor="secondaryBackGroundColor"
+      borderBottomWidth={0.3}
+      borderBottomColor="lightGrey"
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         { showMenuButton && <Feather

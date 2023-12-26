@@ -12,7 +12,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 import FeedCard from '../../../components/feeds/FeedCard'
 import { PaginatedResponse } from '../../../models/PaginatedResponse'
 import { uniqBy } from 'lodash'
-import { CUSTOM_STATUS_CODE } from '../../../enums/CustomCodes'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../theme'
 import { useUtilState } from '../../../states/util'
@@ -21,16 +20,17 @@ interface IProps {
     id: number;
 }
 
-const UserPosts = ({ id }: IProps) => {
+const Drafts = ({ id }: IProps) => {
     const [posts, setPosts] = React.useState<IPost[]>([]);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
     const [nomore, setNomore] = React.useState(false);
 
     const theme = useTheme<Theme>();
-    const { isDarkMode }= useUtilState((state) => state);
+    const { isDarkMode }= useUtilState((state) => state)
 
-    const getPosts = useQuery(['getProfileUpvotePosts', id, currentPage], () => httpService.get(`${URLS.GET_PROFILE_UPVOTES}/${id}`, {
+
+    const getPosts = useQuery(['getProfilePosts', id, currentPage], () => httpService.get(`${URLS.GET_PROFILE_DRAFTS}`, {
         params: {
             page: currentPage,
         }
@@ -40,8 +40,9 @@ const UserPosts = ({ id }: IProps) => {
         },
         onSuccess: (data) => {
             const item: PaginatedResponse<IPost> = data.data;
+            console
 
-            if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
+            if (item.data) {
                 if (posts.length > 0) {
                     setPosts(uniqBy([...posts, ...item.data.data], 'id'));
                     setTotal(item.data.total);
@@ -52,7 +53,7 @@ const UserPosts = ({ id }: IProps) => {
                 }
                 
             } else {
-                
+                setPosts([])
             }
         },
     });
@@ -80,7 +81,7 @@ const UserPosts = ({ id }: IProps) => {
        {
            !getPosts.isLoading && posts.length < 1 && (
                <Box justifyContent='center' alignItems='center' height={50} paddingTop='l'>
-                <CustomText variant='subheader' fontSize={18} color='primaryColor'>No Upvotes</CustomText>
+                <CustomText variant='subheader' fontSize={18} color='primaryColor'>No Drafts</CustomText>
                </Box>
            )
        }
@@ -89,7 +90,7 @@ const UserPosts = ({ id }: IProps) => {
             posts.length > 0 && (
                 <>
                     { posts.map(post => (
-                        <FeedCard key={post.id} post={post} showReactions />
+                        <FeedCard key={post.id} post={post} showReactions={false} />
                     ))}
                 </>
              )
@@ -116,4 +117,4 @@ const UserPosts = ({ id }: IProps) => {
   )
 }
 
-export default UserPosts
+export default Drafts

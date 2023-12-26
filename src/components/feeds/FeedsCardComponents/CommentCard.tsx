@@ -28,6 +28,7 @@ import { CUSTOM_STATUS_CODE } from '../../../enums/CustomCodes'
 import ReplyCard from './ReplyCard'
 import { useModalState } from '../../../states/modalState'
 import { useDetailsState } from '../../../states/userState'
+import { useCommentMentionState } from '../commentState'
 
 
 const CommentCard = ({
@@ -54,6 +55,8 @@ const CommentCard = ({
   const queryClient = useQueryClient();
   const { setAll } = useModalState((state) =>  state);
   const { id } = useDetailsState((state) => state);
+  const { users, selectedUsers, reset } = useCommentMentionState((state) => state)
+
 
   // query
 
@@ -263,8 +266,10 @@ const CommentCard = ({
   const handleSubmit = React.useCallback(() => {
     if (createReply.isLoading) return;
     const formData = new FormData();
-    formData.append("comment_id", comment.id as any),
-      formData.append("reply", text);
+    formData.append("comment_id", comment.id as any);
+    const newText = text.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+    formData.append("comment", newText);
+      formData.append("reply", newText);
     if (images.length > 0) {
       for (let i = 0; i < images.length; i++) {
         const name = images[i].uri.split("/").pop();
@@ -276,7 +281,21 @@ const CommentCard = ({
         } as any);
       }
     }
-    //formData.append('mentioned_users', [].toString());
+
+    const regex = /@\[\w+/g 
+    const mentionss = text.match(regex) || [];
+    const userIds: number[] = []
+    mentionss.forEach((item) => {
+      const newItem = item.replace('[', '');
+
+      const user = selectedUsers.map((user) => {
+        if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+          userIds.push(user.id)
+          return user.id;
+        }
+      });
+    })
+    formData.append('mentioned_users[]', userIds as any);
     createReply.mutate(formData);
   }, [text, comment, createReply]);
 
@@ -284,7 +303,7 @@ const CommentCard = ({
     setAll({ activeComment_id: activeComment.id, showReportComment: true });
   }
   return (
-    <Box width='100%' borderBottomWidth={0.5} borderBottomColor='grey' marginBottom='m'>
+    <Box width='100%' borderBottomWidth={0.5} borderBottomColor='grey' marginBottom='m' paddingTop='m'>
       
 
       {/* IF EDITING MODE IS NOT TRUE */}
@@ -436,7 +455,7 @@ const CommentCard = ({
               </Box>
 
               {reply && (
-                <Box width='100%' maxHeight={400} >
+                <Box width='100%' maxHeight={400} borderTopWidth={0.3} borderTopColor='lightGrey' >
 
                   {/* REPLY SECTIONS */}
                   <Box width={'100%'} maxHeight={300}>
@@ -455,7 +474,7 @@ const CommentCard = ({
 
                     { !getReplies.isLoading && replies.length > 0 && (
                       <ScrollView>
-                        { replies.map((item,index) => (
+                        { replies.map((item, index) => (
                           <ReplyCard comment={item} key={index.toString()} />
                         ))}
                       </ScrollView>
