@@ -103,13 +103,6 @@ const UserPosts = ({ id }: IProps) => {
            )
        }
 
-        {/* {
-           posts.length  === total && (
-            <Box justifyContent='center' alignItems='center' height={20} >
-                <CustomText variant="subheader" fontSize={16}>Thats all for now!</CustomText>
-            </Box>
-           )
-       } */}
 
        </ScrollView>
     </Box>

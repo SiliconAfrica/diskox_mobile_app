@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions } from 'react-native'
+import { View, Text, useWindowDimensions, StatusBar } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import { FlashList } from '@shopify/flash-list'
@@ -52,6 +52,7 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
 
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
+      <StatusBar animated backgroundColor={'lightGrey'} translucent={true} />
       <ScrollView>
         <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
         <Box width='100%' height={HEIGHT / 100 * 89}>

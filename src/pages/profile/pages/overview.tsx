@@ -104,7 +104,6 @@ const Overview = ({ id }: IProps) => {
 
   return (
     <Box flex={1} bg={isDarkMode ?"mainBackGroundColor":'secondaryBackGroundColor'}>
-      {/* STATS SECTIONS */}
 
       <ScrollView onScroll={handleScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 50 }}>
         <Box padding="m">
@@ -194,15 +193,6 @@ const Overview = ({ id }: IProps) => {
             ))}
           </>
         )}
-
-
-      {/* {
-           posts.length  === total && (
-               <Box justifyContent='center' alignItems='center' height={20} >
-                <CustomText variant="subheader" fontSize={16}>Thats all for now!</CustomText>
-               </Box>
-           )
-       } */}
 
         {getPosts.isLoading && (
           <Box justifyContent="center" alignItems="center" height={20}>

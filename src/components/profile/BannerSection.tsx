@@ -225,7 +225,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           source={{ uri: `${IMAGE_BASE}/${user?.cover_photo}` }}
           style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
         >
-          {userId === id && (
+          { (
             <Box
               flexDirection="row"
               width="100%"
@@ -249,54 +249,49 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     alignItems: "center",
                   }}
                 >
-                  {!updateBanner.isLoading && (
-                    <Feather
+                  <Feather
                       name="arrow-left"
                       size={20}
                       color={theme.colors.textColor}
                     />
-                  )}
-                  {updateBanner.isLoading && (
-                    <ActivityIndicator
-                      color={theme.colors.primaryColor}
-                      size={"small"}
-                    />
-                  )}
                 </Pressable>
               </Box>
 
-              <Box
-                width={40}
-                height={40}
-                borderRadius={25}
-                bg="grey"
-                overflow="hidden"
-              >
-                <Pressable
-                  onPress={pickImage}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: 25,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {!updateBanner.isLoading && (
-                    <Feather
-                      name="edit"
-                      size={20}
-                      color={theme.colors.textColor}
-                    />
-                  )}
-                  {updateBanner.isLoading && (
-                    <ActivityIndicator
-                      color={theme.colors.primaryColor}
-                      size={"small"}
-                    />
-                  )}
-                </Pressable>
-              </Box>
+             {userId === id && (
+               <Box
+               width={40}
+               height={40}
+               borderRadius={25}
+               bg="grey"
+               overflow="hidden"
+             >
+               <Pressable
+                 onPress={pickImage}
+                 style={{
+                   width: "100%",
+                   height: "100%",
+                   borderRadius: 25,
+                   justifyContent: "center",
+                   alignItems: "center",
+                 }}
+               >
+                 {!updateBanner.isLoading && (
+                   <Feather
+                     name="edit"
+                     size={20}
+                     color={theme.colors.textColor}
+                   />
+                 )}
+                 {updateBanner.isLoading && (
+                   <ActivityIndicator
+                     color={theme.colors.primaryColor}
+                     size={"small"}
+                   />
+                 )}
+               </Pressable>
+             </Box>
+             )}
+
             </Box>
           )}
 
