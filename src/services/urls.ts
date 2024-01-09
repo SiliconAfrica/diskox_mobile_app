@@ -63,6 +63,8 @@ export const URLS = {
   JOIN_COMMUNITY: "/join_or_leave_community",
   GET_COMMUNITY_POSTS: "fetch_single_community_posts",
   GET_COMMUNITY_MEMBERS: "/fetch_community_members",
+  UPDATE_COMMUNITY_PROFILE_IMAGE: "/update_community_profile_image",
+  UPDATE_COMMUNITY_BANNER_IMAGE: "/update_community_banner_image",
   ACCEPT_COMMUNITY_MEMBER_REQUEST: "/accept_community_member_request",
   DECLINE_COMMUNITY_MEMBER_REQUEST: "/decline_community_member_request",
   SEARCH_COMMUNITY_MEMBERS_BY_USERNAME: "/search_community_member_by_username",

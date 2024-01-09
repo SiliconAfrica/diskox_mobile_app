@@ -26,13 +26,13 @@ const CommunityList = () => {
   const toast = useToast();
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageForMyCommunities, setPageForMyCommunities] = useState(1);
+  const [pageForMyCommunities, setPageForMyCommunities] = useState(0);
   const { community_privilege, id, setAll } = useDetailsState((state) => state);
   const { isLoading, isError, data } = useQuery(["getCommunities", page], () =>
     httpService.get(`${URLS.GET_COMMUNITIES}?page=${page}`)
   );
   const { data: myCommunities, isLoading: isLoadingMyCommunities } = useQuery(
-    ["getMyCommunities", pageForMyCommunities],
+    ["getMyCommunitie", pageForMyCommunities],
     () =>
       httpService.get(
         `${URLS.GET_JOINED_COMMUNITIES}?page=${pageForMyCommunities}`
