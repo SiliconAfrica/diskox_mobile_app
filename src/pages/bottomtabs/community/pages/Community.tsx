@@ -1,7 +1,7 @@
 import { useWindowDimensions, Pressable, ImageBackground } from "react-native";
 import React, { memo, useState } from "react";
 import Box from "../../../../components/general/Box";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons, FontAwesome, Entypo } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../../theme";
 import { ScrollView } from "react-native-gesture-handler";
@@ -18,8 +18,10 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import PrimaryButton from "../../../../components/general/PrimaryButton";
 import useToast from "../../../../hooks/useToast";
+import mime from "mime";
 
 const Community = () => {
   const theme = useTheme<Theme>();
@@ -33,6 +35,8 @@ const Community = () => {
 
   const { id, data } = route.params;
   const [details, setDetails] = React.useState<null | ICommunity>(null);
+  const [banner, setBanner] = React.useState("");
+  const [profilePicture, setProfilePicture] = React.useState("");
 
   const { isLoading, isError } = useQuery(
     ["getCommunity", id],
@@ -62,7 +66,7 @@ const Community = () => {
   const { isLoading: isJoining, mutate } = useMutation({
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {
-      toast.show(`${data?.data?.message}`, {
+      toast.show(`${data?.data?.message || "Success"}`, {
         type: "success",
       });
       queryClient.invalidateQueries(["getCommunities"]);
@@ -92,6 +96,7 @@ const Community = () => {
   });
   const { isLoading: isDeclining, mutate: declineInvite } = useMutation({
     mutationFn: () =>
+      // update_community_banner_image
       httpService.post(`${URLS.DECLINE_COMMUNITY_INVITATION}/${id}`),
     onSuccess: (data) => {
       toast.show(data?.data?.message || "Invitation declined successfully", {
@@ -106,7 +111,84 @@ const Community = () => {
       });
     },
   });
+  const { isLoading: isUploading, mutate: changeBanner } = useMutation({
+    mutationFn: (body: FormData) =>
+      httpService.post(`${URLS.UPDATE_COMMUNITY_BANNER_IMAGE}/${id}`, body),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Updated successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity"]);
+    },
+    onError: (e) => {
+      setBanner("");
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const { mutate: changeProfileImage } = useMutation({
+    mutationFn: (body: FormData) =>
+      httpService.post(`${URLS.UPDATE_COMMUNITY_PROFILE_IMAGE}/${id}`, body),
+    onSuccess: (data) => {
+      toast.show(data?.data?.message || "Updated successfully", {
+        type: "success",
+      });
+      queryClient.invalidateQueries(["getCommunities"]);
+      queryClient.invalidateQueries(["getCommunity"]);
+    },
+    onError: (e) => {
+      setProfilePicture("");
+      toast.show(`An error occured`, {
+        type: "danger",
+      });
+    },
+  });
+  const change_profile_image = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const file = result.assets[0];
+      const mimeType = mime.getType(file.uri);
+      const name = file.uri.split("/").pop();
+      setProfilePicture(file.uri);
 
+      const form = new FormData();
+      form.append("profile_image", {
+        uri: file.uri,
+        type: mimeType,
+        name,
+      } as any);
+      changeProfileImage(form);
+    }
+  };
+  const change_banner_image = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      const file = result.assets[0];
+      const mimeType = mime.getType(file.uri);
+      const name = file.uri.split("/").pop();
+      setBanner(file.uri);
+
+      const form = new FormData();
+      form.append("banner_image", {
+        uri: file.uri,
+        type: mimeType,
+        name,
+      } as any);
+      changeBanner(form);
+    }
+  };
   const switchPages = React.useCallback(() => {
     switch (active) {
       case 1: {
@@ -131,7 +213,9 @@ const Community = () => {
           style={{ backgroundColor: "#E3A812" }}
         >
           <ImageBackground
-            source={{ uri: IMAGE_BASE + details?.banner_image }}
+            source={{
+              uri: banner ? banner : IMAGE_BASE + details?.banner_image,
+            }}
             style={{ width: "100%", height: "100%" }}
           >
             <Box
@@ -155,30 +239,49 @@ const Community = () => {
                   onPress={() => navigation.popToTop()}
                 />
               </Box>
-
-              {details?.is_member === 1 && showSettings && (
-                <Box
-                  width={40}
-                  height={40}
-                  borderRadius={20}
-                  justifyContent="center"
-                  alignItems="center"
-                  bg="fadedButtonBgColor"
-                >
-                  <Feather
-                    name="settings"
-                    size={25}
-                    color={theme.colors.primaryColor}
-                    onPress={() =>
-                      navigation.navigate("community-settings", {
-                        id: details.id,
-                        username: details.username,
-                        type: COMMUNITY_SETTING_TYPE.DEFAULT,
-                      })
-                    }
-                  />
-                </Box>
-              )}
+              <Box flexDirection="row">
+                {details?.is_member === 1 && showSettings && (
+                  <Box
+                    width={40}
+                    height={40}
+                    borderRadius={20}
+                    justifyContent="center"
+                    alignItems="center"
+                    bg="fadedButtonBgColor"
+                  >
+                    <FontAwesome
+                      name="paint-brush"
+                      color={theme.colors.primaryColor}
+                      size={25}
+                      onPress={change_banner_image}
+                    />
+                  </Box>
+                )}
+                <Box width={5} />
+                {details?.is_member === 1 && showSettings && (
+                  <Box
+                    width={40}
+                    height={40}
+                    borderRadius={20}
+                    justifyContent="center"
+                    alignItems="center"
+                    bg="fadedButtonBgColor"
+                  >
+                    <Feather
+                      name="settings"
+                      size={25}
+                      color={theme.colors.primaryColor}
+                      onPress={() =>
+                        navigation.navigate("community-settings", {
+                          id: details.id,
+                          username: details.username,
+                          type: COMMUNITY_SETTING_TYPE.DEFAULT,
+                        })
+                      }
+                    />
+                  </Box>
+                )}
+              </Box>
             </Box>
 
             <Box
@@ -194,19 +297,39 @@ const Community = () => {
               justifyContent="center"
               alignItems="center"
             >
-              {details?.profile_image === null ? (
+              {details?.profile_image || profilePicture ? (
+                <Image
+                  source={{
+                    uri: profilePicture
+                      ? profilePicture
+                      : `${IMAGE_BASE}/${details?.profile_image}`,
+                  }}
+                  contentFit="cover"
+                  style={{ width: "100%", height: "100%", borderRadius: 70 }}
+                />
+              ) : (
                 <Ionicons
                   name="people"
                   size={90}
                   color={theme.colors.mainBackGroundColor}
                 />
-              ) : (
-                <Image
-                  source={{ uri: `${IMAGE_BASE}/${details?.profile_image}` }}
-                  contentFit="cover"
-                  style={{ width: "100%", height: "100%", borderRadius: 70 }}
-                />
               )}
+              <Box
+                width={30}
+                height={30}
+                borderRadius={25}
+                style={{ position: "absolute", right: 0, bottom: 0 }}
+                justifyContent="center"
+                alignItems="center"
+                bg="white"
+              >
+                <Entypo
+                  onPress={change_profile_image}
+                  name="camera"
+                  size={20}
+                  color={theme.colors.primaryColor}
+                />
+              </Box>
             </Box>
           </ImageBackground>
         </Box>
@@ -217,7 +340,7 @@ const Community = () => {
           {details?.is_member_request_pending === 1 ? (
             <PrimaryButton
               title={"Pending"}
-              onPress={() => mutate()}
+              onPress={() => mutate({} as any)}
               isLoading={isJoining}
               color={theme.colors.yellowGreen}
             />
@@ -240,7 +363,7 @@ const Community = () => {
               <PrimaryButton
                 title={"Join"}
                 isLoading={isJoining}
-                onPress={() => mutate()}
+                onPress={() => mutate({} as any)}
               />
             )
           )}
