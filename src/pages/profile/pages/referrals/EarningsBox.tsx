@@ -17,6 +17,8 @@ type TRefPoints = {
   balance: number;
   threshold: number;
   point_per_ref: number;
+  available_points: number;
+  naira_exchange_per_point: number;
 };
 export default function EarningsBox() {
   const theme = useTheme<Theme>();
@@ -65,7 +67,7 @@ export default function EarningsBox() {
       </CustomText>
       <Box width="100%" flexDirection="row" alignItems="center">
         <CustomText variant="header" color="whitesmoke">
-          {refPoints?.total_points}
+          {refPoints?.available_points}
         </CustomText>
         <CustomText variant="xs" color="whitesmoke">
           {" pts"}
@@ -83,8 +85,8 @@ export default function EarningsBox() {
       >
         <Box
           width={`${
-            (refPoints?.total_points
-              ? refPoints.total_points / refPoints.threshold
+            (refPoints?.available_points
+              ? refPoints.available_points / refPoints.threshold
               : 0) * 100
           }%`}
           backgroundColor="white"
@@ -101,7 +103,10 @@ export default function EarningsBox() {
       </CustomText>
       <Box width="100%" flexDirection="row" alignItems="center">
         <CustomText variant="header" color="whitesmoke">
-          &#8358; {refPoints?.balance?.toLocaleString()}
+          &#8358;{" "}
+          {Number(
+            refPoints?.naira_exchange_per_point * refPoints?.available_points
+          ).toLocaleString()}
         </CustomText>
       </Box>
       <CustomText color="whitesmoke" mt="l" variant="body">

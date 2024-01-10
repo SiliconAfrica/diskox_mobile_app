@@ -19,6 +19,8 @@ interface State {
   showFilter: boolean;
   showPostAction: boolean;
   showVerification: boolean;
+  showReportComment: boolean;
+  showReportReply: boolean;
   postId: number;
   visibility: string;
   filterBy: string;
@@ -26,11 +28,18 @@ interface State {
   showImageVideoSlider: boolean;
   imageVideoSliderData: any[];
   showReportPost: boolean;
-  showBlockUser: boolean,
-  showDeleteConvo: boolean,
-  imageViewer: boolean,
-  activeImages: string[],
-  activeChat: { userId: number, username: string }| null;
+  showBlockUser: boolean;
+  showInviteModerator: boolean;
+  showSuspendMemberFromCommunity: boolean;
+  showBlockMemberFromCommunity: boolean;
+  showAddCommunityRule: boolean;
+  showDeleteConvo: boolean;
+  imageViewer: boolean;
+  activeImages: string[];
+  activeComment_id: number;
+  activeReply_id: number;
+  activeUser_id: number;
+  activeChat: { userId: number; username: string } | null;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -45,6 +54,8 @@ export const useModalState = create<State>((set) => ({
   showFilter: false,
   showPostAction: false,
   showVerification: false,
+  showReportComment: false,
+  showReportReply: false,
   postId: 0,
   visibility: VISIBILITY.EVERYONE,
   filterBy: POST_FILTERR.ALL,
@@ -53,10 +64,17 @@ export const useModalState = create<State>((set) => ({
   imageVideoSliderData: [],
   showReportPost: false,
   showBlockUser: false,
+  showInviteModerator: false,
+  showSuspendMemberFromCommunity: false,
+  showBlockMemberFromCommunity: false,
+  showAddCommunityRule: false,
   activeChat: null,
   showDeleteConvo: false,
   imageViewer: false,
   activeImages: [],
+  activeComment_id: null,
+  activeReply_id: null,
+  activeUser_id: null,
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

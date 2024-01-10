@@ -14,6 +14,12 @@ import ReportPost from "../components/modals/ReportPost";
 import BlockUserModal from "../components/modals/BlockUserModal";
 import DeleteConversationModal from "../components/modals/DeleteConversationModal";
 import VerificationModal from "../components/modals/VerificationModal";
+import ReportComment from "../components/modals/ReportComment";
+import ReportReply from "../components/modals/ReportReply";
+import InviteModeratorModal from "../components/modals/InviteModeratorModal";
+import SuspendMemberModal from "../components/modals/SuspendMemberModal";
+import BlockCommunityMemberModal from "../components/modals/BlockCommunityMemberModal";
+import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 
 const renderModals = () => {
   const {
@@ -28,7 +34,13 @@ const renderModals = () => {
     showReportPost,
     showBlockUser,
     showDeleteConvo,
-    showVerification
+    showVerification,
+    showReportComment,
+    showReportReply,
+    showInviteModerator,
+    showSuspendMemberFromCommunity,
+    showBlockMemberFromCommunity,
+    showAddCommunityRule,
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -47,6 +59,12 @@ const renderModals = () => {
         {showBlockUser && <BlockUserModal />}
         {showDeleteConvo && <DeleteConversationModal />}
         {showVerification && <VerificationModal />}
+        {showReportComment && <ReportComment />}
+        {showReportReply && <ReportReply />}
+        {showInviteModerator && <InviteModeratorModal />}
+        {showSuspendMemberFromCommunity && <SuspendMemberModal />}
+        {showBlockMemberFromCommunity && <BlockCommunityMemberModal />}
+        {showAddCommunityRule && <AddCommunityRuleModal />}
       </>
     );
   }, [
@@ -61,7 +79,13 @@ const renderModals = () => {
     showReportPost,
     showBlockUser,
     showDeleteConvo,
-    showVerification
+    showVerification,
+    showReportComment,
+    showReportReply,
+    showInviteModerator,
+    showSuspendMemberFromCommunity,
+    showBlockMemberFromCommunity,
+    showAddCommunityRule,
   ]);
 
   return {

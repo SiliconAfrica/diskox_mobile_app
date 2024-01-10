@@ -1,4 +1,10 @@
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  Linking,
+} from "react-native";
 import React from "react";
 import Box from "../../components/general/Box";
 import { Image } from "expo-image";
@@ -17,7 +23,7 @@ import * as Google from "expo-auth-session/providers/google";
 import SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
 import { useMutation } from "react-query";
-import httpService from "../../utils/httpService";
+import httpService, { FRONTEND_BASE_URL } from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
@@ -207,11 +213,23 @@ const Onboarding = ({
       <Box width="100%" height="15%" justifyContent="center">
         <CustomText variant="xs" textAlign="center">
           By continuing, you agree to Diskos{" "}
-          <CustomText variant="xs" color="textBlue">
-            User Agreement
+          <CustomText
+            variant="xs"
+            color="textBlue"
+            onPress={() =>
+              Linking.openURL(`${FRONTEND_BASE_URL}terms-and-conditions`)
+            }
+          >
+            Terms and Conditions
           </CustomText>{" "}
           and acknowledge that you’ve read our{" "}
-          <CustomText variant="xs" color="textBlue">
+          <CustomText
+            variant="xs"
+            color="textBlue"
+            onPress={() =>
+              Linking.openURL(`${FRONTEND_BASE_URL}privacy-policy`)
+            }
+          >
             Privacy Policy
           </CustomText>
           .

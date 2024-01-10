@@ -14,17 +14,35 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import { useDetailsState } from '../../states/userState'
 import CustomText from '../../components/general/CustomText'
-import { color } from 'react-native-reanimated'
-import PostCard from '../../components/feeds/PostCard'
+import RepostCard from '../../components/repost/RepostCard'
+import useToast from '../../hooks/useToast'
+import { useCreatePostState } from '../create-post/state'
+import TagModal from '../../components/createpost/TagModal'
+import FadedButton from '../../components/general/FadedButton'
+import { Ionicons } from '@expo/vector-icons'
+import EmojiPicker from 'rn-emoji-picker'
+import { emojis } from 'rn-emoji-picker/dist/data'
 
 const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList, 'repost'>) => {
     const [post, setPost] = React.useState<IPost | null>(null)
     const { profile_image, username } = useDetailsState((state) => state);
     const [comment, setComment] = React.useState('');
+    const [showTagModal, setShowTagModal] = React.useState(false);
+    const [showEmoji, setShowEmoji] = React.useState(false);
+    const [recent, setRecent] = React.useState([]);
+
 
     const { id } = route.params;
     const theme = useTheme<Theme>();
     const queryClient = useQueryClient();
+    const toast = useToast();
+    const { tags, setTags, reset } = useCreatePostState((state) => state);
+
+    React.useEffect(() => {
+      return () => {
+        reset();
+      }
+    }, [])
 
     // queries
     const getData = useQuery([`getPostRepost${id}`, id], () => httpService.get(`${URLS.GET_SINGLE_POST}/${id}`), {
@@ -39,19 +57,64 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
     const { isLoading, mutate } = useMutation({
       mutationFn: (data: any) => httpService.post(`${URLS.REPOST}`, data),
       onSuccess: (data) => {
-        alert('Success');
+        //alert('Success');
+        toast.show(data.data.message, { type: 'success' });
         setComment('');
+        reset();
         queryClient.invalidateQueries(['GetAllPosts']);
         queryClient.invalidateQueries(['GetAllTrendingPosts']);
       },
       onError: (error: any) => {
-        alert(error.message);
-      
+        toast.show(error.message, { type: 'error' });
       }
     });
 
+    const handleEmojiPicked = React.useCallback((emoji: string) => {
+      // Get the current cursor position
+      const cursorPosition = comment.length;
+    
+      // Insert the emoji at the cursor position
+      const updatedText = comment.slice(0, cursorPosition) + emoji + comment.slice(cursorPosition);
+    
+      // Update the text
+      setComment(updatedText);
+    }, [comment]);
+
+    const handleSubmit = () => {
+      if (comment.length < 1) {
+        toast.show('you have to type a comment', { type: 'warning' });
+      }
+      const formData = new FormData();
+      formData.append('post_id', id.toString());
+      formData.append('repost_comment', comment);
+
+      if (tags.length > 0) {
+        tags.map((item) => {
+          formData.append('tags[]', item.toString());
+        } )
+      }
+      // getting hash tags
+      const regex = /#(\w+)/g;
+      const hashtags = comment.match(regex);
+      if (hashtags.length > 0) {
+        hashtags.map((item) => {
+          formData.append('hashtags[]', item);
+        })
+      }
+      console.log(hashtags);
+      console.log(formData)
+      mutate(formData);
+    }
+
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
+        {/* MODAL */}
+        <TagModal 
+          onClose={() => setShowTagModal(false)}
+          open={showTagModal}
+          tags={tags}
+          setTags={(indx)=> setTags(indx)}
+        />
         <SettingsHeader showSave={false} title='Repost' handleArrowPressed={() => navigation.goBack()}  />
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20 }}>
@@ -60,7 +123,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
 
             {
                     profile_image && (
-                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 40, height: 40, borderRadius: 25 }} contentFit='contain' />
+                        <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 40, height: 40, borderRadius: 25 }} contentFit='cover' />
                     )
                 }
                 {
@@ -71,7 +134,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
                     )
         }
          
-                <Pressable onPress={() => mutate({ post_id: id, repost_commet:comment })} style={{ borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: '#F3FBF5', width: 100, height: 45, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+                <Pressable onPress={handleSubmit} style={{ borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: '#F3FBF5', width: 100, height: 45, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
                    { !isLoading && <CustomText variant='body' color='primaryColor'>Repost</CustomText> }
                    { isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                 </Pressable>
@@ -80,10 +143,64 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
 
             <Box width="100%" borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={15} marginTop='m'>
                 { !getData.isLoading && post !== null && (
-                    <PostCard {...post} showStats={false} />
+                    <RepostCard post={post} />
                 )}
             </Box>
         </ScrollView>
+
+        <Box width={'100%'} height={100} borderTopWidth={0.5} borderTopColor='grey' flexDirection='row' justifyContent='space-between' alignItems='center' paddingHorizontal='m' position='relative'>
+
+        {
+            showEmoji && (
+              <Box width='100%' maxHeight={300} position='absolute' zIndex={30} top={-200} bottom={80} >
+                <ScrollView nestedScrollEnabled contentContainerStyle={{ height: 200 }}>
+                <EmojiPicker
+
+                      emojis={emojis} // emojis data source see data/emojis
+                      recent={recent} // store of recently used emojis
+                      autoFocus={true} // autofocus search input
+                      loading={false} // spinner for if your emoji data or recent store is async
+                      darkMode={true} // to be or not to be, that is the question
+                      perLine={10} // # of emoji's per line
+                      onSelect={(e) => handleEmojiPicked(e.emoji)} // callback when user selects emoji - returns emoji obj
+                      onChangeRecent={setRecent} 
+                      backgroundColor={theme.colors.secondaryBackGroundColor}// callback to update recent storage - arr of emoji objs
+                      // backgroundColor={'#000'} // optional custom bg color
+                      // enabledCategories={[ // optional list of enabled category keys
+                      //   'recent', 
+                      //   'emotion', 
+                      //   'emojis', 
+                      //   'activities', 
+                      //   'flags', 
+                      //   'food', 
+                      //   'places', 
+                      //   'nature'
+                      // ]}
+                      // defaultCategory={'food'} // optional default category key
+                  />
+                </ScrollView>
+              </Box>
+            )
+          }
+
+          <Box flexDirection='row' alignItems='center'>
+            <Ionicons name='happy-outline' size={25} color={theme.colors.textColor} style={{ marginHorizontal: 10 }} onPress={() => setShowEmoji(prev => !prev)}  />
+            <FadedButton 
+              onPress={() => setShowTagModal(true)}
+              title='Tag'
+              width={70}
+              height={35}
+            />
+          </Box>
+
+          {tags.length > 0 && (
+            <CustomText variant='body'>
+              You tagged {tags.length} {tags.length > 1 ? 'People':'Person'}
+            </CustomText>
+          )}
+
+         
+        </Box>
 
     </Box>
   )

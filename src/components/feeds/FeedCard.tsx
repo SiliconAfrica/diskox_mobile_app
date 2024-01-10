@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
-import { ArchiveAdd, ArchiveMinus, ArchiveTick, Eye, Heart, Message,  } from 'iconsax-react-native'
+import { ArchiveAdd, ArchiveMinus, ArchiveTick, Eye, Heart, Message, User,  } from 'iconsax-react-native'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
@@ -22,11 +22,11 @@ import { useDetailsState } from '../../states/userState'
 import { URLS } from '../../services/urls'
 import httpService, { IMAGE_BASE } from '../../utils/httpService'
 import moment from 'moment'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-
+import { ArrowBigDown, ArrowBigUp } from 'lucide-react-native'
 
 const FeedCard = ({
-    post: activePost
+    post: activePost,
+    showReactions = true
 }: {
     post?: IPost,
     showReactions?: boolean,
@@ -117,7 +117,7 @@ const FeedCard = ({
           const upvote = useMutation({
             mutationFn: () => httpService.post(`${URLS.UPVOTE_POST}/${id}`),
             onError: (error: any) => {
-              alert(error.message);
+              toast.show(error.message, { type: 'error' });
             },
             onSuccess: (data) => {
               queryClient.invalidateQueries([`getPost${id}`]);
@@ -127,7 +127,7 @@ const FeedCard = ({
           const downvote = useMutation({
             mutationFn: () => httpService.post(`${URLS.DOWN_VOTE_POST}/${id}`),
             onError: (error: any) => {
-              alert(error.message);
+              toast.show(error.message, { type: 'error' });
             },
             onSuccess: (data) => {
               queryClient.invalidateQueries([`getPost${id}`]);
@@ -156,10 +156,10 @@ const FeedCard = ({
                 if (data.data.message) {
                     toast.show(data.data?.message, { type: 'success' });
                     setPost(prev => ({ ...prev, has_voted_poll: 1 }));
-                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                    queryClient.invalidateQueries([`getPost${id}`]);
                     return;
                 } else {
-                    queryClient.invalidateQueries([`getPoll${id}`, id]);
+                  queryClient.invalidateQueries([`getPost${id}`]);
                 }
             }
         });
@@ -250,7 +250,7 @@ const FeedCard = ({
           }
 
   return (
-    <Box width="100%"  marginBottom='s' bg='secondaryBackGroundColor'>
+    <Box width="100%" bg={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderTopWidth={0.3} borderBottomColor='lightGrey' borderTopColor='lightGrey' style={{ marginBottom: 15 }}>
 
         {/* HEADER SECTION */}
         <Box flexDirection='row' alignItems='flex-start' width='100%'  justifyContent='space-between' paddingHorizontal='s' paddingVertical='m'>
@@ -260,12 +260,19 @@ const FeedCard = ({
                 <Pressable
                   onPress={() => handleNavigate()}
                 >
-                  <Box width={32} height={32} borderRadius={17} borderWidth={1} borderColor='primaryColor' overflow='hidden'>
-                      <Image source={{ uri: `${IMAGE_BASE}/${profile_image}` }} contentFit='cover' style={{
-                          width: '100%',
-                          height: '100%'
-                      }} />
-                  </Box>
+                  {profile_image !== null && (
+                    <Box width={32} height={32} borderRadius={17} borderWidth={1} borderColor='primaryColor' overflow='hidden'>
+                        <Image source={{ uri: `${IMAGE_BASE}/${profile_image}` }} contentFit='cover' style={{
+                            width: '100%',
+                            height: '100%'
+                        }} />
+                    </Box>
+                  )}
+                  {profile_image === null && (
+                    <Box width={32} height={32} borderRadius={17} borderWidth={1} justifyContent='center' alignItems='center' borderColor='primaryColor' overflow='hidden'>
+                        <User variant='Bold' size={15} color={theme.colors.textColor} />
+                    </Box>
+                  )}
                 </Pressable>
 
                 {/* DETAILS BOX */}
@@ -290,32 +297,34 @@ const FeedCard = ({
                           )}
                         </CustomText>
                           { myId !== userId && (
-                              <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={22} width={65} spinnerColor={theme.colors.textColor} onPress={handleFollow} color={theme.colors.mainBackGroundColor} textColor={theme.colors.textColor} />
+                              <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={22} width={65} spinnerColor={theme.colors.textColor} onPress={handleFollow} color={theme.colors.fadedButtonBgColor} textColor={theme.colors.primaryColor} variant='xs' />
                           )}
                     </Box>
                     <CustomText variant='xs' marginTop='s'>{moment(created_at).fromNow()}</CustomText>
                 </Box>
            </Box>
 
-           <Box flexDirection='row'>
-            { myId !== userId && (
-               <>
-                <ArchiveAdd size={25} color={post.is_bookmarked === 1 ? theme.colors.primaryColor : theme.colors.textColor} onPress={handleBookmark} variant={post.is_bookmarked === 1 ? 'Bold':'Outline'} /> 
-               </>
-            )}
-            <Feather name='more-vertical' size={25} color={theme.colors.textColor} style={{ marginLeft: 10 }} onPress={() => setAll({ activePost: post, showPostAction : true })} />
+           { showReactions && (
+            <Box flexDirection='row'>
+              { myId !== userId && (
+                <>
+                  <ArchiveAdd size={20} color={post.is_bookmarked === 1 ? theme.colors.primaryColor : theme.colors.textColor} onPress={handleBookmark} variant={post.is_bookmarked === 1 ? 'Bold':'Outline'} /> 
+                </>
+              )}
+              <Feather name='more-vertical' size={20} color={theme.colors.textColor} style={{ marginLeft: 10 }} onPress={() => setAll({ activePost: post, showPostAction : true })} />
            </Box>
+           )}
         </Box>
 
         {/* TEXTBOX */}
         <Box paddingHorizontal='s' flexDirection='row' width={'100%'} flexWrap='wrap' marginBottom='m'>
-          {post.post_type === 'question' && (
+          {post?.post_type === 'question' && (
             <>
               { showMoreTitle ? <CustomText variant='header' fontSize={16}>{post.title}</CustomText> : post.title?.length > 150 ? <CustomText variant='header' fontSize={16}>{`${post.title?.slice(0, 150)}...`}</CustomText> :  <CustomText variant='header' fontSize={16}>{post.title}</CustomText> }
               { post.title?.length > 150 && <CustomText style={{ width: '100%'}} onPress={() => setShowMoreTitle(!showMoreTitle)} color={showMoreTitle ? 'lightGrey':'primaryColor'}>{ showMoreTitle ? 'Read less':'Read more'}</CustomText>}
             </>
           )}
-          {post.title !== null && (
+          {post?.title !== null && (
             <Box height={10} width='100%'/>
           )}
             { showMore ? colorizeHashtags(post?.description ?? '') : post?.description?.length > 150 ? colorizeHashtags(`${post?.description?.slice(0, 150)}...`) : colorizeHashtags(post?.description) }
@@ -326,13 +335,13 @@ const FeedCard = ({
 
         {/* VIDEO BOX */}
         {
-            post.post_videos.length > 0 && (
+            post?.post_videos?.length > 0 && (
                 <CustomVideoplayer uri={`${IMAGE_BASE}${post?.post_videos[0].video_path}`} poster={`${IMAGE_BASE}${post?.post_videos[0].video_thumbnail}`} />
             )
         }
 
         {/* IMAGE BOX */}
-       {post_images.length > 0 && (
+       {post_images?.length > 0 && (
          <Box width='100%' height={300} flexDirection='row' position='relative' marginBottom='l'>
          { post.post_images.length === 1 && (
              <Pressable style={{ width: '100%', height: '100%'}} onPress={() => {
@@ -456,157 +465,142 @@ const FeedCard = ({
 
         {/* REACTIOONS */}
 
-        <Box width='100%' paddingHorizontal='s'>
-            <Box width={'100%'} borderTopWidth={0.5} borderTopColor='lightGrey'>
+        { showReactions && (
+           <Box width='100%' paddingHorizontal='s'>
+           <Box width={'100%'} borderTopWidth={0.3} borderTopColor='lightGrey'>
 
-                {/* VIEW SECTION */}
-                <Box flexDirection='row' alignItems='center' marginVertical='m'>
-                    <Eye size={20} color={theme.colors.lightGrey} variant='Outline' />
-                    <CustomText color='lightGrey' variant='body' marginLeft='s'>{post.view_count} Views</CustomText>
-                </Box>
+               {/* VIEW SECTION */}
+               <Box flexDirection='row' alignItems='center' marginVertical='m'>
+                   <Eye size={18} color={theme.colors.lightGrey} variant='Outline' />
+                   <CustomText fontSize={14} color='lightGrey' variant='body' marginLeft='s'>{post.view_count}</CustomText>
+               </Box>
 
-                {/* REACTION SECTION */}
-                <Box width={'100%'} height={60} flexDirection='row'>
-                    {/* MAIN REACTION BOX */}
-                    <Box width={'40%'} height={32} flexDirection='row' borderRadius={20} borderWidth={0.5} borderColor='lightGrey'>
+               {/* REACTION SECTION */}
+               <Box width={'100%'} height={60} flexDirection='row'>
+                   {/* MAIN REACTION BOX */}
+                   <Box width={'40%'} height={32} flexDirection='row' borderRadius={20} borderWidth={0.5} borderColor='lightGrey'>
 
-                        {/* UPVOTE */}
-                        <Pressable style={{
-                            width: '70%',
-                            height: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                            borderRightWidth: 0.5,
-                            borderRightColor: theme.colors.lightGrey,
-                        }} 
-                        onPress={handleUpVote}
-                        >
-                            {upvote.isLoading && (
-                                <ActivityIndicator
-                                size="small"
-                                color={theme.colors.primaryColor}
-                                />
-                            )}
-                            {!upvote.isLoading && (
-                                <>
-                                    {post.has_upvoted === 0 && (
-                                        <Image
-                                        source={require("../../../assets/images/arrows/up.png")}
-                                        contentFit="cover"
-                                        style={{ width: 20, height: 20 }}
-                                        />
-                                    )}
-                                    {post.has_upvoted !== 0 && (
-                                        <Image
-                                        source={require("../../../assets/images/arrows/upfilled.png")}
-                                        contentFit="cover"
-                                        style={{ width: 20, height: 20 }}
-                                        />
-                                    )}
-                                    <CustomText variant='xs' fontSize={12} marginLeft='s' color={post.has_upvoted !== 0 ? 'primaryColor':'textColor'}>{post.upvotes_count > 0 && post.upvotes_count} UPVOTE</CustomText>
-                                </>
-                            )}
-                        </Pressable>
+                       {/* UPVOTE */}
+                       <Pressable style={{
+                           width: '70%',
+                           height: '100%',
+                           justifyContent: 'center',
+                           alignItems: 'center',
+                           flexDirection: 'row',
+                           borderRightWidth: 0.5,
+                           borderRightColor: theme.colors.lightGrey,
+                       }} 
+                       onPress={handleUpVote}
+                       >
+                           {upvote.isLoading && (
+                               <ActivityIndicator
+                               size="small"
+                               color={theme.colors.primaryColor}
+                               />
+                           )}
+                           {!upvote.isLoading && (
+                               <>
+                                   {(
+                          
+                                      <ArrowBigUp size={20} color={post.has_upvoted === 0 ? theme.colors.textColor:theme.colors.primaryColor} fill={post.has_upvoted === 0 ? 'transparent':theme.colors.primaryColor} />
+                                   )}
+                                  
+                                   <CustomText variant='xs' fontSize={12} marginLeft='s' color={post.has_upvoted !== 0 ? 'primaryColor':'textColor'}>{post.upvotes_count > 0 && post.upvotes_count} Upvote</CustomText>
+                               </>
+                           )}
+                       </Pressable>
 
-                        {/* DOWNVOTE */}
-                        <Pressable style={{
-                            width: '30%',
-                            height: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexDirection: 'row',
-                        }} 
-                        onPress={handleDownVote}
-                        >
-                             {!downvote.isLoading && (
-                    <>
-                      {post.has_downvoted === 0 && (
-                        <Image
-                          source={require("../../../assets/images/arrows/down.png")}
-                          contentFit="cover"
-                          style={{ width: 20, height: 20 }}
-                        />
-                      )}
-                      {post.has_downvoted !== 0 && (
-                        <Image
-                          source={require("../../../assets/images/arrows/downfilled.png")}
-                          contentFit="cover"
-                          style={{ width: 20, height: 20 }}
-                        />
-                      )}
-                    </>
-                  )}
-                  {downvote.isLoading && (
-                    <ActivityIndicator
-                      size="small"
-                      color={theme.colors.primaryColor}
-                    />
-                  )}
-                        </Pressable>
+                       {/* DOWNVOTE */}
+                       <Pressable style={{
+                           width: '30%',
+                           height: '100%',
+                           justifyContent: 'center',
+                           alignItems: 'center',
+                           flexDirection: 'row',
+                       }} 
+                       onPress={handleDownVote}
+                       >
+                            {!downvote.isLoading && (
+                   <>
+                     {(
+                      //  <Image
+                      //    source={require("../../../assets/images/arrows/down.png")}
+                      //    contentFit="cover"
+                      //    style={{ width: 20, height: 20 }}
+                      //  />
+                      <ArrowBigDown size={20} color={post.has_downvoted === 0 ? theme.colors.textColor:'red'} fill={post.has_downvoted === 0 ? 'transparent':'red'} />
+                     )}
+                     {/* {post.has_downvoted !== 0 && (
+                       <Image
+                         source={require("../../../assets/images/arrows/downfilled.png")}
+                         contentFit="cover"
+                         style={{ width: 20, height: 20 }}
+                       />
+                     )} */}
+                   </>
+                 )}
+                 {downvote.isLoading && (
+                   <ActivityIndicator
+                     size="small"
+                     color={theme.colors.primaryColor}
+                   />
+                 )}
+                       </Pressable>
 
-                    </Box>
+                   </Box>
 
-                    {/* REACTION LIKE, COMMENT AND SHARE SECTIOON */}
-                    <Box flex={1} width={'100%'} height={32} paddingLeft='m' flexDirection='row' justifyContent='space-between' alignItems='center'>
-                        <Box flexDirection='row'>
+                   {/* REACTION LIKE, COMMENT AND SHARE SECTIOON */}
+                   <Box flex={1} width={'100%'} height={32} paddingLeft='m' flexDirection='row' justifyContent='space-between' alignItems='center'>
+                       <Box flexDirection='row'>
 
-                        <Pressable
-                                style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                marginHorizontal: 10,
-                                }}
-                                onPress={() => handleReaction("love")}
-                            >
-                                {/* <Ionicons
-                                name="heart-outline"
-                                size={20}
-                                color={
-                                    post.has_reacted.length > 0
-                                    ? theme.colors.primaryColor
-                                    : theme.colors.textColor
-                                }
-                                /> */}
-                                <Heart size={20}  color={
-                                    post.has_reacted.length > 0
-                                    ? theme.colors.primaryColor
-                                    : theme.colors.textColor
-                                } variant={post.has_reacted.length > 0 ? 'Bold' : 'Outline'} />
-                                <CustomText variant="body">{reactions_count > 0 && reactions_count}</CustomText>
-                            </Pressable>
-              
-                            <Pressable
-                                onPress={() => setShowComment(prev => !prev)}
-                                style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                marginHorizontal: 10,
-                                }}
-                            >
-                                <Message size={20} color={showComment ? theme.colors.primaryColor : theme.colors.textColor} />
-                                <CustomText variant="body">{post.comments_count > 0 && post.comments_count}</CustomText>
-                            </Pressable>
-                        </Box>
+                       <Pressable
+                               style={{
+                               flexDirection: "row",
+                               alignItems: "center",
+                               marginHorizontal: 10,
+                               }}
+                               onPress={() => handleReaction("love")}
+                           >
+                               <Heart size={20}  color={
+                                   post.has_reacted.length > 0
+                                   ? theme.colors.primaryColor
+                                   : theme.colors.textColor
+                               } variant={post.has_reacted.length > 0 ? 'Bold' : 'Outline'} />
+                               <CustomText variant="body"  marginLeft='s'>{reactions_count > 0 && reactions_count}</CustomText>
+                           </Pressable>
+             
+                           <Pressable
+                               onPress={() => setShowComment(prev => !prev)}
+                               style={{
+                               flexDirection: "row",
+                               alignItems: "center",
+                               marginHorizontal: 10,
+                               }}
+                           >
+                               <Message size={20} color={showComment ? theme.colors.primaryColor : theme.colors.textColor} />
+                               <CustomText variant="body" marginLeft='s'>{post.comments_count > 0 && post.comments_count}</CustomText>
+                           </Pressable>
+                       </Box>
 
-                        <Pressable
-                            style={{ width: 30, flexDirection: "row", alignItems: "center" }}
-                            onPress={handleShare}
-                            >
-                            <Ionicons
-                                name="share-social-outline"
-                                size={20}
-                                color={theme.colors.textColor}
-                            />
-                            <CustomText variant="body">{post.repost_count > 0 && post.repost_count}</CustomText>
-                        </Pressable>
+                       <Pressable
+                           style={{ width: 30, flexDirection: "row", alignItems: "center" }}
+                           onPress={handleShare}
+                           >
+                           <Ionicons
+                               name="share-social-outline"
+                               size={20}
+                               color={theme.colors.textColor}
+                           />
+                           <CustomText variant="body">{post.repost_count > 0 && post.repost_count}</CustomText>
+                       </Pressable>
 
-                    </Box>
+                   </Box>
 
-                </Box>
+               </Box>
 
-            </Box>
-        </Box>
+           </Box>
+       </Box>
+        )}
 
         {/* COMMENT SECTION */}
        { showComment &&  <CommentSection postId={post.id} /> }

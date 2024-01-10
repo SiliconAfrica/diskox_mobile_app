@@ -5,6 +5,7 @@ import Box from '../general/Box'
 import CustomText from '../general/CustomText'
 import { IPost } from '../../models/post'
 import PostCard from '../feeds/PostCard'
+import FeedCard from '../feeds/FeedCard'
 
 const PostsResults = ({ data }: { data: IPost[]}) => {
   return (
@@ -17,7 +18,7 @@ const PostsResults = ({ data }: { data: IPost[]}) => {
     )}
     data={data}
     renderItem={({ item }) => (
-        <PostCard showStats={false}  {...item} />
+        <FeedCard post={item} showReactions />
     )}
 />
   )

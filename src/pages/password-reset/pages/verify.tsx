@@ -1,5 +1,5 @@
 import { View, Text, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import OTPTextInput from "react-native-otp-textinput";
 import Box from "../../../components/general/Box";
 import CustomText from "../../../components/general/CustomText";
@@ -14,7 +14,7 @@ import { useSignupState } from "../../signup/state";
 import { useDetailsState } from "../../../states/userState";
 import useToast from "../../../hooks/useToast";
 
-const Verify = () => {
+const Verify = ({}) => {
   const [code, setCode] = React.useState("");
   const ref = React.useRef();
   const toast = useToast();

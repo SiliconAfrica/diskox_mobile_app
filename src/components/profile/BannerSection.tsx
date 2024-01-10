@@ -1,11 +1,13 @@
 import {
-  View,
-  Text,
-  ImageBackground,
-  useWindowDimensions,
-  Pressable,
-  StyleSheet,
   ActivityIndicator,
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
 import React, { useEffect } from "react";
 import Box from "../general/Box";
@@ -16,7 +18,11 @@ import {
 } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import httpService, { IMAGE_BASE } from "../../utils/httpService";
+import httpService, {
+  BASE_URL,
+  FRONTEND_BASE_URL,
+  IMAGE_BASE,
+} from "../../utils/httpService";
 import {
   CompositeNavigationProp,
   RouteProp,
@@ -28,7 +34,7 @@ import { RootBottomTabParamList } from "../../navigation/BottomTabs";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { Image } from "expo-image";
 import { URLS } from "../../services/urls";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import { useDetailsState } from "../../states/userState";
@@ -42,6 +48,14 @@ import * as ImagePicker from "expo-image-picker";
 import mime from "mime";
 import { handlePromise } from "../../utils/handlePomise";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import { setUrlAsync, setStringAsync } from 'expo-clipboard';
+import InviteModal from "../modals/InviteModal";
 
 export enum ACTIVE_TAB {
   OVERVIEW = 1,
@@ -49,6 +63,7 @@ export enum ACTIVE_TAB {
   UPVOTES,
   COMMENTS,
   POLLS,
+  DRAFTS
 }
 
 interface IProps {
@@ -60,8 +75,9 @@ interface IProps {
 const BannerSection = ({ currentTab, switchTab }: IProps) => {
   const [user, setUser] = React.useState<IUser | null>(null);
   const [showMonetization, setShowMonetization] = React.useState(false);
+  const [showModall, setShowModal] = React.useState(false)
   const [image, setImage] = React.useState<Array<ImagePicker.ImagePickerAsset>>(
-    []
+    [],
   );
 
   const navigation = useNavigation<PageType>();
@@ -84,10 +100,10 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       onSuccess: async (data) => {
         setUser(data?.data?.data);
         const [saveUser, saveUserErr] = await handlePromise(
-          AsyncStorage.setItem(`user`, JSON.stringify(data.data.data))
+          AsyncStorage.setItem(`user`, JSON.stringify(data.data.data)),
         );
       },
-    }
+    },
   );
 
   // query
@@ -96,13 +112,13 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     ["getFollowerCount", userId],
     () =>
       httpService.get(
-        `${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${userId}`
+        `${URLS.GET_USER_FOLLOWING_AND_FOLLOWERS_COUNT}/${userId}`,
       ),
     {
       onError: () => {},
       onSuccess: (data) => {
       },
-    }
+    },
   );
 
   const followUnFollowMutation = useMutation({
@@ -110,6 +126,11 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       httpService.post(`${URLS.FOLLOW_OR_UNFOLLOW_USER}/${userId}`),
     onSuccess: (data) => {
       toast.show(data?.data?.message, { type: "success" });
+      queryClient.invalidateQueries(["getDetails"]);
+      // setUser({
+      //   ...user,
+      //   isFollowing: user.isFollowing === 0?1:0,
+      // })
     },
   });
 
@@ -131,13 +152,22 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       onSuccess: async (data) => {
         if (
           Number(getFollowCount.data?.data.followers_count) >=
-          Number(data?.data?.data?.monitization_followers)
+            Number(data?.data?.data?.monitization_followers)
         ) {
           setShowMonetization(true);
         }
       },
-    }
+    },
   );
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Checkout this profile ${FRONTEND_BASE_URL}${user?.username}`,
+      });
+    } catch (error) {
+    }
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -181,19 +211,26 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
     );
   }
 
+  const copy = async () => {
+    await setStringAsync(FRONTEND_BASE_URL + user?.username);
+    toast.show('Copied to clipboard', { type: "success" });
+  }
+
   return (
     <Box width="100%">
+      <InviteModal isLoading={false} isVisible={showModall} close={() => setShowModal(false)} />
+
       {!getUserDetails.isLoading && user?.cover_photo !== null && (
         <ImageBackground
           source={{ uri: `${IMAGE_BASE}/${user?.cover_photo}` }}
           style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
         >
-          {userId === id && (
+          { (
             <Box
               flexDirection="row"
               width="100%"
               paddingHorizontal={"m"}
-              justifyContent="flex-end"
+              justifyContent="space-between"
             >
               <Box
                 width={40}
@@ -203,7 +240,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                 overflow="hidden"
               >
                 <Pressable
-                  onPress={pickImage}
+                  onPress={() => navigation.goBack()}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -212,21 +249,49 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                     alignItems: "center",
                   }}
                 >
-                  {!updateBanner.isLoading && (
-                    <Feather
-                      name="edit"
+                  <Feather
+                      name="arrow-left"
                       size={20}
                       color={theme.colors.textColor}
                     />
-                  )}
-                  {updateBanner.isLoading && (
-                    <ActivityIndicator
-                      color={theme.colors.primaryColor}
-                      size={"small"}
-                    />
-                  )}
                 </Pressable>
               </Box>
+
+             {userId === id && (
+               <Box
+               width={40}
+               height={40}
+               borderRadius={25}
+               bg="grey"
+               overflow="hidden"
+             >
+               <Pressable
+                 onPress={pickImage}
+                 style={{
+                   width: "100%",
+                   height: "100%",
+                   borderRadius: 25,
+                   justifyContent: "center",
+                   alignItems: "center",
+                 }}
+               >
+                 {!updateBanner.isLoading && (
+                   <Feather
+                     name="edit"
+                     size={20}
+                     color={theme.colors.textColor}
+                   />
+                 )}
+                 {updateBanner.isLoading && (
+                   <ActivityIndicator
+                     color={theme.colors.primaryColor}
+                     size={"small"}
+                   />
+                 )}
+               </Pressable>
+             </Box>
+             )}
+
             </Box>
           )}
 
@@ -246,11 +311,24 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                 : "white",
             }}
           >
-            <Image
-              source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
-              contentFit="cover"
-              style={{ width: "100%", height: "100%", borderRadius: 70 }}
-            />
+            <Pressable
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 70,
+              }}
+              onPress={() =>
+                setAll({
+                  imageViewer: true,
+                  activeImages: [user?.profile_image],
+                })}
+            >
+              <Image
+                source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
+                contentFit="cover"
+                style={{ width: "100%", height: "100%", borderRadius: 70 }}
+              />
+            </Pressable>
           </Box>
         </ImageBackground>
       )}
@@ -314,11 +392,24 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                 : "white",
             }}
           >
-            <Image
-              source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
-              contentFit="cover"
-              style={{ width: "100%", height: "100%", borderRadius: 70 }}
-            />
+            <Pressable
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 70,
+              }}
+              onPress={() =>
+                setAll({
+                  imageViewer: true,
+                  activeImages: [user?.profile_image],
+                })}
+            >
+              <Image
+                source={{ uri: `${IMAGE_BASE}/${user?.profile_image}` }}
+                contentFit="cover"
+                style={{ width: "100%", height: "100%", borderRadius: 70 }}
+              />
+            </Pressable>
           </Box>
         </Box>
       )}
@@ -374,9 +465,25 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               </Box>
             </Pressable>
           )}
-          {/* <Box width={50} height={50} borderRadius={25} borderWidth={2} borderColor='secondaryBackGroundColor' alignItems='center' justifyContent='center'>
-            <Ionicons name="ellipsis-vertical-outline" size={25} color={theme.colors.textColor} />
-          </Box> */}
+          <Pressable
+            onPress={handleShare}
+          >
+            <Box
+              width={35}
+              height={35}
+              borderRadius={25}
+              borderWidth={2}
+              borderColor="secondaryBackGroundColor"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Ionicons
+                name="share-social-outline"
+                size={20}
+                color={theme.colors.textColor}
+              />
+            </Box>
+          </Pressable>
         </Box>
       )}
 
@@ -406,38 +513,40 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           >
             {!followUnFollowMutation.isLoading && (
               <>
-                {(user as IUser)?.isFollowing ? (
-                  <CustomText
-                    variant="header"
-                    fontSize={16}
-                    marginLeft="s"
-                    color="white"
-                    style={{
-                      color: "white",
-                    }}
-                  >
-                    Following
-                  </CustomText>
-                ) : (
-                  <>
-                    <Ionicons
-                      name="person-add-outline"
-                      size={25}
-                      color={"white"}
-                    />
+                {(user as IUser)?.isFollowing === 1
+                  ? (
                     <CustomText
                       variant="header"
-                      fontSize={16}
+                      fontSize={14}
                       marginLeft="s"
                       color="white"
                       style={{
                         color: "white",
                       }}
                     >
-                      Follow
+                      Following
                     </CustomText>
-                  </>
-                )}
+                  )
+                  : (
+                    <>
+                      <Ionicons
+                        name="person-add-outline"
+                        size={20}
+                        color={"white"}
+                      />
+                      <CustomText
+                        variant="header"
+                        fontSize={14}
+                        marginLeft="s"
+                        color="white"
+                        style={{
+                          color: "white",
+                        }}
+                      >
+                        Follow
+                      </CustomText>
+                    </>
+                  )}
               </>
             )}
             {followUnFollowMutation.isLoading && (
@@ -465,6 +574,25 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               color={theme.colors.textColor}
             />
           </Pressable>
+          <Pressable
+            onPress={handleShare}
+          >
+            <Box
+              width={35}
+              height={35}
+              borderRadius={25}
+              borderWidth={2}
+              borderColor="secondaryBackGroundColor"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Ionicons
+                name="share-social-outline"
+                size={20}
+                color={theme.colors.textColor}
+              />
+            </Box>
+          </Pressable>
         </Box>
       )}
 
@@ -487,7 +615,11 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               {!getFollowCount.isLoading &&
                 getFollowCount.data?.data.followers_count}
             </CustomText>
-            <CustomText variant="xs" marginLeft="s">
+            <CustomText
+              variant="xs"
+              marginLeft="s"
+              onPress={() => navigation.navigate("following", { id: userId })}
+            >
               Followers
             </CustomText>
           </Box>
@@ -502,17 +634,21 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               {!getFollowCount.isLoading &&
                 getFollowCount.data?.data.following_count}
             </CustomText>
-            <CustomText variant="xs" marginLeft="s">
+            <CustomText
+              variant="xs"
+              marginLeft="s"
+              onPress={() => navigation.navigate("following", { id: userId })}
+            >
               Following
             </CustomText>
           </Box>
         </Box>
 
-        <CustomText variant="body" fontSize={15} marginTop="m">
+        <CustomText variant="body" fontSize={15} marginTop="s">
           {user?.about}
         </CustomText>
 
-        <Box flexDirection="row" marginTop="m" alignItems="center">
+        <Box flexDirection="row" marginTop="s" alignItems="center">
           <Box flexDirection="row" alignItems="center">
             <Ionicons
               name="calendar-outline"
@@ -541,109 +677,183 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
         <Box
           width="100%"
           height={60}
-          flexDirection="row"
-          paddingHorizontal="s"
           borderBottomColor="secondaryBackGroundColor"
           borderBottomWidth={2}
         >
-          <Pressable
-            style={{
-              ...styles.button,
-              borderBottomColor: theme.colors.primaryColor,
-              borderBottomWidth: currentTab === ACTIVE_TAB.OVERVIEW ? 3 : 0,
-            }}
-            onPress={() => switchTab(ACTIVE_TAB.OVERVIEW)}
-          >
-            <CustomText
-              variant="subheader"
-              fontSize={14}
-              color={
-                currentTab === ACTIVE_TAB.OVERVIEW
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 30  }}>
+            <Pressable
+              style={{
+                ...styles.button,
+                borderBottomColor: theme.colors.primaryColor,
+                borderBottomWidth: currentTab === ACTIVE_TAB.OVERVIEW ? 3 : 0,
+              }}
+              onPress={() => switchTab(ACTIVE_TAB.OVERVIEW)}
+            >
+              <CustomText
+                variant="subheader"
+                fontSize={12}
+                color={currentTab === ACTIVE_TAB.OVERVIEW
                   ? "primaryColor"
-                  : "textColor"
-              }
-            >
-              Overview
-            </CustomText>
-          </Pressable>
+                  : "textColor"}
+              >
+                Overview
+              </CustomText>
+            </Pressable>
 
-          <Pressable
-            style={{
-              ...styles.button,
-              borderBottomColor: theme.colors.primaryColor,
-              borderBottomWidth: currentTab === ACTIVE_TAB.POSTS ? 3 : 0,
-            }}
-            onPress={() => switchTab(ACTIVE_TAB.POSTS)}
-          >
-            <CustomText
-              variant="subheader"
-              fontSize={14}
-              color={
-                currentTab === ACTIVE_TAB.POSTS ? "primaryColor" : "textColor"
-              }
+            <Pressable
+              style={{
+                ...styles.button,
+                borderBottomColor: theme.colors.primaryColor,
+                borderBottomWidth: currentTab === ACTIVE_TAB.POSTS ? 3 : 0,
+              }}
+              onPress={() => switchTab(ACTIVE_TAB.POSTS)}
             >
-              Posts
-            </CustomText>
-          </Pressable>
-
-          <Pressable
-            style={{
-              ...styles.button,
-              borderBottomColor: theme.colors.primaryColor,
-              borderBottomWidth: currentTab === ACTIVE_TAB.UPVOTES ? 3 : 0,
-            }}
-            onPress={() => switchTab(ACTIVE_TAB.UPVOTES)}
-          >
-            <CustomText
-              variant="subheader"
-              fontSize={14}
-              color={
-                currentTab === ACTIVE_TAB.UPVOTES ? "primaryColor" : "textColor"
-              }
-            >
-              Upvotes
-            </CustomText>
-          </Pressable>
-
-          <Pressable
-            style={{
-              ...styles.button,
-              borderBottomColor: theme.colors.primaryColor,
-              borderBottomWidth: currentTab === ACTIVE_TAB.COMMENTS ? 3 : 0,
-            }}
-            onPress={() => switchTab(ACTIVE_TAB.COMMENTS)}
-          >
-            <CustomText
-              variant="subheader"
-              fontSize={14}
-              color={
-                currentTab === ACTIVE_TAB.COMMENTS
+              <CustomText
+                variant="subheader"
+                fontSize={12}
+                color={currentTab === ACTIVE_TAB.POSTS
                   ? "primaryColor"
-                  : "textColor"
-              }
-            >
-              Comments
-            </CustomText>
-          </Pressable>
+                  : "textColor"}
+              >
+                Posts
+              </CustomText>
+            </Pressable>
 
-          <Pressable
-            style={{
-              ...styles.button,
-              borderBottomColor: theme.colors.primaryColor,
-              borderBottomWidth: currentTab === ACTIVE_TAB.POLLS ? 3 : 0,
-            }}
-            onPress={() => switchTab(ACTIVE_TAB.POLLS)}
-          >
-            <CustomText
-              variant="subheader"
-              fontSize={14}
-              color={
-                currentTab === ACTIVE_TAB.POLLS ? "primaryColor" : "textColor"
-              }
+            <Pressable
+              style={{
+                ...styles.button,
+                borderBottomColor: theme.colors.primaryColor,
+                borderBottomWidth: currentTab === ACTIVE_TAB.UPVOTES ? 3 : 0,
+              }}
+              onPress={() => switchTab(ACTIVE_TAB.UPVOTES)}
             >
-              Polls
-            </CustomText>
-          </Pressable>
+              <CustomText
+                variant="subheader"
+                fontSize={12}
+                color={currentTab === ACTIVE_TAB.UPVOTES
+                  ? "primaryColor"
+                  : "textColor"}
+              >
+                Upvotes
+              </CustomText>
+            </Pressable>
+
+            <Pressable
+              style={{
+                ...styles.button,
+                borderBottomColor: theme.colors.primaryColor,
+                borderBottomWidth: currentTab === ACTIVE_TAB.COMMENTS ? 3 : 0,
+              }}
+              onPress={() => switchTab(ACTIVE_TAB.COMMENTS)}
+            >
+              <CustomText
+                variant="subheader"
+                fontSize={12}
+                color={currentTab === ACTIVE_TAB.COMMENTS
+                  ? "primaryColor"
+                  : "textColor"}
+              >
+                Comments
+              </CustomText>
+            </Pressable>
+
+            <Pressable
+              style={{
+                ...styles.button,
+                borderBottomColor: theme.colors.primaryColor,
+                borderBottomWidth: currentTab === ACTIVE_TAB.POLLS ? 3 : 0,
+              }}
+              onPress={() => switchTab(ACTIVE_TAB.POLLS)}
+            >
+              <CustomText
+                variant="subheader"
+                fontSize={12}
+                color={currentTab === ACTIVE_TAB.POLLS
+                  ? "primaryColor"
+                  : "textColor"}
+              >
+                Polls
+              </CustomText>
+            </Pressable>
+
+           {id === userId && (
+
+                  <Pressable
+                  style={{
+                    ...styles.button,
+                    borderBottomColor: theme.colors.primaryColor,
+                    borderBottomWidth: currentTab === ACTIVE_TAB.DRAFTS ? 3 : 0,
+                  }}
+                  onPress={() => switchTab(ACTIVE_TAB.DRAFTS)}
+                  >
+                  <CustomText
+                    variant="subheader"
+                    fontSize={12}
+                    color={currentTab === ACTIVE_TAB.DRAFTS
+                      ? "primaryColor"
+                      : "textColor"}
+                  >
+                    Drafts
+                  </CustomText>
+                  </Pressable>
+
+           )}
+
+           <Menu  style={{ flexDirection:'row', alignItems: 'center' }}>
+            <MenuTrigger style={{ flexDirection: 'row', alignItems: 'center', }}>
+              <>
+              <Ionicons name='share-social-outline' size={20} color={theme.colors.primaryColor} />
+                <CustomText
+                  variant="subheader"
+                  fontSize={12}
+                  color={"primaryColor"}
+                  marginLeft="s"
+                >Share Profile</CustomText>
+              </>
+            </MenuTrigger>
+            <MenuOptions customStyles={{
+                  optionsContainer: {
+                    backgroundColor: theme.colors.secondaryBackGroundColor,
+                    padding: 5,
+                    width: 180,
+                  }
+                }}>
+              <MenuOption style={{ flexDirection:'row', alignItems:'center'}} onSelect={() => handleShare()}>
+                <Ionicons name='md-logo-facebook'  size={20} color={'blue'} />
+                <CustomText marginLeft="s">Facebook</CustomText>
+              </MenuOption>
+
+              <MenuOption style={{ flexDirection:'row', alignItems:'center'}} onSelect={() => handleShare()}>
+                <Ionicons name='logo-whatsapp'  size={20} color={theme.colors.primaryColor} />
+                <CustomText marginLeft="s">Whatsapp</CustomText>
+              </MenuOption>
+
+              <MenuOption style={{ flexDirection:'row', alignItems:'center'}} onSelect={() => handleShare()}>
+                <Ionicons name='logo-twitter'  size={20} color={'skyblue'} />
+                <CustomText marginLeft="s">Twitter</CustomText>
+              </MenuOption>
+
+              <MenuOption style={{ flexDirection:'row', alignItems:'center'}} onSelect={() => handleShare()}>
+                <Ionicons name='logo-pinterest'  size={20} color={'red'} />
+                <CustomText marginLeft="s">Pinterest</CustomText>
+              </MenuOption>
+
+              <MenuOption style={{ flexDirection:'row', alignItems:'center', justifyContent: 'center', height: 35, borderRadius: 17, backgroundColor: theme.colors.mainBackGroundColor }} onSelect={() => copy()}>
+                <Ionicons name='copy-outline'  size={15} color={theme.colors.textColor} />
+                <CustomText marginLeft="s">Copy link</CustomText>
+              </MenuOption>
+
+              <MenuOption style={{ flexDirection:'row', alignItems:'center', justifyContent: 'center', height: 35, borderRadius: 17 }} onSelect={() => setShowModal(true)}>
+                <Ionicons name='person-add-outline'  size={20} color={theme.colors.primaryColor} />
+                <CustomText marginLeft="s" color='primaryColor'>Invite people to diskox</CustomText>
+              </MenuOption>
+             
+            </MenuOptions>
+           </Menu>
+
+        
+
+          </ScrollView>
         </Box>
       </Box>
     </Box>
@@ -652,6 +862,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
 
 const styles = StyleSheet.create({
   button: {
+    width: 70,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",

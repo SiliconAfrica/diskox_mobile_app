@@ -22,6 +22,7 @@ import mime from 'mime'
 import { PaginatedResponse } from '../../../models/PaginatedResponse'
 import { CUSTOM_STATUS_CODE } from '../../../enums/CustomCodes'
 import _ from 'lodash'
+import { useCommentMentionState } from '../commentState'
 
 
 
@@ -44,6 +45,7 @@ const CommentSection = ({
     const toast = useToast();
     const queryClient = useQueryClient();
     const { checkloggedInState } = useCheckLoggedInState();
+    const { users, selectedUsers, reset } = useCommentMentionState((state) => state)
 
 
     //queries
@@ -115,6 +117,7 @@ const CommentSection = ({
           queryClient.invalidateQueries([`getPost${postId}`]);
           setImages([]);
           setText("");
+          reset()
         },
         onError: (error: any) => {
           toast.show("An error occured while rying to create the comment", {
@@ -147,8 +150,9 @@ const CommentSection = ({
       const handleSubmit = React.useCallback(() => {
         if (mutationLoading) return;
         const formData = new FormData();
-        formData.append("post_id", postId.toString() as any),
-          formData.append("comment", text);
+        formData.append("post_id", postId.toString() as any)
+        const newText = text.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+          formData.append("comment", newText);
         if (images.length > 0) {
           for (let i = 0; i < images.length; i++) {
             const name = images[i].uri.split("/").pop();
@@ -160,8 +164,23 @@ const CommentSection = ({
             } as any);
           }
         }
-        //formData.append('mentioned_users', [].toString())
-    
+        const regex = /@\[\w+/g 
+        const mentionss = text.match(regex) || [];
+        const userIds: number[] = []
+        mentionss.forEach((item) => {
+          const newItem = item.replace('[', '');
+
+          const user = selectedUsers.map((user) => {
+            if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+              userIds.push(user.id)
+              
+              //formData.append('mentioned_users', user.id.toString())
+              return user.id;
+            }
+          });
+        })
+
+        formData.append('mentioned_users[]', userIds as any);
         mutate(formData);
       }, [text, postId, mutationLoading]);
 
@@ -191,7 +210,7 @@ const CommentSection = ({
   return (
     <Box width='100%' minHeight={50} bg='mainBackGroundColor' position='relative'>
 
-        <Box flex={1} maxHeight={300} paddingTop='s' borderTopWidth={0.5} borderTopColor='lightGrey' marginHorizontal='m'>
+        <Box flex={1} maxHeight={600} paddingTop='s' borderTopWidth={0.3} marginHorizontal='m'>
           
             <FlatList 
                   extraData={comments}

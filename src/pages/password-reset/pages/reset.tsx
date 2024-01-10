@@ -25,7 +25,7 @@ const Reset = () => {
         placement: "top",
       });
       setTimeout(() => {
-        navigation.navigate("onboarding", { showModal: 1 });
+        navigation.navigate("sign-in");
       }, 2000);
     },
     onError: (error: any) => {

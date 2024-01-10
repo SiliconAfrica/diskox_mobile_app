@@ -5,10 +5,10 @@ import axios, {
 } from "axios";
 import * as SecureStorage from "expo-secure-store";
 
-export const FRONTEND_BASE_URL = "https://test.diskox.com/";
+export const FRONTEND_BASE_URL = "https://test404.diskox.com/";
 export const BASE_URL = "https://test404.diskox.com/api/v1";
 export const IMAGE_BASE = "https://test404.diskox.com/storage/";
-const SITE_URL='https://test404.diskox.com'
+const SITE_URL = "https://test404.diskox.com";
 
 const httpService = axios.create({
   baseURL: BASE_URL,
