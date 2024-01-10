@@ -25,15 +25,15 @@ const Followers = ({ id }: {
 
   const theme = useTheme<Theme>();
 
-  const { isLoading, isError } = useQuery([`getFo-${id}`, id, page], () => httpService.get(`${URLS.GET_USERS_FOLLOWERS}/${id}`, {
+  const { isLoading, isError } = useQuery([`getUserFollowers-${id}`, page], () => httpService.get(`${URLS.GET_USERS_FOLLOWERS}/${id}`, {
     params: {
       page
     }
   }), {
     onSuccess: (data) => {
       const item: PaginatedResponse<FollowingModel> = data.data;
-      if (users.length > 0) {
-        if (data.data?.data !== undefined) {
+      if (users?.length > 0) {
+        if (item?.data?.data?.length !== undefined) {
           setUsers(_.uniq([...users, ...item.data.data]));
         } else {
           setNoMore(true);
@@ -46,13 +46,13 @@ const Followers = ({ id }: {
     }
   })
 
-  const onEndReached = React.useCallback(async () => {
-    const startIndex = (currentPage -1) * perPage;
-        const endIndex = Math.min(startIndex + perPage -1, total - 1);
-        if (currentPage < endIndex && users.length > 0 && noMore === false && !isLoading) {
-          setPage(prev => prev+1);
-      }
-  }, [currentPage, perPage, total, noMore, isLoading]);
+  const onEndReached = () => {
+    if (users.length < total && !isLoading) {
+      setPage(prev => prev+1);
+    }
+    // alert('end reached');
+  };
+
   return (
     <Box flex={1}>
       {isLoading && (
@@ -64,7 +64,7 @@ const Followers = ({ id }: {
         !isLoading && 
         <FlatList 
           onEndReached={onEndReached}
-          onEndReachedThreshold={1}
+          onEndReachedThreshold={10.8}
           ListEmptyComponent={() => (
             <>
               <Box width='100%' height={50} justifyContent='center' alignItems='center'>
