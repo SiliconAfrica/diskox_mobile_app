@@ -21,6 +21,8 @@ import { PaginatedResponse } from '../../models/PaginatedResponse';
 import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
 import { uniqBy } from 'lodash';
 import { Image } from 'expo-image'
+import { MediaPost } from '../../models/post'
+import UploadedImage from './UploadedImage'
 
 
 interface IProps {
@@ -34,7 +36,8 @@ interface IProps {
   addPoll: () => void;
   deletePoll: (i: number) => void;
   day: string;
-  setDay: (day: string) => void
+  setDay: (day: string) => void;
+  uploadedImages?: MediaPost[];
 }
 
 const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
@@ -110,11 +113,12 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSugge
   );
 };
 
-const Poll = ({ choice, index, deletePoll, handleChange }: {
+const Poll = ({ choice, index, deletePoll, handleChange, uploadedImages }: {
   index: number,
   choice: string,
   deletePoll: (i: number)=> void,
   handleChange: (e: string, i: number) => void;
+  uploadedImages?: MediaPost[];
 }) => {
   const theme = useTheme<Theme>();
   return (
@@ -125,17 +129,17 @@ const Poll = ({ choice, index, deletePoll, handleChange }: {
   )
 }
 
-const WritePoll = ({ description, setDescription, files, handlePicker, onDelete, setPolls: handlePollChange, deletePoll, addPoll, polls, day, setDay }: IProps) => {
+const WritePoll = ({ description, setDescription, files, handlePicker, onDelete, setPolls: handlePollChange, deletePoll, addPoll, polls, day, setDay, uploadedImages }: IProps) => {
   const theme = useTheme<Theme>();
   const [showDays, setShowDays] = React.useState(false);
   const [dayLabel, setDayLabel] = React.useState('1 day');
   const days: { name: string, value: number}[] = [
     {
-      name: '1 day',
-      value: 1,
+      name: '2 days',
+      value: 2,
     },
     {
-      name: '3 day',
+      name: '3 days',
       value: 3
     },
     {
@@ -237,6 +241,11 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
               </Pressable>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100, zIndex: 1  }}>
+              {/* {
+                  uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                  ))
+                } */}
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}

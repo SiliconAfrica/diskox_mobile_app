@@ -33,8 +33,6 @@ const Following = ({ id }: {
     onSuccess: (data) => {
       const item: PaginatedResponse<FollowingModel> = data.data;
       console.log(item);
-      // console.log(`users length ${item?.data?.data?.length}`);
-      // console.log(`ths current page is ${page}`)
       if (followings?.length > 0) {
         if (item?.data?.data?.length !== undefined) {
           setFollowings(_.uniq([...followings, ...item.data.data]));

@@ -19,6 +19,8 @@ import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
 import { uniqBy } from 'lodash';
 import { Image } from 'expo-image'
 import { UserRound } from 'lucide-react-native';
+import { MediaPost } from '../../models/post';
+import UploadedImage from './UploadedImage';
 
 interface IProps {
   files: ImagePicker.ImagePickerAsset[];
@@ -28,6 +30,7 @@ interface IProps {
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   title: string;
   setTitle: (e: string) => void;
+  uploadedImages?: MediaPost[];
 }
 
 const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
@@ -103,7 +106,7 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSugge
   );
 };
 
-const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription, title, setTitle }: IProps) => {
+const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription, title, setTitle, uploadedImages }: IProps) => {
   const theme = useTheme<Theme>();
 
   const handleChange = (text: string) => {
@@ -149,6 +152,11 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
               </Pressable>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
+                {/* {
+                  uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                  ))
+                } */}
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
