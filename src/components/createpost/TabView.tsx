@@ -15,7 +15,8 @@ export enum TAB_BAR_ENUM {
 }
 
 interface IProps {
-    setActive: (num: number) => void
+    setActive: (num: number) => void;
+    active?: number;
 }
 
 /**
@@ -26,12 +27,10 @@ interface IProps {
 + */
 
 
-const TabView: React.FC<IProps> = ({ setActive }: { setActive: (num: number) => void }) => {
+const TabView: React.FC<IProps> = ({ setActive, active }: { setActive: (num: number) => void, active: number }) => {
     const theme = useTheme<Theme>();
-    const [tabController, setTabController] = React.useState(TAB_BAR_ENUM.POST);
 
     const setActiveTab = React.useCallback((tab: TAB_BAR_ENUM) => {
-        setTabController(tab);
         setActive(tab);
     }, [])
   return (
@@ -39,19 +38,19 @@ const TabView: React.FC<IProps> = ({ setActive }: { setActive: (num: number) => 
 
             <Box flexDirection='row' width='100%'>
 
-                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.POST)} style={{ ...style.button, borderBottomWidth: tabController === TAB_BAR_ENUM.POST ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
-                    <Feather name='file-text' size={25} color={tabController === TAB_BAR_ENUM.POST ? theme.colors.primaryColor : theme.colors.textColor} />
-                    <CustomText variant='body' marginLeft='s' color={tabController === TAB_BAR_ENUM.POST ? 'primaryColor':'textColor'}>Post</CustomText>
+                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.POST)} style={{ ...style.button, borderBottomWidth: active === TAB_BAR_ENUM.POST ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
+                    <Feather name='file-text' size={25} color={active === TAB_BAR_ENUM.POST ? theme.colors.primaryColor : theme.colors.textColor} />
+                    <CustomText variant='body' marginLeft='s' color={active === TAB_BAR_ENUM.POST ? 'primaryColor':'textColor'}>Post</CustomText>
                 </Pressable>
 
-                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.QUESTION)} style={{ ...style.button, borderBottomWidth: tabController === TAB_BAR_ENUM.QUESTION ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
-                    <Feather name='help-circle' size={25} color={tabController === TAB_BAR_ENUM.QUESTION ? theme.colors.primaryColor : theme.colors.textColor} />
-                    <CustomText variant='body' marginLeft='s' color={tabController === TAB_BAR_ENUM.QUESTION ? 'primaryColor':'textColor'}>Question</CustomText>
+                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.QUESTION)} style={{ ...style.button, borderBottomWidth: active === TAB_BAR_ENUM.QUESTION ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
+                    <Feather name='help-circle' size={25} color={active === TAB_BAR_ENUM.QUESTION ? theme.colors.primaryColor : theme.colors.textColor} />
+                    <CustomText variant='body' marginLeft='s' color={active === TAB_BAR_ENUM.QUESTION ? 'primaryColor':'textColor'}>Question</CustomText>
                 </Pressable>
 
-                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.POLL)} style={{ ...style.button, borderBottomWidth: tabController === TAB_BAR_ENUM.POLL ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
-                    <Feather name='list' size={25} color={tabController === TAB_BAR_ENUM.POLL ? theme.colors.primaryColor : theme.colors.textColor} />
-                    <CustomText variant='body' marginLeft='s' color={tabController === TAB_BAR_ENUM.POLL ? 'primaryColor':'textColor'}>Poll</CustomText>
+                <Pressable onPress={() => setActiveTab(TAB_BAR_ENUM.POLL)} style={{ ...style.button, borderBottomWidth: active === TAB_BAR_ENUM.POLL ? 2 : 0, borderBottomColor: theme.colors.primaryColor }}>
+                    <Feather name='list' size={25} color={active === TAB_BAR_ENUM.POLL ? theme.colors.primaryColor : theme.colors.textColor} />
+                    <CustomText variant='body' marginLeft='s' color={active === TAB_BAR_ENUM.POLL ? 'primaryColor':'textColor'}>Poll</CustomText>
                 </Pressable>
 
             </Box>

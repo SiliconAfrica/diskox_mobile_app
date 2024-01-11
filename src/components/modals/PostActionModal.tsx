@@ -26,6 +26,16 @@ import { useDetailsState } from "../../states/userState";
 import { useDeletePostState } from "../../states/deleteedPost";
 
 
+const filterPostType = (type: string): number => {
+  const obj = {
+    post: 1,
+    question: 2,
+    poll: 3,
+  }
+  return obj[type];
+}
+
+
 const ActionChip = ({
   icon,
   label,
@@ -159,7 +169,10 @@ const PostActionModal = () => {
     activePost !== null && id === activePost.user.id && {
       id: 5,
       label: "Edit Post",
-      action: () => {},
+      action: () => {
+        navigation.navigate('edit-post', { postId: activePost.id, type: filterPostType(activePost?.post_type) });
+        setAll({ showPostAction: false, activePost: null });
+      },
       icon: (
         <Feather
           name="edit"

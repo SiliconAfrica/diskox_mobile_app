@@ -136,6 +136,6 @@ export const URLS = {
   GET_FOLLOWING: '/following_posts',
   GET_USER_FOLLOWING: '/fetch_user_following',
   GET_USERS_FOLLOWERS: '/fetch_user_followers',
-  GET_MENTIONS:'/search_user_mentions'
-
+  GET_MENTIONS:'/search_user_mentions',
+  UPDATE_POST: '/update_post',
 };
