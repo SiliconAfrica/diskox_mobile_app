@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React, { useEffect } from "react";
 import Box from "../../components/general/Box";
 import SettingsHeader from "../../components/settings/Header";
@@ -28,18 +28,22 @@ import PrimaryButton from "../../components/general/PrimaryButton";
 import useToast from "../../hooks/useToast";
 import { Follower } from "../../models/Follower";
 import { useCreatePostState } from "./state";
+import { URLS } from "../../services/urls";
+import { IPost } from "../../models/post";
 
-const CreatePost = ({
+const EditPost = ({
   navigation,
   route,
-}: NativeStackScreenProps<RootStackParamList, "create-post">) => {
+}: NativeStackScreenProps<RootStackParamList, "edit-post">) => {
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
-  const theOrigin = route?.params?.origin;
-  const communityId = route?.params?.communityId;
+  // const theOrigin = route?.params?.origin;
+  // const communityId = route?.params?.communityId;
+  const postId = route?.params.postId;
+  const postType = route?.params.type;
   const { setAll, visibility } = useModalState((state) => state);
-  const [activeTab, setActive] = React.useState(TAB_BAR_ENUM.POST);
+  const [activeTab, setActive] = React.useState(postType);
   const [files, setFiles] = React.useState<ImagePicker.ImagePickerAsset[]>([]);
   const [show, setShow] = React.useState(false);
   const [value, setValues] = React.useState("");
@@ -52,18 +56,40 @@ const CreatePost = ({
   const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
   const [origin, setOrigin] = React.useState("post");
+  const [post, setPost] = React.useState<IPost|null>(null)
 
   const theme = useTheme<Theme>();
   const toast = useToast();
-  const { tags, setTags, reset } = useCreatePostState((state) => state)
+  const { tags, setTags, reset } = useCreatePostState((state) => state);
 
-  useEffect(() => {
-    if (theOrigin && theOrigin === "community") {
-      setOrigin("community");
-    } else {
-      setOrigin("post");
+  const fetchPost = useQuery([`getSinglePostByID`, postId], () => httpService.get(`${URLS.GET_SINGLE_POST}/${postId}`), {
+    onSuccess: (data) => {
+      const item: IPost = data.data.data;
+      console.log(`post type ${item.post_type}`)
+      setPost(item);
+      if (item.post_type === 'post') {
+        setValues(item.description);
+        setActive(TAB_BAR_ENUM.POST);
+      } else if (item.post_type === 'question') {
+        setTitle(item.title);
+        setQuestion(item.description);
+        setActive(TAB_BAR_ENUM.QUESTION);
+      } else {
+        setPollQuestion(item.description);
+        const polls = item?.polls.map((item) => item.subject);
+        setPolls(polls)
+        setActive(TAB_BAR_ENUM.POLL);
+      }
     }
-  }, []);
+  });
+
+  // useEffect(() => {
+  //   if (theOrigin && theOrigin === "community") {
+  //     setOrigin("community");
+  //   } else {
+  //     setOrigin("post");
+  //   }
+  // }, []);
   // functions
   const editPoll = React.useCallback(
     (e: string, i: number) => {
@@ -112,7 +138,7 @@ const CreatePost = ({
 
   // mutation
   const { isLoading, mutate } = useMutation({
-    mutationFn: (data: FormData) => httpService.post("/create_post", data),
+    mutationFn: (data: FormData) => httpService.post(`${URLS.UPDATE_POST}/${postId}`, data),
     onSuccess: (data) => {
       toast.show("Post created", { type: "success" });
       // clean up
@@ -144,6 +170,7 @@ const CreatePost = ({
             files={files}
             handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
+            uploadedImages={post?.post_images}
           />
         );
       }
@@ -157,6 +184,7 @@ const CreatePost = ({
             onDelete={handleMediaDelete}
             title={title}
             setTitle={handleTitle}
+            uploadedImages={post?.post_images}
           />
         );
       }
@@ -174,6 +202,7 @@ const CreatePost = ({
             deletePoll={deletePoll}
             day={day}
             setDay={(day) => setDay(day)}
+            uploadedImages={post?.post_images}
           />
         );
       }
@@ -197,15 +226,16 @@ const CreatePost = ({
 
   const handleSubmit = React.useCallback(async () => {
     const formData = new FormData();
-    if (origin === "community") {
-      formData.append("community_id", communityId.toString());
-    }
+    // if (origin === "community") {
+    //   formData.append("community_id", communityId.toString());
+    // }
     if (activeTab === TAB_BAR_ENUM.POST) {
       formData.append("description", value);
       formData.append("post_type", "post");
     }
 
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
+      formData.append('title', title);
       formData.append("description", question);
       formData.append("post_type", "question");
     }
@@ -302,6 +332,13 @@ const CreatePost = ({
     [files]
   );
 
+  const handleUploadedDelete = React.useCallback(
+    ({ index, clearAll }: { index: number; clearAll: boolean }) => {
+      setPost({ ...post, post_images: post?.post_images.filter((item, i) => i !== index)});
+    },
+    [files]
+  );
+
   const updateTextWithEmoji = React.useCallback(
     (emoji: string) => {
       switch (activeTab) {
@@ -321,166 +358,163 @@ const CreatePost = ({
     },
     [activeTab]
   );
-  return (
-    <Box flex={1} backgroundColor="mainBackGroundColor">
-      <TagModal
-        open={show}
-        onClose={() => setShow(false)}
-        tags={tags}
-        setTags={(tags) => handleCheck(tags)}
-      />
-      <SettingsHeader
-        showSave={true}
-        onSave={() => {}}
-        RightItem={
-          <PrimaryButton
-            isLoading={isLoading}
-            title="Post"
-            width={100}
-            height={40}
-            onPress={handleSubmit}
-          />
-        }
-        title="Create Post"
-        handleArrowPressed={() => navigation.goBack()}
-      />
-
-      {/* HEADER SECTTION */}
-      <Box
-        width={"100%"}
-        height={100}
-        flexDirection="row"
-        alignItems="center"
-        px="m"
-        justifyContent="space-between"
-      >
-        <Box flexDirection="row" alignItems="center">
-          <Box
-            width={40}
-            height={40}
-            borderRadius={20}
-            borderColor="primaryColor"
-          >
-            <Image
-              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
+  if (fetchPost.isLoading) {
+    return (
+      <Box flex={1} backgroundColor="mainBackGroundColor" alignItems="center" justifyContent="center" paddingTop="xl">
+        <ActivityIndicator color={theme.colors.primaryColor} size={'large'} />
+      </Box>
+    )
+  }
+  else if (!isLoading && isError) {
+    return (
+      <Box flex={1} backgroundColor="mainBackGroundColor" alignItems="center" justifyContent="center" paddingTop="l">
+        <CustomText  color="primaryColor" variant="body">
+          Post not found
+        </CustomText>
+      </Box>
+    )
+  }
+  else {
+    return (
+      <Box flex={1} backgroundColor="mainBackGroundColor">
+        <TagModal
+          open={show}
+          onClose={() => setShow(false)}
+          tags={tags}
+          setTags={(tags) => handleCheck(tags)}
+        />
+        <SettingsHeader
+          showSave={true}
+          onSave={() => {}}
+          RightItem={
+            <PrimaryButton
+              isLoading={isLoading}
+              title="save"
+              width={100}
+              height={40}
+              onPress={handleSubmit}
             />
+          }
+          title="Edit Post"
+          handleArrowPressed={() => navigation.goBack()}
+        />
+  
+        {/* HEADER SECTTION */}
+        <Box
+          width={"100%"}
+          height={100}
+          flexDirection="row"
+          alignItems="center"
+          px="m"
+          justifyContent="space-between"
+        >
+          <Box flexDirection="row" alignItems="center">
+            <Box
+              width={40}
+              height={40}
+              borderRadius={20}
+              borderColor="primaryColor"
+            >
+              <Image
+                source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                style={{ width: 40, height: 40, borderRadius: 20 }}
+              />
+            </Box>
+  
+            <Box marginLeft="m">
+              <CustomText variant="body">{username}</CustomText>
+  
+              <Pressable
+                onPress={() => setAll({ showVisibility: true })}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderRadius: 30,
+                  backgroundColor: theme.colors.secondaryBackGroundColor,
+                  padding: 2,
+                }}
+              >
+                <Ionicons
+                  name={visibility === 'everyone' ? "globe-outline":'people-outline'}
+                  size={20}
+                  color={theme.colors.textColor}
+                />
+                <CustomText variant="xs">{visibility}</CustomText>
+                <Feather
+                  name="chevron-down"
+                  size={20}
+                  color={theme.colors.textColor}
+                />
+              </Pressable>
+            </Box>
           </Box>
-
-          <Box marginLeft="m">
-            <CustomText variant="body">{username}</CustomText>
-
+  
+          {/* <FadedButton
+            title="Tag people"
+            onPress={() => setShow(true)}
+            height={40}
+          /> */}
+        </Box>
+  
+        {/* TABVIEW */}
+        <TabView active={activeTab} setActive={(data) => setActive(data)} />
+  
+        <Box flex={1}>
+          <ScrollView style={{ flex: 1 }} >
+          {toggleTab()}
+          </ScrollView>
+        </Box>
+  
+        {/* MEDIA UPLOAD SECTION */}
+        <Box
+          width={"100%"}
+          height={100}
+          flexDirection="row"
+          borderTopWidth={2}
+          borderTopColor="secondaryBackGroundColor"
+          paddingHorizontal="m"
+          alignItems="center"
+          position="relative"
+          zIndex={9}
+        >
+          {showEmoji && (
+            <Box
+              width="80%"
+              height={250}
+              position="absolute"
+              bottom={70}
+              borderRadius={10}
+              zIndex={10}
+              backgroundColor="secondaryBackGroundColor"
+            >
+              <Emojipicker onSelected={updateTextWithEmoji} />
+            </Box>
+          )}
+  
+          <Box flexDirection="row">
             <Pressable
-              onPress={() => setAll({ showVisibility: true })}
+              onPress={() => setShowEmoji((prev) => !prev)}
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderRadius: 30,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
                 backgroundColor: theme.colors.secondaryBackGroundColor,
-                padding: 2,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <Ionicons
-                name={visibility === 'everyone' ? "globe-outline":'people-outline'}
-                size={20}
-                color={theme.colors.textColor}
-              />
-              <CustomText variant="xs">{visibility}</CustomText>
               <Feather
-                name="chevron-down"
-                size={20}
-                color={theme.colors.textColor}
+                name="smile"
+                size={25}
+                color={
+                  showEmoji ? theme.colors.primaryColor : theme.colors.textColor
+                }
               />
             </Pressable>
-          </Box>
-        </Box>
-
-        <FadedButton
-          title="Tag people"
-          onPress={() => setShow(true)}
-          height={40}
-        />
-      </Box>
-
-      {/* TABVIEW */}
-      <TabView setActive={(data) => setActive(data)} />
-
-      <Box flex={1}>
-        <ScrollView style={{ flex: 1 }} >
-        {toggleTab()}
-        </ScrollView>
-      </Box>
-
-      {/* MEDIA UPLOAD SECTION */}
-      <Box
-        width={"100%"}
-        height={100}
-        flexDirection="row"
-        borderTopWidth={2}
-        borderTopColor="secondaryBackGroundColor"
-        paddingHorizontal="m"
-        alignItems="center"
-        position="relative"
-        zIndex={9}
-      >
-        {showEmoji && (
-          <Box
-            width="80%"
-            height={250}
-            position="absolute"
-            bottom={70}
-            borderRadius={10}
-            zIndex={10}
-            backgroundColor="secondaryBackGroundColor"
-          >
-            <Emojipicker onSelected={updateTextWithEmoji} />
-          </Box>
-        )}
-
-        <Box flexDirection="row">
-          <Pressable
-            onPress={() => setShowEmoji((prev) => !prev)}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: theme.colors.secondaryBackGroundColor,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Feather
-              name="smile"
-              size={25}
-              color={
-                showEmoji ? theme.colors.primaryColor : theme.colors.textColor
-              }
-            />
-          </Pressable>
-
-          <Pressable
-            onPress={() => handleDocumentPicker("Images")}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: theme.colors.secondaryBackGroundColor,
-              justifyContent: "center",
-              alignItems: "center",
-              marginLeft: 20,
-            }}
-          >
-            <Ionicons
-              name="image-outline"
-              size={25}
-              color={theme.colors.textColor}
-            />
-          </Pressable>
-
-          {activeTab !== TAB_BAR_ENUM.POLL && (
+  
             <Pressable
-              onPress={() => handleDocumentPicker("Videos")}
+              onPress={() => handleDocumentPicker("Images")}
               style={{
                 width: 40,
                 height: 40,
@@ -492,37 +526,58 @@ const CreatePost = ({
               }}
             >
               <Ionicons
-                name="videocam-outline"
+                name="image-outline"
                 size={25}
                 color={theme.colors.textColor}
               />
             </Pressable>
-          )}
-        </Box>
-
-        <Box flex={1} flexDirection="row" justifyContent="flex-end">
-          {selectedUsers.length <= 4 &&
-            selectedUsers.map((item, index) => (
-              <Box
-                width={30}
-                height={30}
-                borderRadius={15}
-                overflow="hidden"
-                backgroundColor="fadedButtonBgColor"
+  
+            {/* {activeTab !== TAB_BAR_ENUM.POLL && (
+              <Pressable
+                onPress={() => handleDocumentPicker("Videos")}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: theme.colors.secondaryBackGroundColor,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: 20,
+                }}
               >
-                <Image
-                  source={{
-                    uri: `${IMAGE_BASE}${item.follower.profile_image}`,
-                  }}
-                  contentFit="cover"
-                  style={{ width: "100%", height: "100%" }}
+                <Ionicons
+                  name="videocam-outline"
+                  size={25}
+                  color={theme.colors.textColor}
                 />
-              </Box>
-            ))}
+              </Pressable>
+            )} */}
+          </Box>
+  
+          <Box flex={1} flexDirection="row" justifyContent="flex-end">
+            {selectedUsers.length <= 4 &&
+              selectedUsers.map((item, index) => (
+                <Box
+                  width={30}
+                  height={30}
+                  borderRadius={15}
+                  overflow="hidden"
+                  backgroundColor="fadedButtonBgColor"
+                >
+                  <Image
+                    source={{
+                      uri: `${IMAGE_BASE}${item.follower.profile_image}`,
+                    }}
+                    contentFit="cover"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </Box>
+              ))}
+          </Box>
         </Box>
       </Box>
-    </Box>
-  );
+    );
+  }
 };
 
-export default CreatePost;
+export default EditPost;

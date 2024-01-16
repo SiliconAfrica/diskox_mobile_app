@@ -13,10 +13,15 @@ import PostCard from '../../components/feeds/PostCard';
 import { FlatList, RefreshControl } from 'react-native-gesture-handler';
 import _ from 'lodash';
 import FeedCard from '../../components/feeds/FeedCard';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/MainNavigation';
 
 // import { Container } from './styles';
 
-const Bookmarks: React.FC = () => {
+const Bookmarks: React.FC = ({
+    route,
+    navigation,
+  }: NativeStackScreenProps<RootStackParamList, "post">) => {
     const [posts, setPosts] = React.useState<IPost[]>([]);
     const [isRefreshing, setIsRefreshing] = React.useState(false);
     const [page, setPage] = React.useState(1);
@@ -50,7 +55,7 @@ const Bookmarks: React.FC = () => {
     }
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-        <SettingsHeader title='Bookmarks' showSave={false}  />
+        <SettingsHeader title='Bookmarks' showSave={false} handleArrowPressed={() => navigation.goBack()}  />
         { !isLoading  && isError && (
             <Box width={'100%'} height={120} alignItems='center'>
                 <CustomText>{(error as any)?.message}</CustomText>

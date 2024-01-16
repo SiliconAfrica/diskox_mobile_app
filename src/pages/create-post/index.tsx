@@ -28,6 +28,8 @@ import PrimaryButton from "../../components/general/PrimaryButton";
 import useToast from "../../hooks/useToast";
 import { Follower } from "../../models/Follower";
 import { useCreatePostState } from "./state";
+import { useCommentMentionState } from "../../components/feeds/commentState";
+import Saveasdraft from "../../components/modals/SavaAsDraft";
 
 const CreatePost = ({
   navigation,
@@ -52,10 +54,16 @@ const CreatePost = ({
   const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
   const [origin, setOrigin] = React.useState("post");
+  const [showModal, setShowModal] = React.useState(false);
+  const [status, setStatus] = React.useState<'active'|'draft'>('active');
+  const [cancel, setCancel] = React.useState(false);
+
 
   const theme = useTheme<Theme>();
   const toast = useToast();
   const { tags, setTags, reset } = useCreatePostState((state) => state);
+  const { users, selectedUsers: selectedMentionedUsers, reset: resetMention } = useCommentMentionState((state) => state)
+
 
   useEffect(() => {
     if (theOrigin && theOrigin === "community") {
@@ -64,6 +72,31 @@ const CreatePost = ({
       setOrigin("post");
     }
   }, []);
+
+  // effect for navigation
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!cancel) {
+        if (value !== '' || question !== '' || pollQuestion !== '' || files.length > 0) {
+          e.preventDefault();
+          setShowModal(true);
+        } else {
+          return;
+        }
+      }  else {
+        return;
+      }
+    })
+    return unsubscribe;
+  }, [navigation, value, question,pollQuestion, files, cancel]);
+
+  React.useEffect(() =>{
+    (async function() {
+      if (status === 'draft') {
+        handleSubmit();
+      }
+    })()
+  },[status])
   // functions
   const editPoll = React.useCallback(
     (e: string, i: number) => {
@@ -117,8 +150,12 @@ const CreatePost = ({
       toast.show("Post created", { type: "success" });
       // clean up
       setFiles([]);
+      setValues("")
+      setQuestion("")
+      setPollQuestion("")
       reset();
       setValues("");
+      setCancel(true);
       navigation.goBack();
     },
     onError: (error: any) => {
@@ -201,20 +238,73 @@ const CreatePost = ({
       formData.append("community_id", communityId.toString());
     }
     if (activeTab === TAB_BAR_ENUM.POST) {
-      formData.append("description", value);
+      const regex = /@\[\w+/g 
+      const mentionss = value.match(regex) || [];
+      const userIds: number[] = []
+      mentionss.forEach((item) => {
+        const newItem = item.replace('[', '');
+
+        const user = selectedMentionedUsers.map((user) => {
+          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+            userIds.push(user.id)
+            
+            //formData.append('mentioned_users', user.id.toString())
+            return user.id;
+          }
+        });
+      })
+      const newText = value.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+      formData.append('mentioned_users[]', userIds as any);
+      formData.append("description", newText);
       formData.append("post_type", "post");
     }
 
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
-      formData.append("description", question);
+      const regex = /@\[\w+/g 
+      const mentionss = value.match(regex) || [];
+      const userIds: number[] = []
+      mentionss.forEach((item) => {
+        const newItem = item.replace('[', '');
+
+        const user = selectedMentionedUsers.map((user) => {
+          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+            userIds.push(user.id)
+            
+            //formData.append('mentioned_users', user.id.toString())
+            return user.id;
+          }
+        });
+      })
+      const newText = question.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+
+      formData.append("description", newText);
       formData.append("post_type", "question");
-      formData.append("title", title);
+      formData.append('title', title);
+      formData.append('mentioned_users[]', userIds as any);
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
-      formData.append("description", pollQuestion);
+      const regex = /@\[\w+/g 
+      const mentionss = value.match(regex) || [];
+      const userIds: number[] = []
+      mentionss.forEach((item) => {
+        const newItem = item.replace('[', '');
+
+        const user = selectedMentionedUsers.map((user) => {
+          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+            userIds.push(user.id)
+            
+            //formData.append('mentioned_users', user.id.toString())
+            return user.id;
+          }
+        });
+      })
+      const newText = pollQuestion.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+
+      formData.append("description", newText);
       formData.append("post_type", "poll");
       formData.append("poll_duration", day);
+      formData.append('mentioned_users[]', userIds as any);
       polls.map((item) => {
         formData.append("polls[]", item);
       });
@@ -233,7 +323,7 @@ const CreatePost = ({
         formData.append("tags[]", item.toString() as any);
       });
     }
-    formData.append("status", "active");
+    formData.append("status", status);
     if (files.length > 0) {
       const images = files.filter((item, index) => item.type === "image");
       const videos = files.filter((item, index) => item.type === "video");
@@ -267,6 +357,7 @@ const CreatePost = ({
     question,
     day,
     activeTab,
+    status
   ]);
 
   const handleDocumentPicker = React.useCallback(
@@ -330,6 +421,11 @@ const CreatePost = ({
         tags={tags}
         setTags={(tags) => handleCheck(tags)}
       />
+      <Saveasdraft isLoading={isLoading} isVisible={showModal} close={() => {
+        setShowModal(false);
+        setCancel(true)
+        navigation.goBack();
+      } } action={() => setStatus("draft")} />
       <SettingsHeader
         showSave={true}
         onSave={() => {}}
@@ -407,7 +503,7 @@ const CreatePost = ({
       </Box>
 
       {/* TABVIEW */}
-      <TabView setActive={(data) => setActive(data)} />
+      <TabView active={activeTab} setActive={(data) => setActive(data)} />
 
       <Box flex={1}>
         <ScrollView style={{ flex: 1 }}>{toggleTab()}</ScrollView>

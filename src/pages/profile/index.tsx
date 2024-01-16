@@ -1,4 +1,4 @@
-import { View, Text, useWindowDimensions } from 'react-native'
+import { View, Text, useWindowDimensions, StatusBar } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import { FlashList } from '@shopify/flash-list'
@@ -12,6 +12,7 @@ import UserPosts from './pages/Posts'
 import Upvotes from './pages/Upvotes'
 import Comments from './pages/Comments'
 import Polls from './pages/Polls'
+import Drafts from './pages/Drafts'
 
 
 const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'>) => {
@@ -42,12 +43,16 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
       case ACTIVE_TAB.POLLS: {
         return <Polls id={userId} />
       }
+      case ACTIVE_TAB.DRAFTS: {
+        return <Drafts id={userId} />
+      }
     }
   }, [currentTab]);
 
 
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
+      <StatusBar animated backgroundColor={'lightGrey'} translucent={true} />
       <ScrollView>
         <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
         <Box width='100%' height={HEIGHT / 100 * 89}>

@@ -181,7 +181,7 @@ const NewPost = ({
           </>
         )}
         ListHeaderComponent={() => (
-          <Box marginBottom="s">
+          <Box style={{ marginBottom:15 }}>
             { isLoggedIn && <Searchbar /> }
           </Box>
       )}

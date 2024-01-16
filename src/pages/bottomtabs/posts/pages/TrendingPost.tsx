@@ -143,8 +143,9 @@ const TrendingPost = ({
           </>
         )}
         ListHeaderComponent={() => (
-          <Box marginBottom="s">
+          <Box bg={isDarkMode ? "mainBackGroundColor":"secondaryBackGroundColor"} style={{ marginBottom: 15 }}>
             { isLoggedIn && <Searchbar /> }
+            <Box height={15}/>
             <FilterTopbar activeTab={activeTab} onActive={(data) => onActive(data)} />
           </Box>
       )}
