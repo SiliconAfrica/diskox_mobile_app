@@ -151,9 +151,10 @@ const Setup = ({
   };
 
   const handleSubmit = React.useCallback(() => {
+    console.log(payload);
     if (
-      (showUsername &&
-        (payload.username === "" || payload.phone_number === "")) ||
+      (showUsername && payload.username === "") ||
+      payload.phone_number === "" ||
       state === "" ||
       date === "" ||
       gender === ""
@@ -181,6 +182,7 @@ const Setup = ({
       state,
       birthday: date,
       gender: gender,
+      phone_number: payload.phone_number,
       ...(showUsername ? payload : {}),
     };
     mutate(obj);
@@ -277,7 +279,17 @@ const Setup = ({
             {image()}
           </Box>
           <CustomText variant="subheader">Where are you from?</CustomText>
-
+          <CustomTextInputWithoutForm
+            name="phone_number"
+            placeholder="Enter your phone number"
+            value={payload.phone_number}
+            label="Phone Number"
+            required
+            containerStyle={{ marginTop: theme.spacing.m }}
+            onChangeText={(val) =>
+              setPayload((prev) => ({ ...prev, phone_number: val }))
+            }
+          />
           {/* <CountryPicker onPicked={handleSelect} /> */}
           {showUsername && (
             <>
@@ -293,17 +305,6 @@ const Setup = ({
                     ...prev,
                     username: val.toLowerCase(),
                   }))
-                }
-              />
-              <CustomTextInputWithoutForm
-                name="phone_number"
-                placeholder="Enter your phone number"
-                value={payload.phone_number}
-                label="Phone Number"
-                required
-                containerStyle={{ marginTop: theme.spacing.m }}
-                onChangeText={(val) =>
-                  setPayload((prev) => ({ ...prev, phone_number: val }))
                 }
               />
             </>
