@@ -31,6 +31,7 @@ interface IProps {
   title: string;
   setTitle: (e: string) => void;
   uploadedImages?: MediaPost[];
+  removeImage?: (data: { id?: number, type: 'image'|'video' }) => void;
 }
 
 const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
@@ -106,7 +107,7 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSugge
   );
 };
 
-const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription, title, setTitle, uploadedImages }: IProps) => {
+const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescription, title, setTitle, uploadedImages =[], removeImage }: IProps) => {
   const theme = useTheme<Theme>();
 
   const handleChange = (text: string) => {
@@ -144,7 +145,7 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
         </Box>
 
         {
-          files.length > 0 && (
+           (
             <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
@@ -152,24 +153,25 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
               </Pressable>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
-                {/* {
-                  uploadedImages.map((item, index) => (
-                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                {
+                  uploadedImages.length > 0 && uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
-                } */}
+                }
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
-                {files.length < 5 && (
-                  <Pressable style={{
-                    marginLeft: 20,
-                    width: 150, height: '90%',
-                    borderRadius: 15,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderWidth: 2,
-                    borderColor: theme.colors.secondaryBackGroundColor,
-                  }}
+                {files.length < 5 && files.length !== 0 && (
+                  <Pressable 
+                    style={{
+                      marginLeft: 20,
+                      width: 150, height: '90%',
+                      borderRadius: 15,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: 2,
+                      borderColor: theme.colors.secondaryBackGroundColor,
+                    }}
                     onPress={() => handlePicker()}
                   >
                     <CustomText variant='body'>Add Media File</CustomText>

@@ -22,6 +22,10 @@ import FadedButton from '../../components/general/FadedButton'
 import { Ionicons } from '@expo/vector-icons'
 import EmojiPicker from 'rn-emoji-picker'
 import { emojis } from 'rn-emoji-picker/dist/data'
+import { MentionInput } from 'react-native-controlled-mentions'
+import { renderSuggestions } from '../../components/createpost/WritePost'
+import { useCommentMentionState } from '../../components/feeds/commentState'
+import { uniq } from 'lodash'
 
 const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList, 'repost'>) => {
     const [post, setPost] = React.useState<IPost | null>(null)
@@ -30,6 +34,10 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
     const [showTagModal, setShowTagModal] = React.useState(false);
     const [showEmoji, setShowEmoji] = React.useState(false);
     const [recent, setRecent] = React.useState([]);
+    const [userIds, setUserIds] = React.useState<number[]>([])
+
+    // global state
+    const { users, selectedUsers: selectedMentionedUsers, reset: resetMention } = useCommentMentionState((state) => state)
 
 
     const { id } = route.params;
@@ -63,6 +71,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
         reset();
         queryClient.invalidateQueries(['GetAllPosts']);
         queryClient.invalidateQueries(['GetAllTrendingPosts']);
+        navigation.goBack();
       },
       onError: (error: any) => {
         toast.show(error.message, { type: 'error' });
@@ -86,7 +95,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
       }
       const formData = new FormData();
       formData.append('post_id', id.toString());
-      formData.append('repost_comment', comment);
+    
 
       if (tags.length > 0) {
         tags.map((item) => {
@@ -94,15 +103,30 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
         } )
       }
       // getting hash tags
-      const regex = /#(\w+)/g;
-      const hashtags = comment.match(regex);
-      if (hashtags.length > 0) {
+      const hashtags = comment.match(/#\w+/g);
+      if (hashtags && hashtags.length) {
         hashtags.map((item) => {
           formData.append('hashtags[]', item);
         })
       }
-      console.log(hashtags);
-      console.log(formData)
+      //const mentionregex = /@\[\w+/g 
+      const regex = /@\[\S+]/g
+      const mentionss = comment.match(regex) || [];
+      mentionss.forEach((item) => {
+        const newItem = item.replace('[', '').replace(']', '');
+        selectedMentionedUsers.forEach((user) => {
+          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
+            userIds.push(user.id)
+            setUserIds((prev) => uniq([...prev, user.id]));
+            return user.id;
+          }
+        })
+      })
+      const newText = comment.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+      formData.append('repost_comment', newText);
+      console.log(userIds);
+      formData.append('mentioned_users[]', userIds as any);
+     
       mutate(formData);
     }
 
@@ -134,14 +158,36 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
                     )
         }
          
-                <Pressable onPress={handleSubmit} style={{ borderWidth: 2, borderColor: theme.colors.primaryColor, backgroundColor: '#F3FBF5', width: 100, height: 45, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
+                <Pressable onPress={handleSubmit} style={{ borderWidth: 1, borderColor: theme.colors.primaryColor, backgroundColor: '#F3FBF5', width: 100, height: 32, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
                    { !isLoading && <CustomText variant='body' color='primaryColor'>Repost</CustomText> }
                    { isLoading && <ActivityIndicator size='small' color={theme.colors.primaryColor} /> }
                 </Pressable>
             </Box>
-            <TextInput multiline inputMode='text' placeholder='Say something...' style={{ marginTop: 20, width: '100%', color: theme.colors.textColor, fontFamily: 'RedRegular' }} placeholderTextColor={theme.colors.textColor} value={comment} onChangeText={(e: string) => setComment(e)} />
+            <Box flex={1} >
+              <MentionInput
+                partTypes={[
+                  {
+                    trigger: '@',
+                    renderSuggestions,
+                    textStyle: { fontWeight: 'bold', color: theme.colors.primaryColor },
+                    isInsertSpaceAfterMention: true,
+                    pattern: /(@\w+)/g
+                  },
+                  {
+                    trigger: '#',
+                    textStyle: { fontWeight: 'bold', color: theme.colors.primaryColor },
+                    isInsertSpaceAfterMention: true,
+                    pattern: /(#\w+)/g
+                  }
+                ]}
+                value={comment}
+                onChange={(val) => setComment(val)} 
+                containerStyle={{ minHeight: 80,  paddingHorizontal: 10, marginTop:20  }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor  }}
+              placeholderTextColor={theme.colors.textColor} multiline placeholder={`Let's Diskox it...`} textAlignVertical='top' />
+            </Box>
+            {/* <TextInput multiline inputMode='text' placeholder='Say something...' style={{ marginTop: 20, width: '100%', color: theme.colors.textColor, fontFamily: 'RedRegular' }} placeholderTextColor={theme.colors.textColor} value={comment} onChangeText={(e: string) => setComment(e)} /> */}
 
-            <Box width="100%" borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={15} marginTop='m'>
+            <Box width="100%" borderWidth={0} borderColor='secondaryBackGroundColor' borderRadius={15} marginTop='m'>
                 { !getData.isLoading && post !== null && (
                     <RepostCard post={post} />
                 )}
@@ -153,9 +199,8 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
         {
             showEmoji && (
               <Box width='100%' maxHeight={300} position='absolute' zIndex={30} top={-200} bottom={80} >
-                <ScrollView nestedScrollEnabled contentContainerStyle={{ height: 200 }}>
-                <EmojiPicker
-
+                {/* <ScrollView nestedScrollEnabled contentContainerStyle={{ height: 200 }}> */}
+                 <EmojiPicker
                       emojis={emojis} // emojis data source see data/emojis
                       recent={recent} // store of recently used emojis
                       autoFocus={true} // autofocus search input
@@ -178,7 +223,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
                       // ]}
                       // defaultCategory={'food'} // optional default category key
                   />
-                </ScrollView>
+                {/* </ScrollView> */}
               </Box>
             )
           }
@@ -189,7 +234,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
               onPress={() => setShowTagModal(true)}
               title='Tag'
               width={70}
-              height={35}
+              height={32}
             />
           </Box>
 

@@ -166,7 +166,7 @@ const PostActionModal = () => {
         />
       ),
     },
-    activePost !== null && id === activePost.user.id && {
+    activePost !== null && id === activePost.user.id && activePost.post_type !== 'poll' && {
       id: 5,
       label: "Edit Post",
       action: () => {
@@ -209,7 +209,7 @@ const PostActionModal = () => {
     <ModalWrapper
       onClose={() => setAll({ showPostAction: false, activePost: null })}
       shouldScrroll={false}
-      snapPoints={["40%"]}
+      snapPoints={['30%', "40%"]}
       ref={ref}
     >
 

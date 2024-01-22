@@ -30,10 +30,10 @@ const FilterTopbar = ({
   return (
     <Box
       borderBottomWidth={0.3}
-      borderBottomColor="lightGrey"
+      borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"}
       height={60}
       borderTopWidth={0.3}
-      borderTopColor="lightGrey"
+      borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"}
       backgroundColor={ isDarkMode ? "secondaryBackGroundColor":'mainBackGroundColor'}
       width="100%"
       flexDirection="row"

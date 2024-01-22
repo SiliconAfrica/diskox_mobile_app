@@ -29,7 +29,8 @@ import useToast from "../../hooks/useToast";
 import { Follower } from "../../models/Follower";
 import { useCreatePostState } from "./state";
 import { URLS } from "../../services/urls";
-import { IPost } from "../../models/post";
+import { IPost, MediaPost } from "../../models/post";
+import { uniq } from "lodash";
 
 const EditPost = ({
   navigation,
@@ -56,7 +57,10 @@ const EditPost = ({
   const [selectedUsers, setSelectedUsers] = React.useState<Follower[]>([]);
   const [followers, setFollowers] = React.useState<Follower[]>([]);
   const [origin, setOrigin] = React.useState("post");
-  const [post, setPost] = React.useState<IPost|null>(null)
+  const [post, setPost] = React.useState<IPost|null>(null);
+  const [removedImagesId, setRemovedImagesId] = React.useState<number[]>([]);
+  const [uploadedFiles, setUploadedFiles] = React.useState<MediaPost[]>([]);
+  const [removedVideoIds, setRemovedVideoIds] = React.useState<number[]>([]);
 
   const theme = useTheme<Theme>();
   const toast = useToast();
@@ -65,8 +69,14 @@ const EditPost = ({
   const fetchPost = useQuery([`getSinglePostByID`, postId], () => httpService.get(`${URLS.GET_SINGLE_POST}/${postId}`), {
     onSuccess: (data) => {
       const item: IPost = data.data.data;
-      console.log(`post type ${item.post_type}`)
+      console.log(`post type ${JSON.stringify(item.post_images)}`)
       setPost(item);
+      if (item.post_images.length > 0 ) {
+        setUploadedFiles((prev) => [...prev, ...item.post_images ])
+      }
+      if (item.post_videos.length > 0) {
+        setUploadedFiles((prev) => [...prev, ...item.post_videos]);
+      }
       if (item.post_type === 'post') {
         setValues(item.description);
         setActive(TAB_BAR_ENUM.POST);
@@ -140,7 +150,7 @@ const EditPost = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post(`${URLS.UPDATE_POST}/${postId}`, data),
     onSuccess: (data) => {
-      toast.show("Post created", { type: "success" });
+      toast.show("Post updated!", { type: "success" });
       // clean up
       setFiles([]);
       reset();
@@ -170,7 +180,8 @@ const EditPost = ({
             files={files}
             handlePicker={handleDocumentPicker as any}
             onDelete={handleMediaDelete}
-            uploadedImages={post?.post_images}
+            uploadedImages={uploadedFiles}
+            removeImage={handleUploadedDelete}
           />
         );
       }
@@ -184,7 +195,8 @@ const EditPost = ({
             onDelete={handleMediaDelete}
             title={title}
             setTitle={handleTitle}
-            uploadedImages={post?.post_images}
+            uploadedImages={uploadedFiles}
+            removeImage={handleUploadedDelete}
           />
         );
       }
@@ -217,7 +229,8 @@ const EditPost = ({
     polls,
     day,
     title,
-    setTitle
+    setTitle,
+    uploadedFiles,
   ]);
 
   const handleCheck = React.useCallback((val: number) => {
@@ -285,6 +298,18 @@ const EditPost = ({
         } as any);
       });
     }
+
+    if (removedImagesId.length > 0) {
+      removedImagesId.map((item) => {
+        formData.append('removed_images', item.toString() as any)
+      })
+    }
+    if (removedVideoIds.length > 0) {
+      removedImagesId.map((item) => {
+        formData.append('removed_videos', item.toString() as any)
+      })
+    }
+    console.log(formData);
     mutate(formData);
   }, [
     value,
@@ -333,10 +358,23 @@ const EditPost = ({
   );
 
   const handleUploadedDelete = React.useCallback(
-    ({ index, clearAll }: { index: number; clearAll: boolean }) => {
-      setPost({ ...post, post_images: post?.post_images.filter((item, i) => i !== index)});
+    ({ id, type }: { id: number; type: 'image'|'video' }) => {
+      
+     if (type === 'image') {
+      const img = uploadedFiles.filter((item) => item.id === id)[0];
+      const newFiles = uploadedFiles.filter((item) => item.id !== img.id);
+      setUploadedFiles(newFiles);
+      const ids = uniq([...removedImagesId, id]);
+      setRemovedImagesId(ids);
+     } else {
+      const img = uploadedFiles.filter((item) => item.id === id)[0];
+      const newFiles = uploadedFiles.filter((item) => item.id !== img.id);
+      const ids = uniq([...removedVideoIds, id]);
+      setUploadedFiles(newFiles);
+      setRemovedVideoIds(prev => [...prev, id]);
+     }
     },
-    [files]
+    [uploadedFiles, removedImagesId, removedVideoIds, setRemovedImagesId, setRemovedVideoIds]
   );
 
   const updateTextWithEmoji = React.useCallback(

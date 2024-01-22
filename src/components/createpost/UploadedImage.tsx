@@ -18,7 +18,7 @@ import { IMAGE_BASE } from '../../utils/httpService'
 interface IProps {
     file: MediaPost;
     index: number;
-    onDelete: (data:{ index?: number, clearAll?: boolean}) => void;
+    onDelete: (data:{ id?: number, type: 'image'|'video'}) => void;
     width?: number | string;
     height?: number | string;
 }
@@ -45,9 +45,9 @@ const UploadedImage = ({ file, index, onDelete, width = 150, height = '90%' }: I
     }, [file]);
   return (
     <Box width={width} height={height} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
-        {/* <Pressable style={{ ...style.deleteButton, backgroundColor: '#000000b9'}} onPress={() => onDelete({ index, clearAll: false })}>
+        <Pressable style={{ ...style.deleteButton, backgroundColor: '#000000b9'}} onPress={() => onDelete({  id: file.id, type: file.type.includes('image') ? 'image':'video' })}>
             <Feather name='trash-2' size={25} color={theme.colors.textColor} />
-        </Pressable> */}
+        </Pressable>
         {RenderItem()}
     </Box>
   )
