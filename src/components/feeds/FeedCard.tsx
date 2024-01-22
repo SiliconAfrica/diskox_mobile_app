@@ -250,7 +250,7 @@ const FeedCard = ({
           }
 
   return (
-    <Box width="100%" bg={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderTopWidth={0.3} borderBottomColor='lightGrey' borderTopColor='lightGrey' style={{ marginBottom: 15 }}>
+    <Box width="100%" bg={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderTopWidth={0.3} borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} style={{ marginBottom: 15 }}>
 
         {/* HEADER SECTION */}
         <Box flexDirection='row' alignItems='flex-start' width='100%'  justifyContent='space-between' paddingHorizontal='s' paddingVertical='m'>
@@ -470,13 +470,13 @@ const FeedCard = ({
            <Box width={'100%'} borderTopWidth={0.3} borderTopColor='lightGrey'>
 
                {/* VIEW SECTION */}
-               <Box flexDirection='row' alignItems='center' marginVertical='m'>
+               <Box flexDirection='row' alignItems='center' marginVertical='s'>
                    <Eye size={18} color={theme.colors.lightGrey} variant='Outline' />
                    <CustomText fontSize={14} color='lightGrey' variant='body' marginLeft='s'>{post.view_count}</CustomText>
                </Box>
 
                {/* REACTION SECTION */}
-               <Box width={'100%'} height={60} flexDirection='row'>
+               <Box width={'100%'} height={40} flexDirection='row'>
                    {/* MAIN REACTION BOX */}
                    <Box width={'40%'} height={32} flexDirection='row' borderRadius={20} borderWidth={0.5} borderColor='lightGrey'>
 

@@ -238,17 +238,14 @@ const CreatePost = ({
       formData.append("community_id", communityId.toString());
     }
     if (activeTab === TAB_BAR_ENUM.POST) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g
       const mentionss = value.match(regex) || [];
       const userIds: number[] = []
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace('[', '').replace(']', '');
         const user = selectedMentionedUsers.map((user) => {
           if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
             userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
             return user.id;
           }
         });
@@ -260,17 +257,14 @@ const CreatePost = ({
     }
 
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g
       const mentionss = value.match(regex) || [];
       const userIds: number[] = []
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace('[', '').replace(']', '');
         const user = selectedMentionedUsers.map((user) => {
           if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
             userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
             return user.id;
           }
         });
@@ -284,17 +278,14 @@ const CreatePost = ({
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g
       const mentionss = value.match(regex) || [];
       const userIds: number[] = []
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace('[', '').replace(']', '');
         const user = selectedMentionedUsers.map((user) => {
           if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
             userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
             return user.id;
           }
         });

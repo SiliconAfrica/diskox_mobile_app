@@ -31,9 +31,10 @@ interface IProps {
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   uploadedImages?: MediaPost[];
+  removeImage?: (data: { id: number, type: 'image'|'video' }) => void;
 }
 
-const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
+export const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
   const [users, setUsers] = React.useState<Mention[]>([]);
   const [total, setTotal] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -106,7 +107,7 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSugge
   );
 };
 
-const WritePost = ({ files, handlePicker, onDelete, description, setDescription, uploadedImages }: IProps) => {
+const WritePost = ({ files, handlePicker, onDelete, description, setDescription, uploadedImages = [], removeImage }: IProps) => {
   const theme = useTheme<Theme>();
 
   const handleChange = (text: string) => {
@@ -135,7 +136,7 @@ const WritePost = ({ files, handlePicker, onDelete, description, setDescription,
         </Box>
 
         {
-          files.length > 0 && (
+           (
             <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
@@ -143,12 +144,12 @@ const WritePost = ({ files, handlePicker, onDelete, description, setDescription,
               </Pressable>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
-              {/* {
-                  uploadedImages.map((item, index) => (
-                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                {
+                  uploadedImages.length > 0 && uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
-                } */}
-                {files.map((file, index) => (
+                }
+                {files.length > 0 && files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
                 {files.length < 10 && (

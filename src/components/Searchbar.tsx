@@ -20,7 +20,7 @@ const Searchbar = () => {
     const { profile_image, username } = useDetailsState((state) => state);
     const { isDarkMode } = useUtilState((state) => state)
   return (
-    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderBottomColor='lightGrey' borderTopWidth={0.3} borderTopColor='lightGrey' width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s' style={{ marginTop:15 }}>
+    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} borderTopWidth={0.3} borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s' style={{ marginTop:15 }}>
          {
                     profile_image && (
                         <Image source={{ uri: `${IMAGE_BASE}${profile_image}` }} style={{ width: 32, height: 32, borderRadius: 17 }} contentFit='cover' />
