@@ -34,7 +34,7 @@ const TabView: React.FC<IProps> = ({ setActive, active }: { setActive: (num: num
         setActive(tab);
     }, [])
   return (
-        <Box width='100%' height={60} flexDirection='row' borderBottomWidth={1} borderBottomColor='secondaryBackGroundColor' paddingHorizontal='m'>
+        <Box width='100%' height={60} flexDirection='row' borderBottomWidth={1} borderBottomColor='borderColor' paddingHorizontal='m'>
 
             <Box flexDirection='row' width='100%'>
 

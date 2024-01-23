@@ -120,9 +120,9 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
       <ScrollView contentContainerStyle={{ flex: 1 }}>
         <Box flex={1} height={350} paddingTop='m' paddingHorizontal='m'>
          
-         <Box marginBottom='m' width={'100%'} flexDirection='row' justifyContent='space-between'  height={60} alignItems='center' borderRadius={10} padding='s' borderWidth={1} borderColor='grey'>
+         <Box marginBottom='m' width={'100%'} flexDirection='row' justifyContent='space-between'  height={60} alignItems='center' borderRadius={10} padding='s' borderWidth={1} borderColor='borderColor'>
 
-          <TextInput value={title} onChangeText={setTitle} style={{ width: '80%', fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`Question Title`} textAlignVertical='top' />
+          <TextInput value={title} onChangeText={setTitle} style={{ width: '80%', fontFamily: 'RedMedium', fontSize: 14, color: theme.colors.textColor }} placeholderTextColor={theme.colors.textColor} multiline placeholder={`Question Title`} textAlignVertical='top' />
 
           <CustomText variant='xs'>{title.length}/200</CustomText>
          </Box>
@@ -145,8 +145,8 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
         </Box>
 
         {
-           (
-            <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
+          files.length > 0 && (
+            <Box height={200} margin='m' borderWidth={0.5} borderColor='borderColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
                 <Feather name='x' size={20} color={theme.colors.textColor} />
@@ -161,7 +161,7 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
-                {files.length < 5 && files.length !== 0 && (
+                { (
                   <Pressable 
                     style={{
                       marginLeft: 20,
@@ -169,8 +169,8 @@ const WriteQuestion = ({ files, handlePicker, onDelete, description, setDescript
                       borderRadius: 15,
                       justifyContent: 'center',
                       alignItems: 'center',
-                      borderWidth: 2,
-                      borderColor: theme.colors.secondaryBackGroundColor,
+                      borderWidth: 0.5,
+                      borderColor: theme.colors.borderColor,
                     }}
                     onPress={() => handlePicker()}
                   >

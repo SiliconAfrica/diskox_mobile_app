@@ -136,8 +136,8 @@ const WritePost = ({ files, handlePicker, onDelete, description, setDescription,
         </Box>
 
         {
-           (
-            <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
+          files.length > 0 && (
+            <Box height={200} margin='m' borderWidth={0.5} borderColor='borderColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
                 <Feather name='x' size={20} color={theme.colors.textColor} />
@@ -149,19 +149,20 @@ const WritePost = ({ files, handlePicker, onDelete, description, setDescription,
                     <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
                 }
-                {files.length > 0 && files.map((file, index) => (
+                {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
-                {files.length < 10 && (
-                  <Pressable style={{
-                    marginLeft: 20,
-                    width: 150, height: '90%',
-                    borderRadius: 15,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderWidth: 2,
-                    borderColor: theme.colors.secondaryBackGroundColor,
-                  }}
+                { (
+                  <Pressable 
+                    style={{
+                      marginLeft: 20,
+                      width: 150, height: '90%',
+                      borderRadius: 15,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: 0.5,
+                      borderColor: theme.colors.borderColor,
+                    }}
                     onPress={() => handlePicker()}
                   >
                     <CustomText variant='body'>Add Media File</CustomText>

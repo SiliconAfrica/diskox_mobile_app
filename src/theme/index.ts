@@ -18,6 +18,10 @@ const COLOR_PALLET = {
   inputBorderColorLight: '#B8B8B8',
   whiteText:'#FCFCFC',
   transparent2: 'transparent',
+  darkMainBg: '#1A1A1A',
+  darkSecondaryBg: '#323433',
+  darkAccntColor: '#3F4040',
+  borderColor: '#4D6275'
 };
 
 const theme = createTheme({
@@ -70,8 +74,8 @@ export const darkTheme: Theme = {
   ...theme,
   colors: {
     ...theme.colors,
-    mainBackGroundColor: "rgb(21, 21, 21)",
-    secondaryBackGroundColor: "rgb(33, 33, 33)",
+    mainBackGroundColor: COLOR_PALLET.darkMainBg,
+    secondaryBackGroundColor: COLOR_PALLET.darkSecondaryBg,
     headerTextColor: COLOR_PALLET.white,
     textColor: COLOR_PALLET.whiteText,
     black: "white",

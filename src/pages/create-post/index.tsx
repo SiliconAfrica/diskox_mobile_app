@@ -30,6 +30,9 @@ import { Follower } from "../../models/Follower";
 import { useCreatePostState } from "./state";
 import { useCommentMentionState } from "../../components/feeds/commentState";
 import Saveasdraft from "../../components/modals/SavaAsDraft";
+import BorderButton from "../../components/general/BorderButton";
+import { includes } from 'lodash'
+import { useGlobalFileState } from "../../states/pickedFileState";
 
 const CreatePost = ({
   navigation,
@@ -38,6 +41,9 @@ const CreatePost = ({
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
+
+  const { files: PickedFiles, clearFiles } = useGlobalFileState((state) => state);
+
   const theOrigin = route?.params?.origin;
   const communityId = route?.params?.communityId;
   const { setAll, visibility } = useModalState((state) => state);
@@ -73,11 +79,17 @@ const CreatePost = ({
     }
   }, []);
 
+  useEffect(() => {
+    if (PickedFiles.length > 0) {
+      setFiles((prev) => [...prev, ...PickedFiles]);
+    }
+  }, [PickedFiles])
+
   // effect for navigation
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!cancel) {
-        if (value !== '' || question !== '' || pollQuestion !== '' || files.length > 0) {
+        if (value !== '' || question !== '' || pollQuestion !== '' || files.length > 0 || polls.length > 0) {
           e.preventDefault();
           setShowModal(true);
         } else {
@@ -156,6 +168,7 @@ const CreatePost = ({
       reset();
       setValues("");
       setCancel(true);
+      clearFiles();
       navigation.goBack();
     },
     onError: (error: any) => {
@@ -233,6 +246,10 @@ const CreatePost = ({
   }, []);
 
   const handleSubmit = React.useCallback(async () => {
+    if (activeTab === TAB_BAR_ENUM.POLL && includes(polls, '')) {
+      toast.show('You must full out all poll options', { type: 'warning' });
+      return;
+    }
     const formData = new FormData();
     if (origin === "community") {
       formData.append("community_id", communityId.toString());
@@ -278,6 +295,7 @@ const CreatePost = ({
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
+      
       const regex = /@\[\S+]/g
       const mentionss = value.match(regex) || [];
       const userIds: number[] = []
@@ -425,7 +443,7 @@ const CreatePost = ({
             isLoading={isLoading}
             title="Post"
             width={100}
-            height={40}
+            height={32}
             onPress={handleSubmit}
           />
         }
@@ -486,10 +504,18 @@ const CreatePost = ({
           </Box>
         </Box>
 
-        <FadedButton
+        {/* <FadedButton
           title="Tag people"
           onPress={() => setShow(true)}
           height={40}
+        /> */}
+        <BorderButton 
+          height={32}
+          title="Tag people"
+          onPress={() => setShow(true)}
+          borderColor={theme.colors.primaryColor}
+          color={theme.colors.primaryColor}
+
         />
       </Box>
 
@@ -505,8 +531,8 @@ const CreatePost = ({
         width={"100%"}
         height={100}
         flexDirection="row"
-        borderTopWidth={2}
-        borderTopColor="secondaryBackGroundColor"
+        borderTopWidth={1}
+        borderTopColor="borderColor"
         paddingHorizontal="m"
         alignItems="center"
         position="relative"

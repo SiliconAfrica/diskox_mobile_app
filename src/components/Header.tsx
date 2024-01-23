@@ -36,7 +36,7 @@ const Header = ({
       justifyContent="space-between"
       alignItems="center"
       borderBottomWidth={0.3}
-      borderBottomColor="lightGrey"
+      borderBottomColor="borderColor"
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         { showMenuButton && <Feather
@@ -106,14 +106,14 @@ const Header = ({
             width={30}
             height={30}
             borderRadius={25}
-            backgroundColor="fadedButtonBgColor"
+            backgroundColor="secondaryBackGroundColor"
             justifyContent="center"
             alignItems="center"
           >
-            <Ionicons
-              name="add-outline"
-              size={25}
-              color={theme.colors.primaryColor}
+            <Feather
+              name="edit-2"
+              size={20}
+              color={theme.colors.textColor}
               onPress={() => navigation.navigate("create-post")}
             />
           </Box>

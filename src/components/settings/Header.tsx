@@ -19,7 +19,7 @@ const SettingsHeader = ({ title, showSave = false, onSave, handleArrowPressed = 
   const theme = useTheme<Theme>();
   
   return (
-    <Box width='100%' height={100} paddingHorizontal='m' paddingTop='l' backgroundColor='mainBackGroundColor' flexDirection='row' justifyContent='space-between' alignItems='center' borderBottomWidth={2} borderBottomColor='secondaryBackGroundColor'>
+    <Box width='100%' height={100} paddingHorizontal='m' paddingTop='l' backgroundColor='mainBackGroundColor' flexDirection='row' justifyContent='space-between' alignItems='center' borderBottomWidth={1} borderBottomColor='borderColor'>
         <Box flexDirection='row' alignItems='center'>
           <Ionicons name='arrow-back-outline' size={25} color={theme.colors.textColor} onPress={handleArrowPressed ? handleArrowPressed: null} />
           <CustomText variant='subheader' marginLeft='s'>{title}</CustomText>
