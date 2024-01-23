@@ -12,14 +12,15 @@ interface IProps {
     isLoading?: boolean;
     borderRadius?: number;
     borderColor?: string;
+    color?: string;
 }
 
-const BorderButton = ({ title, onPress, width = 120, height = 44, isLoading = false, borderRadius = (height as number) / 2 || 25, borderColor }: IProps) => {
+const BorderButton = ({ title, onPress, width = 120, height = 44, isLoading = false, borderRadius = (height as number) / 2 || 25, borderColor, color = 'white' }: IProps) => {
     const theme = useTheme<Theme>();
   return (
     <Pressable onPress={onPress} style={{ borderWidth: 1, borderColor: borderColor ?? theme.colors.mainBackGroundColor, borderRadius:  borderRadius, width, height, justifyContent: 'center', alignItems: 'center', }}>
         { isLoading && <ActivityIndicator color={'white'} size='small' /> }
-        { !isLoading && <CustomText variant="subheader" color='textColor' fontSize={17}>{title}</CustomText> }
+        { !isLoading && <CustomText variant="subheader" color='textColor' fontSize={17} style={{ color }}>{title}</CustomText> }
     </Pressable>
   )
 }

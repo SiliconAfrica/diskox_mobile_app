@@ -19,7 +19,7 @@ import httpService, { IMAGE_BASE } from '../../utils/httpService';
 import { URLS } from '../../services/urls';
 import { PaginatedResponse } from '../../models/PaginatedResponse';
 import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
-import { uniqBy } from 'lodash';
+import { includes, uniqBy } from 'lodash';
 import { Image } from 'expo-image'
 import { MediaPost } from '../../models/post'
 import UploadedImage from './UploadedImage'
@@ -122,9 +122,20 @@ const Poll = ({ choice, index, deletePoll, handleChange, uploadedImages }: {
 }) => {
   const theme = useTheme<Theme>();
   return (
-    <Box flexDirection='row' width='100%' height={50} borderRadius={10} borderWidth={2} borderColor='grey' alignItems='center' justifyContent='space-between' paddingHorizontal='m' marginBottom='s' >
-      <TextInput placeholder='Choice' placeholderTextColor={theme.colors.textColor} value={choice} onChangeText={(e) => handleChange(e, index)} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular', flex: 0.8 }} />
-      <Feather name='x' size={25} color={theme.colors.textColor} onPress={() => deletePoll(index)} style={{ color: theme.colors.textColor }} />
+    <Box flexDirection='row' width='100%' height={50} borderRadius={10} borderWidth={1} borderColor='borderColor' alignItems='center' justifyContent='space-between' paddingLeft='m' marginBottom='s' overflow='hidden' >
+      <TextInput placeholder={`Option ${index+1}`} placeholderTextColor={theme.colors.textColor} value={choice} onChangeText={(e) => handleChange(e, index)} style={{ color: theme.colors.textColor, fontFamily: 'RedRegular', flex: 0.8 }} />
+      <Pressable
+        onPress={() => deletePoll(index)} 
+        style={{
+          width: '15%',
+          height: '100%',
+          backgroundColor: theme.colors.secondaryBackGroundColor,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <Feather name='x' size={20} color={theme.colors.textColor} style={{ color: theme.colors.textColor }} />
+      </Pressable>
     </Box>
   )
 }
@@ -132,7 +143,7 @@ const Poll = ({ choice, index, deletePoll, handleChange, uploadedImages }: {
 const WritePoll = ({ description, setDescription, files, handlePicker, onDelete, setPolls: handlePollChange, deletePoll, addPoll, polls, day, setDay, uploadedImages }: IProps) => {
   const theme = useTheme<Theme>();
   const [showDays, setShowDays] = React.useState(false);
-  const [dayLabel, setDayLabel] = React.useState('1 day');
+  const [dayLabel, setDayLabel] = React.useState('2 days');
   const days: { name: string, value: number}[] = [
     {
       name: '2 days',
@@ -180,13 +191,13 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
             value={description}
             onChange={setDescription} 
             containerStyle={{ minHeight: 80,  paddingHorizontal: 10, marginTop:20  }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor  }}
-           placeholderTextColor={theme.colors.textColor} multiline placeholder={`what doyou want to ask?`} textAlignVertical='top' />
+           placeholderTextColor={theme.colors.textColor} multiline placeholder={`Describe your poll`} textAlignVertical='top' />
         </Box>
 
          <Box width='100%' paddingHorizontal='m' zIndex={5}>
 
-            <Box width='100%' borderRadius={20} backgroundColor='secondaryBackGroundColor' padding='m'>
-              <CustomText>Create your poll</CustomText>
+            <Box width='100%' borderRadius={20} borderWidth={0.5} borderColor='borderColor' padding='m'>
+              {/* <CustomText variant='subheader' fontSize={16}>Describe your poll</CustomText> */}
 
               <Box flex={1} marginTop='m'>
                 {
@@ -197,13 +208,13 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
               </Box>
 
               <Box width='100%' height={60} flexDirection='row' justifyContent='space-between' marginTop='m' alignItems='center' zIndex={10} >
-                <PrimaryButton title='Add option' height={40} onPress={() => addPoll()} />
+                <PrimaryButton borderRadius={5} width={120} title='Add option' height={40} onPress={() => addPoll()} />
 
                 <Box position='relative'  flexDirection='row' justifyContent='flex-end' alignItems='center'>
                   <Feather name='clock' size={20} color={theme.colors.textColor} />
                   <CustomText variant='xs' marginLeft='s'>Duration</CustomText>
 
-                  <Pressable onPress={() => setShowDays(prev => !prev)} style={{ height: 40, width:85, borderRadius: 10, borderWidth: 2, borderColor: theme.colors.grey, flexDirection: 'row', justifyContent:'space-between',alignItems: 'center', paddingHorizontal: 7, marginLeft: 10 }}>
+                  <Pressable onPress={() => setShowDays(prev => !prev)} style={{ height: 40, width:85, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.borderColor, flexDirection: 'row', justifyContent:'space-between',alignItems: 'center', paddingHorizontal: 7, marginLeft: 10 }}>
                     <CustomText>{dayLabel}</CustomText>
                     <Feather name={showDays ? 'chevron-up':'chevron-down'} size={15} color={theme.colors.textColor} />
                   </Pressable>
@@ -213,7 +224,7 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
                       <Box position='absolute' width={100} borderRadius={10} zIndex={10} backgroundColor='mainBackGroundColor' top={40}>
                         {
                           days.map((item, i) => (
-                            <Pressable onPress={() => {setDay(item.value.toString()); setDayLabel(item.name)}} key={i.toString()} style={{ width: '100%', height: 40, justifyContent: 'center', paddingLeft: 10, borderBottomWidth:i === days.length - 1 ? 0:1, borderBottomColor: theme.colors.secondaryBackGroundColor }}>
+                            <Pressable onPress={() => {setDay(item.value.toString()); setDayLabel(item.name)}} key={i.toString()} style={{ width: '100%', height: 40, justifyContent: 'center', paddingLeft: 10, borderBottomWidth:i === days.length - 1 ? 0:0.3, borderBottomColor: theme.colors.borderColor }}>
                               <CustomText >{item.name}</CustomText>
                             </Pressable>
                           ))
@@ -225,6 +236,10 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
                 </Box>
               </Box>
 
+              { includes(polls, '') && (
+                <CustomText variant='body' fontSize={14} style={{ color: 'red' }}>You must fill in the options</CustomText>
+              )}
+
             </Box>
 
          </Box>
@@ -232,33 +247,34 @@ const WritePoll = ({ description, setDescription, files, handlePicker, onDelete,
           <Box width={100} height={200}></Box>
          )}
 
-         {
+        {
           files.length > 0 && (
-            <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20} zIndex={0}>
+            <Box height={200} margin='m' borderWidth={0.5} borderColor='borderColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
                 <Feather name='x' size={20} color={theme.colors.textColor} />
               </Pressable>
 
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100, zIndex: 1  }}>
-              {/* {
-                  uploadedImages.map((item, index) => (
-                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
+                {/* {
+                  uploadedImages.length > 0 && uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
                 } */}
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
-                {files.length < 5 && (
-                  <Pressable style={{
-                    marginLeft: 20,
-                    width: 150, height: '90%',
-                    borderRadius: 15,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderWidth: 2,
-                    borderColor: theme.colors.secondaryBackGroundColor,
-                  }}
+                { (
+                  <Pressable 
+                    style={{
+                      marginLeft: 20,
+                      width: 150, height: '90%',
+                      borderRadius: 15,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderWidth: 0.5,
+                      borderColor: theme.colors.borderColor,
+                    }}
                     onPress={() => handlePicker()}
                   >
                     <CustomText variant='body'>Add Media File</CustomText>
