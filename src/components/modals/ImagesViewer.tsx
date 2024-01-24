@@ -7,6 +7,7 @@ import useToast from '../../hooks/useToast'
 import { Image } from 'expo-image'
 import { IMAGE_BASE } from '../../utils/httpService'
 import CustomText from '../general/CustomText'
+import PagerView from 'react-native-pager-view';
 
 const ImagesViewer = () => {
     const toast = useToast();
@@ -35,54 +36,39 @@ const ImagesViewer = () => {
             <CloseCircle size={30} color='white' variant='Outline' onPress={() => setAll({ imageViewer: false, activeImages: [] })} />
         </Box>
         <Box width={'100%'} height={'60%'} flexDirection='row' position='relative'>
-            {/* ARROW LEFT */}
-            {activeImages.length > 1 && (
-                <Pressable style={{
-                    width: 30,
-                    height: '100%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    left: 0,
-                    zIndex: 10
-                }} 
-                    onPress={backward}
-                >
-                    <ArrowLeft2 size={30} color='white' variant='Outline' />
-                </Pressable>
-            )}
 
             {/* MAIN AREA */}
-            <Box flex={1} style={{ backgroundColor: 'black' }}>
-                <Image source={{ uri: `${IMAGE_BASE}${activeImages[index]}`}} contentFit='contain' style={{
+            <PagerView style={{ backgroundColor: 'black', flex: 1 }} initialPage={0} onPageSelected={(e) => setIndex(e.nativeEvent.position)}>
+                {activeImages.map((item, indx) => (
+                    <Box
+                    width={'100%'}
+                    height={'100%'}
+                    key={indx.toString()}
+                >
+                    <Image source={{ uri: `${IMAGE_BASE}${activeImages[indx]}`}} contentFit='contain' style={{
                     width: '100%',
                     height: '100%',
                     ...StyleSheet.absoluteFillObject
                 }} />
-            </Box>
+                </Box>
+                ))}
+            </PagerView>
 
-            {/* ARROW RIGHT */}
-            {activeImages.length > 1 && (
-                <Pressable  style={{
-                    width: 30,
-                    height: '100%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    right: 0
-                }} 
-                onPress={forward}
-                >
-                    <ArrowRight2 size={30} color='white' variant='Outline' />
-                </Pressable>
-            )}
         </Box>
             
-        <Box width={'100%'} height={50} alignItems='center' justifyContent='center' paddingRight='s'>
-           <Box width={70} height={30} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#000000dd' }}>
+       { activeImages.length === 1 && (
+         <Box width={'100%'} height={50} alignItems='center' justifyContent='center' paddingRight='s'>
+            <Box width={70} height={30} borderRadius={20} justifyContent='center' alignItems='center' style={{ backgroundColor: '#000000dd' }}>
                 <CustomText variant='body' style={{ color: 'white' }}>{index+1} / {len}</CustomText>
-           </Box>
+            </Box>
         </Box>
+       )}
+       
+       <Box width={'100%'} flexDirection='row' justifyContent='center' alignItems='center'>
+        { activeImages.length > 1 && activeImages.map((item, indx) => (
+            <Box key={indx.toString()} width={ index === indx ? 10:5 } height={index === indx ? 10:5} marginHorizontal='s' borderRadius={20} bg={indx === index ? 'primaryColor':'secondaryBackGroundColor'} />
+        ))}
+       </Box>
 
     </Box>
 
