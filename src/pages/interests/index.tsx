@@ -23,6 +23,7 @@ import { da } from "date-fns/locale";
 
 const Interests = ({
   navigation,
+  route,
 }: NativeStackScreenProps<RootStackParamList, "categories">) => {
   // states
   const [interests, setInterests] = React.useState<IInterest[]>([]);
@@ -33,7 +34,8 @@ const Interests = ({
   const { username } = useDetailsState((state) => state);
   const toast = useToast();
   const theme = useTheme<Theme>();
-
+  const shouldSelectCommunitiesNext =
+    route?.params?.shouldSelectCommunitiesNext;
   // get user interests
   const { isLoading, isError } = useQuery(
     ["getUserInterests", username],
@@ -87,7 +89,6 @@ const Interests = ({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.UPDATE_INTEREST}`, data),
     onSuccess: (data) => {
-      console.log(data.data);
       if (data?.data?.code === CUSTOM_STATUS_CODE.INTERNAL_SERVER_ERROR) {
         toast.show(
           data?.data?.message || "An error occured while getting interests",
@@ -95,7 +96,11 @@ const Interests = ({
         );
       } else {
         toast.show("Successful", { type: "success" });
-        navigation.navigate("home");
+        if (shouldSelectCommunitiesNext) {
+          navigation.navigate("select-communities");
+        } else {
+          navigation.navigate("home");
+        }
       }
     },
     onError: (error: any) => {
