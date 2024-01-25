@@ -20,6 +20,8 @@ import { PaginatedResponse } from '../../models/PaginatedResponse';
 import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
 import { uniqBy } from 'lodash';
 import { Image } from 'expo-image'
+import { MediaPost } from '../../models/post';
+import UploadedImage from './UploadedImage';
 
 
 interface IProps {
@@ -28,6 +30,7 @@ interface IProps {
   onDelete: (data: { index?: number, clearAll?: boolean }) => void;
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
+  uploadedImages?: MediaPost[];
 }
 
 const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSuggestionPress }) => {
@@ -103,7 +106,7 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({ keyword, onSugge
   );
 };
 
-const WritePost = ({ files, handlePicker, onDelete, description, setDescription }: IProps) => {
+const WritePost = ({ files, handlePicker, onDelete, description, setDescription, uploadedImages }: IProps) => {
   const theme = useTheme<Theme>();
 
   const handleChange = (text: string) => {
@@ -140,6 +143,11 @@ const WritePost = ({ files, handlePicker, onDelete, description, setDescription 
               </Pressable>
 
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
+              {/* {
+                  uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                  ))
+                } */}
                 {files.map((file, index) => (
                   <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}

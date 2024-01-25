@@ -41,6 +41,8 @@ import TrendingHashtags from "../pages/TrendingHastags";
 import Register from "../pages/register";
 import SignIn from "../pages/signin";
 import FollowingPage from "../pages/following";
+import EditPost from "../pages/create-post/EditPost";
+import SelectCommunities from "../pages/selectCommunities";
 
 export type RootStackParamList = {
   home: undefined;
@@ -77,15 +79,21 @@ export type RootStackParamList = {
   blocked: undefined;
   "notifications-settings": undefined;
   list: undefined;
-  categories: undefined;
-  community: { id: number, data: ICommunity };
-  "community-members": { id: number, username: string };
-  "community-settings": { id:number, username: string; type: COMMUNITY_SETTING_TYPE };
-  "verification": { id: number },
-  "bookmark": undefined;
-  "hashtag": { hashTag: string },
+  categories: { shouldSelectCommunitiesNext: boolean };
+  "select-communities": undefined;
+  community: { id: number; data: ICommunity };
+  "community-members": { id: number; username: string };
+  "community-settings": {
+    id: number;
+    username: string;
+    type: COMMUNITY_SETTING_TYPE;
+  };
+  verification: { id: number };
+  bookmark: undefined;
+  hashtag: { hashTag: string };
   "trending-hashtags": undefined;
   following: { id: number };
+  "edit-post": { postId: number; type: number };
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -145,6 +153,10 @@ const MainNavigation = (): JSX.Element => {
           component={CommunitySettings}
         />
         <RootStackNavigation.Screen name="categories" component={Interests} />
+        <RootStackNavigation.Screen
+          name="select-communities"
+          component={SelectCommunities}
+        />
       </RootStackNavigation.Group>
 
       {/* UNAUTHENTICATED FLOW */}
@@ -185,14 +197,8 @@ const MainNavigation = (): JSX.Element => {
           name="singleKnowledge"
           component={SingleKnowledge}
         />
-         <RootStackNavigation.Screen
-          name="bookmark"
-          component={Bookmarks}
-        />
-        <RootStackNavigation.Screen
-          name="hashtag"
-          component={Hashtag}
-        />
+        <RootStackNavigation.Screen name="bookmark" component={Bookmarks} />
+        <RootStackNavigation.Screen name="hashtag" component={Hashtag} />
         <RootStackNavigation.Screen
           name="trending-hashtags"
           component={TrendingHashtags}
@@ -203,6 +209,7 @@ const MainNavigation = (): JSX.Element => {
           component={FollowingPage}
         />
 
+        <RootStackNavigation.Screen name="edit-post" component={EditPost} />
       </RootStackNavigation.Group>
     </RootStackNavigation.Navigator>
   );

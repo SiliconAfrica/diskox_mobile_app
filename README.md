@@ -25,3 +25,7 @@ For Wisdom:
 - After unsuspending user, the user is still showing in suspension
 
 is_member_request_pending - value to check before pending
+
+# To note
+
+After filling phone number and country proceed to topics. DOn't pop up the "Your profile is 50% complete"

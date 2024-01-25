@@ -503,7 +503,7 @@ const CreatePost = ({
       </Box>
 
       {/* TABVIEW */}
-      <TabView setActive={(data) => setActive(data)} />
+      <TabView active={activeTab} setActive={(data) => setActive(data)} />
 
       <Box flex={1}>
         <ScrollView style={{ flex: 1 }}>{toggleTab()}</ScrollView>
