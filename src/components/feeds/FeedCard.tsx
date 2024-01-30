@@ -250,7 +250,7 @@ const FeedCard = ({
           }
 
   return (
-    <Box width="100%" bg={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderTopWidth={0.3} borderBottomColor='lightGrey' borderTopColor='lightGrey' style={{ marginBottom: 15 }}>
+    <Box width="100%" bg={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderTopWidth={0.3} borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} style={{ marginBottom: 15 }}>
 
         {/* HEADER SECTION */}
         <Box flexDirection='row' alignItems='flex-start' width='100%'  justifyContent='space-between' paddingHorizontal='s' paddingVertical='m'>
@@ -278,7 +278,7 @@ const FeedCard = ({
                 {/* DETAILS BOX */}
                 <Box width={'100%'}  marginLeft='s' overflow='hidden'>
                     <Box width={'100%'} flexWrap='wrap' flexDirection='row' alignItems='center'>
-                        <CustomText marginRight='s' variant='xs' >{name} @{username}
+                        <CustomText marginRight='s' variant='subheader' fontSize={14} >{name} @{username}
                           {community_id === null && tags.length===1 && (
                             <>
                               tagged  <CustomText variant='subheader' fontSize={14}>{tags[0].user.name } </CustomText>
@@ -297,10 +297,10 @@ const FeedCard = ({
                           )}
                         </CustomText>
                           { myId !== userId && (
-                              <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={22} width={65} spinnerColor={theme.colors.textColor} onPress={handleFollow} color={theme.colors.fadedButtonBgColor} textColor={theme.colors.primaryColor} variant='xs' />
+                              <CustomButton title={post.user.isFollowing === 1 ? 'Following' : 'Follow'} isLoading={follow.isLoading} height={22} width={65} spinnerColor={theme.colors.textColor} onPress={handleFollow} color={isDarkMode ? 'black':theme.colors.fadedButtonBgColor} textColor={isDarkMode ? 'white':theme.colors.primaryColor} variant='subheader' />
                           )}
                     </Box>
-                    <CustomText variant='xs' marginTop='s'>{moment(created_at).fromNow()}</CustomText>
+                    <CustomText variant='body' fontSize={12} color='lightGrey'>{moment(created_at).fromNow()}</CustomText>
                 </Box>
            </Box>
 
@@ -467,18 +467,18 @@ const FeedCard = ({
 
         { showReactions && (
            <Box width='100%' paddingHorizontal='s'>
-           <Box width={'100%'} borderTopWidth={0.3} borderTopColor='lightGrey'>
+           <Box width={'100%'} borderTopWidth={0.3} borderTopColor='borderColor'>
 
                {/* VIEW SECTION */}
-               <Box flexDirection='row' alignItems='center' marginVertical='m'>
+               <Box flexDirection='row' alignItems='center' marginVertical='s'>
                    <Eye size={18} color={theme.colors.lightGrey} variant='Outline' />
                    <CustomText fontSize={14} color='lightGrey' variant='body' marginLeft='s'>{post.view_count}</CustomText>
                </Box>
 
                {/* REACTION SECTION */}
-               <Box width={'100%'} height={60} flexDirection='row'>
+               <Box width={'100%'} height={40} flexDirection='row'>
                    {/* MAIN REACTION BOX */}
-                   <Box width={'40%'} height={32} flexDirection='row' borderRadius={20} borderWidth={0.5} borderColor='lightGrey'>
+                   <Box width={'40%'} height={32} flexDirection='row' borderRadius={20} borderWidth={0.5} borderColor='borderColor'>
 
                        {/* UPVOTE */}
                        <Pressable style={{
@@ -488,7 +488,7 @@ const FeedCard = ({
                            alignItems: 'center',
                            flexDirection: 'row',
                            borderRightWidth: 0.5,
-                           borderRightColor: theme.colors.lightGrey,
+                          //  borderRightColor: theme.colors.borderColor,
                        }} 
                        onPress={handleUpVote}
                        >

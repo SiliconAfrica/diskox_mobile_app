@@ -12,6 +12,7 @@ import { Theme } from '../../theme'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../navigation/MainNavigation'
+import { useUtilState } from '../../states/util'
 
 
 const ShareChip = ({
@@ -36,6 +37,7 @@ const ShareModal = () => {
     const ref = useRef<BottomSheetModal>();
     const theme = useTheme<Theme>();
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'post'>>();
+    const { isLoggedIn } = useUtilState((state) => state)
 
     let medias = ['Facebook', 'Twitter', 'LinkedIn', 'Whatsapp'];
 
@@ -104,17 +106,19 @@ const ShareModal = () => {
     <ModalWrapper
         onClose={() => setAll({ showShare: false, postId: 0, activePost: null })}
         shouldScrroll
-        snapPoints={['50%']}
+        snapPoints={ isLoggedIn ? ['45%', '50%'] : ['35%', '40%']}
         ref={ref}
     >
-        <Box borderBottomWidth={2} borderBottomColor='secondaryBackGroundColor' paddingBottom='s'>
-            <ShareChip icon={
-                <Ionicons name='reload-circle-outline' size={25} color={theme.colors.primaryColor} />
-            } 
-                label='Repost on Diskos'
-                action={handleRepost}
-            />
-        </Box>
+        {isLoggedIn && (
+            <Box borderBottomWidth={2} borderBottomColor='secondaryBackGroundColor' paddingBottom='s'>
+                <ShareChip icon={
+                    <Ionicons name='reload-circle-outline' size={25} color={theme.colors.primaryColor} />
+                } 
+                    label='Repost on Diskos'
+                    action={handleRepost}
+                />
+            </Box>
+        )}
         {medias.map((item, i) => (
             <ShareChip key={i} icon={<Ionicons name={name(item).name as any} size={25} color={name(item).color} />} label={item} action={handleShare} />
         ))}

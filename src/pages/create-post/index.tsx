@@ -30,6 +30,9 @@ import { Follower } from "../../models/Follower";
 import { useCreatePostState } from "./state";
 import { useCommentMentionState } from "../../components/feeds/commentState";
 import Saveasdraft from "../../components/modals/SavaAsDraft";
+import BorderButton from "../../components/general/BorderButton";
+import { includes } from "lodash";
+import { useGlobalFileState } from "../../states/pickedFileState";
 
 const CreatePost = ({
   navigation,
@@ -38,6 +41,11 @@ const CreatePost = ({
   const { profile_image, name, username, id } = useDetailsState(
     (state) => state
   );
+
+  const { files: PickedFiles, clearFiles } = useGlobalFileState(
+    (state) => state
+  );
+
   const theOrigin = route?.params?.origin;
   const communityId = route?.params?.communityId;
   const { setAll, visibility } = useModalState((state) => state);
@@ -55,15 +63,17 @@ const CreatePost = ({
   const [followers, setFollowers] = React.useState<Follower[]>([]);
   const [origin, setOrigin] = React.useState("post");
   const [showModal, setShowModal] = React.useState(false);
-  const [status, setStatus] = React.useState<'active'|'draft'>('active');
+  const [status, setStatus] = React.useState<"active" | "draft">("active");
   const [cancel, setCancel] = React.useState(false);
-
 
   const theme = useTheme<Theme>();
   const toast = useToast();
   const { tags, setTags, reset } = useCreatePostState((state) => state);
-  const { users, selectedUsers: selectedMentionedUsers, reset: resetMention } = useCommentMentionState((state) => state)
-
+  const {
+    users,
+    selectedUsers: selectedMentionedUsers,
+    reset: resetMention,
+  } = useCommentMentionState((state) => state);
 
   useEffect(() => {
     if (theOrigin && theOrigin === "community") {
@@ -73,30 +83,42 @@ const CreatePost = ({
     }
   }, []);
 
+  useEffect(() => {
+    if (PickedFiles.length > 0) {
+      setFiles((prev) => [...prev, ...PickedFiles]);
+    }
+  }, [PickedFiles]);
+
   // effect for navigation
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
       if (!cancel) {
-        if (value !== '' || question !== '' || pollQuestion !== '' || files.length > 0) {
+        if (
+          value !== "" ||
+          question !== "" ||
+          pollQuestion !== "" ||
+          files.length > 0 ||
+          polls.length > 0
+        ) {
           e.preventDefault();
           setShowModal(true);
         } else {
           return;
         }
-      }  else {
+      } else {
         return;
       }
-    })
+    });
     return unsubscribe;
-  }, [navigation, value, question,pollQuestion, files, cancel]);
+  }, [navigation, value, question, pollQuestion, files, cancel]);
 
-  React.useEffect(() =>{
-    (async function() {
-      if (status === 'draft') {
+  React.useEffect(() => {
+    (async function () {
+      if (status === "draft") {
         handleSubmit();
       }
-    })()
-  },[status])
+    })();
+  }, [status]);
   // functions
   const editPoll = React.useCallback(
     (e: string, i: number) => {
@@ -150,12 +172,13 @@ const CreatePost = ({
       toast.show("Post created", { type: "success" });
       // clean up
       setFiles([]);
-      setValues("")
-      setQuestion("")
-      setPollQuestion("")
+      setValues("");
+      setQuestion("");
+      setPollQuestion("");
       reset();
       setValues("");
       setCancel(true);
+      clearFiles();
       navigation.goBack();
     },
     onError: (error: any) => {
@@ -233,78 +256,79 @@ const CreatePost = ({
   }, []);
 
   const handleSubmit = React.useCallback(async () => {
+    if (activeTab === TAB_BAR_ENUM.POLL && includes(polls, "")) {
+      toast.show("You must full out all poll options", { type: "warning" });
+      return;
+    }
     const formData = new FormData();
     if (origin === "community") {
       formData.append("community_id", communityId.toString());
     }
     if (activeTab === TAB_BAR_ENUM.POST) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g;
       const mentionss = value.match(regex) || [];
-      const userIds: number[] = []
+      const userIds: number[] = [];
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace("[", "").replace("]", "");
         const user = selectedMentionedUsers.map((user) => {
-          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
-            userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
+          if (
+            user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))
+          ) {
+            userIds.push(user.id);
             return user.id;
           }
         });
-      })
-      const newText = value.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
-      formData.append('mentioned_users[]', userIds as any);
+      });
+      const newText = value.replace(/@\[([^\]]*)\]\(\)/g, "@$1");
+      formData.append("mentioned_users[]", userIds as any);
       formData.append("description", newText);
       formData.append("post_type", "post");
     }
 
     if (activeTab === TAB_BAR_ENUM.QUESTION) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g;
       const mentionss = value.match(regex) || [];
-      const userIds: number[] = []
+      const userIds: number[] = [];
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace("[", "").replace("]", "");
         const user = selectedMentionedUsers.map((user) => {
-          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
-            userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
+          if (
+            user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))
+          ) {
+            userIds.push(user.id);
             return user.id;
           }
         });
-      })
-      const newText = question.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+      });
+      const newText = question.replace(/@\[([^\]]*)\]\(\)/g, "@$1");
 
       formData.append("description", newText);
       formData.append("post_type", "question");
-      formData.append('title', title);
-      formData.append('mentioned_users[]', userIds as any);
+      formData.append("title", title);
+      formData.append("mentioned_users[]", userIds as any);
     }
 
     if (activeTab === TAB_BAR_ENUM.POLL) {
-      const regex = /@\[\w+/g 
+      const regex = /@\[\S+]/g;
       const mentionss = value.match(regex) || [];
-      const userIds: number[] = []
+      const userIds: number[] = [];
       mentionss.forEach((item) => {
-        const newItem = item.replace('[', '');
-
+        const newItem = item.replace("[", "").replace("]", "");
         const user = selectedMentionedUsers.map((user) => {
-          if (user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))) {
-            userIds.push(user.id)
-            
-            //formData.append('mentioned_users', user.id.toString())
+          if (
+            user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))
+          ) {
+            userIds.push(user.id);
             return user.id;
           }
         });
-      })
-      const newText = pollQuestion.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
+      });
+      const newText = pollQuestion.replace(/@\[([^\]]*)\]\(\)/g, "@$1");
 
       formData.append("description", newText);
       formData.append("post_type", "poll");
       formData.append("poll_duration", day);
-      formData.append('mentioned_users[]', userIds as any);
+      formData.append("mentioned_users[]", userIds as any);
       polls.map((item) => {
         formData.append("polls[]", item);
       });
@@ -357,7 +381,7 @@ const CreatePost = ({
     question,
     day,
     activeTab,
-    status
+    status,
   ]);
 
   const handleDocumentPicker = React.useCallback(
@@ -421,11 +445,16 @@ const CreatePost = ({
         tags={tags}
         setTags={(tags) => handleCheck(tags)}
       />
-      <Saveasdraft isLoading={isLoading} isVisible={showModal} close={() => {
-        setShowModal(false);
-        setCancel(true)
-        navigation.goBack();
-      } } action={() => setStatus("draft")} />
+      <Saveasdraft
+        isLoading={isLoading}
+        isVisible={showModal}
+        close={() => {
+          setShowModal(false);
+          setCancel(true);
+          navigation.goBack();
+        }}
+        action={() => setStatus("draft")}
+      />
       <SettingsHeader
         showSave={true}
         onSave={() => {}}
@@ -434,7 +463,7 @@ const CreatePost = ({
             isLoading={isLoading}
             title="Post"
             width={100}
-            height={40}
+            height={32}
             onPress={handleSubmit}
           />
         }
@@ -495,10 +524,17 @@ const CreatePost = ({
           </Box>
         </Box>
 
-        <FadedButton
+        {/* <FadedButton
           title="Tag people"
           onPress={() => setShow(true)}
           height={40}
+        /> */}
+        <BorderButton
+          height={32}
+          title="Tag people"
+          onPress={() => setShow(true)}
+          borderColor={theme.colors.primaryColor}
+          color={theme.colors.primaryColor}
         />
       </Box>
 
@@ -514,8 +550,8 @@ const CreatePost = ({
         width={"100%"}
         height={100}
         flexDirection="row"
-        borderTopWidth={2}
-        borderTopColor="secondaryBackGroundColor"
+        borderTopWidth={1}
+        borderTopColor="borderColor"
         paddingHorizontal="m"
         alignItems="center"
         position="relative"

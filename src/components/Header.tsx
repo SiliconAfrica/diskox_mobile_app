@@ -13,11 +13,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { useDetailsState } from "../states/userState";
 import { IMAGE_BASE } from "../utils/httpService";
 
-const Header = ({
-  showMenuButton = true
-}: {
-  showMenuButton?: boolean
-}) => {
+const Header = ({ showMenuButton = true }: { showMenuButton?: boolean }) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>();
   const [isDarkMode, isLoggedIn] = useUtilState((state) => [
@@ -36,15 +32,17 @@ const Header = ({
       justifyContent="space-between"
       alignItems="center"
       borderBottomWidth={0.3}
-      borderBottomColor="lightGrey"
+      borderBottomColor="borderColor"
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        { showMenuButton && <Feather
-          name="menu"
-          size={25}
-          color={theme.colors.textColor}
-          onPress={() => navigation.openDrawer()}
-        />}
+        {showMenuButton && (
+          <Feather
+            name="menu"
+            size={25}
+            color={theme.colors.textColor}
+            onPress={() => navigation.openDrawer()}
+          />
+        )}
         <Image
           source={
             isDarkMode
@@ -106,14 +104,14 @@ const Header = ({
             width={30}
             height={30}
             borderRadius={25}
-            backgroundColor="fadedButtonBgColor"
+            backgroundColor="secondaryBackGroundColor"
             justifyContent="center"
             alignItems="center"
           >
-            <Ionicons
-              name="add-outline"
-              size={25}
-              color={theme.colors.primaryColor}
+            <Feather
+              name="edit-2"
+              size={20}
+              color={theme.colors.textColor}
               onPress={() => navigation.navigate("create-post")}
             />
           </Box>

@@ -14,7 +14,7 @@ interface IProps {
     color?: string;
     textColor?: string;
     spinnerColor?: string;
-    variant?:'xs'|'body';
+    variant?:'xs'|'body'|'subheader';
 }
 
 const CustomButton = ({ title, onPress, width = 120, height = 32, isLoading = false, color='grey', textColor = 'white', spinnerColor = 'white', variant = 'body'}: IProps) => {

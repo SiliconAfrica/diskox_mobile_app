@@ -57,7 +57,7 @@ const style = StyleSheet.create({
         position: 'absolute',
         right: 0,
         bottom: -1,
-        height: 30,
+        height: 50,
         width: '100%',
         borderRadius: 0,
         justifyContent: 'center',

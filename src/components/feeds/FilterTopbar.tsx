@@ -30,10 +30,10 @@ const FilterTopbar = ({
   return (
     <Box
       borderBottomWidth={0.3}
-      borderBottomColor="lightGrey"
+      borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"}
       height={60}
       borderTopWidth={0.3}
-      borderTopColor="lightGrey"
+      borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"}
       backgroundColor={ isDarkMode ? "secondaryBackGroundColor":'mainBackGroundColor'}
       width="100%"
       flexDirection="row"
@@ -55,13 +55,13 @@ const FilterTopbar = ({
           backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
-        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
+        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? 'white': theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
         <CustomText
           variant="subheader"
           fontSize={14}
-          color={
-            activeTab === FILTER_BAR_ENUM.TRENDING ? "primaryColor" : "lightGrey"
-          }
+          style={{
+            color: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? "white": theme.colors.primaryColor : theme.colors.lightGrey,
+          }}
         >
           Trending
         </CustomText>
@@ -85,7 +85,7 @@ const FilterTopbar = ({
           size={20}
           color={
             activeTab === FILTER_BAR_ENUM.NEW
-              ? theme.colors.primaryColor
+              ? isDarkMode ? 'white': theme.colors.primaryColor
               : theme.colors.lightGrey
           }
           style={{ marginRight: 4 }}
@@ -93,7 +93,9 @@ const FilterTopbar = ({
         <CustomText
           variant="subheader"
           fontSize={14}
-          color={activeTab === FILTER_BAR_ENUM.NEW ? "primaryColor" : "lightGrey"}
+          style={{
+            color: activeTab === FILTER_BAR_ENUM.NEW ? isDarkMode ? "white": theme.colors.primaryColor : theme.colors.lightGrey,
+          }}
         >
           New
         </CustomText>
@@ -118,7 +120,7 @@ const FilterTopbar = ({
             size={20}
             color={
               activeTab === FILTER_BAR_ENUM.FOLLOWING
-                ? theme.colors.primaryColor
+                ? isDarkMode ? 'white': theme.colors.primaryColor
                 : theme.colors.lightGrey
             }
             style={{ marginRight: 4 }}
@@ -126,7 +128,9 @@ const FilterTopbar = ({
           <CustomText
             variant="subheader"
             fontSize={14}
-            color={activeTab === FILTER_BAR_ENUM.FOLLOWING ? "primaryColor" : "lightGrey"}
+            style={{
+              color: activeTab === FILTER_BAR_ENUM.FOLLOWING ? isDarkMode ? "white": theme.colors.primaryColor : theme.colors.lightGrey,
+            }}
           >
             Following
           </CustomText>
