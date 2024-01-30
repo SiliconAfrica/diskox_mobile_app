@@ -103,7 +103,7 @@ const MessageBubble = ({
         }
       }}
       onLongPress={
-        deleted_by !== id
+        deleted_by === null
           ? () => {
               setSelectedMessage({ ...theMessage });
 

@@ -13,6 +13,8 @@ import { Theme } from "../../theme";
 import { Image } from "expo-image";
 import { IChatMessage } from "../../models/chatmessages";
 import { useDetailsState } from "../../states/userState";
+import { copyToClipboard } from "../../utils/clipboard";
+import useToast from "../../hooks/useToast";
 
 export default function SelectedChatBottom({
   selectedMessage,
@@ -26,6 +28,7 @@ export default function SelectedChatBottom({
   const ref = useRef<BottomSheetModal>();
   const theme = useTheme<Theme>();
   const { id } = useDetailsState((state) => state);
+  const toast = useToast();
   return (
     <Box
       flexDirection="row"
@@ -42,14 +45,26 @@ export default function SelectedChatBottom({
           name="reply"
           size={30}
           color={theme.colors.primaryColor}
-          onPress={() =>
-            setSelectedMessageAction((prev) => ({ ...prev, reply: true }))
-          }
+          onPress={() => {
+            unselectMessage();
+            setSelectedMessageAction((prev) => ({ ...prev, reply: true }));
+          }}
         />
         <CustomText>Reply</CustomText>
       </Box>
       <Box width="15%" alignItems="center">
-        <Ionicons name="copy" size={30} color={theme.colors.primaryColor} />
+        <Ionicons
+          name="copy"
+          size={30}
+          color={theme.colors.primaryColor}
+          onPress={() => {
+            const copied = copyToClipboard(selectedMessage.message);
+            if (copied) {
+              toast.show("Copied", { type: "success" });
+              unselectMessage();
+            }
+          }}
+        />
         <CustomText>Copy</CustomText>
       </Box>
       {selectedMessage.sender_id === id && (

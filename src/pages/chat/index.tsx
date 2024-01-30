@@ -43,6 +43,8 @@ import {
   MenuTrigger,
 } from "react-native-popup-menu";
 import SelectedChatBottom from "../../components/modals/SelectedChatBottom";
+import { useNavigation } from "@react-navigation/native";
+import { PageType } from "../login";
 
 enum FILE_TYPE {
   IMAGE,
@@ -68,6 +70,7 @@ const Chat = ({
   route,
 }: NativeStackScreenProps<RootStackParamList, "chat">) => {
   const theme = useTheme<Theme>();
+  const navigation = useNavigation<PageType>();
   const queryClient = useQueryClient();
 
   // states
@@ -101,13 +104,13 @@ const Chat = ({
 
   const { id: loggedUser } = useDetailsState((state) => state);
 
-  const unselectMessage = () => {
-    setSelectedMessageAction({
+  const unselectMessage = (closereply?: boolean) => {
+    setSelectedMessageAction((prev) => ({
       selected: false,
-      reply: false,
+      reply: closereply ? false : prev.reply,
       edit: false,
       delete: false,
-    });
+    }));
   };
   // query
   const getMessages = useQuery(
@@ -301,8 +304,20 @@ const Chat = ({
   // Render the grouped chat messages
   const groupedMessages = groupChatMessagesByDate();
 
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (!selectedMessageAction.selected) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+        e.preventDefault();
+        unselectMessage(true);
+      }),
+    [navigation, selectedMessageAction]
+  );
   return (
-    <TouchableWithoutFeedback onPress={unselectMessage}>
+    <TouchableWithoutFeedback onPress={() => unselectMessage}>
       <Box flex={1} backgroundColor="mainBackGroundColor">
         {/* MODALS */}
         <ViewImageModal
@@ -441,6 +456,44 @@ const Chat = ({
           />
         ) : (
           <>
+            {selectedMessageAction.reply && (
+              <Box
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+                padding="m"
+                borderTopWidth={0.2}
+                borderBottomWidth={0.2}
+                borderColor="grey"
+                backgroundColor="secondaryBackGroundColor"
+              >
+                <Box width="90%">
+                  <CustomText>
+                    Replying {selectedMessage.sender_user?.username}
+                  </CustomText>
+                  <CustomText color="grey">
+                    {selectedMessage.message}
+                  </CustomText>
+                </Box>
+                <Box width="8%">
+                  <Box
+                    width={30}
+                    height={30}
+                    borderRadius={20}
+                    backgroundColor="lightGrey"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Ionicons
+                      name="close"
+                      onPress={() => unselectMessage(true)}
+                      size={20}
+                      color={theme.colors.black}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
             {/* TEXTBOX AREA */}
             <Box
               width="100%"
