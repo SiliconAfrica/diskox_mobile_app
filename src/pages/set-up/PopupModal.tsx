@@ -18,6 +18,7 @@ const PopupModal = ({
 }) => {
   const theme = useTheme<Theme>();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   return (
     <Modal
       style={{ flex: 1 }}
@@ -61,14 +62,17 @@ const PopupModal = ({
             variant="body"
             textAlign="center"
             mt="m"
-            onPress={() => navigation.navigate("home")}
+            onPress={() => {
+              setVisible(false);
+              navigation.navigate("home");
+            }}
           >
             I'll do this later
           </CustomText>
           <NormalButton
             action={() => {
               setVisible(false);
-              navigation.navigate("categories");
+              navigation.navigate("profile-setting");
             }}
             label="Continue"
           />

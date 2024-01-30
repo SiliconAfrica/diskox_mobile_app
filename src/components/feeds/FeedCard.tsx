@@ -488,7 +488,7 @@ const FeedCard = ({
                            alignItems: 'center',
                            flexDirection: 'row',
                            borderRightWidth: 0.5,
-                           borderRightColor: theme.colors.borderColor,
+                          //  borderRightColor: theme.colors.borderColor,
                        }} 
                        onPress={handleUpVote}
                        >

@@ -148,7 +148,7 @@ const BottomTabs = (): JSX.Element => {
           backgroundColor: theme.colors.mainBackGroundColor,
           height: Platform.OS === "ios" ? 100 : 80,
           borderTopWidth: 0.3,
-          borderTopColor: theme.colors.borderColor,
+          // borderTopColor: theme.colors.borderColor,
         },
       }}
     >

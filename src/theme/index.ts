@@ -7,6 +7,7 @@ const COLOR_PALLET = {
   fadedWhite: "#FCFCFC80",
   grey: "grey",
   whitesmoke: "whitesmoke",
+  almostPrimaryGreen: "#D8F3E0",
   lightGrey: "#949E97",
   fadedButtonBgColor: "#F3FBF5",
   textBlue: "#0079D3",
@@ -15,13 +16,12 @@ const COLOR_PALLET = {
   transparent: "#000000b9",
   yellowGreen: "#A8B60C",
   error: "#FA2019",
-  inputBorderColorLight: '#B8B8B8',
-  whiteText:'#FCFCFC',
-  transparent2: 'transparent',
-  darkMainBg: '#1A1A1A',
-  darkSecondaryBg: '#323433',
-  darkAccntColor: '#3F4040',
-  borderColor: '#4D6275'
+  inputBorderColorLight: "#B8B8B8",
+  darkMainBg: "#1A1A1A",
+  darkSecondaryBg: "#323433",
+  whiteText: "#FCFCFC",
+  transparent2: "transparent",
+  borderColor: "#4D6275",
 };
 
 const theme = createTheme({

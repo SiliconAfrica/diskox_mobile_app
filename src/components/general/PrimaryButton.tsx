@@ -12,6 +12,7 @@ interface IProps {
   isLoading?: boolean;
   borderRadius?: number;
   color?: any;
+  textColor?: any;
 }
 
 const PrimaryButton = ({
@@ -21,6 +22,7 @@ const PrimaryButton = ({
   height = 45,
   isLoading = false,
   color,
+  textColor,
   borderRadius = (height as number) / 2 || 25,
 }: IProps) => {
   const theme = useTheme<Theme>();
@@ -38,13 +40,15 @@ const PrimaryButton = ({
         alignItems: "center",
       }}
     >
-      {isLoading && <ActivityIndicator color={"white"} size="small" />}
+      {isLoading && (
+        <ActivityIndicator color={theme.colors.white} size="small" />
+      )}
       {!isLoading && (
         <CustomText
           variant="subheader"
           color="primaryColor"
           fontSize={17}
-          style={{ color: "white" }}
+          style={{ color: textColor || theme.colors.white }}
         >
           {title}
         </CustomText>
