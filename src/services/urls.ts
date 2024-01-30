@@ -25,6 +25,7 @@ export const URLS = {
   CHATTED_USER: "/fetch_chatted_users",
   GET_CHAT_MESSAGES: "/fetch_messages",
   POST_CHAT_MESSAGE: "/send_message",
+  UPDATE_CHAT_MESSAGE: "/edit_message",
   GET_USER_BY_USERNAME: "/get_user_by_username",
   GET_USER_BY_ID: "/get_user",
   GET_PROFILE_POSTS: "/fetch_user_posts",

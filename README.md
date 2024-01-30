@@ -28,4 +28,5 @@ is_member_request_pending - value to check before pending
 
 # To note
 
-After filling phone number and country proceed to topics. DOn't pop up the "Your profile is 50% complete"
+- Start by msking sure deleted message is not highlightable or action can't be performed on it
+- Redesign the message box of chat

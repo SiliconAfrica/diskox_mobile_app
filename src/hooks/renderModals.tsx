@@ -20,6 +20,7 @@ import InviteModeratorModal from "../components/modals/InviteModeratorModal";
 import SuspendMemberModal from "../components/modals/SuspendMemberModal";
 import BlockCommunityMemberModal from "../components/modals/BlockCommunityMemberModal";
 import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
+import SelectChatModal from "../components/modals/SelectedChatBottom";
 
 const renderModals = () => {
   const {
