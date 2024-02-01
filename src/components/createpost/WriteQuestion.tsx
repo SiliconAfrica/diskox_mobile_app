@@ -246,7 +246,7 @@ const WriteQuestion = ({
         </Box>
 
         {
-           (
+           files.length > 0 && (
             <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
 
               <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
@@ -256,7 +256,7 @@ const WriteQuestion = ({
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
                 {
                   uploadedImages.map((item, index) => (
-                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                    <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
                 }
                 {files.map((file, index) => (
@@ -282,7 +282,7 @@ const WriteQuestion = ({
                     color={theme.colors.textColor}
                   />
                 </Pressable>
-              }
+              )}
             </ScrollView>
           </Box>
         )}

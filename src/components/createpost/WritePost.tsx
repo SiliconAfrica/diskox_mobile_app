@@ -215,7 +215,7 @@ const WritePost = ({
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
               {
                   uploadedImages.map((item, index) => (
-                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                    <UploadedImage file={item as any} index={index} onDelete={removeImage} key={index} />
                   ))
                 }
                 {files.map((file, index) => (
@@ -241,7 +241,7 @@ const WritePost = ({
                     color={theme.colors.textColor}
                   />
                 </Pressable>
-              }
+              )}
             </ScrollView>
           </Box>
         )}
