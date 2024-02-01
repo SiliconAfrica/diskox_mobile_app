@@ -1,36 +1,28 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
-import React from "react";
-import Box from "../general/Box";
-import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { useTheme } from "@shopify/restyle";
-import { Theme } from "../../theme";
-import { Feather } from "@expo/vector-icons";
-import MediaCard from "./MediaCard";
-import CustomText from "../general/CustomText";
-import { DocumentResult } from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
-import { UserRound } from "lucide-react-native";
-import {
-  MentionInput,
-  MentionSuggestionsProps,
-} from "react-native-controlled-mentions";
-import { Mention } from "../../models/mention";
-import { useCommentMentionState } from "../feeds/commentState";
-import { useQuery } from "react-query";
-import httpService, { IMAGE_BASE } from "../../utils/httpService";
-import { URLS } from "../../services/urls";
-import { PaginatedResponse } from "../../models/PaginatedResponse";
-import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
-import { uniqBy } from "lodash";
-import { Image } from "expo-image";
-import { MediaPost } from "../../models/post";
-import UploadedImage from "./UploadedImage";
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native'
+import React from 'react'
+import Box from '../general/Box'
+import { ScrollView, TextInput, } from 'react-native-gesture-handler';
+import { useTheme } from '@shopify/restyle';
+import { Theme } from '../../theme';
+import { Feather } from '@expo/vector-icons'
+import MediaCard from './MediaCard';
+import CustomText from '../general/CustomText';
+//import { DocumentResult } from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { UserRound } from 'lucide-react-native';
+import { MentionInput, MentionSuggestionsProps } from 'react-native-controlled-mentions';
+import { Mention } from '../../models/mention';
+import { useCommentMentionState } from '../feeds/commentState';
+import { useQuery } from 'react-query';
+import httpService, { IMAGE_BASE } from '../../utils/httpService';
+import { URLS } from '../../services/urls';
+import { PaginatedResponse } from '../../models/PaginatedResponse';
+import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
+import { uniqBy } from 'lodash';
+import { Image } from 'expo-image'
+import { MediaPost } from '../../models/post';
+import UploadedImage from './UploadedImage';
+
 
 interface IProps {
   files: ImagePicker.ImagePickerAsset[];
@@ -212,53 +204,25 @@ const WritePost = ({
           />
         </Box>
 
-        {files.length > 0 && (
-          <Box
-            height={200}
-            margin="m"
-            borderWidth={0.5}
-            borderColor="borderColor"
-            borderRadius={20}
-          >
-            <Pressable
-              onPress={() => onDelete({ clearAll: true })}
-              style={{
-                ...style.deleteButton,
-                backgroundColor: theme.colors.secondaryBackGroundColor,
-              }}
-            >
-              <Feather name="x" size={20} color={theme.colors.textColor} />
-            </Pressable>
+        {
+           (
+            <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                alignItems: "center",
-                paddingLeft: 0,
-                paddingRight: 100,
-              }}
-            >
-              {uploadedImages.length > 0 &&
-                uploadedImages.map((item, index) => (
-                  <UploadedImage
-                    file={item as any}
-                    index={index}
-                    onDelete={removeImage}
-                    key={index}
-                  />
-                ))}
-              {files.map((file, index) => (
-                <MediaCard
-                  file={file as any}
-                  index={index}
-                  onDelete={onDelete}
-                  key={index}
-                />
-              ))}
+              <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
+                <Feather name='x' size={20} color={theme.colors.textColor} />
+              </Pressable>
+
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
               {
-                <Pressable
-                  style={{
+                  uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                  ))
+                }
+                {files.map((file, index) => (
+                  <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
+                ))}
+                { files.length > 0 && files.length < 10 && (
+                  <Pressable style={{
                     marginLeft: 20,
                     width: 150,
                     height: "90%",

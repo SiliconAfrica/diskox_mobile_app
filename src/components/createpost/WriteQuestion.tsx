@@ -245,53 +245,25 @@ const WriteQuestion = ({
           />
         </Box>
 
-        {files.length > 0 && (
-          <Box
-            height={200}
-            margin="m"
-            borderWidth={0.5}
-            borderColor="borderColor"
-            borderRadius={20}
-          >
-            <Pressable
-              onPress={() => onDelete({ clearAll: true })}
-              style={{
-                ...style.deleteButton,
-                backgroundColor: theme.colors.secondaryBackGroundColor,
-              }}
-            >
-              <Feather name="x" size={20} color={theme.colors.textColor} />
-            </Pressable>
+        {
+           (
+            <Box height={200} margin='m' borderWidth={2} borderColor='secondaryBackGroundColor' borderRadius={20}>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                alignItems: "center",
-                paddingLeft: 0,
-                paddingRight: 100,
-              }}
-            >
-              {uploadedImages.length > 0 &&
-                uploadedImages.map((item, index) => (
-                  <UploadedImage
-                    file={item as any}
-                    index={index}
-                    onDelete={removeImage}
-                    key={index}
-                  />
+              <Pressable onPress={() => onDelete({ clearAll: true })} style={{ ...style.deleteButton, backgroundColor: theme.colors.secondaryBackGroundColor }}>
+                <Feather name='x' size={20} color={theme.colors.textColor} />
+              </Pressable>
+
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', paddingLeft: 0, paddingRight: 100 }}>
+                {
+                  uploadedImages.map((item, index) => (
+                    <UploadedImage file={item as any} index={index} onDelete={onDelete} key={index} />
+                  ))
+                }
+                {files.map((file, index) => (
+                  <MediaCard file={file as any} index={index} onDelete={onDelete} key={index} />
                 ))}
-              {files.map((file, index) => (
-                <MediaCard
-                  file={file as any}
-                  index={index}
-                  onDelete={onDelete}
-                  key={index}
-                />
-              ))}
-              {
-                <Pressable
-                  style={{
+                {files.length > 0 && files.length < 10 && (
+                  <Pressable style={{
                     marginLeft: 20,
                     width: 150,
                     height: "90%",
