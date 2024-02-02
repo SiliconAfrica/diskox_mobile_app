@@ -33,6 +33,8 @@ import Saveasdraft from "../../components/modals/SavaAsDraft";
 import BorderButton from "../../components/general/BorderButton";
 import { includes } from "lodash";
 import { useGlobalFileState } from "../../states/pickedFileState";
+import CommunitiesModal from "../../components/modals/CommunitiesModal";
+import { ICommunity } from "../../models/Community";
 
 const CreatePost = ({
   navigation,
@@ -65,6 +67,8 @@ const CreatePost = ({
   const [showModal, setShowModal] = React.useState(false);
   const [status, setStatus] = React.useState<"active" | "draft">("active");
   const [cancel, setCancel] = React.useState(false);
+  const [community, setCommunity] = React.useState<ICommunity|null>(null);
+  const [showCommunities, setShowCommunities] = React.useState(false)
 
   const theme = useTheme<Theme>();
   const toast = useToast();
@@ -179,6 +183,7 @@ const CreatePost = ({
       setValues("");
       setCancel(true);
       clearFiles();
+      setCommunity(null);
       navigation.goBack();
     },
     onError: (error: any) => {
@@ -263,6 +268,9 @@ const CreatePost = ({
     const formData = new FormData();
     if (origin === "community") {
       formData.append("community_id", communityId.toString());
+    }
+    if (community !== null) {
+      formData.append("community_id", community.id.toString());
     }
     if (activeTab === TAB_BAR_ENUM.POST) {
       const regex = /@\[\S+]/g;
@@ -445,6 +453,7 @@ const CreatePost = ({
         tags={tags}
         setTags={(tags) => handleCheck(tags)}
       />
+      <CommunitiesModal isVisisble={showCommunities} onClose={() => setShowCommunities(false)} activeCommunity={community} setActiveCommunity={(data) =>setCommunity(data)} />
       <Saveasdraft
         isLoading={isLoading}
         isVisible={showModal}
@@ -474,68 +483,107 @@ const CreatePost = ({
       {/* HEADER SECTTION */}
       <Box
         width={"100%"}
-        height={100}
-        flexDirection="row"
+        height={'auto'}
+        flexDirection="column"
         alignItems="center"
         px="m"
         justifyContent="space-between"
       >
-        <Box flexDirection="row" alignItems="center">
-          <Box
-            width={40}
-            height={40}
-            borderRadius={20}
-            borderColor="primaryColor"
-          >
-            <Image
-              source={{ uri: `${IMAGE_BASE}${profile_image}` }}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
-            />
-          </Box>
-
-          <Box marginLeft="m">
-            <CustomText variant="body">{username}</CustomText>
-
+        <Box width='100%' height={80} flexDirection="row" alignItems="center">
             <Pressable
-              onPress={() => setAll({ showVisibility: true })}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderRadius: 30,
-                backgroundColor: theme.colors.secondaryBackGroundColor,
-                padding: 2,
-              }}
-            >
-              <Ionicons
-                name={
-                  visibility === "everyone" ? "globe-outline" : "people-outline"
-                }
-                size={20}
-                color={theme.colors.textColor}
-              />
-              <CustomText variant="xs">{visibility}</CustomText>
-              <Feather
-                name="chevron-down"
-                size={20}
-                color={theme.colors.textColor}
-              />
+                onPress={() => setShowCommunities(true)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderRadius: 30,
+                  backgroundColor: theme.colors.secondaryBackGroundColor,
+                  paddingHorizontal: 10,
+                  width: 'auto',
+                  height: 30,
+                  marginRight: 20,
+                }}
+              >
+                <Ionicons
+                  name={
+                    "people"
+                  }
+                  size={20}
+                  color={theme.colors.textColor}
+                />
+                <CustomText variant="xs">{community === null ? 'Choose community':community.name}</CustomText>
+                <Feather
+                  name="chevron-down"
+                  size={20}
+                  color={theme.colors.textColor}
+                />
             </Pressable>
-          </Box>
+
+          {community === null && (
+            <Pressable
+            onPress={() => setAll({ showVisibility: true })}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderRadius: 30,
+              backgroundColor: theme.colors.secondaryBackGroundColor,
+              padding: 2,
+              width: 110,
+              height: 30
+            }}
+          >
+            <Ionicons
+              name={
+                visibility === "everyone" ? "globe-outline" : "people-outline"
+              }
+              size={20}
+              color={theme.colors.textColor}
+            />
+            <CustomText variant="xs">{visibility}</CustomText>
+            <Feather
+              name="chevron-down"
+              size={20}
+              color={theme.colors.textColor}
+            />
+        </Pressable>
+          )}
         </Box>
 
-        {/* <FadedButton
-          title="Tag people"
-          onPress={() => setShow(true)}
-          height={40}
-        /> */}
-        <BorderButton
-          height={32}
-          title="Tag people"
-          onPress={() => setShow(true)}
-          borderColor={theme.colors.primaryColor}
-          color={theme.colors.primaryColor}
-        />
+       <Box width={'100%'} flexDirection="row" justifyContent="space-between">
+
+          <Box flexDirection="row" alignItems="center">
+              <Box
+                width={40}
+                height={40}
+                borderRadius={20}
+                borderColor="primaryColor"
+              >
+                <Image
+                  source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+                  style={{ width: 40, height: 40, borderRadius: 20 }}
+                />
+              </Box>
+
+              <Box marginLeft="m">
+                <CustomText variant="body">{username}</CustomText>
+              </Box>
+            </Box>
+
+            {/* <FadedButton
+              title="Tag people"
+              onPress={() => setShow(true)}
+              height={40}
+            /> */}
+            <BorderButton
+              height={32}
+              title="Tag people"
+              onPress={() => setShow(true)}
+              borderColor={theme.colors.primaryColor}
+              color={theme.colors.primaryColor}
+            />
+
+       </Box>
       </Box>
 
       {/* TABVIEW */}

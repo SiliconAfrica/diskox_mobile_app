@@ -54,7 +54,7 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
       <StatusBar animated backgroundColor={'lightGrey'} translucent={true} />
-      <Header />
+      <Header showMenuButton={false} />
       <ScrollView>
         <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
         <Box width='100%' height={HEIGHT / 100 * 80}>
