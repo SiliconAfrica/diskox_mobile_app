@@ -13,6 +13,7 @@ import Upvotes from './pages/Upvotes'
 import Comments from './pages/Comments'
 import Polls from './pages/Polls'
 import Drafts from './pages/Drafts'
+import Header from '../../components/Header'
 
 
 const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'>) => {
@@ -53,9 +54,10 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
       <StatusBar animated backgroundColor={'lightGrey'} translucent={true} />
+      <Header />
       <ScrollView>
         <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
-        <Box width='100%' height={HEIGHT / 100 * 89}>
+        <Box width='100%' height={HEIGHT / 100 * 80}>
           {activePage()}
         </Box>
       </ScrollView>

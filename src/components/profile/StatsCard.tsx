@@ -24,8 +24,8 @@ const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
     <Box
       width={(WIDTH / 100) * 43}
       height={150}
-      backgroundColor="mainBackGroundColor"
-      borderWidth={1}
+      backgroundColor="borderColor"
+      borderWidth={0}
       borderRadius={20}
       borderColor="secondaryBackGroundColor"
       flexDirection="row"
