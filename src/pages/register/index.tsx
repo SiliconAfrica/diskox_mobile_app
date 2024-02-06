@@ -20,9 +20,13 @@ import { RootStackParamList } from "../../navigation/MainNavigation";
 import useToast from "../../hooks/useToast";
 
 // google auth
+// google auth
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import * as WebBrowser from "expo-web-browser";
 import { AntDesign } from "@expo/vector-icons";
-import * as Google from "expo-auth-session/providers/google";
 import * as SecureStorage from "expo-secure-store";
 import * as AuthSession from "expo-auth-session";
 import { useMutation, useQueryClient } from "react-query";
@@ -78,6 +82,7 @@ const Register = ({
   const { setAll: updateOldUser } = useUserStateBeforeAddingByRegistration(
     (state) => state
   );
+  const { setAll: updateUtil } = useUtilState((state) => state);
   const oldUser = useDetailsState((state) => state);
   const { setAll: updateUser } = useDetailsState((state) => state);
   const [googleSigninLoading, setGoogleSignInLoading] = React.useState(false);
@@ -86,20 +91,17 @@ const Register = ({
   const navigation = useNavigation<PageType>();
   const toast = useToast();
 
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    // androidClientId: '168560685354-gjamvhchu5gmoep11opc06672p6at6n1.apps.googleusercontent.com',
-    // iosClientId: '168560685354-ic5lpdnv8o3sk12foocoifirhfb2t8aj.apps.googleusercontent.com',
-    // redirectUri: 'https://auth.expo.io/@dandolla98/diskos',
-    // expoClientId: '168560685354-bh00asn9q9239stks3nhpe5bhrfmqckd.apps.googleusercontent.com',
-
-    androidClientId:
-      "304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com",
+  //google signin
+  GoogleSignin.configure({
+    // scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
     iosClientId:
       "304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1.apps.googleusercontent.com",
-    expoClientId:
-      "304260188611-brt1bj0fr87p8nugabs40s6ciar4ov75.apps.googleusercontent.com",
-    redirectUri: "https://auth.expo.io/@dandolla98/diskos",
-    scopes: ["profile", "email"],
+    webClientId:
+      "304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
+
+    offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+    forceCodeForRefreshToken: true,
+    profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
   });
 
   const { isLoading: isSigningUp, mutate: register } = useMutation({
@@ -146,6 +148,7 @@ const Register = ({
     const [saveUser, saveUserErr] = await handlePromise(
       AsyncStorage.setItem(`user`, JSON.stringify(data.data.user))
     );
+    updateUtil({ isLoggedIn: true });
     if (proceedToSetup === true) {
       navigation.navigate("set-up", {
         showUsername: true,
@@ -178,13 +181,6 @@ const Register = ({
     },
   });
 
-  React.useEffect(() => {
-    if (response?.type === "success") {
-      // Handle successful authentication
-      mutate(response.params?.id_token);
-    }
-  }, [response]);
-
   const navigate = React.useCallback(
     (data: any) => {
       const obj: RegisterPayload = {
@@ -204,7 +200,27 @@ const Register = ({
   );
 
   const signInWithGoogleAsync = async () => {
-    promptAsync({ useProxy: true, projectNameForProxy: "@dandolla98/diskos" });
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      if (userInfo.user) {
+        mutate(userInfo?.idToken);
+      }
+    } catch (error) {
+      if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+        toast.show("Sign in already in progress", { type: "danger" });
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+        toast.show("Play services unavailable or outdated", { type: "danger" });
+      } else if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        toast.show("Canceled", { type: "info" });
+      } else {
+        // some other error happened
+        toast.show("Unknown error occurred", { type: "danger" });
+      }
+    }
   };
 
   const { renderForm } = useForm({
@@ -217,6 +233,7 @@ const Register = ({
     },
     validationSchema: registerSchema,
   });
+
   return renderForm(
     <Box
       backgroundColor="mainBackGroundColor"
