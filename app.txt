@@ -1,7 +1,10 @@
+
+former app.json
+
 {
   "expo": {
     "name": "Diskox",
-    "slug": "Diskos",
+    "slug": "diskos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -18,16 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
-      "buildNumber": "7",
-      "infoPlist": {
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1"
-            ]
-          }
-        ]
-      }
+      "buildNumber": "7"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +29,7 @@
         "backgroundColor": "#34A853"
       },
       "package": "com.dandolla98.diskos",
-      "versionCode": 30,
+      "versionCode": 27,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
@@ -63,32 +57,11 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera.",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
         }
-      ],
-      [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1"
-        }
-      ],
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "compileSdkVersion": 34,
-            "targetSdkVersion": 34,
-            "buildToolsVersion": "34.0.0",
-            "kotlinVersion": "1.8.10"
-          },
-          "ios": {
-            "deploymentTarget": "13.4"
-          }
-        }
       ]
     ],
     "extra": {
       "eas": {
-        "owner": "diskox",
-        "projectId": "37c57626-f133-49fc-8ac0-0eade87e65b2"
+        "projectId": "d9d08b33-5cc3-4ff3-9357-45475bfc87b3"
       }
     },
     "runtimeVersion": {
@@ -96,8 +69,7 @@
       "nativeVersion": "48.0.18"
     },
     "updates": {
-      "url": "https://u.expo.dev/37c57626-f133-49fc-8ac0-0eade87e65b2"
-    },
-    "owner": "diskox"
+      "url": "https://u.expo.dev/d9d08b33-5cc3-4ff3-9357-45475bfc87b3"
+    }
   }
 }
