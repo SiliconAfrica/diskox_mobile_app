@@ -140,4 +140,7 @@ export const URLS = {
   GET_USERS_FOLLOWERS: "/fetch_user_followers",
   GET_MENTIONS: "/search_user_mentions",
   UPDATE_POST: "/update_post",
+  GET_MY_COMMUNITIES: '/fetch_communities_user_belongs_to',
+  RECOMMENDED_PEOPLE: '/get_people_you_may_know',
+  RECOMMENDED_COMMUNITY: '/get_communities_you_may_know'
 };

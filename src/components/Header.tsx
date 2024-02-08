@@ -43,6 +43,14 @@ const Header = ({ showMenuButton = true }: { showMenuButton?: boolean }) => {
             onPress={() => navigation.openDrawer()}
           />
         )}
+        {!showMenuButton && (
+          <Feather
+            name="arrow-left"
+            size={25}
+            color={theme.colors.textColor}
+            onPress={() => navigation.goBack()}
+          />
+        )}
         <Image
           source={
             isDarkMode

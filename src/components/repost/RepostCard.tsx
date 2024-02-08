@@ -248,7 +248,7 @@ const RepostCard = ({
           }
 
   return (
-    <Box width="100%"  marginBottom='s' bg='transparent2' borderWidth={0.5} borderColor='grey' borderRadius={12}>
+    <Box width="100%"  marginBottom='s' bg='transparent2' borderWidth={1} borderColor='borderColor' borderRadius={12}>
 
         {/* HEADER SECTION */}
         <Box flexDirection='row' alignItems='flex-start' width='100%'  justifyContent='space-between' paddingHorizontal='s' paddingVertical='m'>

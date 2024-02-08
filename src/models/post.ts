@@ -35,7 +35,7 @@ export type IPost = {
   post_images: MediaPost[];
   post_videos: MediaPost[];
   user: IUser & UserStats;
-  reposted_post: any[];
+  reposted_post: IPost[];
   has_reacted: any[];
   community_id: number;
   community?: ICommunity;

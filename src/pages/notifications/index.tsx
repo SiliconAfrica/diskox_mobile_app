@@ -2,7 +2,7 @@ import { View, Text, ActivityIndicator } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import CustomText from '../../components/general/CustomText'
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,13 +18,23 @@ import { Image } from 'expo-image'
 import { FlashList } from '@shopify/flash-list';
 
 const NotificationCard = ({ id, message, profile_image, created_at, read_at}: INotification) => {
+  const theme = useTheme<Theme>()
   return (
     <Box flexDirection='row' height={70} backgroundColor={read_at === null ? 'secondaryBackGroundColor' : 'mainBackGroundColor'} borderBottomWidth={0.4} borderBottomColor={read_at === null ? 'primaryColor' : 'secondaryBackGroundColor'}  paddingHorizontal='m'>
 
       <Box flex={0.7} flexDirection='row' alignItems='center' width='100%'>
-        <Box width={50} overflow='hidden' height={50} borderRadius={25} backgroundColor='primaryColor'>
+       { profile_image !== null && (
+         <Box width={50} overflow='hidden' height={50} borderRadius={25} backgroundColor='primaryColor'>
           <Image source={{ uri: `${IMAGE_BASE}/${profile_image}`}} contentFit='cover' style={{ width: '100%', height: '100%'}} />
         </Box>
+       )}
+       {
+        profile_image === null && (
+          <Box width={50} overflow='hidden' height={50} borderRadius={25} backgroundColor='secondaryBackGroundColor' justifyContent='center' alignItems='center'>
+            <Ionicons name='person-outline' size={25} color={theme.colors.textColor} />
+          </Box>
+        )
+       }
         <CustomText marginLeft='m'>{message.length > 20 ? message.substring(0, 20) + '...' : message}</CustomText>
       </Box>
       
