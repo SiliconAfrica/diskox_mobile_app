@@ -35,7 +35,7 @@
         "backgroundColor": "#34A853"
       },
       "package": "com.dandolla98.diskos",
-      "versionCode": 30,
+      "versionCode": 31,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
