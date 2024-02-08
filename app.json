@@ -12,9 +12,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#34A853"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
