@@ -1,4 +1,4 @@
-export type IUser = {
+export interface IUser  {
   id: number;
   name: string;
   email: string;
@@ -23,7 +23,7 @@ export type IUser = {
   isFollowing?: 0|1;
 };
 
-export type UserStats = {
+export interface UserStats {
   following_count: number;
   followers_count: number;
   isFollowing: number;

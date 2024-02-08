@@ -223,7 +223,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       {!getUserDetails.isLoading && user?.cover_photo !== null && (
         <ImageBackground
           source={{ uri: `${IMAGE_BASE}/${user?.cover_photo}` }}
-          style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 50 }}
+          style={{ width: "100%", height: (HEIGHT / 100) * 25, paddingTop: 20 }}
         >
           { (
             <Box
@@ -277,7 +277,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                >
                  {!updateBanner.isLoading && (
                    <Feather
-                     name="edit"
+                     name="camera"
                      size={20}
                      color={theme.colors.textColor}
                    />
@@ -465,25 +465,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               </Box>
             </Pressable>
           )}
-          <Pressable
-            onPress={handleShare}
-          >
-            <Box
-              width={35}
-              height={35}
-              borderRadius={25}
-              borderWidth={2}
-              borderColor="secondaryBackGroundColor"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Ionicons
-                name="share-social-outline"
-                size={20}
-                color={theme.colors.textColor}
-              />
-            </Box>
-          </Pressable>
+          
         </Box>
       )}
 
@@ -599,43 +581,43 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       {/* DETAILS SECTIONS */}
       <Box paddingHorizontal="m">
         {/* NAME */}
-        <Box flexDirection="row">
+        <Box flexDirection="row" alignItems="center">
           <CustomText variant="subheader" fontSize={18}>
             {user?.name || "NONE"}
           </CustomText>
-          <CustomText variant="xs" marginLeft="s">
+          <CustomText variant="subheader" color="lightGrey" fontSize={14} marginLeft="s">
             @{user?.username}
           </CustomText>
         </Box>
 
         {/* FOLLOWER */}
-        <Box flexDirection="row" alignItems="center" marginTop="s">
+        <Box flexDirection="row" alignItems="center" marginVertical="m">
           <Box flexDirection="row" alignItems="center">
             <CustomText variant="subheader" fontSize={18}>
               {!getFollowCount.isLoading &&
                 getFollowCount.data?.data.followers_count}
             </CustomText>
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               marginLeft="s"
               onPress={() => navigation.navigate("following", { id: userId })}
             >
               Followers
             </CustomText>
           </Box>
-          <Ionicons
-            name="ellipse-outline"
-            size={10}
-            color={theme.colors.textColor}
-            style={{ marginHorizontal: 10 }}
-          />
+          
+          {/* ELLISPSI ICON */}
+          <Box width={5} height={5} borderRadius={10} backgroundColor={'black'} marginHorizontal="m" />
+          
           <Box flexDirection="row" alignItems="center">
             <CustomText variant="subheader" fontSize={18}>
               {!getFollowCount.isLoading &&
                 getFollowCount.data?.data.following_count}
             </CustomText>
             <CustomText
-              variant="xs"
+              variant="subheader"
+              fontSize={14}
               marginLeft="s"
               onPress={() => navigation.navigate("following", { id: userId })}
             >
@@ -644,7 +626,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           </Box>
         </Box>
 
-        <CustomText variant="body" fontSize={15} marginTop="s">
+        <CustomText variant="subheader" fontSize={15} marginBottom="m">
           {user?.about}
         </CustomText>
 
@@ -652,21 +634,21 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
           <Box flexDirection="row" alignItems="center">
             <Ionicons
               name="calendar-outline"
-              size={25}
+              size={20}
               color={theme.colors.textColor}
             />
-            <CustomText marginLeft="s">
-              Joined {moment(user?.created_at).format("MMM YYYY")}
+            <CustomText  variant="subheader" fontSize={16} marginLeft="s">
+              Joined {moment(user?.created_at).format("DD MMM YYYY")}
             </CustomText>
           </Box>
 
-          <Box flexDirection="row" alignItems="center" marginLeft="l">
+          <Box flexDirection="row" alignItems="center" marginLeft="s">
             <Ionicons
               name="location-outline"
-              size={25}
+              size={20}
               color={theme.colors.textColor}
             />
-            <CustomText marginLeft="s">
+            <CustomText variant="subheader" fontSize={16} marginLeft="s">
               {user?.state}, {user?.country}
             </CustomText>
           </Box>
@@ -691,7 +673,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             >
               <CustomText
                 variant="subheader"
-                fontSize={12}
+                fontSize={14}
                 color={currentTab === ACTIVE_TAB.OVERVIEW
                   ? "primaryColor"
                   : "textColor"}
@@ -710,7 +692,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             >
               <CustomText
                 variant="subheader"
-                fontSize={12}
+                fontSize={14}
                 color={currentTab === ACTIVE_TAB.POSTS
                   ? "primaryColor"
                   : "textColor"}
@@ -729,7 +711,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             >
               <CustomText
                 variant="subheader"
-                fontSize={12}
+                fontSize={14}
                 color={currentTab === ACTIVE_TAB.UPVOTES
                   ? "primaryColor"
                   : "textColor"}
@@ -748,7 +730,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             >
               <CustomText
                 variant="subheader"
-                fontSize={12}
+                fontSize={14}
                 color={currentTab === ACTIVE_TAB.COMMENTS
                   ? "primaryColor"
                   : "textColor"}
@@ -767,7 +749,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
             >
               <CustomText
                 variant="subheader"
-                fontSize={12}
+                fontSize={14}
                 color={currentTab === ACTIVE_TAB.POLLS
                   ? "primaryColor"
                   : "textColor"}
@@ -788,7 +770,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
                   >
                   <CustomText
                     variant="subheader"
-                    fontSize={12}
+                    fontSize={14}
                     color={currentTab === ACTIVE_TAB.DRAFTS
                       ? "primaryColor"
                       : "textColor"}
@@ -805,7 +787,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               <Ionicons name='share-social-outline' size={20} color={theme.colors.primaryColor} />
                 <CustomText
                   variant="subheader"
-                  fontSize={12}
+                  fontSize={14}
                   color={"primaryColor"}
                   marginLeft="s"
                 >Share Profile</CustomText>
@@ -862,7 +844,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: 70,
+    width: 80,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",

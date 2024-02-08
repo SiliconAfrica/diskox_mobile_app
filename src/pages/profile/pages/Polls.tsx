@@ -95,13 +95,11 @@ const UserPosts = ({ id }: IProps) => {
              )
         }
 
-        {
-           getPosts.isLoading && (
-               <Box justifyContent='center' alignItems='center' height={20} paddingTop='l'>
-                <ActivityIndicator size='large' color={theme.colors.primaryColor} />
-               </Box>
-           )
-       }
+        {getPosts.isLoading && (
+          <Box justifyContent="center" alignItems="center" height={20} paddingTop='m'>
+            <ActivityIndicator size="small" color={theme.colors.primaryColor} />
+          </Box>
+        )}
 
        </ScrollView>
     </Box>
