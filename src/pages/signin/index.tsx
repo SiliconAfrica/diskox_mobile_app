@@ -79,7 +79,7 @@ const SignIn = ({
     iosClientId:
       "304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1.apps.googleusercontent.com",
     webClientId:
-      "304260188611-rvqd1uusvltaunvop6lolq5mh7sc4i9i.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
+      "304260188611-lu76mr1h45m25icv0nrtt5hoiolsco5s.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
 
     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
     forceCodeForRefreshToken: true,
