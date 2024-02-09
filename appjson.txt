@@ -12,9 +12,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#34A853"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dandolla98.diskox",
@@ -35,7 +33,7 @@
         "backgroundColor": "#34A853"
       },
       "package": "com.dandolla98.diskos",
-      "versionCode": 36,
+      "versionCode": 33,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
@@ -62,6 +60,12 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera.",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1"
         }
       ],
       [
