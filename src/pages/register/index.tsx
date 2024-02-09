@@ -21,10 +21,10 @@ import useToast from "../../hooks/useToast";
 
 // google auth
 // google auth
-import {
-  GoogleSignin,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+// import {
+//   GoogleSignin,
+//   statusCodes,
+// } from "@react-native-google-signin/google-signin";
 import * as WebBrowser from "expo-web-browser";
 import { AntDesign } from "@expo/vector-icons";
 import * as SecureStorage from "expo-secure-store";
@@ -92,17 +92,17 @@ const Register = ({
   const toast = useToast();
 
   //google signin
-  GoogleSignin.configure({
-    // scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
-    iosClientId:
-      "304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1.apps.googleusercontent.com",
-    webClientId:
-      "304260188611-lu76mr1h45m25icv0nrtt5hoiolsco5s.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
+  // GoogleSignin.configure({
+  //   // scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
+  //   iosClientId:
+  //     "304260188611-vum90d9hsr2rcol830ni6a9jrh374kc1.apps.googleusercontent.com",
+  //   webClientId:
+  //     "304260188611-lu76mr1h45m25icv0nrtt5hoiolsco5s.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
 
-    offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-    forceCodeForRefreshToken: true,
-    profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
-  });
+  //   offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+  //   forceCodeForRefreshToken: true,
+  //   profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
+  // });
 
   const { isLoading: isSigningUp, mutate: register } = useMutation({
     mutationFn: (data: RegisterPayload) =>
@@ -200,27 +200,26 @@ const Register = ({
   );
 
   const signInWithGoogleAsync = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-
-      if (userInfo.user) {
-        mutate(userInfo?.idToken);
-      }
-    } catch (error) {
-      if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-        toast.show("Sign in already in progress", { type: "danger" });
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-        toast.show("Play services unavailable or outdated", { type: "danger" });
-      } else if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        toast.show("Canceled", { type: "info" });
-      } else {
-        // some other error happened
-        toast.show("Unknown error occurred", { type: "danger" });
-      }
-    }
+    // try {
+    //   await GoogleSignin.hasPlayServices();
+    //   const userInfo = await GoogleSignin.signIn();
+    //   if (userInfo.user) {
+    //     mutate(userInfo?.idToken);
+    //   }
+    // } catch (error) {
+    //   if (error.code === statusCodes.IN_PROGRESS) {
+    //     // operation (e.g. sign in) is in progress already
+    //     toast.show("Sign in already in progress", { type: "danger" });
+    //   } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //     // play services not available or outdated
+    //     toast.show("Play services unavailable or outdated", { type: "danger" });
+    //   } else if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //     toast.show("Canceled", { type: "info" });
+    //   } else {
+    //     // some other error happened
+    //     toast.show("Unknown error occurred", { type: "danger" });
+    //   }
+    // }
   };
 
   const { renderForm } = useForm({
