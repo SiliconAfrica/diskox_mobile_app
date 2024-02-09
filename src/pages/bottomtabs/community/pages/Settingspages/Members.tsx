@@ -14,7 +14,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { useToast } from "react-native-toast-notifications";
 import { IUser } from "../../../../../models/user";
 import { Image } from "expo-image";
@@ -223,7 +223,7 @@ const Members = () => {
         </Box>
 
         <Box flex={1}>
-          <FlashList
+          <FlatList
             ListEmptyComponent={() => (
               <>
                 {!isLoading && !isFetching && (
@@ -283,7 +283,6 @@ const Members = () => {
                 await fetchNextPage();
               }
             }}
-            estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
               item.data.data.data.map((member: IUser) => (

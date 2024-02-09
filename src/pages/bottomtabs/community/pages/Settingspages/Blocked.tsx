@@ -17,7 +17,7 @@ import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { URLS } from "../../../../../services/urls";
@@ -245,7 +245,7 @@ const Blocked = () => {
           </CustomText>
           <Box height={20} />
         </Box> */}
-        <FlashList
+        <FlatList
           ListEmptyComponent={() => (
             <>
               {!isLoading && (
@@ -303,7 +303,6 @@ const Blocked = () => {
               await fetchNextPage();
             }
           }}
-          estimatedItemSize={10}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) =>
             item.data.data.data.map((member: IUser) => (

@@ -12,8 +12,7 @@ import { IUser } from '../../models/user'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
 import { Image } from 'expo-image'
-import { set } from 'react-native-reanimated'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native-gesture-handler'
 import { ChatEntry } from '../../models/ChatEntry'
 import moment from 'moment'
 import { useNavigation } from '@react-navigation/native'
@@ -91,7 +90,7 @@ const ChatList = () => {
                     <Ionicons name='add-outline' size={25} color='white' />
                 </Pressable>
             )}
-            <FlashList
+            <FlatList
                 contentContainerStyle={{ paddingHorizontal: 20 }}
                 ListEmptyComponent={() => (
                     <Box flex={1} justifyContent='center' alignItems='center'>
@@ -111,7 +110,6 @@ const ChatList = () => {
                     </Box>
                 )}
                 keyExtractor={(item, index) => index.toString()}
-                estimatedItemSize={100}
                 data={chats.filter((item) => {
                     if (debounceValue === '') {
                         return item;

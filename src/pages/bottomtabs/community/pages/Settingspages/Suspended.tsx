@@ -14,7 +14,7 @@ import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import useToast from "../../../../../hooks/useToast";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { ActivityIndicator } from "react-native";
 // import { MemberCardSingle } from "./Members";
 import { IUser } from "../../../../../models/user";
@@ -219,7 +219,7 @@ const Suspended = () => {
         </Box>
 
         <Box flex={1}>
-          <FlashList
+          <FlatList
             ListEmptyComponent={() => (
               <>
                 {!isLoading && (
@@ -277,7 +277,6 @@ const Suspended = () => {
                 await fetchNextPage();
               }
             }}
-            estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
               item.data.data.data.map((member: IUser) => (

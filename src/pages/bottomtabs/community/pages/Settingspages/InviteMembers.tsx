@@ -8,7 +8,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { useCommunityDetailsState } from "../../states/Settings.state";
@@ -231,7 +231,7 @@ const InviteMembers = () => {
         </Box>
 
         <Box flex={1}>
-          <FlashList
+          <FlatList
             ListEmptyComponent={() => (
               <>
                 {!isLoading && !isFetching && (
@@ -291,7 +291,6 @@ const InviteMembers = () => {
                 await fetchNextPage();
               }
             }}
-            estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) => {
               return item.data.data.data.map(

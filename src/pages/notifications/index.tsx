@@ -15,7 +15,7 @@ import moment from 'moment'
 import { URLS } from '../../services/urls';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Image } from 'expo-image'
-import { FlashList } from '@shopify/flash-list';
+import { FlatList } from 'react-native-gesture-handler'
 
 const NotificationCard = ({ id, message, profile_image, created_at, read_at}: INotification) => {
   const theme = useTheme<Theme>()
@@ -99,9 +99,8 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
 
 
       { !isError && (
-        <FlashList 
+        <FlatList 
           onEndReached={onEndReached}
-          estimatedItemSize={100}
           keyExtractor={(_, i)=> i.toString()}
           data={notitications}
           ListEmptyComponent={() => (

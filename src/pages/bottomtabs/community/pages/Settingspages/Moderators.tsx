@@ -14,7 +14,7 @@ import { PageType } from "../../../../login";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { Image } from "expo-image";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
@@ -241,7 +241,7 @@ const Moderators = () => {
         </Box>
 
         <Box flex={1}>
-          <FlashList
+          <FlatList
             ListEmptyComponent={() => (
               <>
                 {!isLoading && !isFetching && (
@@ -302,7 +302,6 @@ const Moderators = () => {
                 await fetchNextPage();
               }
             }}
-            estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
               item?.data?.data?.map((member: IUser & { permissions: any }) => (

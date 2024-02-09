@@ -14,7 +14,7 @@ import { URLS } from "../../services/urls";
 import { ICommunity } from "../../models/Community";
 import moment from "moment";
 import useToast from "../../hooks/useToast";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { IModerator } from "../../models/Moderators";
 import { Image } from "expo-image";
 
@@ -220,7 +220,7 @@ const AboutCommunity = () => {
           </Box>
         )}
         {!moderatorQuery.isLoading && !moderatorQuery.isError && (
-          <FlashList
+          <FlatList
             keyExtractor={(item, i) => i.toString()}
             data={moderators}
             renderItem={({ item }) => <ModeratorCard {...item} />}
@@ -238,7 +238,6 @@ const AboutCommunity = () => {
                 )}
               </>
             )}
-            estimatedItemSize={20}
           />
         )}
       </Box>

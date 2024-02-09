@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
@@ -55,7 +55,7 @@ export default function Announcements() {
         title="Announcement"
         handleArrowPressed={() => navigation.goBack()}
       />
-      <FlashList
+      <FlatList
         ListHeaderComponent={() => (
           <>
             <Box
@@ -76,7 +76,6 @@ export default function Announcements() {
         )}
         contentContainerStyle={{}}
         keyExtractor={(item, index) => index.toString()}
-        estimatedItemSize={100}
         data={announcements}
         onScrollBeginDrag={() => {
           if (!isFetching && !isLoading && !isRefetching) {
