@@ -7,7 +7,7 @@ import { IPost } from '../../models/post'
 import { useQuery } from 'react-query'
 import httpService from '../../utils/httpService'
 import { URLS } from '../../services/urls'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native-gesture-handler'
 import PostCard from '../feeds/PostCard'
 import CustomText from '../general/CustomText'
 import { useTheme } from '@shopify/restyle'
@@ -51,9 +51,8 @@ const Posts = () => {
     }
   }, [total, currentPage, lastPage])
   return (
-    <FlashList
+    <FlatList
       onEndReached={handleEndReached} 
-      estimatedItemSize={20}
       ListFooterComponent={() => (
         <>
           {

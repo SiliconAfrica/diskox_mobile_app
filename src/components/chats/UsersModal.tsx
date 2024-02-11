@@ -6,7 +6,7 @@ import { Theme } from '../../theme'
 import CustomText from '../general/CustomText'
 import { IUser } from '../../models/user'
 import { Image } from 'expo-image'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native-gesture-handler'
 import { useQuery } from 'react-query'
 import { useDetailsState } from '../../states/userState'
 import httpService, { IMAGE_BASE } from '../../utils/httpService'
@@ -97,12 +97,11 @@ const UserModal = ({ open, onClose }: {
 
             {/* SCROLLAREA */}
             { !isLoading && !isError && (
-                <FlashList 
+                <FlatList 
                 ListEmptyComponent={() => (
                     <Text>Nothing to see here</Text>
                 )}
                 keyExtractor={(item, index) => index.toString()}
-                estimatedItemSize={100}
                 data={followers}
                 renderItem={({ item }) => (
                     <UserCard user={item} action={Selected} />

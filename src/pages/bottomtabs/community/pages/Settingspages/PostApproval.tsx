@@ -11,7 +11,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import SettingsHeader from "../../../../../components/settings/Header";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import useToast from "../../../../../hooks/useToast";
@@ -206,7 +206,7 @@ const PostApproval = () => {
                 ))
             }
             </ScrollView> */}
-        <FlashList
+        <FlatList
           ListEmptyComponent={() => (
             <>
               {!isLoading && (
@@ -265,7 +265,6 @@ const PostApproval = () => {
               await fetchNextPage();
             }
           }}
-          estimatedItemSize={10}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) =>
             item?.data?.data?.data?.map((post: IPost) => (

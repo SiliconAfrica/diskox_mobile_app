@@ -14,10 +14,10 @@ import { URLS } from '../../../../services/urls'
 import { CUSTOM_STATUS_CODE } from '../../../../enums/CustomCodes'
 import { IBlockUser } from '../../../../models/BlockedUser'
 import useToast from '../../../../hooks/useToast'
-import { FlashList } from '@shopify/flash-list'
 import PrimaryButton from '../../../../components/general/PrimaryButton'
 import { Image } from 'expo-image'
-import { date } from 'zod'
+import { date } from 'zod';
+import { FlatList } from 'react-native-gesture-handler'
 
 const BlockedUserCard = ({ username, name, profile_image}: IBlockUser) => {
   const theme = useTheme<Theme>();
@@ -90,7 +90,7 @@ const BlockedUsers= ({ navigation }: NativeStackScreenProps<RootStackParamList, 
         }
         {
           !isError && (
-            <FlashList 
+            <FlatList 
           ListFooterComponent={() => (
             <>
               { isLoading && (
@@ -109,7 +109,7 @@ const BlockedUsers= ({ navigation }: NativeStackScreenProps<RootStackParamList, 
             )}
             </>
           )}
-          estimatedItemSize={20}
+         
           keyExtractor={(item, index) => index.toString()}
           data={users}
           renderItem={({ item }) => (

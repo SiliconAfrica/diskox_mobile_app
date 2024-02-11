@@ -16,7 +16,7 @@ import httpService, { IMAGE_BASE } from "../../../../../utils/httpService";
 import { URLS } from "../../../../../services/urls";
 import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
 import useToast from "../../../../../hooks/useToast";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { IUser } from "../../../../../models/user";
 import CustomButton from "../../../../../components/general/CustomButton";
 import { Image } from "expo-image";
@@ -245,7 +245,7 @@ const MemberRequest = () => {
             />
           </Box>
         ) : (
-          <FlashList
+          <FlatList
             ListEmptyComponent={() => (
               <>
                 {!isLoading && (
@@ -303,7 +303,6 @@ const MemberRequest = () => {
                 await fetchNextPage();
               }
             }}
-            estimatedItemSize={10}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) =>
               item.data.data.data.map((member: IUser) => (

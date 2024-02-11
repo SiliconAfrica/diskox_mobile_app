@@ -14,7 +14,7 @@ import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import PrimaryButton from "../general/PrimaryButton";
 import { IRule } from "../../models/Rules";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 
 const Accordion = ({
   id,
@@ -125,11 +125,10 @@ const Rules = () => {
         )}
 
         {!isError && (
-          <FlashList
+          <FlatList
             data={rules}
             renderItem={({ item }) => <Accordion {...item} />}
             keyExtractor={(item, i) => i.toString()}
-            estimatedItemSize={20}
             ListEmptyComponent={() => (
               <>
                 {!isLoading && (

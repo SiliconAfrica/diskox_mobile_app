@@ -20,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../../login";
 import { COMMUNITY_SETTING_TYPE } from "../../../../../enums/CommunitySettings";
 import { IUser } from "../../../../../models/user";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import useToast from "../../../../../hooks/useToast";
 import { useCommunityDetailsState } from "../../states/Settings.state";
 import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
@@ -182,7 +182,7 @@ const Rules = () => {
         }
       />
       <Box flex={1}>
-        <FlashList
+        <FlatList
           ListEmptyComponent={() => (
             <>
               {!isLoading && (
@@ -240,7 +240,6 @@ const Rules = () => {
               await fetchNextPage();
             }
           }}
-          estimatedItemSize={10}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) =>
             item.data.data.map((rule: IRule, i) => (

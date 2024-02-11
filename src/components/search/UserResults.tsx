@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from 'react-native'
 import React from 'react'
 import { IUser } from '../../models/user'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native-gesture-handler'
 import PostCard from '../feeds/PostCard'
 import theme, { Theme } from '../../theme'
 import { useTheme } from '@shopify/restyle'
@@ -44,8 +44,7 @@ const UserCard = ({ user }: {
 
 const UserResults = ({ users }: { users: Array<IUser>}) => {
   return (
-    <FlashList 
-        estimatedItemSize={20}
+    <FlatList 
         ListEmptyComponent={()  => (
             <Box px='m'>
                 <CustomText>No Person found</CustomText>

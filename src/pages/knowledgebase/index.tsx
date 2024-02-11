@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet } from "react-native";
 import Box from "../../components/general/Box";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import SettingsHeader from "../../components/settings/Header";
 import { PageType } from "../login";
 import CustomText from "../../components/general/CustomText";
@@ -56,7 +56,7 @@ export default function KnowledgeBase() {
         title="Knowledge Base"
         handleArrowPressed={() => navigation.goBack()}
       />
-      <FlashList
+      <FlatList
         ListHeaderComponent={() => (
           <>
             <Box style={{ width: "100%", height: 200 }}>
@@ -74,7 +74,6 @@ export default function KnowledgeBase() {
         )}
         contentContainerStyle={{ paddingHorizontal: 0 }}
         keyExtractor={(item, index) => item.id.toString()}
-        estimatedItemSize={100}
         data={knowledgebase}
         onScrollBeginDrag={() => {
           if (!isFetching && !isLoading && !isRefetching) {

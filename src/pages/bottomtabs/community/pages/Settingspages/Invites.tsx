@@ -19,7 +19,7 @@ import { URLS } from "../../../../../services/urls";
 import useToast from "../../../../../hooks/useToast";
 import { CUSTOM_STATUS_CODE } from "../../../../../enums/CustomCodes";
 import { IUser } from "../../../../../models/user";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList } from 'react-native-gesture-handler'
 import { Image } from "expo-image";
 
 const PostCard = ({
@@ -302,7 +302,7 @@ const Invites = () => {
             ))}
           </ScrollView> */}
           {active === 1 ? (
-            <FlashList
+            <FlatList
               ListEmptyComponent={() => (
                 <>
                   {!isLoadingPending && (
@@ -362,7 +362,6 @@ const Invites = () => {
                   await fetchPendingNextPage();
                 }
               }}
-              estimatedItemSize={10}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, index }) =>
                 item.data.data.data.map((member: IUser) => (
@@ -378,7 +377,7 @@ const Invites = () => {
               }
             />
           ) : (
-            <FlashList
+            <FlatList
               ListEmptyComponent={() => (
                 <>
                   {!isLoading && (
@@ -436,7 +435,6 @@ const Invites = () => {
                   await fetchNextPage();
                 }
               }}
-              estimatedItemSize={10}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, index }) =>
                 item.data.data.data.map((member: IUser) => (

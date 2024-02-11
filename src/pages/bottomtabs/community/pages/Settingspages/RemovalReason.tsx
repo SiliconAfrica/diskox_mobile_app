@@ -44,7 +44,7 @@ const RemovalReason = () => {
 
     return (
         <Box flex={1} backgroundColor='mainBackGroundColor'>
-            <SettingsHeader title='Removal reason' showSave handleArrowPressed={() => navigation.goBack()} rightItem={<CustomText variant='body' color='primaryColor' onPress={() => navigation.push('community-settings', { id: 23, type: COMMUNITY_SETTING_TYPE.ADD_REMOVAL_REASON})}>Add Reason</CustomText>} />
+            <SettingsHeader title='Removal reason' showSave handleArrowPressed={() => navigation.goBack()} RightItem={<CustomText variant='body' color='primaryColor' onPress={() => navigation.push('community-settings', { id: 23, type: COMMUNITY_SETTING_TYPE.ADD_REMOVAL_REASON, username: ''})}>Add Reason</CustomText>} />
             <Box flex={1}>
 
                 <Box flex={1} >

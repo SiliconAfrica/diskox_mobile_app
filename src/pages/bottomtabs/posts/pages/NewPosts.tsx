@@ -3,7 +3,6 @@ import React, { useCallback } from "react";
 import Box from "../../../../components/general/Box";
 import Searchbar from "../../../../components/Searchbar";
 import { useUtilState } from "../../../../states/util";
-import { FlashList } from "@shopify/flash-list";
 import FilterTopbar, {
   FILTER_BAR_ENUM,
 } from "../../../../components/feeds/FilterTopbar";
@@ -239,6 +238,18 @@ const NewPost = ({
     }
   };
 
+  const handleInfintiScroll = (type: 'community'|'people') => {
+    if (type === 'community') {
+      if (totalCommuntiies> recommendedCommunities.length) {
+        setCommunityPage((prev) => prev + 1);
+      }
+    } else {
+      if (peopleTotal > recommendedPeople.length) {
+        setPeoplePage((prev) => prev + 1);
+      }
+    }
+  }
+    
   const handleRecommendation = useCallback(
     (index: number) => {
       return (
@@ -246,7 +257,7 @@ const NewPost = ({
           <CustomText variant="subheader" fontSize={18}>
             People you may know
           </CustomText>
-          {getRecommendedPeople.isLoading && (
+          {getRecommendedPeople.isLoading && recommendedPeople.length < 1 && (
             <Box
               width={"100%"}
               height={"100%"}
@@ -289,22 +300,46 @@ const NewPost = ({
                 contentContainerStyle={{ marginTop: 20 }}
                 data={recommendedPeople}
                 extraData={recommendedPeople}
+                onEndReached={() => handleInfintiScroll('people')}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={() => {
+                  return (
+                   <>
+                      {
+                      peopleTotal === recommendedPeople.length && (
+                        <Box width={220} height={'100%'} justifyContent="center" alignItems="center">
+                          <CustomText>Thats all for now</CustomText>
+                        </Box>
+                      )
+                      }
+                      {getRecommendedPeople.isLoading && (
+                        <Box width={220} height={'100%'} justifyContent="center" alignItems="center">
+                          <ActivityIndicator size={"small"} color={theme.colors.primaryColor} />
+                        </Box>
+                      )}
+                   </>
+                  )
+                }}
                 renderItem={({ index, item }) => (
-                  <Box
-                    width={220}
-                    padding="s"
-                    marginRight="m"
-                    borderRadius={10}
-                    bg="mainBackGroundColor"
-                  >
-                    <RecommendedUsersCard
-                      user={item}
-                      index={index}
-                      removedUser={(index) => {
-                        recommendedPeople.filter((_, indx) => index !== indx);
-                      }}
-                    />
-                  </Box>
+                  <>
+                    <Box
+                      width={220}
+                      padding="s"
+                      marginRight="m"
+                      borderRadius={10}
+                      bg="mainBackGroundColor"
+                    >
+                      <RecommendedUsersCard
+                        user={item}
+                        index={index}
+                        removedUser={(index) => {
+                          const newPeople = recommendedPeople.filter((_, indx) => index !== indx);
+                          setRecommendedPeople(newPeople);
+                        }}
+                      />
+                    </Box>
+                    
+                  </>
                 )}
               />
             </>
@@ -339,6 +374,9 @@ const NewPost = ({
             </Box>
           </Box>
         )}
+        {
+          !getRecommendedCommunities.isLoading && <></>
+        }
         {!getRecommendedCommunities.isLoading &&
           recommendedCommunities?.length === 0 && <></>}
         {!getRecommendedCommunities.isLoading &&
@@ -379,6 +417,24 @@ const NewPost = ({
                 contentContainerStyle={{ marginTop: 20 }}
                 data={recommendedCommunities}
                 extraData={recommendedCommunities}
+                onEndReached={() => handleInfintiScroll('community')}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={() => (
+                  <>
+                    {
+                      totalCommuntiies === recommendedCommunities.length && (
+                        <Box width={220} height={'100%'} justifyContent="center" alignItems="center">
+                          <CustomText>Thats all for now</CustomText>
+                        </Box>
+                      )
+                    }
+                    {getRecommendedCommunities.isLoading && (
+                      <Box width={220} height={'100%'} justifyContent="center" alignItems="center">
+                        <ActivityIndicator size={"small"} color={theme.colors.primaryColor} />
+                      </Box>
+                    )}
+                  </>
+                )}
                 renderItem={({ index, item }) => (
                   <Box
                     width={220}
@@ -391,7 +447,8 @@ const NewPost = ({
                       community={item}
                       index={index}
                       removedCommunity={(indx) => {
-                        recommendedPeople.filter((_, index) => index !== indx);
+                        const newRec = recommendedPeople.filter((_, index) => index !== indx);
+                        setRecommendedPeople(newRec);
                       }}
                     />
                   </Box>

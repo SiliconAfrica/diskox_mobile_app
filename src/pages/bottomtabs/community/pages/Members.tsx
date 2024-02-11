@@ -13,7 +13,7 @@ import httpService, { IMAGE_BASE } from '../../../../utils/httpService'
 import { URLS } from '../../../../services/urls'
 import { useMutation, useQuery } from 'react-query'
 import { RouteProp, useRoute } from '@react-navigation/native'
-import { FlashList } from '@shopify/flash-list'
+import { FlatList } from 'react-native-gesture-handler'
 import { useToast } from 'react-native-toast-notifications'
 import { Image } from 'expo-image'
 
@@ -103,7 +103,7 @@ const Members = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => 
         {/* MEMBERS LIST */}
         { !isLoading && !isError && (
             <Box flex={1} marginTop='l'>
-                <FlashList 
+                <FlatList 
                     ListEmptyComponent={() => (
                         <>
                             { !isLoading && (
@@ -123,7 +123,6 @@ const Members = ({ navigation }: NativeStackScreenProps<RootStackParamList>) => 
                         </>
                     )}
                     data={members}
-                    estimatedItemSize={10}
                     keyExtractor={(item, index) => item.id.toString()}
                     renderItem={({ item }) => (
                         <MemberCard {...item} />
