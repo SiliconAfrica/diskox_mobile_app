@@ -33,11 +33,7 @@ import { CustomTextInput } from "../../components/form/CustomInput";
 import useForm from "../../hooks/useForm";
 import { useSignupState } from "../signup/state";
 import { AntDesign } from "@expo/vector-icons";
-import {
-  loginSchema,
-  registerSchema,
-  usernameSelectSchema,
-} from "../../services/validations";
+import { loginSchema } from "../../services/validations";
 import { SubmitButton } from "../../components/form/SubmittButton";
 import {
   useDetailsState,
