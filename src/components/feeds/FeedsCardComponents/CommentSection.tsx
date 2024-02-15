@@ -246,7 +246,7 @@ const CommentSection = ({
         <Box width='100%' minHeight={90}  bg='mainBackGroundColor'  overflow='visible' elevation={4} borderTopWidth={0.3} borderTopColor='lightGrey' paddingVertical='s' paddingHorizontal='m'>
            { images.length > 0 && (
              <Box width='100%' height={90}>
-                <ScrollView style={{ width: '100%' }} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center'}} horizontal>
+                <ScrollView style={{ width: '100%', flex: 1 }} contentContainerStyle={{ justifyContent: 'center', alignItems: 'center'}} horizontal>
                     {images.map((item, index) => (
                        <ImageBox key={index.toString()} type='LOCAL' payload={item} index={index} onRemove={removeImage} />
                     ))}

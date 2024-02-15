@@ -85,6 +85,7 @@ const NewPost = ({
           page: peoplePage,
         },
       }),
+
     {
       onSuccess: (data) => {
         const item: PaginatedResponse2<IRecommendedPeople> = data.data;
@@ -124,6 +125,7 @@ const NewPost = ({
       },
     },
   );
+
 
   // muatation
   const paginatedMutation = useMutation({
@@ -508,7 +510,7 @@ const NewPost = ({
           keyExtractor={(item, index) => item.id.toString()}
           extraData={DeletedIds}
           renderItem={({ item, index }) => {
-            if (index % 12 === 0) {
+            if (index % 12 === 0 && isLoggedIn) {
               return (
                 <>
                   <FeedCard post={item} showReactions />
@@ -523,7 +525,7 @@ const NewPost = ({
                   </Box>
                 </>
               );
-            } else if (index % 7 === 0) {
+            } else if (index % 7 === 0 && isLoggedIn) {
               return (
                 <>
                   <FeedCard post={item} showReactions />
