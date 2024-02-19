@@ -42,6 +42,7 @@ const Profile = ({
   const { refreshAccounts } = useMultipleAccounts((state) => state);
   const {
     profile_image,
+    phone_number,
     name,
     describes_you,
     username,
@@ -83,19 +84,19 @@ const Profile = ({
       refreshAccounts(data?.data?.data);
       queryClient.invalidateQueries(["getLoggedInDetails"]);
       setFile(null);
-      navigation.goBack();
+      navigation.navigate("home");
     },
     onError: (error: any) => {
-      toast.show("An error occured", { type: "error" });
+      toast.show(error?.message || "An error occured", { type: "error" });
     },
   });
-
   const handleSubmit = () => {
     if (isLoading) return;
     const formData = new FormData();
     formData.append("country", country);
     formData.append("state", state);
     formData.append("describes_you", description);
+    formData.append("phone_number", phone_number);
     formData.append("gender", gender);
     formData.append("birthday", date);
     formData.append("name", fullname);

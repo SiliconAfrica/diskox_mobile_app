@@ -11,7 +11,6 @@ import { useMutation, useQuery } from "react-query";
 import { IInterest } from "../../models/Interests";
 import useToast from "../../hooks/useToast";
 import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
-import { FlashList } from "@shopify/flash-list";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import InterestChip from "../../components/interest/InterestChip";
@@ -143,15 +142,15 @@ const Interests = ({
         handleArrowPressed={() => navigation.goBack()}
       />
       <Box width={"100%"} padding="m">
-        <CustomText variant="subheader">
+        <CustomText variant="subheader" textAlign="center">
           What topics are you most interested in?
         </CustomText>
-        <CustomText variant="body" marginVertical="s">
+        <CustomText variant="body" marginVertical="s" textAlign="center">
           Select 3 or more to continue. We’ll use this to show posts or
           recommend communities you may like.
         </CustomText>
       </Box>
-      <Box flex={1} backgroundColor="secondaryBackGroundColor">
+      <Box flex={1} backgroundColor="white">
         {getInterests.isError ||
           (isError && (
             <Box

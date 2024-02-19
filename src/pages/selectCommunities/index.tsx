@@ -78,8 +78,10 @@ const SelectCommunities = ({
       <ScrollView>
         <Box>
           <Box width={"100%"} padding="m">
-            <CustomText variant="subheader">Top Communities</CustomText>
-            <CustomText variant="body" marginVertical="s">
+            <CustomText variant="subheader" textAlign="center">
+              Top Communities
+            </CustomText>
+            <CustomText variant="body" marginVertical="s" textAlign="center">
               Select at least 5 communities to get started.
             </CustomText>
           </Box>
@@ -100,7 +102,11 @@ const SelectCommunities = ({
                       borderRadius={5}
                       alignItems="center"
                       justifyContent="center"
-                      backgroundColor="secondaryBackGroundColor"
+                      backgroundColor={
+                        selected.includes(community.id)
+                          ? "fadedButtonBgColor"
+                          : "secondaryBackGroundColor"
+                      }
                       borderWidth={1}
                       borderColor={
                         selected.includes(community.id)
@@ -108,7 +114,15 @@ const SelectCommunities = ({
                           : "secondaryBackGroundColor"
                       }
                     >
-                      <CustomText>{index + 1}</CustomText>
+                      <CustomText
+                        color={
+                          selected.includes(community.id)
+                            ? "primaryColor"
+                            : "black"
+                        }
+                      >
+                        {index + 1}
+                      </CustomText>
                     </Box>
                     <Box
                       width={"92.5%"}
@@ -116,7 +130,11 @@ const SelectCommunities = ({
                       flexDirection="row"
                       justifyContent="space-between"
                       alignItems="center"
-                      backgroundColor="secondaryBackGroundColor"
+                      backgroundColor={
+                        selected.includes(community.id)
+                          ? "fadedButtonBgColor"
+                          : "secondaryBackGroundColor"
+                      }
                       borderRadius={5}
                       paddingHorizontal="s"
                       borderWidth={1}
@@ -147,7 +165,7 @@ const SelectCommunities = ({
                           <FontAwesome
                             name="users"
                             size={35}
-                            color={theme.colors.black}
+                            color={theme.colors.grey}
                           />
                         )}
                       </Box>

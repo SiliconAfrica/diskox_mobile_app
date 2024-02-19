@@ -163,7 +163,6 @@ const SignIn = ({
         mutate(userInfo?.idToken);
       }
     } catch (error) {
-      console.log(error, "sksk");
       if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
         toast.show("Sign in already in progress", { type: "danger" });
@@ -262,13 +261,13 @@ const SignIn = ({
             alignItems="center"
           >
             <Box
-              borderBottomWidth={2}
+              borderBottomWidth={1}
               style={{ borderBottomColor: theme.colors.black }}
               width={"40%"}
             ></Box>
             <CustomText>OR</CustomText>
             <Box
-              borderBottomWidth={2}
+              borderBottomWidth={1}
               style={{ borderBottomColor: theme.colors.black }}
               width={"40%"}
             ></Box>

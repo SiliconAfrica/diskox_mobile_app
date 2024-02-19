@@ -279,7 +279,9 @@ const Setup = ({
           >
             {image()}
           </Box>
-          <CustomText variant="subheader">Where are you from?</CustomText>
+          <CustomText variant="subheader" textAlign="center">
+            Provide your location, gender and date of birth
+          </CustomText>
           <CustomTextInputWithoutForm
             name="phone_number"
             placeholder="Enter your phone number"
