@@ -113,7 +113,9 @@ const Interests = ({
       if (selectedInterests.includes(id)) {
         setSelectedInterests((prev) => prev.filter((item) => item !== id));
       } else {
-        setSelectedInterests((prev) => [...prev, id]);
+        if (selectedInterests.length < 5) {
+          setSelectedInterests((prev) => [...prev, id]);
+        }
       }
     },
     [selectedInterests]
