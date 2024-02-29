@@ -30,3 +30,5 @@ is_member_request_pending - value to check before pending
 
 - Start by msking sure deleted message is not highlightable or action can't be performed on it
 - Redesign the message box of chat
+
+- Another person can delete another person comment
