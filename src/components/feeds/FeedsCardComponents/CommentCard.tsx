@@ -55,7 +55,6 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
   const [newImage, setNewImage] = React.useState<ImagePickerAsset[]>([]);
   const [replies, setReplies] = React.useState<IReply[]>([]);
   const [showEmoji, setShowEmoji] = React.useState(false);
-  console.log("plooooo");
   const toast = useToast();
   const queryClient = useQueryClient();
   const { setAll } = useModalState((state) => state);
@@ -224,7 +223,6 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
 
     reacttocomment.mutate(formData);
   };
-
   const handleImagePicked = (image: ImagePickerAsset) => {
     if (images.length > 0) {
       toast.show("Cannot pick more than one image", {
