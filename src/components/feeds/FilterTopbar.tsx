@@ -42,30 +42,7 @@ const FilterTopbar = ({
       paddingHorizontal="m"
      
     >
-        <Pressable
-        onPress={() => onActive(FILTER_BAR_ENUM.TRENDING)}
-        style={{
-          flex: 1,
-          height: 40,
-          borderRadius: 30,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingHorizontal: 10,
-          backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
-        }}
-      >
-        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? 'white': theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
-        <CustomText
-          variant="subheader"
-          fontSize={14}
-          style={{
-            color: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? "white": theme.colors.primaryColor : theme.colors.lightGrey,
-          }}
-        >
-          Trending
-        </CustomText>
-      </Pressable>
+        
 
       <Pressable
         onPress={() => onActive(FILTER_BAR_ENUM.NEW)}
@@ -98,6 +75,31 @@ const FilterTopbar = ({
           }}
         >
           New
+        </CustomText>
+      </Pressable>
+
+      <Pressable
+        onPress={() => onActive(FILTER_BAR_ENUM.TRENDING)}
+        style={{
+          flex: 1,
+          height: 40,
+          borderRadius: 30,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 10,
+          backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
+        }}
+      >
+        <Ionicons size={20} name='trending-up' color={activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? 'white': theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginRight: 4 }} />
+        <CustomText
+          variant="subheader"
+          fontSize={14}
+          style={{
+            color: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? "white": theme.colors.primaryColor : theme.colors.lightGrey,
+          }}
+        >
+          Trending
         </CustomText>
       </Pressable>
 

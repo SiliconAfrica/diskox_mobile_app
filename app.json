@@ -35,6 +35,7 @@
         "backgroundColor": "#34A853"
       },
       "package": "com.dandolla98.diskos",
+      "googleServicesFile": "./google-services.json",
       "versionCode": 48,
       "permissions": [
         "android.permission.RECORD_AUDIO",

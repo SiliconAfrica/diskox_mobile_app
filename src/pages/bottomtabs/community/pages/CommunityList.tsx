@@ -9,7 +9,6 @@ import CommunityListCard from "../../../../components/community/CommunityListCar
 import { useQueries, useQuery } from "react-query";
 import httpService from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
-import { FlashList } from "@shopify/flash-list";
 import { ICommunity } from "../../../../models/Community";
 import { Theme } from "../../../../theme";
 import { useTheme } from "@shopify/restyle";
@@ -73,7 +72,7 @@ const CommunityList = () => {
       />
 
       {/* HEADER */}
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Box
           width="100%"
           flexDirection="row"

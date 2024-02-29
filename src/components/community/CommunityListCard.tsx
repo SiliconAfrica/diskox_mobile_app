@@ -13,6 +13,7 @@ import useToast from "../../hooks/useToast";
 import ErrorButton from "../general/ErrorButton";
 import { ActivityIndicator, Pressable } from "react-native";
 import theme from "../../theme";
+import { Feather } from '@expo/vector-icons';
 
 const CommunityListCard = (props: ICommunity) => {
   const { name, description, profile_image, id, is_member } = props;
@@ -58,8 +59,8 @@ const CommunityListCard = (props: ICommunity) => {
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: theme.spacing.m,
-        borderBottomColor: theme.colors.secondaryBackGroundColor,
-        borderBottomWidth: 2,
+        borderBottomColor: theme.colors.borderColor,
+        borderBottomWidth: 0.5,
       }}
       // width={"100%"}
       // height={100}
@@ -75,14 +76,21 @@ const CommunityListCard = (props: ICommunity) => {
           height={30}
           width={30}
           borderRadius={15}
-          bg="primaryColor"
+          bg="secondaryBackGroundColor"
           overflow="hidden"
         >
-          <Image
+          { profile_image !== null && (
+            <Image
             source={{ uri: `${IMAGE_BASE}${profile_image}` }}
             contentFit="cover"
             style={{ width: "100%", height: "100%" }}
           />
+          )}
+          { profile_image === null && (
+            <Box width='100%' height={'100%'} justifyContent="center" alignItems="center">
+              <Feather name='users' size={15} color={theme.colors.primaryColor} />
+            </Box>
+          )}
         </Box>
 
         <Box marginLeft="s">

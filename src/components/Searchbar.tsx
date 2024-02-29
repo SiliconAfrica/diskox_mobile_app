@@ -65,7 +65,7 @@ const Searchbar = () => {
             flex: 1,
             height: 44,
             borderRadius: 25,
-            backgroundColor: isDarkMode ? theme.colors.darkAccntColor:theme.colors.secondaryBackGroundColor,
+            backgroundColor: isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.secondaryBackGroundColor,
             marginHorizontal: 10,
            justifyContent: 'center',
            paddingLeft: 20

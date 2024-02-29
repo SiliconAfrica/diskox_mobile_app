@@ -21,6 +21,8 @@ import { Ionicons } from '@expo/vector-icons'
 import useDebounce from '../../hooks/useDebounce'
 import useToast from '../../hooks/useToast'
 import { PaginatedResponse } from '../../models/PaginatedResponse'
+import { uniqBy } from 'lodash'
+import { Feather } from '@expo/vector-icons'
 
 
 interface IProps {
@@ -33,10 +35,17 @@ export const UserList = ({ user, action }: {
     const theme = useTheme<Theme>();
 
     return (
-        <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: theme.colors.secondaryBackGroundColor, borderBottomWidth: 2 }} >
+        <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: theme.colors.secondaryBackGroundColor, borderBottomWidth: 0.5 }} >
             <Box flexDirection='row' alignItems='center' >
                 <Box width={32} height={32} borderRadius={17} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
-                    <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />
+                    { user.profile_image !== null && (
+                        <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />
+                    )}
+                    { user.profile_image === null && (
+                        <Box width={'100%'} height={'100%'} justifyContent='center' alignItems='center'>
+                            <Feather name='user' size={15} color={theme.colors.textColor} />
+                        </Box>
+                    )}
                 </Box>
 
                 <Box marginLeft='s'>
@@ -49,10 +58,10 @@ export const UserList = ({ user, action }: {
                             </Box>
                         )}
                     </Box>
-                    <CustomText variant='body' fontSize={14}>{user.message}</CustomText>
+                    <CustomText variant='body' fontSize={14}>{user.message.length > 40 ? user.message.substring(0, 40) + '...': user.message}</CustomText>
                 </Box>
             </Box>
-            <CustomText variant='xs'>{moment(user.created_at).startOf('hour').fromNow()}</CustomText>
+            <CustomText variant='xs'>{moment(user.created_at).startOf('seconds').fromNow()}</CustomText>
         </Pressable>
     )
 }
@@ -67,9 +76,10 @@ const ChatList = () => {
     const toast = useToast();
 
     const { isLoading } = useQuery(['getChattedUsers'], () => httpService.get(`${URLS.CHATTED_USER}`), {
+        refetchInterval: 1000,
         onSuccess: (data) => {
             const item: PaginatedResponse<ChatEntry> = data.data;
-            setChats(data.data.data.data);
+            setChats(uniqBy([...data.data.data.data], 'id'));
         },
         onError: (error: any) => {
             toast.show(error.message, { type: 'error' });
