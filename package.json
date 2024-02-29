@@ -7,7 +7,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "tsc": "tsc",
-    "apk-build": "eas build --profile preview --platform android"
+    "apk": "eas build --profile preview --platform android"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",

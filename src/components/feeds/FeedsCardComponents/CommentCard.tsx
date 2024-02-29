@@ -436,7 +436,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                       variant="subheader"
                       fontSize={14}
                     >
-                      Report Post
+                      Report
                     </CustomText>
                   </MenuOption>
                 )}

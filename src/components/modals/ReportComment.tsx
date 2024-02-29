@@ -154,8 +154,9 @@ const ReportComment = () => {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
   const { height: HEIGHT } = useWindowDimensions();
 
-  const { activeComment_id, activeReply_id, setAll, showReportComment } =
-    useModalState((state) => state);
+  const { activeComment_id, setAll, showReportComment } = useModalState(
+    (state) => state
+  );
   const theme = useTheme<Theme>();
   const toast = useToast();
 
@@ -171,20 +172,13 @@ const ReportComment = () => {
 
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: FormData) =>
-      httpService.post(
-        `${activeReply_id ? URLS.REPORT_REPLY : URLS.REPORT_COMMENT}`,
-        data
-      ),
+      httpService.post(`${URLS.REPORT_COMMENT}`, data),
     onSuccess: (data) => {
       toast.show(data.data.message, {
         type: "success",
         animationType: "zoom-in",
       });
-      setAll({
-        showReportComment: false,
-        activeComment_id: null,
-        activeReply_id: null,
-      });
+      setAll({ showReportComment: false, activeComment_id: null });
     },
     onError: (error: any) => {
       toast.show(error.message, { type: "error", animationType: "zoom-in" });
@@ -192,17 +186,12 @@ const ReportComment = () => {
   });
 
   const report = () => {
-    if (
-      activeReport === "" ||
-      (activeComment_id === null && activeReply_id === null)
-    ) {
+    if (activeReport === "" || activeComment_id === null) {
       toast.show("You have to select an option", { type: "warning" });
       return;
     }
-
     const formData = new FormData();
-    formData.append("comment_id", activeComment_id?.toString());
-    formData.append("reply_id", activeReply_id?.toString());
+    formData.append("comment_id", activeComment_id.toString());
     formData.append("reason", activeReport);
     mutate(formData);
   };
