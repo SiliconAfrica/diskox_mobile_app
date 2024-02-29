@@ -277,7 +277,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
   };
 
   const handleReport = () => {
-    setAll({ activeComment_id: activeComment.id, showReportComment: true });
+    setAll({ activeReply_id: activeComment.id, showReportComment: true });
   };
 
   return (
@@ -372,7 +372,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
                       variant="subheader"
                       fontSize={14}
                     >
-                      Report Post
+                      Report
                     </CustomText>
                   </MenuOption>
                 )}
