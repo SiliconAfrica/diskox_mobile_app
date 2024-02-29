@@ -36,7 +36,7 @@
       },
       "package": "com.dandolla98.diskos",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 48,
+      "versionCode": 49,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
