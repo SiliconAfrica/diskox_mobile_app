@@ -277,7 +277,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
   };
 
   const handleReport = () => {
-    setAll({ activeReply_id: activeComment.id, showReportComment: true });
+    setAll({ activeReply_id: activeComment.id, showReportReply: true });
   };
 
   return (
