@@ -48,7 +48,7 @@ const FeedCard = ({
   const [showAll, setShowAll] = React.useState(false);
   const [post, setPost] = React.useState<IPost>({ ...activePost });
   const [images, setImages] = React.useState(
-    activePost.post_images.map((item) => item.image_path),
+    activePost.post_images.map((item) => item.image_path)
   );
   const [showMoreTitle, setShowMoreTitle] = React.useState(false);
 
@@ -94,7 +94,7 @@ const FeedCard = ({
         const p: IPost = data.data.data;
         setPost(data.data.data);
       },
-    },
+    }
   );
 
   // muatations
@@ -488,8 +488,8 @@ const FeedCard = ({
             {showMore
               ? colorizeHashtags(post?.repost_comment ?? "")
               : post?.repost_comment?.length > 150
-                ? colorizeHashtags(`${post?.repost_comment?.slice(0, 150)}...`)
-                : colorizeHashtags(post?.repost_comment)}
+              ? colorizeHashtags(`${post?.repost_comment?.slice(0, 150)}...`)
+              : colorizeHashtags(post?.repost_comment)}
             {post?.repost_comment?.length > 150 && (
               <CustomText
                 style={{ width: "100%" }}
@@ -696,7 +696,8 @@ const FeedCard = ({
                       }
                     />
                     <CustomText variant="body" marginLeft="s">
-                      {post.comments_count > 0 && post.comments_count}
+                      {post.comments_count > 0 &&
+                        post.comments_count + post.replies_count}
                     </CustomText>
                   </Pressable>
                 </Box>
