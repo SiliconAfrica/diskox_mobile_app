@@ -8,7 +8,7 @@ export interface IUserState {
   id: number;
   token: string;
   about: string;
-  birthday: string;
+  birthday: any;
   country: string;
   cover_photo: string;
   deleted_at: string;
