@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "../../../../components/general/Box";
 import SettingsHeader from "../../../../components/settings/Header";
 import { useDetailsState } from "../../../../states/userState";
@@ -33,6 +33,8 @@ import mime from "mime";
 import { useMultipleAccounts } from "../../../../states/multipleAccountStates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../../../utils/handlePomise";
+import GenderPicker from "../../../../components/form/GenderPicker";
+import CustomDropdown from "../../../../components/form/CustomDropdown";
 
 const Profile = ({
   navigation,
@@ -54,7 +56,7 @@ const Profile = ({
     birthday,
     setAll,
   } = useDetailsState((state) => state);
-  const [sex, setSex] = React.useState(gender);
+  const [sex, setSex] = React.useState<"male" | "female" | any>(gender);
   const [image, setImage] = React.useState(profile_image);
   const [fullname, setFullname] = React.useState(name);
   const [email, setEmail] = React.useState(userEmail);
@@ -64,6 +66,25 @@ const Profile = ({
   const [selected, setSelectedId] = React.useState<number | null>(null);
   const [date, setDate] = React.useState(birthday);
   const [showDate, setShowDate] = React.useState(false);
+  const [years, setYears] = React.useState<{ value: string }[]>([]);
+  const [months, setMonths] = React.useState<
+    { label: String; value: string }[]
+  >([]);
+  console.log(new Date(Date.parse(birthday)).getFullYear(), "daye");
+  const [days, setDays] = React.useState<{ value: string }[]>([]);
+  const [selectedDate, setSelectedDate] = React.useState({
+    year: birthday
+      ? new Date(Date.parse(birthday)).getFullYear()
+      : years.length > 0
+      ? years[years.length - 1].value
+      : Number(new Date().getFullYear()) - 13,
+    month: birthday
+      ? new Date(Date.parse(birthday)).getMonth()
+      : months.length > 0
+      ? months[0].value
+      : 0,
+    day: birthday ? new Date(Date.parse(birthday)).getDate() : 1,
+  });
   const [file, setFile] = React.useState<ImagePicker.ImagePickerAsset | null>(
     null
   );
@@ -97,7 +118,7 @@ const Profile = ({
     formData.append("state", state);
     formData.append("describes_you", description);
     formData.append("phone_number", phone_number);
-    formData.append("gender", gender);
+    formData.append("gender", sex);
     formData.append("birthday", date);
     formData.append("name", fullname);
     if (file !== null) {
@@ -127,10 +148,15 @@ const Profile = ({
 
   // data serializing
   const renderStates = React.useCallback(() => {
+    const theSelectedCountry = Data.filter((item) => item.name === country).map(
+      (item) => item.id
+    )[0];
     return (States as IState[])
-      .filter((item) => item.country_id === selected)
-      .map((item) => item.name);
-  }, [selected]);
+      .filter((item) => item.country_id === theSelectedCountry)
+      .map((item) => ({
+        label: item.name,
+      }));
+  }, [country]);
   const [countries, setCountries] = React.useState(
     (Data as ICountry[]).map((item) => item.name)
   );
@@ -154,6 +180,109 @@ const Profile = ({
     setShowDate(false);
     setDate(selectedDate.toDateString());
   };
+
+  const handleSelectDate = (type: "year" | "month" | "day", value) => {
+    if (type === "year") {
+      setSelectedDate({ ...selectedDate, year: value });
+    } else if (type === "month") {
+      setSelectedDate({ ...selectedDate, month: value });
+    } else if (type === "day") {
+      setSelectedDate({ ...selectedDate, day: value });
+    }
+  };
+
+  const getYears = () => {
+    const currentYear = new Date().getFullYear();
+    const eligibleYearStart = Number(currentYear) - 13;
+    const eligibleYearEnd = Number(currentYear) - 110;
+    let theYears = [];
+    for (let i = eligibleYearStart; i > eligibleYearEnd; i--) {
+      theYears = [...theYears, { value: i.toString() }];
+    }
+    if (birthday) {
+      const oldYear = new Date(Date.parse(birthday)).getFullYear().toString();
+
+      setYears([{ value: oldYear }, ...theYears]);
+    } else {
+      setYears([...theYears]);
+    }
+  };
+
+  const getMonths = () => {
+    const month = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    let theMonths = [];
+    for (let i = 0; i < 12; i++) {
+      theMonths = [...theMonths, { label: month[i], value: i }];
+    }
+    if (birthday) {
+      const oldMonth = new Date(Date.parse(birthday)).getMonth();
+      const filteredMonths = theMonths.filter(
+        (mont) => mont.value !== oldMonth
+      );
+      setMonths([
+        { value: oldMonth, label: month[oldMonth] },
+        ...filteredMonths,
+      ]);
+    } else {
+      setMonths([...theMonths]);
+    }
+  };
+  const getDays = () => {
+    let theDays = [];
+    for (let i = 1; i < 32; i++) {
+      if (selectedDate.month === 1 && i === 30) {
+        break;
+      } else if (
+        (selectedDate.month === 3 ||
+          selectedDate.month === 5 ||
+          selectedDate.month === 8 ||
+          selectedDate.month === 10) &&
+        i === 31
+      ) {
+        break;
+      }
+      theDays = [...theDays, { value: i.toString() }];
+    }
+
+    if (birthday) {
+      const oldDate = new Date(Date.parse(birthday)).getDate();
+      const filteredDates = theDays.filter(
+        (item) => item.value !== oldDate.toString()
+      );
+      setDays([{ value: oldDate }, ...filteredDates]);
+    } else {
+      setDays([...theDays]);
+    }
+  };
+  useEffect(() => {
+    getYears();
+    getMonths();
+    getDays();
+  }, []);
+  useEffect(() => {
+    const yyyy = Number(selectedDate.year);
+    const mm = Number(selectedDate.month);
+    const dd = Number(selectedDate.day);
+
+    const theDate = new Date(yyyy, mm, dd);
+    setDate(theDate.toDateString());
+  }, [selectedDate]);
+  useEffect(() => {
+    getDays();
+  }, [selectedDate.month]);
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
@@ -256,49 +385,59 @@ const Profile = ({
             showEditIcon={true}
             textarea
           />
-          <CustomDropDwon
-            title="Gender"
-            options={["Male", "Female"]}
-            value={sex}
-            onSelected={(val) => setSex(val)}
-          />
-          <CustomDropDwon
-            title="country"
-            options={Data.map((item) => item.name)}
-            value={country}
-            onSelected={(val) => handleSelectCountry(val)}
-          />
-          <CustomDropDwon
-            title="State"
-            options={renderStates()}
-            value={state}
-            onSelected={(val) => setState(val)}
-          />
 
-          <Box>
-            <CustomText variant="subheader" fontSize={16}>
-              Birth date
-            </CustomText>
-            <CustomText
-              variant="body"
-              marginTop="s"
-              onPress={() => setShowDate(true)}
-            >
-              {moment(date).format("YYYY-MM-DD")}
-            </CustomText>
+          <Box style={{ marginBottom: 20 }}>
+            <GenderPicker value={sex} onChange={(gen: string) => setSex(gen)} />
           </Box>
-          {showDate && (
-            <DateTimePicker
-              mode="date"
-              display="calendar"
-              onChange={handleDateChange}
-              maximumDate={
-                new Date(moment().subtract(10, "years").format("YYYY-MM-DD"))
-              }
-              value={moment(date).toDate()}
-              themeVariant={isDarkMode ? "dark" : "light"}
+
+          <CustomDropdown
+            label="Country"
+            options={Data}
+            labelField="name"
+            valueField="name"
+            placeholder="Nigeria"
+            value={country}
+            onChange={(val) => handleSelectCountry(val.name)}
+            search
+          />
+          <CustomDropdown
+            label="State"
+            options={renderStates()}
+            labelField="label"
+            valueField="label"
+            value={state}
+            onChange={(data) => setState(data.label)}
+            search
+          />
+          <CustomText variant="subheader" marginTop="m" fontSize={16}>
+            Birth date
+          </CustomText>
+          <Box flexDirection="row" justifyContent="space-between">
+            <CustomDropdown
+              boxStyle={{ width: "30%" }}
+              options={years}
+              labelField="value"
+              valueField="value"
+              placeholder={years.length > 0 ? years[0].value : ""}
+              onChange={(value) => handleSelectDate("year", value.value)}
             />
-          )}
+            <CustomDropdown
+              boxStyle={{ width: "35%" }}
+              options={months}
+              labelField="label"
+              valueField="value"
+              placeholder={months.length > 0 && months[0].label.toString()}
+              onChange={(value) => handleSelectDate("month", value.value)}
+            />
+            <CustomDropdown
+              boxStyle={{ width: "30%" }}
+              options={days}
+              labelField="value"
+              valueField="value"
+              placeholder={days.length > 0 && days[0].value}
+              onChange={(value) => handleSelectDate("day", value.value)}
+            />
+          </Box>
         </ScrollView>
       </Box>
     </Box>
