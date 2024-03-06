@@ -58,9 +58,12 @@ const Profile = ({
   } = useDetailsState((state) => state);
   const [sex, setSex] = React.useState<"male" | "female" | any>(gender);
   const [image, setImage] = React.useState(profile_image);
-  const [fullname, setFullname] = React.useState(name);
+  const [fullname, setFullname] = React.useState(name === "null" ? "" : name);
   const [email, setEmail] = React.useState(userEmail);
-  const [description, setDescription] = React.useState(describes_you);
+  const [description, setDescription] = React.useState(
+    describes_you === "null" ? "" : describes_you
+  );
+  console.log({ describes_you });
   const [country, setCountry] = React.useState(nation);
   const [state, setState] = React.useState(MyState);
   const [selected, setSelectedId] = React.useState<number | null>(null);
@@ -70,7 +73,6 @@ const Profile = ({
   const [months, setMonths] = React.useState<
     { label: String; value: string }[]
   >([]);
-  console.log(new Date(Date.parse(birthday)).getFullYear(), "daye");
   const [days, setDays] = React.useState<{ value: string }[]>([]);
   const [selectedDate, setSelectedDate] = React.useState({
     year: birthday
@@ -350,7 +352,7 @@ const Profile = ({
         </Pressable>
 
         <Box>
-          <CustomText variant="body">{name}</CustomText>
+          <CustomText variant="body">{name === "null" ? "" : name}</CustomText>
           <CustomText variant="xs">@{username}</CustomText>
         </Box>
       </Box>
