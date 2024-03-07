@@ -20,6 +20,7 @@ interface IDropdown {
   placeholderStyle?: StyleProp<ViewStyle>;
   value?: any;
   search?: boolean;
+  dropdownPosition?: "auto" | "bottom" | "top";
 }
 
 export default function CustomDropdown({
@@ -35,6 +36,7 @@ export default function CustomDropdown({
   labelField = "label",
   valueField = "value",
   search,
+  dropdownPosition,
 }: IDropdown) {
   const theme = useTheme<Theme>();
 
@@ -48,7 +50,9 @@ export default function CustomDropdown({
 
   return (
     <Box marginTop="s" style={boxStyle}>
-      <CustomText variant="body">{label}</CustomText>
+      <CustomText variant="subheader" fontSize={16}>
+        {label}
+      </CustomText>
       <Box
         width="100%"
         paddingVertical="s"
@@ -70,6 +74,7 @@ export default function CustomDropdown({
           onChange={onChange}
           data={options || [{ label: "No input", value: "" }]}
           renderItem={renderItem}
+          dropdownPosition={dropdownPosition}
           renderRightIcon={() => (
             <Feather
               name="chevron-down"

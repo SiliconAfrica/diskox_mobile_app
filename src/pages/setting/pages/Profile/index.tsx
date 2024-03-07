@@ -48,6 +48,7 @@ const Profile = ({
     name,
     describes_you,
     username,
+
     email: userEmail,
     about,
     gender,
@@ -373,11 +374,18 @@ const Profile = ({
             showEditIcon={false}
             onChangeText={(e) => setEmail(e)}
           />
+
           <Editable
             title="Display name"
             value={fullname}
             onChangeText={(e) => setFullname(e)}
             showEditIcon={true}
+          />
+          <Editable
+            title="Username"
+            value={username}
+            showEditIcon={false}
+            onChangeText={(e) => setEmail(e)}
           />
           <Editable
             title="About"
@@ -391,26 +399,29 @@ const Profile = ({
           <Box style={{ marginBottom: 20 }}>
             <GenderPicker value={sex} onChange={(gen: string) => setSex(gen)} />
           </Box>
-
-          <CustomDropdown
-            label="Country"
-            options={Data}
-            labelField="name"
-            valueField="name"
-            placeholder="Nigeria"
-            value={country}
-            onChange={(val) => handleSelectCountry(val.name)}
-            search
-          />
-          <CustomDropdown
-            label="State"
-            options={renderStates()}
-            labelField="label"
-            valueField="label"
-            value={state}
-            onChange={(data) => setState(data.label)}
-            search
-          />
+          <Box flexDirection="row" justifyContent="space-between">
+            <CustomDropdown
+              label="Country"
+              boxStyle={{ width: "48%" }}
+              options={Data}
+              labelField="name"
+              valueField="name"
+              placeholder="Nigeria"
+              value={country}
+              onChange={(val) => handleSelectCountry(val.name)}
+              search
+            />
+            <CustomDropdown
+              label="State"
+              boxStyle={{ width: "48%" }}
+              options={renderStates()}
+              labelField="label"
+              valueField="label"
+              value={state}
+              onChange={(data) => setState(data.label)}
+              search
+            />
+          </Box>
           <CustomText variant="subheader" marginTop="m" fontSize={16}>
             Birth date
           </CustomText>
@@ -422,6 +433,7 @@ const Profile = ({
               valueField="value"
               placeholder={years.length > 0 ? years[0].value : ""}
               onChange={(value) => handleSelectDate("year", value.value)}
+              dropdownPosition="top"
             />
             <CustomDropdown
               boxStyle={{ width: "35%" }}
@@ -430,6 +442,7 @@ const Profile = ({
               valueField="value"
               placeholder={months.length > 0 && months[0].label.toString()}
               onChange={(value) => handleSelectDate("month", value.value)}
+              dropdownPosition="top"
             />
             <CustomDropdown
               boxStyle={{ width: "30%" }}
@@ -438,6 +451,7 @@ const Profile = ({
               valueField="value"
               placeholder={days.length > 0 && days[0].value}
               onChange={(value) => handleSelectDate("day", value.value)}
+              dropdownPosition="top"
             />
           </Box>
         </ScrollView>
