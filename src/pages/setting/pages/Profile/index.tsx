@@ -35,10 +35,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { handlePromise } from "../../../../utils/handlePomise";
 import GenderPicker from "../../../../components/form/GenderPicker";
 import CustomDropdown from "../../../../components/form/CustomDropdown";
+import { useNavigation } from "@react-navigation/native";
+import { SubmitButton } from "../../../../components/form/SubmittButton";
+import NormalButton from "../../../../components/general/NormalButton";
+import { PageType } from "../../../login";
 
-const Profile = ({
-  navigation,
-}: NativeStackScreenProps<RootStackParamList, "profile-setting">) => {
+const Profile = () => {
+  const navigation = useNavigation<PageType>();
+
   const theme = useTheme<Theme>();
   const { isDarkMode } = useUtilState((state) => state);
   const { refreshAccounts } = useMultipleAccounts((state) => state);
@@ -288,7 +292,7 @@ const Profile = ({
   }, [selectedDate.month]);
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
-      <SettingsHeader
+      {/* <SettingsHeader
         title="Profile"
         showSave
         RightItem={
@@ -303,7 +307,7 @@ const Profile = ({
           </CustomText>
         }
         handleArrowPressed={() => navigation.goBack()}
-      />
+      /> */}
 
       <Box
         flexDirection="row"
@@ -454,6 +458,11 @@ const Profile = ({
               dropdownPosition="top"
             />
           </Box>
+          <NormalButton
+            label="Save"
+            isLoading={isLoading}
+            action={() => handleSubmit()}
+          />
         </ScrollView>
       </Box>
     </Box>
