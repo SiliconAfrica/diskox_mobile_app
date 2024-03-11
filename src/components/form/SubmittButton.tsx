@@ -10,7 +10,7 @@ interface IProps {
   onSubmit: (data: any) => void;
   label: string;
   isLoading?: boolean;
-  width: number | string;
+  width?: number | string;
 }
 
 export const SubmitButton = ({
