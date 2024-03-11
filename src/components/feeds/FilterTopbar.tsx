@@ -42,8 +42,6 @@ const FilterTopbar = ({
       paddingHorizontal="m"
      
     >
-        
-
       <Pressable
         onPress={() => onActive(FILTER_BAR_ENUM.NEW)}
         style={{
@@ -54,6 +52,8 @@ const FilterTopbar = ({
           justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: 10,
+            borderColor: theme.colors.primaryColor,
+            borderWidth: activeTab === FILTER_BAR_ENUM.NEW ? 1 : 0,
           backgroundColor: activeTab === FILTER_BAR_ENUM.NEW ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
@@ -88,6 +88,8 @@ const FilterTopbar = ({
           justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: 10,
+            borderColor: theme.colors.primaryColor,
+            borderWidth: activeTab === FILTER_BAR_ENUM.TRENDING ? 1 : 0,
           backgroundColor: activeTab === FILTER_BAR_ENUM.TRENDING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
         }}
       >
@@ -114,6 +116,8 @@ const FilterTopbar = ({
             justifyContent: "center",
             alignItems: "center",
             paddingHorizontal: 10,
+              borderColor: theme.colors.primaryColor,
+              borderWidth: activeTab === FILTER_BAR_ENUM.FOLLOWING ? 1 : 0,
             backgroundColor: activeTab === FILTER_BAR_ENUM.FOLLOWING ? isDarkMode ? theme.colors.mainBackGroundColor:theme.colors.fadedButtonBgColor : 'transparent'
           }}
         >

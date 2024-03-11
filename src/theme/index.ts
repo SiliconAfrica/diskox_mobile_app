@@ -30,7 +30,7 @@ const theme = createTheme({
     mainBackGroundColor: COLOR_PALLET.white,
     secondaryBackGroundColor: COLOR_PALLET.whitesmoke,
     headerTextColor: COLOR_PALLET.black,
-    textColor: COLOR_PALLET.black,
+    textColor: COLOR_PALLET.grey,
   },
   spacing: {
     s: 8,

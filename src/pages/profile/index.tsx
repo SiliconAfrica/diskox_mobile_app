@@ -1,7 +1,6 @@
 import { View, Text, useWindowDimensions, StatusBar } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
-import { FlashList } from '@shopify/flash-list'
 import BannerSection, { ACTIVE_TAB } from '../../components/profile/BannerSection'
 import CustomText from '../../components/general/CustomText'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -57,7 +56,7 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
       <Header showMenuButton={false} />
       <ScrollView>
         <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
-        <Box width='100%' height={HEIGHT / 100 * 80}>
+        <Box width='100%' height={HEIGHT / 100 * 83}>
           {activePage()}
         </Box>
       </ScrollView>

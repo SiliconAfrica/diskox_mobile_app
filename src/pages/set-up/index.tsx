@@ -288,6 +288,8 @@ const Setup = ({
             value={payload.phone_number}
             label="Phone Number"
             required
+            style={{ fontFamily: 'RedRegular' }}
+            keyboardType="number-pad"
             containerStyle={{ marginTop: theme.spacing.m }}
             onChangeText={(val) =>
               setPayload((prev) => ({ ...prev, phone_number: val }))
@@ -302,6 +304,7 @@ const Setup = ({
                 value={payload.username}
                 label="Username"
                 required
+                style={{ fontFamily: 'RedRegular' }}
                 containerStyle={{ marginTop: theme.spacing.m }}
                 onChangeText={(val) =>
                   setPayload((prev) => ({
@@ -320,6 +323,7 @@ const Setup = ({
             placeholder="Nigeria"
             value={selected.name}
             onChange={handleSelect}
+            selectedTextStyle={{ fontFamily: 'RedRegular' } as any}
             search
           />
           <CustomDropdown

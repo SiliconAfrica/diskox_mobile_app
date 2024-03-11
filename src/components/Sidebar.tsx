@@ -15,7 +15,7 @@ import {
 import { Image } from "expo-image";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import CustomText from "./general/CustomText";
-import { ScrollView, Switch } from "react-native-gesture-handler";
+import {ScrollView, Switch, TextInput} from "react-native-gesture-handler";
 import * as SecureStorage from "expo-secure-store";
 import { useMultipleAccounts } from "../states/multipleAccountStates";
 import { IUserState, useDetailsState } from "../states/userState";
@@ -178,10 +178,25 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
     state.isDarkMode,
     state.setAll,
   ]);
-  const { accounts } = useMultipleAccounts((state) => state);
+  const { accounts,removeAccount, switchAccount, addAccountFn } = useMultipleAccounts((state) => state);
   const { setAll: setModal } = useModalState((state) => state);
   const { id: userId } = useDetailsState((state) => state);
   const [showMonetization, setShowMonetization] = React.useState(false);
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  // states
+    const [showTopCommunities, setShowTopCommunities] = React.useState(false);
+
+
+
+    const {
+        profile_image,
+        name,
+        username,
+        setAll: updateDetails,
+    } = useDetailsState((state) => state);
+
 
   const { isLoading, isError } = useQuery(
     ["get_trending_hashtags"],
@@ -233,6 +248,53 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
       },
     }
   );
+
+    const logout = async () => {
+        const [loggedInUser, loggedInUserErr] = await handlePromise(
+            AsyncStorage.getItem(`user`)
+        );
+        if (loggedInUser) {
+            const theUser = JSON.parse(loggedInUser);
+            const remainingAccounts = accounts.filter((account) => {
+                return account.username !== theUser.username;
+            });
+            removeAccount(theUser.username);
+            if (remainingAccounts.length > 0) {
+                const accountToSwitchTo = remainingAccounts[0];
+                const removeOldtoken = await SecureStorage.setItemAsync(
+                    `---${theUser.username}---token`,
+                    ""
+                );
+                const token = await SecureStorage.getItemAsync(
+                    `---${accountToSwitchTo.username}---token`
+                );
+                await SecureStorage.setItemAsync("token", token);
+                const [saveUser, saveUserErr] = await handlePromise(
+                    AsyncStorage.setItem(`user`, JSON.stringify(accountToSwitchTo))
+                );
+                switchAccount(
+                    accountToSwitchTo.username,
+                    token,
+                    updateDetails,
+                    queryClient
+                );
+                toast.show(`Account switched to "@${accountToSwitchTo.username}"`, {
+                    type: "success",
+                });
+            } else {
+                await SecureStorage.setItemAsync("token", "");
+                const [saveUser, saveUserErr] = await handlePromise(
+                    AsyncStorage.setItem(`user`, "")
+                );
+                setAll({ isLoggedIn: false });
+                toast.show(`Logged out successfully`, {
+                    type: "success",
+                });
+                navigation.navigate("home");
+            }
+        }
+        return;
+    };
   return (
     <Box flex={1} backgroundColor="secondaryBackGroundColor" marginTop="xl">
       <View
@@ -352,6 +414,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             </>
           )}
         </Box>
+
         <Box
           paddingHorizontal="m"
           borderTopWidth={1}
@@ -368,7 +431,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
               size={25}
               color={theme.colors.textColor}
             />
-            <CustomText variant="body" marginLeft="m">
+            <CustomText variant="header" fontSize={16} marginLeft="m">
               {isDarkMode ? "Light" : "Dark"}
             </CustomText>
           </View>
@@ -383,41 +446,83 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             }}
           />
         </Box>
-        <Box paddingHorizontal="m">
-          <Item
-            icon={
-              <FontAwesome
-                name="user-circle-o"
-                size={24}
-                color={theme.colors.textColor}
-              />
-            }
-            action={() => navigation.navigate("referrals")}
-            title="Refer & Earn"
-          />
-          <Item
-            icon={
-              <MaterialCommunityIcons
-                name="bullhorn"
-                size={24}
-                color={theme.colors.textColor}
-              />
-            }
-            action={() => navigation.navigate("announcements")}
-            title="Announcements"
-          />
-          <Item
-            icon={
-              <Foundation
-                name="book-bookmark"
-                size={24}
-                color={theme.colors.textColor}
-              />
-            }
-            action={() => navigation.navigate("knowledgeBase")}
-            title="Knowledge Base"
-          />
-        </Box>
+
+          <Box
+              paddingHorizontal="m"
+              borderTopWidth={0.4}
+              borderBottomWidth={0.4}
+              flexDirection="column"
+              // justifyContent="space-between"
+              // alignItems="center"
+              height={showTopCommunities ? 400:50}
+              maxHeight={400}
+              style={{ borderColor: isDarkMode ? "grey" : "lightgrey" }}
+          >
+              <Pressable onPress={() => setShowTopCommunities((prev) => !prev)} style={{ flexDirection: "row", alignItems: "center", height: 50, justifyContent: 'space-between' }}>
+                  <Box width={'90%'} flexDirection={'row'} alignItems={'center'} height={'100%'}>
+                      <Ionicons
+                          name={"people"}
+                          size={25}
+                          color={theme.colors.textColor}
+                      />
+                      <CustomText variant="header" fontSize={16} marginLeft="m">
+                          Top Communities
+                      </CustomText>
+                  </Box>
+
+                  <Feather name={showTopCommunities ? "chevron-up":"chevron-down"} size={20} color="grey" />
+              </Pressable>
+
+              { showTopCommunities && (
+                  <ScrollView>
+                      <Box flexDirection={'row'} width={'100%'} height={40} borderRadius={40} backgroundColor={'mainBackGroundColor'} alignItems={'center'} paddingHorizontal={'m'} >
+                          <Feather name={'search'} color={theme.colors.textColor} size={20} style={{ marginLeft: 10, marginTop: 3 }} />
+                          <TextInput style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 16, color: theme.colors.textColor, marginLeft: 10 }}  placeholder={'Search for community'} placeolderColor={theme.colors.textColor} />
+                      </Box>
+                  </ScrollView>
+              )}
+
+
+          </Box>
+          { isLoggedIn && (
+
+              <Box paddingHorizontal="m">
+                  <Item
+                      icon={
+                          <FontAwesome
+                              name="user-circle-o"
+                              size={24}
+                              color={theme.colors.textColor}
+                          />
+                      }
+                      action={() => navigation.navigate("referrals")}
+                      title="Refer & Earn"
+                  />
+                  <Item
+                      icon={
+                          <MaterialCommunityIcons
+                              name="bullhorn"
+                              size={24}
+                              color={theme.colors.textColor}
+                          />
+                      }
+                      action={() => navigation.navigate("announcements")}
+                      title="Announcements"
+                  />
+                  <Item
+                      icon={
+                          <Foundation
+                              name="book-bookmark"
+                              size={24}
+                              color={theme.colors.textColor}
+                          />
+                      }
+                      action={() => navigation.navigate("knowledgeBase")}
+                      title="Knowledge Base"
+                  />
+              </Box>
+          )}
+
         <Box paddingHorizontal="m" paddingTop="l" paddingBottom="xl">
           <CustomText variant="subheader" fontSize={18}>
             Explore Popular Tags
@@ -464,6 +569,33 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
             </Pressable>
           )}
         </Box>
+
+          { isLoggedIn && (
+
+              <Box
+                  paddingHorizontal="m"
+                  borderTopWidth={1}
+                  borderBottomWidth={1}
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  height={60}
+                  style={{ borderColor: isDarkMode ? "grey" : "lightgrey" }}
+              >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                      <Ionicons
+                          name={'log-out-outline'}
+                          size={25}
+                          color={theme.colors.error}
+                      />
+                      <CustomText onPress={logout} variant="body" marginLeft="m" color={'error'}>
+                          Logout
+                      </CustomText>
+                  </View>
+
+              </Box>
+          )}
+
       </ScrollView>
     </Box>
   );

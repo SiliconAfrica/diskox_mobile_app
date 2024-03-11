@@ -106,7 +106,7 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({keyword, onSugges
 
 
 
-const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Post', onSubmit, isLoading, isReply, username }: {
+const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comment', onSubmit, isLoading, isReply, username }: {
     onImagePicked: (image: ImagePickerAsset) => void,
     text: string,
     onTextChange: (text: string) => void,
@@ -242,7 +242,7 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Post
                         <Ionicons name='images-outline' onPress={pickImage} size={20} color={theme.colors.lightGrey} />
                         <Ionicons name='happy-outline' onPress={() => setShowEmojis(prev => !prev)} size={20} color={ showEmojis ? theme.colors.primaryColor : theme.colors.lightGrey} style={{ marginLeft: 10 }} />
                     </Box>
-                    <CustomButton title={buttonText} width={53} height={28} color={theme.colors.primaryColor} textColor='white' onPress={() => onSubmit()} isLoading={isLoading} />
+                    <CustomButton title={buttonText} width={70} height={28} borderRadius={5}  color={theme.colors.primaryColor} textColor='white' onPress={() => onSubmit()} isLoading={isLoading} />
                 </Box>
 
             </Box>

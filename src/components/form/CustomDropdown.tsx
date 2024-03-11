@@ -59,6 +59,7 @@ export default function CustomDropdown({
         borderColor="secondaryBackGroundColor"
       >
         <Dropdown
+          dropdownPosition="top"
           placeholder={placeholder}
           style={[styles.input, style]}
           placeholderStyle={[styles.placeholderStyle, placeholderStyle]}
@@ -90,9 +91,11 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     width: "100%",
     paddingHorizontal: "2.5%",
+    fontFamily: 'RedRegular'
   },
   placeholderStyle: {
     fontSize: 14,
     lineHeight: 15,
+    fontFamily: 'RedRegular'
   },
 });

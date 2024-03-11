@@ -15,12 +15,13 @@ interface IProps {
     textColor?: string;
     spinnerColor?: string;
     variant?:'xs'|'body'|'subheader';
+    borderRadius?: number;
 }
 
-const CustomButton = ({ title, onPress, width = 120, height = 32, isLoading = false, color='grey', textColor = 'white', spinnerColor = 'white', variant = 'body'}: IProps) => {
+const CustomButton = ({ title, onPress, width = 120, height = 32, isLoading = false, color='grey', textColor = 'white', spinnerColor = 'white', variant = 'body', borderRadius = 25}: IProps) => {
     const theme = useTheme<Theme>();
   return (
-    <Pressable onPress={onPress} style={{ backgroundColor: color, borderRadius: 25, width, height, justifyContent: 'center', alignItems: 'center' }}>
+    <Pressable onPress={onPress} style={{ backgroundColor: color, borderRadius, width, height, justifyContent: 'center', alignItems: 'center' }}>
         { isLoading && <ActivityIndicator color={spinnerColor} size='small' /> }
         { !isLoading && <CustomText variant={variant} color='primaryColor' fontSize={13} style={{ color: textColor }}>{title}</CustomText> }
     </Pressable>
