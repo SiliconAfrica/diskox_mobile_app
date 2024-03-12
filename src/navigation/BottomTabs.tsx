@@ -112,19 +112,19 @@ const ActiveIconTab = ({
           <Ionicons name={nameFilled()} size={25} color={"#34A853"} />
           <CustomText
             variant="xs"
-            fontSize={10}
+            fontSize={12}
             color="primaryColor"
             marginTop="s"
           >
-            {routeName.toUpperCase()}
+            {routeName[0].toUpperCase() + routeName.slice(1).toLowerCase()}
           </CustomText>
         </>
       )}
       {!focused && (
         <>
           <Ionicons name={nameOutline()} size={25} color={"grey"} />
-          <CustomText variant="xs" fontSize={10} marginTop="s">
-            {routeName.toUpperCase()}
+          <CustomText variant="xs" fontSize={12} marginTop="s">
+            {routeName[0].toUpperCase() + routeName.slice(1).toLowerCase()}
           </CustomText>
         </>
       )}

@@ -417,12 +417,12 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
 
         <Box
           paddingHorizontal="m"
-          borderTopWidth={1}
-          borderBottomWidth={1}
+          borderTopWidth={0.3}
+          borderBottomWidth={0.3}
           flexDirection="row"
           justifyContent="space-between"
           alignItems="center"
-          height={60}
+          height={50}
           style={{ borderColor: isDarkMode ? "grey" : "lightgrey" }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -449,7 +449,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
 
           <Box
               paddingHorizontal="m"
-              borderTopWidth={0.4}
+              borderTopWidth={0}
               borderBottomWidth={0.4}
               flexDirection="column"
               // justifyContent="space-between"
@@ -477,7 +477,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                   <ScrollView>
                       <Box flexDirection={'row'} width={'100%'} height={40} borderRadius={40} backgroundColor={'mainBackGroundColor'} alignItems={'center'} paddingHorizontal={'m'} >
                           <Feather name={'search'} color={theme.colors.textColor} size={20} style={{ marginLeft: 10, marginTop: 3 }} />
-                          <TextInput style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 16, color: theme.colors.textColor, marginLeft: 10 }}  placeholder={'Search for community'} placeolderColor={theme.colors.textColor} />
+                          <TextInput style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, marginLeft: 10 }}  placeholder={'Search for community'} placeholderTextColor={theme.colors.textColor} />
                       </Box>
                   </ScrollView>
               )}
@@ -538,16 +538,26 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           {!isLoading &&
             hashtags.length > 0 &&
             hashtags.map((item, index) => (
-              <CustomText
-                key={index.toString()}
-                variant="body"
-                marginTop="m"
-                onPress={() =>
-                  navigation.navigate("hashtag", { hashTag: item.name })
-                }
-              >
-                #{item.name}
-              </CustomText>
+                <Box flexDirection={'row'} marginTop={index === 0 ? 'm':null} justifyContent={'flex-start'} alignItems={'center'} marginBottom={'m'}>
+                    <Box width={30} height={30} borderRadius={20} bg={'fadedButtonBgColor'} justifyContent={'center'} alignItems={'center'} style={{
+                        backgroundColor: '#DCFCE7',
+                    }}>
+                        <CustomText variant="body" fontSize={16} color={'primaryColor'}>
+                            #
+                        </CustomText>
+                    </Box>
+                    <CustomText
+                        key={index.toString()}
+                        variant="subheader"
+                        fontSize={16}
+                        marginLeft="s"
+                        onPress={() =>
+                            navigation.navigate("hashtag", { hashTag: item.name })
+                        }
+                    >
+                        {item.name}
+                    </CustomText>
+                </Box>
             ))}
 
           {!isLoading && !isError && (
@@ -570,12 +580,50 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           )}
         </Box>
 
+          <Box
+              paddingHorizontal="m"
+              borderTopWidth={0.3}
+              borderBottomWidth={0.3}
+              flexDirection="column"
+              // justifyContent="space-between"
+              // alignItems="center"
+              height={showTopCommunities ? 400:50}
+              maxHeight={400}
+              style={{ borderColor: isDarkMode ? "grey" : "lightgrey" }}
+          >
+              <Pressable onPress={() => setShowTopCommunities((prev) => !prev)} style={{ flexDirection: "row", alignItems: "center", height: 50, justifyContent: 'space-between' }}>
+                  <Box width={'90%'} flexDirection={'row'} alignItems={'center'} height={'100%'}>
+                      {/*<Ionicons*/}
+                      {/*    name={"people"}*/}
+                      {/*    size={25}*/}
+                      {/*    color={theme.colors.textColor}*/}
+                      {/*/>*/}
+                      <CustomText variant="header" fontSize={16} marginLeft="m">
+                          Communities Country
+                      </CustomText>
+                  </Box>
+
+                  <Feather name={showTopCommunities ? "chevron-up":"chevron-down"} size={20} color="grey" />
+              </Pressable>
+
+              { showTopCommunities && (
+                  <ScrollView>
+                      <Box flexDirection={'row'} width={'100%'} height={40} borderRadius={40} backgroundColor={'mainBackGroundColor'} alignItems={'center'} paddingHorizontal={'m'} >
+                          <Feather name={'search'} color={theme.colors.textColor} size={20} style={{ marginLeft: 10, marginTop: 3 }} />
+                          <TextInput style={{ flex: 1, fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, marginLeft: 10 }}  placeholder={'Search for community'} placeholderTextColor={theme.colors.textColor} />
+                      </Box>
+                  </ScrollView>
+              )}
+
+
+          </Box>
+
           { isLoggedIn && (
 
               <Box
                   paddingHorizontal="m"
-                  borderTopWidth={1}
-                  borderBottomWidth={1}
+                  borderTopWidth={0}
+                  borderBottomWidth={0}
                   flexDirection="row"
                   justifyContent="space-between"
                   alignItems="center"
@@ -586,9 +634,9 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
                       <Ionicons
                           name={'log-out-outline'}
                           size={25}
-                          color={theme.colors.error}
+                          color={theme.colors.textColor}
                       />
-                      <CustomText onPress={logout} variant="body" marginLeft="m" color={'error'}>
+                      <CustomText onPress={logout} variant="body" marginLeft="m" >
                           Logout
                       </CustomText>
                   </View>

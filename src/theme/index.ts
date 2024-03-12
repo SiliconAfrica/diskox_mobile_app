@@ -22,6 +22,8 @@ const COLOR_PALLET = {
   whiteText: "#FCFCFC",
   transparent2: "transparent",
   borderColor: "#4D6275",
+  textColor: '#1a1a1a',
+  lightGreen: '#DCFCE7'
 };
 
 const theme = createTheme({
@@ -30,7 +32,7 @@ const theme = createTheme({
     mainBackGroundColor: COLOR_PALLET.white,
     secondaryBackGroundColor: COLOR_PALLET.whitesmoke,
     headerTextColor: COLOR_PALLET.black,
-    textColor: COLOR_PALLET.grey,
+    // textColor: COLOR_PALLET.grey,
   },
   spacing: {
     s: 8,

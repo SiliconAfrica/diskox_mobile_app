@@ -237,7 +237,7 @@ const CommentSection = ({ postId }: { postId?: number }) => {
         flex={1}
         maxHeight={600}
         paddingTop="s"
-        borderTopWidth={0.3}
+        borderTopWidth={0}
         marginHorizontal="m"
       >
         <FlatList
@@ -248,7 +248,7 @@ const CommentSection = ({ postId }: { postId?: number }) => {
                 (!paginationMutation.isLoading && (
                   <Box
                     width={"100%"}
-                    height={50}
+                    height={32}
                     justifyContent={"center"}
                     alignItems={"center"}
                   >
@@ -290,8 +290,8 @@ const CommentSection = ({ postId }: { postId?: number }) => {
         bg="mainBackGroundColor"
         overflow="visible"
         elevation={4}
-        borderTopWidth={0.3}
-        borderTopColor="lightGrey"
+        borderTopWidth={0.5}
+        borderTopColor="borderColor"
         paddingVertical="s"
         paddingHorizontal="m"
       >

@@ -26,19 +26,19 @@ const Searchbar = () => {
 
     const handleDocumentPicker = React.useCallback(
         async (documentType: "All" | "Images" | "Videos" | null) => {
-        
+
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions[documentType || "Images"],
             allowsEditing: true,
             base64: false,
           });
-    
+
           if (!result.canceled) {
             setAll(result.assets[0]);
             setTimeout(() => {
                 navigation.navigate('create-post');
             }, 3000);
-            
+
           }
         },
         []
@@ -59,7 +59,7 @@ const Searchbar = () => {
                     )
         }
          </TouchableOpacity>
-        <Pressable 
+        <Pressable
         onPress={() => navigation.navigate('create-post')}
         style={{
             flex: 1,
@@ -70,7 +70,7 @@ const Searchbar = () => {
            justifyContent: 'center',
            paddingLeft: 20
         }}>
-            <CustomText variant='subheader' fontSize={16}>Lets diskox it</CustomText>
+            <CustomText variant='subheader' fontSize={16} color={'grey'}>Lets diskox it</CustomText>
         </Pressable>
         <VideoSquare size={25} color={theme.colors.textColor} style={{ marginRight: 10, }} onPress={() => handleDocumentPicker('Videos')} />
         <Gallery size={25} color={theme.colors.textColor} onPress={() => handleDocumentPicker('Images')} />

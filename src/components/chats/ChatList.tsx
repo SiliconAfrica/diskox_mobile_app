@@ -38,14 +38,7 @@ export const UserList = ({ user, action }: {
         <Pressable onPress={() => action(user)} style={{ width: '100%', height: 70, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: theme.colors.secondaryBackGroundColor, borderBottomWidth: 0.5 }} >
             <Box flexDirection='row' alignItems='center' >
                 <Box width={32} height={32} borderRadius={17} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
-                    { user.profile_image !== null && (
-                        <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />
-                    )}
-                    { user.profile_image === null && (
-                        <Box width={'100%'} height={'100%'} justifyContent='center' alignItems='center'>
-                            <Feather name='user' size={15} color={theme.colors.textColor} />
-                        </Box>
-                    )}
+                        <Image source={user.profile_image ?{ uri: `${IMAGE_BASE}${user.profile_image}` } : require('../../../assets/images/dummy.jpeg')} style={{ width: '100%', height: '100%', borderRadius: 1 }} contentFit='cover' />
                 </Box>
 
                 <Box marginLeft='s'>

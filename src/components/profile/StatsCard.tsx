@@ -25,15 +25,16 @@ const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
   return (
     <Box
       width={(WIDTH / 100) * 43}
-      height={150}
-      backgroundColor={isDarkMode ?"borderColor" : 'mainBackGroundColor'}
+      height={80}
+      backgroundColor={isDarkMode ?"secondaryBackGroundColor" : 'mainBackGroundColor'}
       borderWidth={0}
-      borderRadius={20}
+      borderRadius={10}
       borderColor="secondaryBackGroundColor"
       flexDirection="row"
       justifyContent="center"
       alignItems="center"
       marginBottom="m"
+
     >
       <Box
         width={50}
@@ -49,12 +50,12 @@ const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
       <Box paddingLeft="s">
         <CustomText
           style={{ color: mainColor }}
-          variant="subheader"
+          variant="header"
           fontSize={14}
         >
           {title}
         </CustomText>
-        <CustomText variant="subheader" fontSize={18}>
+        <CustomText variant="header" fontSize={18}>
           {amount}
         </CustomText>
       </Box>

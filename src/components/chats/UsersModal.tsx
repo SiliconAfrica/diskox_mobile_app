@@ -27,17 +27,12 @@ export const UserCard = ({ user, action }: {
     action: (us: Mention) => void
 }) => {
     const theme = useTheme<Theme>();
- 
+
     return (
         <Pressable onPress={() => action(user as Mention)} style={{ width: '100%', height:60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-            <Box flexDirection='row' alignItems='center' > 
+            <Box flexDirection='row' alignItems='center' >
                 <Box width={32} height={32} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
-                   {user.profile_image !== null &&  <Image source={{ uri: `${IMAGE_BASE}${user.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />}
-                   {user.profile_image === null && (
-                    <Box width='100%' height='100%' justifyContent='center' alignItems='center'>
-                        <Feather name='user' size={15} color={theme.colors.textColor} />
-                    </Box>
-                   )}
+                    <Image source={user.profile_image !== null ? { uri: `${IMAGE_BASE}${user.profile_image}` } : require('../../../assets/images/dummy.jpeg')} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />
                 </Box>
 
                 <CustomText variant='subheader' fontSize={15} color='black' marginLeft='s'>{user.name}</CustomText>
@@ -109,7 +104,7 @@ const UserModal = ({ open, onClose }: {
     const handleCheck = React.useCallback((valid: number, val: boolean) => {
         // setTags(valid, val)
     }, [])
-   
+
 
   return (
     <Modal style={{ flex:1, backgroundColor: 'white' }} animationType='slide' transparent visible={open} onDismiss={() => onClose()} >
@@ -136,7 +131,7 @@ const UserModal = ({ open, onClose }: {
 
             {/* SCROLLAREA */}
             { !isLoading && !isError && (
-                <FlatList 
+                <FlatList
                 ListEmptyComponent={() => (
                     <Text>Nothing to see here</Text>
                 )}

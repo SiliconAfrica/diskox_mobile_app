@@ -145,5 +145,6 @@ export const URLS = {
   RECOMMENDED_COMMUNITY: "/get_communities_you_may_know",
   SEND_PUSH_NOTIFICATION_TOKEN: '/save_mobile_logs_token',
   GET_NOTIFICATION_COUNT: '/fetch_unread_notifications_count',
-  MARK_NOTIFICATION_READ: '/mark_notification_read'
+  MARK_NOTIFICATION_READ: '/mark_notification_read',
+  GET_ALL_COMMUNITY: '/all_communities'
 };

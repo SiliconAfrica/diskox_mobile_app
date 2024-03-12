@@ -79,18 +79,12 @@ const CommunityListCard = (props: ICommunity) => {
           bg="secondaryBackGroundColor"
           overflow="hidden"
         >
-          { profile_image !== null && (
             <Image
-            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+            source={profile_image !== null ? { uri: `${IMAGE_BASE}${profile_image}` } : require('../../../assets/images/dummy.jpeg')}
             contentFit="cover"
             style={{ width: "100%", height: "100%" }}
           />
-          )}
-          { profile_image === null && (
-            <Box width='100%' height={'100%'} justifyContent="center" alignItems="center">
-              <Feather name='users' size={15} color={theme.colors.primaryColor} />
-            </Box>
-          )}
+
         </Box>
 
         <Box marginLeft="s">
@@ -110,14 +104,14 @@ const CommunityListCard = (props: ICommunity) => {
           title={"Join"}
           isLoading={isLoading}
           onPress={() => mutate()}
-          height={35}
+          height={30}
           width={70}
         ></PrimaryButton>
       ) : (
         <ErrorButton
           title={"Leave"}
           onPress={() => mutate()}
-          height={35}
+          height={30}
           isLoading={isLoading}
           width={70}
         ></ErrorButton>

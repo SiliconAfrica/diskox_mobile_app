@@ -58,10 +58,10 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({keyword, onSugges
     },
     onError: (error) => {}
   })
- 
+
 
   return (
-    <Box width={'100%'} minHeight={0} maxHeight={180} bg='mainBackGroundColor' borderTopLeftRadius={10} borderTopRightRadius={10} position='absolute' top={-205} zIndex={10} marginTop={'l'} borderWidth={0.3} borderColor='lightGrey'  >
+    <Box width={'100%'} minHeight={0} maxHeight={180} bg='mainBackGroundColor' borderTopLeftRadius={10} borderTopRightRadius={10} position='absolute' top={-205} zIndex={10} marginTop={'l'} borderWidth={0} borderColor='lightGrey'  >
       {
         isLoading && (
           <Box width='100%' height={40} justifyContent='center' alignItems='center'>
@@ -82,9 +82,9 @@ const renderSuggestions: React.FC<MentionSuggestionsProps> = ({keyword, onSugges
                 setSelectedUsers(one);
                 setId(one.id.toString());
               }}
-  
+
               style={{padding: 10, flexDirection: 'row', alignItems:'center' }}
-            > 
+            >
               { one.profile_image !== null && (
                 <Image source={{ uri: `${IMAGE_BASE}${one.profile_image}`}} contentFit='cover' style={{ width: 30, height: 30, borderRadius: 15 }} />
               )}
@@ -146,10 +146,10 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
     }
     const handleTextChange = (text: string) => {
       onTextChange(text);
-    
+
       const regex = /@(\w+)/g;
       const matches = text.match(regex);
-    
+
       if (matches) {
         const users = matches.map(match => match.slice(1)); // remove the "@" symbol
         setMentionedUsers(users);
@@ -161,10 +161,10 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
     const handleEmojiPicked = React.useCallback((emoji: string) => {
       // Get the current cursor position
       const cursorPosition = text.length;
-    
+
       // Insert the emoji at the cursor position
       const updatedText = text.slice(0, cursorPosition) + emoji + text.slice(cursorPosition);
-    
+
       // Update the text
       onTextChange(updatedText);
     }, [onTextChange, text]);
@@ -174,7 +174,7 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
         onTextChange(updatedText);
         setMentionedUsers([]);
       };
-      
+
       const handleTextInputKeyPress = (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
         if (event.nativeEvent.key === ' ') {
           setMentionedUsers([]);
@@ -196,17 +196,17 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
                       darkMode={true} // to be or not to be, that is the question
                       perLine={10} // # of emoji's per line
                       onSelect={(e) => handleEmojiPicked(e.emoji)} // callback when user selects emoji - returns emoji obj
-                      onChangeRecent={setRecent} 
+                      onChangeRecent={setRecent}
                       backgroundColor={theme.colors.secondaryBackGroundColor}// callback to update recent storage - arr of emoji objs
                       // backgroundColor={'#000'} // optional custom bg color
                       // enabledCategories={[ // optional list of enabled category keys
-                      //   'recent', 
-                      //   'emotion', 
-                      //   'emojis', 
-                      //   'activities', 
-                      //   'flags', 
-                      //   'food', 
-                      //   'places', 
+                      //   'recent',
+                      //   'emotion',
+                      //   'emojis',
+                      //   'activities',
+                      //   'flags',
+                      //   'food',
+                      //   'places',
                       //   'nature'
                       // ]}
                       // defaultCategory={'food'} // optional default category key
@@ -230,9 +230,9 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
                         }
                       ]}
 
-                      
-                      
-                      value={text} onChange={handleTextChange} containerStyle={{ minHeight: 80,  paddingHorizontal: 10, }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor  }} placeholderTextColor={theme.colors.textColor} placeholder={isReply ? `@${username}`:'Write your comment here...'} multiline numberOfLines={2} onKeyPress={handleTextInputKeyPress} 
+
+
+                      value={text} onChange={handleTextChange} containerStyle={{ minHeight: 80,  paddingHorizontal: 10, borderWidth: 0 }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, borderWidth: 0 }} placeholderTextColor={theme.colors.textColor} placeholder={isReply ? `@${username}`:'Write your comment here...'} multiline numberOfLines={2} onKeyPress={handleTextInputKeyPress}
                     />
 
                 </Box>
@@ -247,15 +247,15 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
 
             </Box>
 
-           
-{/* 
+
+{/*
            { text.startsWith('@') && (
                 <Box position='absolute' zIndex={10} top={-200} left={0} width={'100%'} height={200} borderTopRightRadius={20} borderTopLeftRadius={20} bg='secondaryBackGroundColor' borderWidth={0.5} borderColor='lightGrey'>
                       <ScrollView contentContainerStyle={{ padding: 20 }}>
                         {mentionedUsers.map(user => (
                           <CustomText variant='body' onPress={() => handleSelectMention(user)} key={user}>{user}</CustomText>
                         ))}
-                        
+
                       </ScrollView>
                 </Box>
            )} */}
