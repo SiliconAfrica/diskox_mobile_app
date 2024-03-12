@@ -68,7 +68,6 @@ const CommentSection = ({ postId }: { postId?: number }) => {
       if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
         if (comments.length > 0) {
           if (item.data?.data.length !== 0) {
-            console.log(item.data.data);
             const uniqArr = _.uniqBy<IComment>(
               [...comments, ...item.data.data],
               "id"
@@ -105,7 +104,7 @@ const CommentSection = ({ postId }: { postId?: number }) => {
                 [...item.data.data, ...comments],
                 "id"
               );
-              setComments(uniqArr);
+              setComments([...uniqArr]);
             } else {
               setNoMore(true);
               //toast.show(data.data?.message, { type: 'success'});
@@ -278,7 +277,8 @@ const CommentSection = ({ postId }: { postId?: number }) => {
           )}
           onEndReachedThreshold={0.5}
           data={comments}
-          keyExtractor={(_, index) => index.toString()}
+          // keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(_, index) => _.id.toString()}
           onEndReached={onEndReached}
           renderItem={({ item }) => <CommentCard comment={item} />}
         />
