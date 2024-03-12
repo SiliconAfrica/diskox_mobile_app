@@ -42,15 +42,25 @@ export default function CustomDropdown({
 
   const renderItem = (item) => {
     return (
-      <Box paddingHorizontal="m" paddingVertical="m">
-        <CustomText variant="body">{item[labelField]}</CustomText>
+      <Box
+        paddingHorizontal="m"
+        paddingVertical="m"
+        style={{ backgroundColor: theme.colors.white }}
+      >
+        <CustomText variant="body" style={{ color: theme.colors.textColor }}>
+          {item[labelField]}
+        </CustomText>
       </Box>
     );
   };
 
   return (
     <Box marginTop="s" style={boxStyle}>
-      <CustomText variant="subheader" fontSize={16}>
+      <CustomText
+        variant="subheader"
+        fontSize={16}
+        style={{ color: theme.colors.textColor }}
+      >
         {label}
       </CustomText>
       <Box
@@ -65,8 +75,15 @@ export default function CustomDropdown({
         <Dropdown
           placeholder={placeholder}
           style={[styles.input, style]}
-          placeholderStyle={[styles.placeholderStyle, placeholderStyle]}
-          selectedTextStyle={selectedTextStyle}
+          placeholderStyle={[
+            styles.placeholderStyle,
+            placeholderStyle,
+            { color: theme.colors.textColor },
+          ]}
+          selectedTextStyle={[
+            selectedTextStyle,
+            { color: theme.colors.textColor },
+          ]}
           search={search}
           maxHeight={300}
           labelField={labelField}

@@ -6,7 +6,7 @@ import {
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "../../general/Box";
 import { FlatList, TextInput } from "react-native-gesture-handler";
 import CustomButton from "../../general/CustomButton";
@@ -23,7 +23,12 @@ import { Image } from "expo-image";
 import ImageBox from "./ImageBox";
 import CommentTextBox from "./CommentTextBox";
 import CommentCard from "./CommentCard";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 import httpService from "../../../utils/httpService";
 import { URLS } from "../../../services/urls";
 import useToast from "../../../hooks/useToast";
@@ -50,89 +55,96 @@ const CommentSection = ({ postId }: { postId?: number }) => {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { checkloggedInState } = useCheckLoggedInState();
+  const [fetchMore, setFetchMore] = React.useState(false);
+
   const { users, selectedUsers, reset } = useCommentMentionState(
     (state) => state
   );
 
   //queries
 
-  const paginationMutation = useMutation({
-    mutationFn: (data: string) =>
-      httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`, {
-        params: {
-          page: currentPage,
-        },
-      }),
-    onSuccess: (data) => {
-      const item: PaginatedResponse<IComment> = data.data;
-      if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
-        if (comments.length > 0) {
-          if (item.data?.data.length !== 0) {
-            const uniqArr = _.uniqBy<IComment>(
-              [...comments, ...item.data.data],
-              "id"
-            );
-            setComments(uniqArr);
-          } else {
-            setNoMore(true);
-          }
-        }
+  const {
+    isError,
+    isLoading: isLoadingComments,
+    data,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: [`fetch_comments`, postId],
+    queryFn: ({ pageParam = 1 }) =>
+      httpService.get(
+        `${URLS.GET_COMMENTS_BY_POST_ID}/${postId}?page=${pageParam}`
+      ),
+    getNextPageParam: (_lastpage, allPages) => {
+      const currentPage = allPages[allPages.length - 1];
+      if (currentPage.data.data.next_page_url) {
+        return allPages.length + 1;
+      } else {
+        return undefined;
+      }
+    },
+    onSuccess: () => {
+      setFetchMore(false);
+    },
+    onError: (e: any) => {
+      if (e.code !== CUSTOM_STATUS_CODE.NO_DATA) {
+        toast.show(e.message, { type: "danger" });
       }
     },
   });
 
-  const { isLoading } = useQuery(
-    [`getPostComments-${postId}`, postId],
-    () =>
-      httpService.get(`${URLS.GET_COMMENTS_BY_POST_ID}/${postId}`, {
-        params: {
-          page: 1,
-        },
-      }),
-    {
-      onError: (error) => {
-        toast.show("An eror occured while getting the comments", {
-          type: "error",
-        });
-      },
-      onSuccess: (data) => {
-        const item: PaginatedResponse<IComment> = data.data;
-        if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
-          if (comments.length > 0) {
-            if (item.data?.data.length !== 0) {
-              const uniqArr = _.uniqBy<IComment>(
-                [...item.data.data, ...comments],
-                "id"
-              );
-              setComments([...uniqArr]);
-            } else {
-              setNoMore(true);
-              //toast.show(data.data?.message, { type: 'success'});
-            }
-          } else {
-            setComments(item.data.data);
-            setTotal(item.data.total);
-            setPerPage(item.data.per_page);
-          }
-        }
-        // setComments(data.data.data.data);
-      },
+  useEffect(() => {
+    if (Array.isArray(data?.pages) && data.pages[0].data.data) {
+      console.log(data.pages, "pagess");
+      // item.data.data.data
+      const theComments = data.pages.map((item) => item?.data?.data?.data);
+
+      console.log(theComments, "ss");
+      let allDataFromPages = [];
+      for (let i = 0; i < theComments.length; i++) {
+        allDataFromPages = [...allDataFromPages, ...theComments[i]];
+      }
+
+      setComments([...allDataFromPages]);
     }
-  );
+  }, [data, data?.pages]);
 
   const { mutate, isLoading: mutationLoading } = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.CREATE_COMMENT}`, data),
-    onSuccess: () => {
+    onSuccess: (res) => {
       toast.show("Comment created successfully", { type: "success" });
-      queryClient.invalidateQueries([`getPostComments-${postId}`]);
-      queryClient.invalidateQueries([`getPost${postId}`]);
+      console.log(res.data, "res.data");
+      setComments([
+        {
+          ...res.data?.data,
+          user: res.data.user,
+          post_images: [],
+          has_reacted: [],
+          has_downvoted: 0,
+          has_upvoted: 0,
+          replies_count: 0,
+          reactions_count: 0,
+          upvotes_count: 0,
+          downvotes_count: 0,
+        },
+        ...comments,
+      ]);
+      // refetch();
+      // refetch({ refetchPage: (page, index) => index === 0 });
+      // queryClient.invalidateQueries([`fetch_comments`, postId]);
+      // queryClient.invalidateQueries([`fetch_comments`]);
+      // queryClient.invalidateQueries([`getPostComments-${postId}`]);
+      // queryClient.invalidateQueries([`getPost${postId}`]);
       setImages([]);
       setText("");
       reset();
     },
     onError: (error: any) => {
-      toast.show("An error occured while rying to create the comment", {
+      toast.show("An error occured while trying to create the comment", {
         type: "error",
       });
     },
@@ -210,21 +222,6 @@ const CommentSection = ({ postId }: { postId?: number }) => {
     setImages(newImages);
   };
 
-  const onEndReached = React.useCallback(async () => {
-    const startIndex = (currentPage - 1) * perPage;
-    const endIndex = Math.min(startIndex + perPage - 1, total - 1);
-    if (
-      currentPage < endIndex &&
-      comments.length > 0 &&
-      noMore === false &&
-      !isLoading
-    ) {
-      // markasViewed.mutate({ posts_id: ids });
-      setCurrentPage((prev) => prev + 1);
-      paginationMutation.mutate(currentPage.toString());
-    }
-  }, [currentPage, ids, perPage, total, noMore, isLoading]);
-
   return (
     <Box
       width="100%"
@@ -243,24 +240,23 @@ const CommentSection = ({ postId }: { postId?: number }) => {
           // extraData={comments}
           ListEmptyComponent={() => (
             <>
-              {!isLoading ||
-                (!paginationMutation.isLoading && (
-                  <Box
-                    width={"100%"}
-                    height={50}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                  >
-                    <CustomText variant="subheader" fontSize={14}>
-                      No comment. Be the first to comment on this post
-                    </CustomText>
-                  </Box>
-                ))}
+              {!isLoadingComments && (
+                <Box
+                  width={"100%"}
+                  height={50}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  <CustomText variant="subheader" fontSize={14}>
+                    No comment. Be the first to comment on this post
+                  </CustomText>
+                </Box>
+              )}
             </>
           )}
           ListFooterComponent={() => (
             <>
-              {paginationMutation.isLoading && comments.length < 1 && (
+              {(isLoadingComments || isFetching || isFetchingNextPage) && (
                 <Box
                   width={"100%"}
                   height={"100%"}
@@ -275,12 +271,39 @@ const CommentSection = ({ postId }: { postId?: number }) => {
               )}
             </>
           )}
+          onScrollBeginDrag={() => {
+            if (hasNextPage) {
+              setFetchMore(true);
+            }
+          }}
           onEndReachedThreshold={0.5}
+          onEndReached={async () => {
+            if (
+              fetchMore &&
+              hasNextPage &&
+              (!isFetching || !isFetchingNextPage)
+            ) {
+              await fetchNextPage();
+            }
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          // data={
+          //   Array.isArray(data?.pages) && data.pages[0].data.data
+          //     ? data?.pages
+          //     : []
+          // }
           data={comments}
-          // keyExtractor={(_, index) => index.toString()}
-          keyExtractor={(_, index) => _.id.toString()}
-          onEndReached={onEndReached}
-          renderItem={({ item }) => <CommentCard comment={item} />}
+          renderItem={({ item }) => {
+            return <CommentCard comment={item} />;
+          }}
+          // renderItem={({ item }) => {
+          //   console.log(item, "helppp");
+          //   // return <></>;
+          //   return item.data.data.data.map((item: IComment) => (
+          //     <CommentCard comment={item} />
+          //   ));
+          //   // <CommentCard comment={item} />
+          // }}
         />
       </Box>
 

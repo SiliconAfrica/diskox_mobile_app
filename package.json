@@ -77,6 +77,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-searchable-country-dropdown": "^1.0.1",
     "react-native-svg": "13.9.0",
+    "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.1.6",
     "react-native-toast-notifications": "^3.4.0",
     "react-native-ui-lib": "^7.5.2",
