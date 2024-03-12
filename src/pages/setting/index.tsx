@@ -44,7 +44,7 @@ export default function TabViewExample({
     <TabBar
       {...props}
       getLabelText={({ route }) => (
-        <CustomText color="black" style={{ fontSize: 11 }}>
+        <CustomText color="black" style={{ fontSize: 10 }}>
           {route.title}
         </CustomText>
       )}
