@@ -21,6 +21,8 @@ import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { CUSTOM_STATUS_CODE } from "../../../enums/CustomCodes";
 import FeedCard from "../../../components/feeds/FeedCard";
 import { useDeletePostState } from "../../../states/deleteedPost";
+import {usePostState} from "../../../states/PostState";
+import usePosts from "../../../hooks/usePosts";
 
 const NewPost = ({
   activeTab,
@@ -36,6 +38,10 @@ const NewPost = ({
   const [refreshing, setRefreshing] = React.useState(false);
   const { ids: DeletedIds } = useDeletePostState((state) => state);
   const toast = useToast();
+
+  // new global state
+  const { poll } = usePostState((state) => state);
+  //const { isLoading, isError, setPage } = usePosts({ type: 'POLL', url: URLS.GET_POLLS})
 
   // states
   const [posts, setPosts] = React.useState<IPost[]>([]);
@@ -85,7 +91,7 @@ const NewPost = ({
   })
 
   // react query
-  const { isLoading, isError, error, refetch } = useQuery(
+  const { isLoading, isError,  error, refetch } = useQuery(
     ["GetPollsPosts"],
     () => httpService.get(`${URLS.GET_POLLS}`, {
       params: {
@@ -175,7 +181,7 @@ const NewPost = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={1}
         ListEmptyComponent={() => (
-          <>
+          <>isLoading, isError,
             {!isLoading && posts.length < 1 && (
               <CustomText variant="body" textAlign="center" marginTop="s">No Post to view</CustomText>
               )}
@@ -190,7 +196,7 @@ const NewPost = ({
         keyExtractor={(item, index) => item.id.toString()}
         extraData={DeletedIds}
         renderItem={({ item }) => <FeedCard post={item} showReactions />}
-        data={posts}
+        data={poll}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">
             {isLoading &&  (
