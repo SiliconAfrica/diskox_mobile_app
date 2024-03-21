@@ -288,9 +288,9 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           AsyncStorage.setItem(`user`, "")
         );
         setAll({ isLoggedIn: false });
-        toast.show(`Logged out successfully`, {
-          type: "success",
-        });
+        // toast.show(`Logged out successfully`, {
+        //   type: "success",
+        // });
         navigation.navigate("home");
         //close side bar
         navigation.toggleDrawer();
