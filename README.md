@@ -26,9 +26,21 @@ For Wisdom:
 
 is_member_request_pending - value to check before pending
 
-# To note
+# Done
 
-- Start by msking sure deleted message is not highlightable or action can't be performed on it
-- Redesign the message box of chat
+- Changed password eye icon
+- Changed login btn password
+- Remove Nigeria as default selected country on sign up
+- Make a maximum of 5 interests on sign up
+- Birthday modal to top direction
+- Move "I'll do this later" to bottom
+- Change reset password description and button text
+- Stop Showing NAN on refer and earn
+- Share to whatsapp in refer and earn is added (twitter and fb still needs you to select)
+- Put withdrawals in earning and the error
+- Added toast message for telling user forgot password otp has been sent
+- Reste paswword input changed to New Password
 
-- Another person can delete another person comment
+## Todo
+
+- After removing account, it still exists

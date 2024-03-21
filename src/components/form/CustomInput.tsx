@@ -12,7 +12,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import Box from "../general/Box";
 import CustomText from "../general/CustomText";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 interface IProps {
   required?: boolean;
@@ -110,7 +110,7 @@ export const CustomTextInput = (props: IProps & TextInputProps) => {
                 />
               </Box>
               {props.isPassword && (
-                <Ionicons
+                <Feather
                   onPress={() => setShowPassword((prev) => !prev)}
                   name={showPassword ? "eye" : "eye-off"}
                   size={25}

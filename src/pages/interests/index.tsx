@@ -115,6 +115,10 @@ const Interests = ({
       } else {
         if (selectedInterests.length < 5) {
           setSelectedInterests((prev) => [...prev, id]);
+        } else {
+          toast.show("You can only select a maximum of 5 interests", {
+            type: "danger",
+          });
         }
       }
     },

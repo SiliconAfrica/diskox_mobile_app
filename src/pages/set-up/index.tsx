@@ -45,16 +45,7 @@ const Setup = ({
   navigation,
   route,
 }: NativeStackScreenProps<RootStackParamList, "set-up">) => {
-  const [selected, setSelected] = React.useState<ICountry>({
-    id: 158,
-    name: "Nigeria",
-    short_name: "NG",
-    flag_img: "wisdom_countrypkg/img/country_flags/NG.png",
-    country_code: "234",
-    created_at: "2023-03-20T10:17:12.000000Z",
-    updated_at: "2023-03-20T12:32:26.000000Z",
-    flag_emoji: "",
-  });
+  const [selected, setSelected] = React.useState<ICountry>({});
   const theme = useTheme<Theme>();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -143,7 +134,7 @@ const Setup = ({
     return (States as IState[])
       .filter((item) => item.country_id === selected.id)
       .map((item) => ({ label: item.name }));
-  }, [selected.id]);
+  }, [selected]);
 
   const handleDateChange = (event: DateTimePickerEvent, selectedDate: Date) => {
     const currentDate = selectedDate || date;
@@ -320,7 +311,7 @@ const Setup = ({
             options={Countries}
             labelField="name"
             valueField="name"
-            placeholder="Nigeria"
+            placeholder="Select"
             value={selected.name}
             onChange={handleSelect}
             selectedTextStyle={{ fontFamily: 'RedRegular' } as any}
@@ -354,6 +345,7 @@ const Setup = ({
               options={years}
               labelField="value"
               valueField="value"
+              dropdownPosition="top"
               placeholder={years.length > 0 ? years[0].value : ""}
               onChange={(value) => handleSelectDate("year", value.value)}
             />
@@ -362,6 +354,7 @@ const Setup = ({
               options={months}
               labelField="label"
               valueField="value"
+              dropdownPosition="top"
               placeholder={months.length > 0 && months[0].label.toString()}
               onChange={(value) => handleSelectDate("month", value.value)}
             />
@@ -370,6 +363,7 @@ const Setup = ({
               options={days}
               labelField="value"
               valueField="value"
+              dropdownPosition="top"
               placeholder={days.length > 0 && days[0].value}
               onChange={(value) => handleSelectDate("day", value.value)}
             />

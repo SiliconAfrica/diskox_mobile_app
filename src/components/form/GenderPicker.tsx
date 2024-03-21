@@ -7,18 +7,19 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import { useUtilState } from "../../states/util";
 
+type TGender = "male" | "female" | undefined;
 const GenderPicker = ({
   onChange,
   value,
 }: {
   onChange: (gen: string) => void;
-  value: "male" | "female" | undefined;
+  value?: "male" | "female" | undefined;
 }) => {
   const theme = useTheme<Theme>();
-  const [gender, setGender] = React.useState("male");
+  const [gender, setGender] = React.useState<TGender>();
   const [isDark] = useUtilState((state) => [state.isDarkMode]);
 
-  const handleChange = React.useCallback((gen: string) => {
+  const handleChange = React.useCallback((gen: TGender) => {
     setGender(gen);
     onChange(gen);
   }, []);

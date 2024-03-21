@@ -58,6 +58,14 @@ const PopupModal = ({
           }}
         >
           {/* <ActivityIndicator color={theme.colors.primaryColor} size='large' /> */}
+
+          <NormalButton
+            action={() => {
+              setVisible(false);
+              navigation.navigate("profile-setting");
+            }}
+            label="Continue"
+          />
           <CustomText
             variant="body"
             textAlign="center"
@@ -69,13 +77,6 @@ const PopupModal = ({
           >
             I'll do this later
           </CustomText>
-          <NormalButton
-            action={() => {
-              setVisible(false);
-              navigation.navigate("profile-setting");
-            }}
-            label="Continue"
-          />
         </View>
       </Box>
     </Modal>
