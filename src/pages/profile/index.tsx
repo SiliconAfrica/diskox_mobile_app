@@ -1,10 +1,9 @@
 import { View, Text, useWindowDimensions, StatusBar } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
-import { FlashList } from '@shopify/flash-list'
 import BannerSection, { ACTIVE_TAB } from '../../components/profile/BannerSection'
 import CustomText from '../../components/general/CustomText'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, RefreshControl } from 'react-native-gesture-handler'
 import Overview from './pages/overview'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../navigation/MainNavigation'
@@ -14,18 +13,29 @@ import Comments from './pages/Comments'
 import Polls from './pages/Polls'
 import Drafts from './pages/Drafts'
 import Header from '../../components/Header'
+import {useQueryClient} from "react-query";
+import {Theme} from "../../theme";
+import {useTheme} from "@shopify/restyle";
 
 
 const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'>) => {
-
+  const [refreshing, isRefreshing] = React.useState(false);
   const { userId } = route.params;
   const [currentTab, setCurrentTab] = React.useState(ACTIVE_TAB.OVERVIEW);
- 
+
   const HEIGHT = useWindowDimensions().height;
+  const queryClient = useQueryClient();
+  const theme = useTheme<Theme>();
 
   const switchTab = React.useCallback((num: ACTIVE_TAB) => {
     setCurrentTab(num);
   }, []);
+
+  const handleRefresh = React.useCallback(() => {
+    isRefreshing(true);
+    queryClient.refetchQueries()
+        .then(() => isRefreshing(false));
+  }, [])
 
   const activePage = React.useCallback(() => {
     switch (currentTab) {
@@ -53,14 +63,14 @@ const Profile = ({ route }: NativeStackScreenProps<RootStackParamList, 'profile'
 
   return (
     <Box flex={1} backgroundColor='mainBackGroundColor'>
-      <StatusBar animated backgroundColor={'lightGrey'} translucent={true} />
+      <StatusBar animated backgroundColor={'transparent'} translucent={true} />
       <Header showMenuButton={false} />
-      <ScrollView>
-        <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
-        <Box width='100%' height={HEIGHT / 100 * 80}>
-          {activePage()}
-        </Box>
-      </ScrollView>
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} disallowInterruption={true} tintColor={'white'} colors={[theme.colors.primaryColor]} progressBackgroundColor={'#3A3A3A'} style={{ backgroundColor: 'transparent' }} />} >
+          <BannerSection currentTab={currentTab} switchTab={switchTab} id={userId} />
+          <Box width='100%' height={HEIGHT / 100 * 83}>
+            {activePage()}
+          </Box>
+        </ScrollView>
     </Box>
   )
 }

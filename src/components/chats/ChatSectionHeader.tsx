@@ -57,9 +57,9 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
                         <CustomText variant="body" marginLeft='s'>Block this person</CustomText>
                     </Box>
                 </MenuOption>
-                <MenuOption onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: false, showDeleteConvo: true })}>
+                {/* <MenuOption onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: false, showDeleteConvo: true })}>
                     <CustomText variant="body" marginLeft='s'>Delete conversation</CustomText>
-                </MenuOption>
+                </MenuOption> */}
             </MenuOptions>
        </Menu>
        {

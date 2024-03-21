@@ -1,9 +1,8 @@
-import { View, Text, ActivityIndicator, RefreshControl } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
 import Box from "../../../components/general/Box";
 import Searchbar from "../../../components/Searchbar";
 import { useUtilState } from "../../../states/util";
-import { FlashList, } from "@shopify/flash-list";
 import FilterTopbar, { FILTER_BAR_ENUM } from "../../../components/feeds/FilterTopbar";
 import PostCard from "../../../components/feeds/PostCard";
 import { IPost } from "../../../models/post";
@@ -18,10 +17,12 @@ import { POST_FILTERR } from "../../../enums/Postfilters";
 import AnnouncementBox from "../../../components/announcements/announcementBox";
 import useToast from "../../../hooks/useToast";
 import _ from 'lodash'
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { CUSTOM_STATUS_CODE } from "../../../enums/CustomCodes";
 import FeedCard from "../../../components/feeds/FeedCard";
 import { useDeletePostState } from "../../../states/deleteedPost";
+import {usePostState} from "../../../states/PostState";
+import usePosts from "../../../hooks/usePosts";
 
 const NewPost = ({
   activeTab,
@@ -37,6 +38,10 @@ const NewPost = ({
   const [refreshing, setRefreshing] = React.useState(false);
   const { ids: DeletedIds } = useDeletePostState((state) => state);
   const toast = useToast();
+
+  // new global state
+  const { poll } = usePostState((state) => state);
+  //const { isLoading, isError, setPage } = usePosts({ type: 'POLL', url: URLS.GET_POLLS})
 
   // states
   const [posts, setPosts] = React.useState<IPost[]>([]);
@@ -86,7 +91,7 @@ const NewPost = ({
   })
 
   // react query
-  const { isLoading, isError, error, refetch } = useQuery(
+  const { isLoading, isError,  error, refetch } = useQuery(
     ["GetPollsPosts"],
     () => httpService.get(`${URLS.GET_POLLS}`, {
       params: {
@@ -148,6 +153,7 @@ const NewPost = ({
   }, [currentPage, ids, perPage, total, noMore, isLoading]);
 
   const handleRefresh = () => {
+    queryClient.refetchQueries();
     if (!isLoading) {
       refetch();
     }
@@ -163,10 +169,11 @@ const NewPost = ({
       {  (
         <FlatList
         refreshControl={
-          <RefreshControl 
+          <RefreshControl
             refreshing={isLoading && posts.length> 0}
-            onRefresh={handleRefresh} 
+            onRefresh={handleRefresh}
             progressViewOffset={50}
+            disallowInterruption={true}
             progressBackgroundColor={theme.colors.primaryColor}
             colors={['white']}
           />
@@ -174,7 +181,7 @@ const NewPost = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={1}
         ListEmptyComponent={() => (
-          <>
+          <>isLoading, isError,
             {!isLoading && posts.length < 1 && (
               <CustomText variant="body" textAlign="center" marginTop="s">No Post to view</CustomText>
               )}
@@ -189,7 +196,7 @@ const NewPost = ({
         keyExtractor={(item, index) => item.id.toString()}
         extraData={DeletedIds}
         renderItem={({ item }) => <FeedCard post={item} showReactions />}
-        data={posts}
+        data={poll}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">
             {isLoading &&  (

@@ -22,7 +22,7 @@ const ViewImageModal = ({ isVisisble, onClose, images }: IProps) => {
     const theme = useTheme<Theme>();
     const { height, width } = useWindowDimensions();
   return (
-    <ReactNavtieModalWrapper isVisible={isVisisble} height={'40%'} backgroundColor={'white'}>
+    <ReactNavtieModalWrapper isVisible={isVisisble} height={'40%'} backgroundColor={theme.colors.mainBackGroundColor}>
         <Box width='100%' paddingHorizontal='m' backgroundColor='mainBackGroundColor'>
             <Box width='100%' alignItems='flex-end' alignContent='flex-end' marginVertical='m'>
                 <Feather name='x' size={20} color={theme.colors.textColor} onPress={() => onClose()} />

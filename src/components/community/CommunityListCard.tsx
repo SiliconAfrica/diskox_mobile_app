@@ -13,6 +13,7 @@ import useToast from "../../hooks/useToast";
 import ErrorButton from "../general/ErrorButton";
 import { ActivityIndicator, Pressable } from "react-native";
 import theme from "../../theme";
+import { Feather } from '@expo/vector-icons';
 
 const CommunityListCard = (props: ICommunity) => {
   const { name, description, profile_image, id, is_member } = props;
@@ -58,8 +59,8 @@ const CommunityListCard = (props: ICommunity) => {
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: theme.spacing.m,
-        borderBottomColor: theme.colors.secondaryBackGroundColor,
-        borderBottomWidth: 2,
+        borderBottomColor: theme.colors.borderColor,
+        borderBottomWidth: 0.5,
       }}
       // width={"100%"}
       // height={100}
@@ -75,14 +76,15 @@ const CommunityListCard = (props: ICommunity) => {
           height={30}
           width={30}
           borderRadius={15}
-          bg="primaryColor"
+          bg="secondaryBackGroundColor"
           overflow="hidden"
         >
-          <Image
-            source={{ uri: `${IMAGE_BASE}${profile_image}` }}
+            <Image
+            source={profile_image !== null ? { uri: `${IMAGE_BASE}${profile_image}` } : require('../../../assets/images/dummy.jpeg')}
             contentFit="cover"
             style={{ width: "100%", height: "100%" }}
           />
+
         </Box>
 
         <Box marginLeft="s">
@@ -102,14 +104,14 @@ const CommunityListCard = (props: ICommunity) => {
           title={"Join"}
           isLoading={isLoading}
           onPress={() => mutate()}
-          height={35}
+          height={30}
           width={70}
         ></PrimaryButton>
       ) : (
         <ErrorButton
           title={"Leave"}
           onPress={() => mutate()}
-          height={35}
+          height={30}
           isLoading={isLoading}
           width={70}
         ></ErrorButton>

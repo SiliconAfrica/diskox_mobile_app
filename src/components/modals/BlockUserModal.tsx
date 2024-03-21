@@ -11,12 +11,26 @@ import CustomText from '../general/CustomText'
 import CustomButton from '../general/CustomButton'
 import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../theme'
+import { useMutation } from 'react-query'
+import httpService from '../../utils/httpService'
+import { URLS } from '../../services/urls'
+import useToast from '../../hooks/useToast'
 
 const BlockUserModal = () => {
     const [setAll, activeChat] = useModalState((state) => [state.setAll, state.activeChat]);
     const { reset, setAll: setValues, stage } = useSignupState((state) => state)
     const ref = useRef<BottomSheetModal>();
     const theme = useTheme<Theme>()
+    const toast = useToast();
+
+    const { mutate, isLoading } = useMutation({ 
+      mutationFn: () => httpService.post(`${URLS.BLOCK_AND_UNBLOCK_USER}/${activeChat.userId}`),
+      onSuccess: (data) => {
+          toast.show('User blocked successfully', { type: 'success' });
+          setAll({ showBlockUser: false });
+      },
+      onError: (error) => {}
+    })
 
     useEffect(() => {
         ref.current.present();
@@ -49,7 +63,7 @@ const BlockUserModal = () => {
             <CustomText variant='header' textAlign='center' fontSize={20} color='black'>Block {activeChat.username}</CustomText>
             <CustomText textAlign='center' variant='body' marginVertical='l'>Blocking this user prevents them from interacting or viewing your profile and sending messages. You won’t receive any notification from them anymore.</CustomText>
 
-            <CustomButton title='Yes, Block User' onPress={() => {}} height={44} color={theme.colors.primaryColor}  />
+            <CustomButton title='Yes, Block User' onPress={mutate} isLoading={isLoading} height={44} color={theme.colors.primaryColor}  />
         </Box>
     </ModalWrapper>
   )

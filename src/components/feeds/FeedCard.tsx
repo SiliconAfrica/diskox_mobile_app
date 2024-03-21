@@ -131,7 +131,7 @@ const FeedCard = ({
       toast.show(error.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost${id}`]);
+      // queryClient.invalidateQueries([`getPost${id}`]);
     },
   });
 
@@ -141,7 +141,7 @@ const FeedCard = ({
       toast.show(error.message, { type: "error" });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries([`getPost${id}`]);
+      // queryClient.invalidateQueries([`getPost${id}`]);
     },
   });
 
@@ -178,6 +178,7 @@ const FeedCard = ({
   const handleReaction = React.useCallback((type: "love" | "upvote") => {
     const check = checkloggedInState();
     if (check) {
+      setPost((prev) => ({ ...prev, has_reacted: prev.has_reacted.length > 0 ? [1]:[]   }))
       reactpost.mutate(type);
     }
   }, []);
@@ -192,6 +193,7 @@ const FeedCard = ({
   const handleUpVote = () => {
     const check = checkloggedInState();
     if (check) {
+      setPost((prev) => ({ ...prev, has_upvoted: prev.has_upvoted === 0 ? 1:0, upvotes_count: prev.has_upvoted === 0 ? prev.upvotes_count + 1: prev.upvotes_count - 1  }))
       upvote.mutate();
     }
   };
@@ -206,6 +208,7 @@ const FeedCard = ({
   const handleDownVote = () => {
     const check = checkloggedInState();
     if (check) {
+      setPost((prev) => ({ ...prev, has_downvoted: prev.has_downvoted === 0 ? 1:0  }))
       downvote.mutate();
     }
   };
@@ -313,7 +316,8 @@ const FeedCard = ({
                 borderColor="primaryColor"
                 overflow="hidden"
               >
-                <User variant="Bold" size={15} color={theme.colors.textColor} />
+                <Image source={require('../../../assets/images/dummy.jpeg')} style={{ width: '100%', height: '100%' }} />
+                {/*<User variant="Bold" size={15} color={theme.colors.textColor} />*/}
               </Box>
             )}
           </Pressable>
@@ -328,10 +332,10 @@ const FeedCard = ({
                 alignItems="center"
               >
                 <CustomText marginRight="s" variant="subheader" fontSize={14}>
-                  {name} @{username}
+                  <CustomText variant={'body'}  style={{ color: '#ffffff', fontSize: 14 }}>{name}</CustomText> <CustomText variant={'body'}  style={{ color: '#d1d5db', fontSize: 14 }}>@{username}</CustomText>
                   {community_id === null && tags.length === 1 && (
                     <>
-                      tagged{" "}
+                      <CustomText variant={'body'}  style={{ color: '#d1d5db', fontSize: 14 }}>tagged{" "}</CustomText>
                       <CustomText variant="subheader" fontSize={14}>
                         {tags[0].user.name}{" "}
                       </CustomText>
@@ -555,17 +559,17 @@ const FeedCard = ({
                     alignItems: "center",
                     flexDirection: "row",
                     borderRightWidth: 0.5,
-                    //  borderRightColor: theme.colors.borderColor,
+                    borderRightColor: theme.colors.borderColor,
                   }}
                   onPress={handleUpVote}
                 >
-                  {upvote.isLoading && (
-                    <ActivityIndicator
-                      size="small"
-                      color={theme.colors.primaryColor}
-                    />
-                  )}
-                  {!upvote.isLoading && (
+                  {/*{upvote.isLoading && (*/}
+                  {/*  <ActivityIndicator*/}
+                  {/*    size="small"*/}
+                  {/*    color={theme.colors.primaryColor}*/}
+                  {/*  />*/}
+                  {/*)}*/}
+                  { (
                     <>
                       {
                         <ArrowBigUp
@@ -608,7 +612,7 @@ const FeedCard = ({
                   }}
                   onPress={handleDownVote}
                 >
-                  {!downvote.isLoading && (
+                  { (
                     <>
                       {
                         //  <Image
@@ -637,12 +641,12 @@ const FeedCard = ({
                      )} */}
                     </>
                   )}
-                  {downvote.isLoading && (
-                    <ActivityIndicator
-                      size="small"
-                      color={theme.colors.primaryColor}
-                    />
-                  )}
+                  {/*{downvote.isLoading && (*/}
+                  {/*  <ActivityIndicator*/}
+                  {/*    size="small"*/}
+                  {/*    color={theme.colors.primaryColor}*/}
+                  {/*  />*/}
+                  {/*)}*/}
                 </Pressable>
               </Box>
 

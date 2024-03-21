@@ -20,7 +20,6 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import httpService from "../../utils/httpService";
 import { URLS } from "../../services/urls";
 import CustomText from "../../components/general/CustomText";
-import { FlashList } from "@shopify/flash-list";
 import {
   IChatContainer,
   IChatMessage,
@@ -45,6 +44,8 @@ import {
 import SelectedChatBottom from "../../components/modals/SelectedChatBottom";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
+import { uniqBy } from "lodash";
+import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
 
 enum FILE_TYPE {
   IMAGE,
@@ -72,6 +73,7 @@ const Chat = ({
   const theme = useTheme<Theme>();
   const navigation = useNavigation<PageType>();
   const queryClient = useQueryClient();
+  const scrollViewRef = React.useRef<ScrollView>(null)
 
   // states
   const { userId, last_seen, profile_image, username } = route.params;
@@ -101,7 +103,6 @@ const Chat = ({
     []
   );
   const [unsent, seetUnsent] = React.useState<UNsentMessage[]>([]);
-
   const { id: loggedUser } = useDetailsState((state) => state);
 
   const unselectMessage = (closereply?: boolean) => {
@@ -117,10 +118,24 @@ const Chat = ({
     ["getMessages", userId],
     () => httpService.get(`${URLS.GET_CHAT_MESSAGES}/${userId}`),
     {
+      refetchInterval: 1000,
       onSuccess: (data) => {
-        const chats: IChatMessage[] = data.data.data;
-        //const manipulatedChat: IChatContainer[] = chats.map((item) => ({ isSent: true, chat: item, message: '', files: [], created_at: '' }))
-        setChats(chats);
+        if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+          const messages: IChatMessage[] = data.data?.data;
+          const arr = uniqBy([...chats, ...messages], 'id')
+          if (chats.length < 1) {
+            setChats(arr);
+            if (scrollViewRef.current) {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }
+          } 
+          if (arr.length > chats.length) {
+            setChats(arr);
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+          }
+          setChats(arr);
+        }
+        
       },
     }
   );
@@ -217,11 +232,11 @@ const Chat = ({
       multiple: false,
     });
 
-    if (result.type === "success") {
-      const name = result.name;
-      const type = mime.getType(result.uri);
+    if (!result.canceled) {
+      const name = result.assets[0].name;
+      const type = mime.getType(result.assets[0].uri);
       console.log(type);
-      const uri = result.uri;
+      const uri = result.assets[0].uri;
       setFiles((prev) => [...prev, { name, type, uri }]);
       setFileType(FILE_TYPE.DOC);
       setShowPickerModal(false);
@@ -344,7 +359,7 @@ const Chat = ({
               <CustomText variant="body">Loading Messages</CustomText>
             </Box>
           )}
-          <ScrollView contentContainerStyle={{ padding: 20 }}>
+          <ScrollView contentContainerStyle={{ padding: 20 }} ref={scrollViewRef}>
             {Object.keys(groupedMessages).length > 0 &&
               Object.keys(groupedMessages).map((date) => (
                 <React.Fragment key={date}>
@@ -374,19 +389,7 @@ const Chat = ({
                   ))}
                 </React.Fragment>
               ))}
-            {getMessages.isLoading && (
-              <Box
-                alignItems="center"
-                justifyContent="center"
-                width="100%"
-                height={40}
-              >
-                <ActivityIndicator
-                  size={"small"}
-                  color={theme.colors.primaryColor}
-                />
-              </Box>
-            )}
+            
           </ScrollView>
 
           {files.length > 0 && (

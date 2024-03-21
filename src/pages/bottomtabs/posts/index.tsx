@@ -7,10 +7,15 @@ import { useUtilState } from '../../../states/util'
 import NewPosts from './pages/NewPosts'
 import FollowingPosts from './pages/FollowingPosts'
 import TrendingPost from './pages/TrendingPost'
+import { usePushNotification } from '../../../hooks/usePushNotifications'
+
 
 const Posts = () => {
   const [activeTab, setActiveTab] = React.useState(FILTER_BAR_ENUM.NEW)
   const { isLoggedIn, isDarkMode } = useUtilState((state) => state);
+
+  const { expoPushToken } = usePushNotification();
+  console.log(expoPushToken);
 
   const handleChange = React.useCallback(() => {
     switch(activeTab) {

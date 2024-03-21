@@ -348,8 +348,8 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
   return (
     <Box
       width="100%"
-      borderBottomWidth={0.5}
-      borderBottomColor="grey"
+      borderBottomWidth={0.4}
+      borderBottomColor="borderColor"
       marginBottom="m"
       paddingTop="m"
     >
@@ -367,10 +367,11 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                 borderColor="primaryColor"
                 overflow="hidden"
               >
+
                 <Image
-                  source={{
+                  source={ comment.user?.profile_image !== null ? {
                     uri: `${IMAGE_BASE}${comment.user?.profile_image}`,
-                  }}
+                  } : require('../../../../assets/images/dummy.jpeg')}
                   contentFit="cover"
                   style={{
                     width: "100%",
@@ -447,7 +448,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
           <Box width={"100%"} paddingLeft="m" paddingBottom="s">
             {/* TEXT AND IMAGE SECTION */}
             <Box width={"100%"} paddingHorizontal="m">
-              <CustomText variant="body" color="grey" fontSize={16}>
+              <CustomText variant="body"  fontSize={15}>
                 {comment.comment}
               </CustomText>
             </Box>
@@ -509,7 +510,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                 flexDirection="row"
                 borderRadius={20}
                 borderWidth={0.5}
-                borderColor="lightGrey"
+                borderColor="borderColor"
               >
                 {/* UPVOTE */}
                 <Pressable
@@ -520,7 +521,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                     alignItems: "center",
                     flexDirection: "row",
                     borderRightWidth: 0.5,
-                    borderRightColor: theme.colors.lightGrey,
+                    borderRightColor: theme.colors.borderColor,
                   }}
                   onPress={() => upvote.mutate()}
                 >
@@ -601,7 +602,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                   style={{ flexDirection: "row", alignItems: "center" }}
                 >
                   <Heart
-                    size={25}
+                    size={20}
                     color={
                       comment.has_reacted.length > 0
                         ? theme.colors.primaryColor
