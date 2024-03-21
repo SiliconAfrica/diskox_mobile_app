@@ -40,6 +40,9 @@ is_member_request_pending - value to check before pending
 - Put withdrawals in earning and the error
 - Added toast message for telling user forgot password otp has been sent
 - Reste paswword input changed to New Password
+- Remove online member for community
+- Fix issues on editing community
+- Fix issue with community topic navigation
 
 ## Todo
 

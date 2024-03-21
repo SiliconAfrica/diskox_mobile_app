@@ -66,7 +66,13 @@ const Topics = ({}) => {
       <SettingsHeader
         showSave
         title="Topics"
-        handleArrowPressed={() => navigation.goBack()}
+        handleArrowPressed={() =>
+          navigation.navigate("community-settings", {
+            id,
+            type: COMMUNITY_SETTING_TYPE.EDIT,
+            username: CommunityUsername,
+          })
+        }
       />
       <Box flex={1} padding="m">
         <Box height={55}>

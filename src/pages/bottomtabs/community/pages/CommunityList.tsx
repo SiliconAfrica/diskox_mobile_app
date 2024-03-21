@@ -62,6 +62,9 @@ const CommunityList = () => {
         `${URLS.GET_JOINED_COMMUNITIES}?page=${pageForMyCommunities}`
       ),
     {
+      onSuccess: (res) => {
+        console.log(res.data?.data, "hellllres.data?.data?.data");
+      },
       keepPreviousData: true,
     }
   );
@@ -150,13 +153,6 @@ const CommunityList = () => {
         {myCommunities?.data.data?.data.map((item) => (
           <CommunityListCard key={item.id} {...item} />
         ))}
-        {!isLoadingMyCommunities &&
-          myCommunities?.data?.data?.next_page_url !== null && (
-            <NormalButton
-              label="See More"
-              action={() => setPageForMyCommunities((prev) => prev + 1)}
-            />
-          )}
         {isLoadingMyCommunities && (
           <ActivityIndicator
             size={30}
@@ -164,6 +160,36 @@ const CommunityList = () => {
             style={{ paddingVertical: 10 }}
           />
         )}
+        <Box
+          flexDirection="row"
+          alignItems="center"
+          paddingHorizontal="s"
+          justifyContent="space-between"
+        >
+          {!isLoadingMyCommunities &&
+            myCommunities?.data?.data?.current_page > 1 && (
+              <NormalButton
+                label="Previous Page"
+                width={
+                  myCommunities?.data?.data?.next_page_url !== null
+                    ? "45%"
+                    : "100%"
+                }
+                action={() => setPageForMyCommunities((prev) => prev - 1)}
+              />
+            )}
+          {!isLoadingMyCommunities &&
+            myCommunities?.data?.data?.next_page_url !== null && (
+              <NormalButton
+                label="Next Page"
+                width={
+                  myCommunities?.data?.data?.current_page > 1 ? "45%" : "100%"
+                }
+                action={() => setPageForMyCommunities((prev) => prev + 1)}
+              />
+            )}
+        </Box>
+
         <Box
           width="100%"
           flexDirection="row"
@@ -183,9 +209,10 @@ const CommunityList = () => {
             return <CommunityListCard key={item.id} {...item} />;
           }
         })}
+
         {!isLoading && data?.data?.data?.next_page_url !== null && (
           <NormalButton
-            label="See More"
+            label="See more"
             action={() => setPage((prev) => prev + 1)}
           />
         )}
@@ -212,8 +239,8 @@ const CommunityList = () => {
             </CustomText>
           </Box>
           {communitiesCountry?.data?.data &&
-            communitiesCountry?.data?.data?.map((country: ICountry) => (
-              <Box>
+            communitiesCountry?.data?.data?.map((country: ICountry, i) => (
+              <Box key={i}>
                 <Pressable
                   onPress={() => {
                     if (selectedCountry?.id === country.id) {

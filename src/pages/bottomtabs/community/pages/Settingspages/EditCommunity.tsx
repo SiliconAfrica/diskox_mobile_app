@@ -37,6 +37,7 @@ const EditCommunity = () => {
   const { title, description, username, topics, newTopic, setAll } =
     useCommunityDetailsState((state) => state);
   const [theTopic, setTheTopic] = useState("");
+  const [showUsernameWarning, setShowUsernameWarning] = useState(false);
 
   useEffect(() => {
     setTheTopic(newTopic ? newTopic : topics);
@@ -106,8 +107,19 @@ const EditCommunity = () => {
         <CustomTextInput
           name="username"
           placeholder="Community username"
+          maxLength={30}
+          removeSpecialCharater
           required
+          onChange={(text) => {
+            setShowUsernameWarning(true);
+          }}
         />
+        {showUsernameWarning && (
+          <CustomText fontSize={12} marginTop="s">
+            Users will not be able to access your community with your previous
+            link
+          </CustomText>
+        )}
         <Box height={20} width={"100%"} />
 
         <CustomTextInput

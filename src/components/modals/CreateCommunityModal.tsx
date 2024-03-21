@@ -122,6 +122,7 @@ const CreateCommunityModal = ({ isVisisble, onClose }: IProps) => {
           <CustomTextInput
             removeSpecialCharater
             name="username"
+            maxLength={30}
             required
             placeholder="Community Username"
           />

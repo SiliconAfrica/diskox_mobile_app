@@ -14,7 +14,7 @@ import { URLS } from "../../services/urls";
 import { ICommunity } from "../../models/Community";
 import moment from "moment";
 import useToast from "../../hooks/useToast";
-import { FlatList } from 'react-native-gesture-handler'
+import { FlatList } from "react-native-gesture-handler";
 import { IModerator } from "../../models/Moderators";
 import { Image } from "expo-image";
 
@@ -151,14 +151,14 @@ const AboutCommunity = () => {
               </CustomText>
             </Box>
 
-            <Box marginLeft="m">
+            {/* <Box marginLeft="m">
               <CustomText variant="subheader" fontSize={18}>
                 24
               </CustomText>
               <CustomText variant="body" marginTop="s" fontSize={14}>
                 Online
               </CustomText>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
 
