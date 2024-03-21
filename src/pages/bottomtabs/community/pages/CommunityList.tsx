@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Box from "../../../../components/general/Box";
@@ -11,6 +11,7 @@ import httpService from "../../../../utils/httpService";
 import { URLS } from "../../../../services/urls";
 import { ICommunity } from "../../../../models/Community";
 import { Theme } from "../../../../theme";
+import _ from "lodash";
 import { useTheme } from "@shopify/restyle";
 import ReactNavtieModalWrapper from "../../../../components/ReactNavtieModalWrapper";
 import CreateCommunityModal from "../../../../components/modals/CreateCommunityModal";
@@ -19,25 +20,76 @@ import useToast from "../../../../hooks/useToast";
 import { handlePromise } from "../../../../utils/handlePomise";
 import CustomButton from "../../../../components/general/CustomButton";
 import NormalButton from "../../../../components/general/NormalButton";
+import { AntDesign } from "@expo/vector-icons";
+import { ICountry } from "../../../../models/country";
 
 const CommunityList = () => {
   const theme = useTheme<Theme>();
   const toast = useToast();
   const [showModal, setShowModal] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageForMyCommunities, setPageForMyCommunities] = useState(0);
+  const [selectedCountry, setSelectedCountry] = useState<Partial<ICountry>>();
+  const [pageForMyCommunities, setPageForMyCommunities] = useState(1);
+  const [topCommunities, setTopCommunities] = useState<ICommunity[]>([]);
+  const [pageForMyCommunitiesByCountries, setPageForMyCommunitiesByCountries] =
+    useState(0);
   const { community_privilege, id, setAll } = useDetailsState((state) => state);
-  const { isLoading, isError, data } = useQuery(["getCommunities", page], () =>
-    httpService.get(`${URLS.GET_COMMUNITIES}?page=${page}`)
+  const { isLoading, isError, isFetching, data } = useQuery(
+    ["getCommunities", page],
+    () => httpService.get(`${URLS.GET_COMMUNITIES}?page=${page}`),
+    {
+      onSuccess: (res) => {
+        if (Array.isArray(res.data?.data?.data)) {
+          if (topCommunities.length > 0) {
+            const uniqArra = _.uniqBy<ICommunity>(
+              [...topCommunities, ...res.data.data.data],
+              "id"
+            );
+            setTopCommunities([...uniqArra]);
+          } else {
+            setTopCommunities([...res.data.data.data]);
+          }
+        }
+      },
+      keepPreviousData: true,
+    }
   );
+
   const { data: myCommunities, isLoading: isLoadingMyCommunities } = useQuery(
-    ["getMyCommunitie", pageForMyCommunities],
+    ["getMyCommunities", pageForMyCommunities],
     () =>
       httpService.get(
         `${URLS.GET_JOINED_COMMUNITIES}?page=${pageForMyCommunities}`
       ),
     {
       keepPreviousData: true,
+    }
+  );
+
+  const { data: communitiesCountry, isLoading: isLoadingCommunitiesCountry } =
+    useQuery(
+      ["communitiesCountry"],
+      () => httpService.get(`${URLS.GET_COMMUNITY_COUNTRIES}`),
+      {
+        keepPreviousData: true,
+      }
+    );
+
+  const {
+    data: communitiesByCountry,
+    isLoading: isLoadingCommunitiesByCountry,
+    isFetching: isFetchingCommunitiesByCountry,
+  } = useQuery(
+    [
+      `communitiesByCountry=${selectedCountry?.name}`,
+      pageForMyCommunitiesByCountries,
+    ],
+    () =>
+      httpService.get(
+        `${URLS.GET_COMMUNITY_BY_COUNTRIES}/${selectedCountry?.name}?page=${pageForMyCommunities}`
+      ),
+    {
+      keepPreviousData: pageForMyCommunities > 1 ? true : false,
     }
   );
 
@@ -122,11 +174,11 @@ const CommunityList = () => {
           paddingBottom="m"
         >
           <CustomText variant="header" fontSize={15}>
-            Explore popular communities
+            Explore top communities
           </CustomText>
         </Box>
 
-        {data?.data.data?.data.map((item) => {
+        {topCommunities.map((item) => {
           if (item.is_member === 0) {
             return <CommunityListCard key={item.id} {...item} />;
           }
@@ -137,13 +189,104 @@ const CommunityList = () => {
             action={() => setPage((prev) => prev + 1)}
           />
         )}
-        {isLoading && (
+        {(isLoading || isFetching) && (
           <ActivityIndicator
             size={30}
             color={theme.colors.primaryColor}
             style={{ paddingVertical: 10 }}
           />
         )}
+
+        <Box width="100%">
+          <Box
+            width="100%"
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            paddingHorizontal="s"
+            marginTop="m"
+            paddingBottom="m"
+          >
+            <CustomText variant="header" fontSize={15}>
+              Communities By Country
+            </CustomText>
+          </Box>
+          {communitiesCountry?.data?.data &&
+            communitiesCountry?.data?.data?.map((country: ICountry) => (
+              <Box>
+                <Pressable
+                  onPress={() => {
+                    if (selectedCountry?.id === country.id) {
+                      setSelectedCountry({});
+                    } else {
+                      setSelectedCountry({ ...country });
+                    }
+                  }}
+                >
+                  <Box
+                    justifyContent="space-between"
+                    paddingVertical="m"
+                    alignItems="center"
+                    paddingHorizontal="m"
+                    flexDirection="row"
+                    width="100%"
+                  >
+                    <CustomText>{country.name}</CustomText>
+                    {selectedCountry?.id === country.id ? (
+                      <AntDesign
+                        name="up"
+                        size={16}
+                        color={theme.colors.black}
+                      />
+                    ) : (
+                      <AntDesign
+                        name="down"
+                        size={16}
+                        color={theme.colors.black}
+                      />
+                    )}
+                  </Box>
+                </Pressable>
+                {selectedCountry?.id === country.id && (
+                  <Box>
+                    {communitiesByCountry?.data?.data?.data.map((item) => {
+                      if (item.is_member === 0) {
+                        return <CommunityListCard key={item.id} {...item} />;
+                      }
+                    })}
+                    {!isLoadingCommunitiesByCountry &&
+                    !isFetchingCommunitiesByCountry &&
+                    !communitiesByCountry?.data ? (
+                      <CustomText paddingHorizontal="l">
+                        No communities here yet
+                      </CustomText>
+                    ) : (
+                      !isLoadingCommunitiesByCountry &&
+                      communitiesByCountry?.data?.data?.next_page_url !==
+                        null && (
+                        <NormalButton
+                          label="See More"
+                          action={() =>
+                            setPageForMyCommunitiesByCountries(
+                              (prev) => prev + 1
+                            )
+                          }
+                        />
+                      )
+                    )}
+                    {(isLoadingCommunitiesByCountry ||
+                      isFetchingCommunitiesByCountry) && (
+                      <ActivityIndicator
+                        size={30}
+                        color={theme.colors.primaryColor}
+                        style={{ paddingVertical: 10 }}
+                      />
+                    )}
+                  </Box>
+                )}
+              </Box>
+            ))}
+        </Box>
       </ScrollView>
       {/* <FlashList
         estimatedItemSize={20}

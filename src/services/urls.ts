@@ -60,6 +60,8 @@ export const URLS = {
   SEARCH: "/search_query",
   GET_COMMUNITIES: "/all_communities",
   GET_JOINED_COMMUNITIES: "/fetch_communities_user_belongs_to",
+  GET_COMMUNITY_COUNTRIES: "/fetch_community_countries",
+  GET_COMMUNITY_BY_COUNTRIES: "/fetch_communities_by_country",
   GET_SINGLE_COMMUNITY: "/fetch_single_community",
   CHECK_COMMUNITY_ROLE: "/check_member_community_role",
   JOIN_COMMUNITY: "/join_or_leave_community",
