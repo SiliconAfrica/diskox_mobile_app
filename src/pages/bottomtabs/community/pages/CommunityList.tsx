@@ -62,9 +62,6 @@ const CommunityList = () => {
         `${URLS.GET_JOINED_COMMUNITIES}?page=${pageForMyCommunities}`
       ),
     {
-      onSuccess: (res) => {
-        console.log(res.data?.data, "hellllres.data?.data?.data");
-      },
       keepPreviousData: true,
     }
   );
