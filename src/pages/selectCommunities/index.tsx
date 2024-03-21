@@ -73,6 +73,7 @@ const SelectCommunities = ({
         title="Select Communities"
         showSave={false}
         handleArrowPressed={() => navigation.goBack()}
+        showBackBtn={false}
       />
       <PopupModal visible={isVisible} setVisible={setIsVisible} />
       <ScrollView>
@@ -194,30 +195,29 @@ const SelectCommunities = ({
                 </Box>
               </Pressable>
             ))}
-
-          <Box
-            width="100%"
-            height={120}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <PrimaryButton
-              width="90%"
-              title="Continue"
-              onPress={selected.length > 4 ? submit : () => {}}
-              isLoading={isJoining}
-              color={
-                selected.length > 4
-                  ? theme.colors.primaryColor
-                  : theme.colors.fadedButtonBgColor
-              }
-              textColor={
-                selected.length > 4 ? theme.colors.white : theme.colors.grey
-              }
-            />
-          </Box>
         </Box>
       </ScrollView>
+      <Box
+        width="100%"
+        height={120}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <PrimaryButton
+          width="90%"
+          title="Continue"
+          onPress={selected.length > 4 ? submit : () => {}}
+          isLoading={isJoining}
+          color={
+            selected.length > 4
+              ? theme.colors.primaryColor
+              : theme.colors.fadedButtonBgColor
+          }
+          textColor={
+            selected.length > 4 ? theme.colors.white : theme.colors.grey
+          }
+        />
+      </Box>
     </Box>
   );
 };
