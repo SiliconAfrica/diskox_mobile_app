@@ -43,6 +43,8 @@ is_member_request_pending - value to check before pending
 - Remove online member for community
 - Fix issues on editing community
 - Fix issue with community topic navigation
+- Close side bar after logging in
+- Fixed issue of gatelocking user on registration
 
 ## Todo
 

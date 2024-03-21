@@ -48,6 +48,7 @@ import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../login";
 import { handlePromise } from "../../utils/handlePomise";
 import { useMultipleAccounts } from "../../states/multipleAccountStates";
+import { saveScreen } from "../../utils/saveCurrentPosition";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -150,12 +151,17 @@ const Register = ({
     );
     updateUtil({ isLoggedIn: true });
     if (proceedToSetup === true) {
+      await saveScreen("set-up", {
+        showUsername: true,
+        userId: data.data.user.id,
+      });
       navigation.navigate("set-up", {
         showUsername: true,
         userId: data.data.user.id,
       });
       return true;
     } else if (proceedToSetup !== true && data.data?.user?.email_verified_at) {
+      await saveScreen("", {});
       navigation.navigate("home");
       return true;
     } else if (proceedToSetup !== true && !data.data?.user?.email_verified_at) {

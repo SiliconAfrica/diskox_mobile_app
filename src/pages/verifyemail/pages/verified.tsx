@@ -8,6 +8,7 @@ import { RootStackParamList } from "../../../navigation/MainNavigation";
 import { AntDesign } from "@expo/vector-icons";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../theme";
+import { saveScreen } from "../../../utils/saveCurrentPosition";
 
 const Verified = () => {
   const navigate = useNavigation<NavigationProp<RootStackParamList>>();
@@ -41,7 +42,10 @@ const Verified = () => {
       <Box flex={0.2}>
         <NormalButton
           label="Continue"
-          action={() => navigate.navigate("set-up")}
+          action={async () => {
+            await saveScreen("set-up");
+            navigate.navigate("set-up");
+          }}
         />
       </Box>
     </Box>

@@ -119,8 +119,9 @@ const ScrollableItem = ({ accounts }: { accounts: IUserState[] }) => {
                             });
                           }
                         } else {
-                          alert(
-                            `Please add account with username of ${user.username} again.`
+                          toast.show(
+                            `Please add account with username of ${user.username} again.`,
+                            { type: "danger" }
                           );
                         }
                       }
@@ -248,7 +249,6 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
   );
 
   const logout = async () => {
-    toast.show("sjs");
     const [loggedInUser, loggedInUserErr] = await handlePromise(
       AsyncStorage.getItem(`user`)
     );
@@ -280,6 +280,8 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
         toast.show(`Account switched to "@${accountToSwitchTo.username}"`, {
           type: "success",
         });
+        //close side bar
+        navigation.toggleDrawer();
       } else {
         await SecureStorage.setItemAsync("token", "");
         const [saveUser, saveUserErr] = await handlePromise(
@@ -290,6 +292,8 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           type: "success",
         });
         navigation.navigate("home");
+        //close side bar
+        navigation.toggleDrawer();
       }
     }
     return;

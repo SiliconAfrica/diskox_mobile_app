@@ -40,12 +40,13 @@ import { useModalState } from "../../states/modalState";
 import { useMultipleAccounts } from "../../states/multipleAccountStates";
 import { useDetailsState } from "../../states/userState";
 import { useVerifyState } from "../verifyemail/state";
+import { saveScreen } from "../../utils/saveCurrentPosition";
 
 const Setup = ({
   navigation,
   route,
 }: NativeStackScreenProps<RootStackParamList, "set-up">) => {
-  const [selected, setSelected] = React.useState<ICountry>({});
+  const [selected, setSelected] = React.useState<Partial<ICountry>>({});
   const theme = useTheme<Theme>();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -104,6 +105,8 @@ const Setup = ({
         });
       }
       setShowModal(true);
+
+      await saveScreen("categories", { shouldSelectCommunitiesNext: true });
       navigation.navigate("categories", { shouldSelectCommunitiesNext: true });
       setAll({ isLoggedIn: true });
     },
@@ -143,7 +146,6 @@ const Setup = ({
   };
 
   const handleSubmit = React.useCallback(() => {
-    console.log(payload);
     if (
       (showUsername && payload.username === "") ||
       payload.phone_number === "" ||
@@ -257,6 +259,7 @@ const Setup = ({
   useEffect(() => {
     getDays();
   }, [selectedDate.month]);
+
   return (
     <Box backgroundColor="mainBackGroundColor" flex={1} paddingTop="xl">
       <ScrollView style={{ paddingHorizontal: theme.spacing.m }}>
@@ -279,7 +282,7 @@ const Setup = ({
             value={payload.phone_number}
             label="Phone Number"
             required
-            style={{ fontFamily: 'RedRegular' }}
+            style={{ fontFamily: "RedRegular" }}
             keyboardType="number-pad"
             containerStyle={{ marginTop: theme.spacing.m }}
             onChangeText={(val) =>
@@ -295,7 +298,7 @@ const Setup = ({
                 value={payload.username}
                 label="Username"
                 required
-                style={{ fontFamily: 'RedRegular' }}
+                style={{ fontFamily: "RedRegular" }}
                 containerStyle={{ marginTop: theme.spacing.m }}
                 onChangeText={(val) =>
                   setPayload((prev) => ({
@@ -314,7 +317,7 @@ const Setup = ({
             placeholder="Select"
             value={selected.name}
             onChange={handleSelect}
-            selectedTextStyle={{ fontFamily: 'RedRegular' } as any}
+            selectedTextStyle={{ fontFamily: "RedRegular" } as any}
             search
           />
           <CustomDropdown

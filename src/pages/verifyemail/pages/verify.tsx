@@ -19,6 +19,7 @@ import {
 import { useModalState } from "../../../states/modalState";
 import { useMultipleAccounts } from "../../../states/multipleAccountStates";
 import useToast from "../../../hooks/useToast";
+import { saveScreen } from "../../../utils/saveCurrentPosition";
 
 const Verify = () => {
   const [code, setCode] = React.useState("");
@@ -69,6 +70,9 @@ const Verify = () => {
           state.token
         );
       }
+
+      //saving screen here incase the person switch off phone before clicking next
+      await saveScreen("set-up");
       setAll({ stage: 2 });
     },
   });

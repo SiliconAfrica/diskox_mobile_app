@@ -19,8 +19,8 @@ import Updates from "expo-updates";
 import Box from "../components/general/Box";
 import ImagesViewer from "../components/modals/ImagesViewer";
 import { useModalState } from "../states/modalState";
-import { MenuProvider } from 'react-native-popup-menu';
-import { io } from 'socket.io-client';
+import { MenuProvider } from "react-native-popup-menu";
+import { io } from "socket.io-client";
 
 // import Pusher from 'pusher-js/react-native';
 import { BASE_URL } from "../utils/httpService";
@@ -33,23 +33,22 @@ import { BASE_URL } from "../utils/httpService";
 //   PusherEvent,
 // } from '@pusher/pusher-websocket-react-native';
 
-
-const PUSHER_APP_KEY='f5d4f2be017648807ffe';
-const PUSHER_APP_ID='1120726';
-const PUSHER_APP_SECRET='2207fb8dfdd934e3f761';
+const PUSHER_APP_KEY = "f5d4f2be017648807ffe";
+const PUSHER_APP_ID = "1120726";
+const PUSHER_APP_SECRET = "2207fb8dfdd934e3f761";
 
 const pusherConfig = {
   appId: PUSHER_APP_ID,
   key: PUSHER_APP_KEY,
   secret: PUSHER_APP_SECRET,
-  cluster: 'ap2',
+  cluster: "ap2",
   encrypted: true, // optional, depending on your requirements
 };
 
 const queryClient = new QueryClient();
-const Navigation = () => {
+const Navigation = ({ navigation }) => {
   const [socket, setSocket] = React.useState(null);
-    const [message, setMessage] = React.useState('');
+  const [message, setMessage] = React.useState("");
 
   const { renderModal } = renderModals();
   const [isDarkMode, setAll] = useUtilState((state) => [
@@ -58,17 +57,22 @@ const Navigation = () => {
   ]);
   const { setAll: setDetails } = useDetailsState((state) => state);
   const { initiateAccount } = useMultipleAccounts((state) => state);
-  const { imageViewer } = useModalState((state) => state)
+  const { imageViewer } = useModalState((state) => state);
 
   const checkForUpdates = async () => {
     try {
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync();
-        Alert.alert('New Upate', 'An update is available for this app', [
-          { text: 'Update', onPress: () => Updates.reloadAsync(), style: 'default', isPreferred: true },
-          { text: 'Cancel', onPress: () => {}, style: 'cancel', }
-        ])
+        Alert.alert("New Upate", "An update is available for this app", [
+          {
+            text: "Update",
+            onPress: () => Updates.reloadAsync(),
+            style: "default",
+            isPreferred: true,
+          },
+          { text: "Cancel", onPress: () => {}, style: "cancel" },
+        ]);
       }
     } catch (error) {
       console.error("Error checking for updates:", error);
@@ -76,33 +80,25 @@ const Navigation = () => {
   };
 
   React.useEffect(() => {
-    const socket = io('http://localhost:3000'); // Replace with your Node.js server URL
+    const socket = io("http://localhost:3000"); // Replace with your Node.js server URL
     setSocket(socket);
 
-    socket.on('connect', () => {
-        console.log('Connected to Socket.IO server');
+    socket.on("connect", () => {
+      console.log("Connected to Socket.IO server");
     });
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from Socket.IO server');
+    socket.on("disconnect", () => {
+      console.log("Disconnected from Socket.IO server");
     });
 
-    socket.on('message', (data) => {
-        console.log('Received message:', data);
-        setMessage(data);
+    socket.on("message", (data) => {
+      console.log("Received message:", data);
+      setMessage(data);
     });
-}, []);
-
-
-
-
-
+  }, []);
 
   React.useEffect(() => {
-  
     (async function () {
-  
-    
       // const data = await SecureStorage.getItemAsync("user");
       const [data, dataErr] = await handlePromise(AsyncStorage.getItem("user"));
       const isDark = await SecureStorage.getItemAsync("darkMode");
@@ -130,10 +126,9 @@ const Navigation = () => {
       }
       await SplashScreen.hideAsync();
     })();
-
   }, []);
   return (
-    <GestureHandlerRootView style={{ flex: 1, position: 'relative' }}>
+    <GestureHandlerRootView style={{ flex: 1, position: "relative" }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={isDarkMode ? darkTheme : theme}>
           <NavigationContainer>
@@ -147,7 +142,7 @@ const Navigation = () => {
               <ToastProvider
                 placement="top"
                 style={{
-                  marginTop: 60
+                  marginTop: 60,
                 }}
                 duration={5000}
                 animationType="slide-in"
@@ -155,12 +150,12 @@ const Navigation = () => {
                 swipeEnabled
                 successColor={theme.colors.primaryColor}
                 dangerColor="red"
-                warningColor='grey'
+                warningColor="grey"
               >
                 <MainNavigation />
                 {renderModal()}
                 {/* IMAGES VIEWER MODAL */}
-                {imageViewer && <ImagesViewer /> }
+                {imageViewer && <ImagesViewer />}
               </ToastProvider>
             </MenuProvider>
           </NavigationContainer>

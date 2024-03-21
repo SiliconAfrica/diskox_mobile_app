@@ -1,5 +1,5 @@
 // import { View, Text, Settings } from 'react-native'
-import React from "react";
+import React, { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 // import Login from '../pages/login';
 // import SignUp from '../pages/signup';
@@ -46,6 +46,9 @@ import SelectCommunities from "../pages/selectCommunities";
 import PostBySlug from "../pages/PostBySlug";
 import SingleCommunity from "../pages/bottomtabs/community/pages/SingleCommunity";
 import MentionProfile from "../pages/user";
+import { getScreen } from "../utils/saveCurrentPosition";
+import { useNavigation } from "@react-navigation/native";
+import { PageType } from "../pages/login";
 
 export type RootStackParamList = {
   home: undefined;
@@ -111,6 +114,17 @@ const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
 + */
 const MainNavigation = (): JSX.Element => {
   const theme = useTheme<Theme>();
+  const navigation = useNavigation<PageType>();
+  useEffect(() => {
+    (async () => {
+      const navigateTo = await getScreen();
+      console.log(navigateTo, "plll");
+      console.log(navigation, "xxx");
+      if (navigateTo.screenName) {
+        navigation.navigate(navigateTo.screenName, navigateTo.params);
+      }
+    })();
+  }, []);
   return (
     // <RootStackNavigation.Navigator initialRouteName='home' drawerContent={(props) => <Sidebar {...props} />} screenOptions={{
     //   headerShown: false,
