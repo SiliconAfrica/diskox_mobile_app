@@ -1,9 +1,8 @@
-import { View, Text, ActivityIndicator, RefreshControl } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import React from "react";
 import Box from "../../../../components/general/Box";
 import Searchbar from "../../../../components/Searchbar";
 import { useUtilState } from "../../../../states/util";
-import { FlashList, } from "@shopify/flash-list";
 import FilterTopbar, { FILTER_BAR_ENUM } from "../../../../components/feeds/FilterTopbar";
 import PostCard from "../../../../components/feeds/PostCard";
 import { IPost } from "../../../../models/post";
@@ -18,7 +17,7 @@ import { POST_FILTERR } from "../../../../enums/Postfilters";
 import AnnouncementBox from "../../../../components/announcements/announcementBox";
 import useToast from "../../../../hooks/useToast";
 import _ from 'lodash'
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { CUSTOM_STATUS_CODE } from "../../../../enums/CustomCodes";
 import FeedCard from "../../../../components/feeds/FeedCard";
 
@@ -110,6 +109,7 @@ const FollowingPost = ({
   }, [currentPage, ids, perPage, total, noMore, isLoading]);
 
   const handleRefresh = () => {
+    queryClient.refetchQueries();
     if (!isLoading) {
       refetch();
     }
@@ -125,10 +125,11 @@ const FollowingPost = ({
       {  (
         <FlatList
         refreshControl={
-          <RefreshControl 
+          <RefreshControl
             refreshing={isLoading && posts.length> 0}
-            onRefresh={handleRefresh} 
+            onRefresh={handleRefresh}
             progressViewOffset={50}
+            disallowInterruption={true}
             progressBackgroundColor={theme.colors.primaryColor}
             colors={['white']}
           />

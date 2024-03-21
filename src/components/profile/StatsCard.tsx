@@ -3,6 +3,7 @@ import React from "react";
 import Box from "../general/Box";
 import { Ionicons } from "@expo/vector-icons";
 import CustomText from "../general/CustomText";
+import { useUtilState } from "../../states/util";
 
 interface IProps {
   mainColor: string;
@@ -20,18 +21,20 @@ interface IProps {
 
 const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
   const WIDTH = useWindowDimensions().width;
+  const { isDarkMode } = useUtilState((state) => state)
   return (
     <Box
       width={(WIDTH / 100) * 43}
-      height={150}
-      backgroundColor="borderColor"
+      height={80}
+      backgroundColor={isDarkMode ?"secondaryBackGroundColor" : 'mainBackGroundColor'}
       borderWidth={0}
-      borderRadius={20}
+      borderRadius={10}
       borderColor="secondaryBackGroundColor"
       flexDirection="row"
       justifyContent="center"
       alignItems="center"
       marginBottom="m"
+
     >
       <Box
         width={50}
@@ -39,7 +42,7 @@ const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
         borderRadius={25}
         justifyContent="center"
         alignItems="center"
-        style={{ backgroundColor: "#F6F0FF" }}
+        style={{ backgroundColor: iconBg }}
       >
         <Ionicons name={iconName} size={25} color={mainColor} />
       </Box>
@@ -47,12 +50,12 @@ const StatsCard = ({ mainColor, iconBg, iconName, title, amount }: IProps) => {
       <Box paddingLeft="s">
         <CustomText
           style={{ color: mainColor }}
-          variant="subheader"
+          variant="header"
           fontSize={14}
         >
           {title}
         </CustomText>
-        <CustomText variant="subheader" fontSize={18}>
+        <CustomText variant="header" fontSize={18}>
           {amount}
         </CustomText>
       </Box>

@@ -109,13 +109,13 @@ const Overview = ({ id }: IProps) => {
         <Box padding="m">
          { id === myID && (
           <>
-             <CustomText variant="subheader" fontSize={20}>
+             <CustomText variant="header" fontSize={16}>
                 User overview
               </CustomText>
-              <CustomText variant="body" fontSize={14} mt="s">
-                Monitor your performance at a glance or get deeper insights by
-                clicking into your analytics below.
-              </CustomText>
+              {/*<CustomText variant="body" fontSize={14} mt="s">*/}
+              {/*  Monitor your performance at a glance or get deeper insights by*/}
+              {/*  clicking into your analytics below.*/}
+              {/*</CustomText>*/}
           </>
          )}
 

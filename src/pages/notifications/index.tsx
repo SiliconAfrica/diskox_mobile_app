@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native'
+import { View, Text, ActivityIndicator, Pressable } from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import CustomText from '../../components/general/CustomText'
@@ -7,7 +7,7 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/MainNavigation';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useDetailsState } from '../../states/userState';
 import httpService, { IMAGE_BASE } from '../../utils/httpService';
 import PrimaryButton from '../../components/general/PrimaryButton';
@@ -16,11 +16,35 @@ import { URLS } from '../../services/urls';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Image } from 'expo-image'
 import { FlatList } from 'react-native-gesture-handler'
+import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes';
+import { useNavigation } from '@react-navigation/native';
 
-const NotificationCard = ({ id, message, profile_image, created_at, read_at}: INotification) => {
-  const theme = useTheme<Theme>()
+const NotificationCard = ({ id, message, profile_image, created_at, read_at, actionLink}: INotification) => {
+  const theme = useTheme<Theme>();
+  const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: () => httpService.put(`${URLS.MARK_NOTIFICATION_READ}/${id}`),
+    onSuccess: (data) => {
+      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.invalidateQueries(['getNotifications'])
+      }
+    },
+    onError: (error) => {},
+  });
+
+  const handleClick = () => {
+    mutate();
+    if (actionLink.includes('post')) {
+      const postId = actionLink.split('post')[1];
+      //navigation.navigate('post', { postId })
+    }
+  }
   return (
-    <Box flexDirection='row' height={70} backgroundColor={read_at === null ? 'secondaryBackGroundColor' : 'mainBackGroundColor'} borderBottomWidth={0.4} borderBottomColor={read_at === null ? 'primaryColor' : 'secondaryBackGroundColor'}  paddingHorizontal='m'>
+    <Pressable 
+    onPress={handleClick}
+    style={{ flexDirection: 'row', height: 70, backgroundColor: read_at === null ? 'secondaryBackGroundColor' : 'mainBackGroundColor', borderBottomWidth: 0.4, borderBottomColor: read_at === null ? 'primaryColor' : 'secondaryBackGroundColor', paddingHorizontal: 10 }}>
 
       <Box flex={0.7} flexDirection='row' alignItems='center' width='100%'>
        { profile_image !== null && (
@@ -42,7 +66,7 @@ const NotificationCard = ({ id, message, profile_image, created_at, read_at}: IN
         <CustomText variant='xs' >{moment(created_at).fromNow()}</CustomText>
       </Box>
 
-    </Box>
+    </Pressable>
   )
 }
 

@@ -15,6 +15,7 @@ interface IProps {
   textColor?: string;
   spinnerColor?: string;
   variant?: "xs" | "body" | "subheader";
+  borderRadius?: number;
 }
 
 const CustomButton = ({
@@ -27,6 +28,7 @@ const CustomButton = ({
   textColor = "white",
   spinnerColor = "white",
   variant = "body",
+  borderRadius = 25,
 }: IProps) => {
   const theme = useTheme<Theme>();
   return (
@@ -34,7 +36,7 @@ const CustomButton = ({
       onPress={onPress}
       style={{
         backgroundColor: color,
-        borderRadius: 25,
+        borderRadius,
         width,
         height,
         justifyContent: "center",

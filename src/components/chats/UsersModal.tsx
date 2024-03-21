@@ -15,23 +15,28 @@ import { useNavigation } from '@react-navigation/native'
 import { PageType } from '../../pages/login'
 import { Follower } from '../../models/Follower'
 import useDebounce from '../../hooks/useDebounce'
+import { URLS } from '../../services/urls'
+import { PaginatedResponse } from '../../models/PaginatedResponse'
+import { Mention } from '../../models/mention'
+import { CUSTOM_STATUS_CODE } from '../../enums/CustomCodes'
+import { uniqBy } from 'lodash'
 
 
 export const UserCard = ({ user, action }: {
-    user: Partial<Follower>,
-    action: (us: Follower) => void
+    user: Partial<Mention>,
+    action: (us: Mention) => void
 }) => {
     const theme = useTheme<Theme>();
- 
+
     return (
-        <Pressable onPress={() => action(user as Follower)} style={{ width: '100%', height:60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
-            <Box flexDirection='row' alignItems='center' > 
+        <Pressable onPress={() => action(user as Mention)} style={{ width: '100%', height:60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+            <Box flexDirection='row' alignItems='center' >
                 <Box width={32} height={32} borderRadius={25} backgroundColor='secondaryBackGroundColor' overflow='hidden'>
-                    <Image source={{ uri: `${IMAGE_BASE}${user.follower.profile_image}` }} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />
+                    <Image source={user.profile_image !== null ? { uri: `${IMAGE_BASE}${user.profile_image}` } : require('../../../assets/images/dummy.jpeg')} style={{ width: '100%', height: '100%', borderRadius:1 }} contentFit='cover' />
                 </Box>
 
-                <CustomText variant='subheader' fontSize={15} color='black' marginLeft='s'>{user.follower.name}</CustomText>
-                <CustomText variant='xs' color='grey' marginLeft='s'>@{user.follower.username}</CustomText>
+                <CustomText variant='subheader' fontSize={15} color='black' marginLeft='s'>{user.name}</CustomText>
+                <CustomText variant='xs' color='grey' marginLeft='s'>@{user.username}</CustomText>
             </Box>
         </Pressable>
     )
@@ -46,31 +51,60 @@ const UserModal = ({ open, onClose }: {
     const { id } = useDetailsState((state) => state);
     const navigation = useNavigation<PageType>();
     const [searchText, setSearchText] = React.useState('');
+    const [users, setUsers] = React.useState<Mention[]>([]);
+    const [total, setTotal] = React.useState(0);
+    const [currentPage, setCurrentPage] = React.useState(1);
 
-    const debounceValue = useDebounce(searchText);
+    const keyword = useDebounce(searchText);
 
-    const { isLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
-        enabled: true,
-        onSuccess: (data) => {
-            const followersArr: Follower[] = data.data.data.data;
-            setFollowers(followersArr);
-        },
-        onError: (error) => {
-            alert(JSON.stringify(error));
+    const { isLoading, isError } = useQuery(
+        ["getMentions", keyword, currentPage],
+        () =>
+          httpService.get(`${URLS.GET_MENTIONS}`, {
+            params: {
+              keyword,
+              page: currentPage,
+            },
+          }),
+        {
+          enabled: keyword != null,
+          onSuccess: (data) => {
+            const item: PaginatedResponse<Mention> = data.data;
+            if (item.code == CUSTOM_STATUS_CODE.SUCCESS) {
+              if (users.length > 0) {
+                setUsers(uniqBy([...users, ...item.data.data], "id"));
+              } else {
+                setUsers(item.data.data);
+                setTotal(item.data.total);
+              }
+            }
+          },
+          onError: (error) => {},
         }
-    });
+      );
 
-    const Selected = React.useCallback((user: Follower) => {
+    // const { isLoading, isError } = useQuery(['GetFollower', id], () => httpService.get(`/fetch_user_followers/${id}`), {
+    //     enabled: true,
+    //     onSuccess: (data) => {
+    //         const followersArr: Follower[] = data.data.data.data;
+    //         setFollowers(followersArr);
+    //     },
+    //     onError: (error) => {
+    //         alert(JSON.stringify(error));
+    //     }
+    // });
+
+    const Selected = React.useCallback((user: Mention) => {
         // navigate to chat page
         // with the users id
-        navigation.navigate("chat", { userId: user.follower_id, profile_image: user.follower.profile_image, username: user.follower.username, last_seen: user.follower.last_seen });
+        navigation.navigate("chat", { userId: user.id, profile_image: user.profile_image, username: user.username, last_seen: new Date().toISOString() });
         onClose();
     }, [followers]);
 
     const handleCheck = React.useCallback((valid: number, val: boolean) => {
         // setTags(valid, val)
     }, [])
-   
+
 
   return (
     <Modal style={{ flex:1, backgroundColor: 'white' }} animationType='slide' transparent visible={open} onDismiss={() => onClose()} >
@@ -84,7 +118,7 @@ const UserModal = ({ open, onClose }: {
             {/* SEARCH  BAR AREA */}
             <Box style={{ ...style.textInput }} marginBottom='l' backgroundColor='secondaryBackGroundColor'>
                 <Ionicons name='search-outline' size={25} color={theme.colors.textColor} />
-                <TextInput style={{ flex: 1, fontFamily: 'RedRegular', marginLeft: 20, fontSize: theme.textVariants.body.fontSize }} placeholderTextColor={theme.colors.textColor} placeholder='Search for someone'  />
+                <TextInput value={searchText} onChangeText={(e) => setSearchText(e)} style={{ flex: 1, fontFamily: 'RedRegular', marginLeft: 20, fontSize: theme.textVariants.body.fontSize, color: theme.colors.textColor }} placeholderTextColor={theme.colors.textColor} placeholder='Search for someone'  />
             </Box>
 
             {
@@ -97,12 +131,12 @@ const UserModal = ({ open, onClose }: {
 
             {/* SCROLLAREA */}
             { !isLoading && !isError && (
-                <FlatList 
+                <FlatList
                 ListEmptyComponent={() => (
                     <Text>Nothing to see here</Text>
                 )}
                 keyExtractor={(item, index) => index.toString()}
-                data={followers}
+                data={users}
                 renderItem={({ item }) => (
                     <UserCard user={item} action={Selected} />
                 )}

@@ -1,0 +1,40 @@
+{
+    "project_info": {
+      "project_number": "1059923057791",
+      "firebase_url": "https://agape-force.firebaseio.com",
+      "project_id": "agape-force",
+      "storage_bucket": "agape-force.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:1059923057791:android:81a69defd277cebab9f34a",
+          "android_client_info": {
+            "package_name": "com.dandolla98.diskos"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "1059923057791-daolrbne36u6bk2cah5232j4nj2iaoij.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyDgt50NYOjU7FAidQPnc1FzIewoT-L8rfA"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": [
+              {
+                "client_id": "1059923057791-daolrbne36u6bk2cah5232j4nj2iaoij.apps.googleusercontent.com",
+                "client_type": 3
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }

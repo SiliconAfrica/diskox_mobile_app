@@ -124,7 +124,7 @@ const CommunityList = () => {
       />
 
       {/* HEADER */}
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Box
           width="100%"
           flexDirection="row"
