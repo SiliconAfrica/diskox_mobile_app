@@ -15,6 +15,7 @@ import { URLS } from "../../services/urls";
 import { Pressable, ScrollView } from "react-native";
 import useToast from "../../hooks/useToast";
 import PopupModal from "../set-up/PopupModal";
+import { saveScreen } from "../../utils/saveCurrentPosition";
 
 const SelectCommunities = ({
   navigation,
@@ -32,10 +33,11 @@ const SelectCommunities = ({
     mutationKey: ["join-multiple-communities"],
     mutationFn: (body: FormData) =>
       httpService.post(`${URLS.JOIN_MULTIPLE_COMMUNITIES}`, body),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.show(data.data?.message || `Successful`, {
         type: "success",
       });
+      await saveScreen("", {});
       setIsVisible(true);
     },
     onError: (err) => {
@@ -91,12 +93,11 @@ const SelectCommunities = ({
             data.data.data &&
             Array.isArray(data.data.data.data) &&
             data.data.data.data.map((community, index) => (
-              <Pressable onPress={() => addToSelected(community.id)}>
-                <Box
-                  paddingHorizontal="m"
-                  key={community.id}
-                  marginVertical="s"
-                >
+              <Pressable
+                key={community.id}
+                onPress={() => addToSelected(community.id)}
+              >
+                <Box paddingHorizontal="m" marginVertical="s">
                   <Box flexDirection="row" justifyContent="space-between">
                     <Box
                       width={"5%"}

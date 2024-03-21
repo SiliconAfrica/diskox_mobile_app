@@ -19,6 +19,7 @@ import { PageType } from "../login";
 import { RootStackParamList } from "../../navigation/MainNavigation";
 import { ScrollView } from "react-native-gesture-handler";
 import { da } from "date-fns/locale";
+import { saveScreen } from "../../utils/saveCurrentPosition";
 
 const Interests = ({
   navigation,
@@ -87,7 +88,7 @@ const Interests = ({
   const updateInterestMutation = useMutation({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.UPDATE_INTEREST}`, data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.data?.code === CUSTOM_STATUS_CODE.INTERNAL_SERVER_ERROR) {
         toast.show(
           data?.data?.message || "An error occured while getting interests",
@@ -96,8 +97,10 @@ const Interests = ({
       } else {
         toast.show("Successful", { type: "success" });
         if (shouldSelectCommunitiesNext) {
+          await saveScreen("select-communities");
           navigation.navigate("select-communities");
         } else {
+          await saveScreen("", {});
           navigation.navigate("home");
         }
       }
