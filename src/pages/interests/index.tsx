@@ -145,7 +145,7 @@ const Interests = ({
       <SettingsHeader
         title="Select Interests"
         showSave={false}
-        handleArrowPressed={() => navigation.goBack()}
+        showBackBtn={false}
       />
       <Box width={"100%"} padding="m">
         <CustomText variant="subheader" textAlign="center">
