@@ -47,7 +47,7 @@ const Community = () => {
       },
     }
   );
-  const { isLoading: isLoadingRole } = useQuery(
+  const { isLoading: isLoadingRole, data: role } = useQuery(
     ["getCommunityRole", id],
     () => httpService.get(`${URLS.CHECK_COMMUNITY_ROLE}/${id}`),
     {
@@ -62,7 +62,6 @@ const Community = () => {
       },
     }
   );
-
   const { isLoading: isJoining, mutate } = useMutation({
     mutationFn: () => httpService.post(`${URLS.JOIN_COMMUNITY}/${id}`),
     onSuccess: (data) => {

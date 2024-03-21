@@ -13,7 +13,8 @@ import useToast from "../../hooks/useToast";
 import ErrorButton from "../general/ErrorButton";
 import { ActivityIndicator, Pressable } from "react-native";
 import theme from "../../theme";
-import { Feather } from '@expo/vector-icons';
+import { Feather } from "@expo/vector-icons";
+import { COMMUNITY_SETTING_TYPE } from "../../enums/CommunitySettings";
 
 const CommunityListCard = (props: ICommunity) => {
   const { name, description, profile_image, id, is_member } = props;
@@ -79,12 +80,15 @@ const CommunityListCard = (props: ICommunity) => {
           bg="secondaryBackGroundColor"
           overflow="hidden"
         >
-            <Image
-            source={profile_image !== null ? { uri: `${IMAGE_BASE}${profile_image}` } : require('../../../assets/images/dummy.jpeg')}
+          <Image
+            source={
+              profile_image !== null
+                ? { uri: `${IMAGE_BASE}${profile_image}` }
+                : require("../../../assets/images/dummy.jpeg")
+            }
             contentFit="cover"
             style={{ width: "100%", height: "100%" }}
           />
-
         </Box>
 
         <Box marginLeft="s">
