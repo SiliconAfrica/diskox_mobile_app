@@ -6,7 +6,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../../theme";
 import httpService, { FRONTEND_BASE_URL } from "../../../../utils/httpService";
 import { useQuery } from "react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { URLS } from "../../../../services/urls";
 import { Alert, Pressable, Share, StyleSheet } from "react-native";
 import { copyToClipboard } from "../../../../utils/clipboard";
@@ -26,7 +26,7 @@ export default function EarningsBox() {
   const [copied, setCopied] = useState<boolean>(false);
   const { username } = useDetailsState((state) => state);
 
-  const { isLoading } = useQuery(
+  const { isLoading, refetch } = useQuery(
     ["referrals_point"],
     () => httpService.get(`${URLS.FETCH_REF_POINTS}`),
     {
@@ -60,6 +60,29 @@ export default function EarningsBox() {
     }
   };
 
+  const onShareToWhatsapp = async () => {
+    try {
+      const result = await Share.share({
+        url: `whatsapp://send?text=${FRONTEND_BASE_URL}register?ref=${username}`,
+        // url: `https://wa.me?text=${FRONTEND_BASE_URL}register?ref=${username}`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
+  };
+
+  useEffect(() => {
+    refetch();
+  }, []);
   return (
     <Box backgroundColor="primaryColor" mx="s" borderRadius={10} py="m" px="m">
       <CustomText variant="body" fontFamily="RedBold" color="whitesmoke">
@@ -85,9 +108,12 @@ export default function EarningsBox() {
       >
         <Box
           width={`${
-            (refPoints?.available_points
-              ? refPoints.available_points / refPoints.threshold
-              : 0) * 100
+            refPoints
+              ? (Number(refPoints?.available_points)
+                  ? Number(refPoints.available_points) /
+                    Number(refPoints.threshold)
+                  : 0) * 100
+              : 0
           }%`}
           backgroundColor="white"
           height={"100%"}
@@ -104,9 +130,12 @@ export default function EarningsBox() {
       <Box width="100%" flexDirection="row" alignItems="center">
         <CustomText variant="header" color="whitesmoke">
           &#8358;{" "}
-          {Number(
-            refPoints?.naira_exchange_per_point * refPoints?.available_points
-          ).toLocaleString()}
+          {refPoints
+            ? Number(
+                Number(refPoints?.naira_exchange_per_point) *
+                  Number(refPoints?.available_points)
+              ).toLocaleString()
+            : 0}
         </CustomText>
       </Box>
       <CustomText color="whitesmoke" mt="l" variant="body">
@@ -182,7 +211,7 @@ export default function EarningsBox() {
               backgroundColor: theme.colors.white,
             },
           ]}
-          onPress={onShare}
+          onPress={onShareToWhatsapp}
         >
           <Box
             width={24}

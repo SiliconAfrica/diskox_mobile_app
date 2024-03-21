@@ -66,7 +66,7 @@ const Reset = () => {
           name="password"
           placeholder="Password"
           isPassword
-          label="Password"
+          label="New Password"
           containerStyle={{ marginTop: 20 }}
         />
         <CustomTextInput

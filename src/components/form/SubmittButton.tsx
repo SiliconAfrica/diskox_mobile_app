@@ -34,8 +34,8 @@ export const SubmitButton = ({
         style={{
           width,
           height: 52,
-          backgroundColor:
-            !isDirty || !isValid ? "#B8E0C2" : theme.colors.primaryColor,
+          backgroundColor: theme.colors.primaryColor,
+          opacity: !isDirty || !isValid ? 0.6 : 1,
           borderRadius: 50,
           justifyContent: "center",
           alignItems: "center",
