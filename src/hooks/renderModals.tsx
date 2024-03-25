@@ -21,9 +21,8 @@ import SuspendMemberModal from "../components/modals/SuspendMemberModal";
 import BlockCommunityMemberModal from "../components/modals/BlockCommunityMemberModal";
 import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 import SelectChatModal from "../components/modals/SelectedChatBottom";
-import ReactionModal from "../components/modals/ReactionModal";
-import TagsModal from "../components/modals/TagsModal";
-import ReportUser from "../components/modals/ReportUser";
+import PaymentAccountModal from "../components/modals/PaymentAccountModal";
+import FlutterwavePaymentModal from "../components/modals/FlutterwavePaymentModal";
 
 const renderModals = () => {
   const {
@@ -45,9 +44,8 @@ const renderModals = () => {
     showSuspendMemberFromCommunity,
     showBlockMemberFromCommunity,
     showAddCommunityRule,
-      showReactedUsers,
-      showTags,
-      showReportUser
+    showPaymentAccountModal,
+    showFlutterPaymentModal,
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -72,9 +70,8 @@ const renderModals = () => {
         {showSuspendMemberFromCommunity && <SuspendMemberModal />}
         {showBlockMemberFromCommunity && <BlockCommunityMemberModal />}
         {showAddCommunityRule && <AddCommunityRuleModal />}
-        {showReactedUsers && <ReactionModal />}
-        {showTags && <TagsModal /> }
-        {showReportUser && <ReportUser />}
+        {showPaymentAccountModal && <PaymentAccountModal />}
+        {showFlutterPaymentModal && <FlutterwavePaymentModal />}
       </>
     );
   }, [
@@ -96,9 +93,8 @@ const renderModals = () => {
     showSuspendMemberFromCommunity,
     showBlockMemberFromCommunity,
     showAddCommunityRule,
-      showReactedUsers,
-      showTags,
-      showReportUser
+    showPaymentAccountModal,
+    showFlutterPaymentModal,
   ]);
 
   return {

@@ -9,6 +9,7 @@ const COLOR_PALLET = {
   whitesmoke: "whitesmoke",
   almostPrimaryGreen: "#D8F3E0",
   lightGrey: "#949E97",
+  lighterGrey: "#f3f4f6",
   fadedButtonBgColor: "#F3FBF5",
   textBlue: "#0079D3",
   twitterBlue: "#1D9BF0",
@@ -22,8 +23,8 @@ const COLOR_PALLET = {
   whiteText: "#FCFCFC",
   transparent2: "transparent",
   borderColor: "#4D6275",
-  textColor: '#1a1a1a',
-  lightGreen: '#DCFCE7'
+  textColor: "#1a1a1a",
+  lightGreen: "#DCFCE7",
 };
 
 const theme = createTheme({

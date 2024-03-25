@@ -22,6 +22,8 @@ interface State {
   showVerification: boolean;
   showReportComment: boolean;
   showReportReply: boolean;
+  showPaymentAccountModal: boolean;
+  showFlutterPaymentModal: boolean;
   postId: number;
   visibility: string;
   filterBy: string;
@@ -64,6 +66,8 @@ export const useModalState = create<State>((set) => ({
   showVerification: false,
   showReportComment: false,
   showReportReply: false,
+  showFlutterPaymentModal: false,
+  showPaymentAccountModal: false,
   postId: 0,
   visibility: VISIBILITY.EVERYONE,
   filterBy: POST_FILTERR.ALL,

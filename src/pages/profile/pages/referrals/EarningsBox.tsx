@@ -8,7 +8,7 @@ import httpService, { FRONTEND_BASE_URL } from "../../../../utils/httpService";
 import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
 import { URLS } from "../../../../services/urls";
-import { Alert, Pressable, Share, StyleSheet } from "react-native";
+import { Alert, Linking, Pressable, Share, StyleSheet } from "react-native";
 import { copyToClipboard } from "../../../../utils/clipboard";
 import { useDetailsState } from "../../../../states/userState";
 
@@ -24,6 +24,7 @@ export default function EarningsBox() {
   const theme = useTheme<Theme>();
   const [refPoints, setRefPoints] = useState<TRefPoints>();
   const [copied, setCopied] = useState<boolean>(false);
+  const [availableBalance, setAvailableBalance] = useState(0);
   const { username } = useDetailsState((state) => state);
 
   const { isLoading, refetch } = useQuery(
@@ -61,25 +62,18 @@ export default function EarningsBox() {
   };
 
   const onShareToWhatsapp = async () => {
-    try {
-      const result = await Share.share({
-        url: `whatsapp://send?text=${FRONTEND_BASE_URL}register?ref=${username}`,
-        // url: `https://wa.me?text=${FRONTEND_BASE_URL}register?ref=${username}`,
-      });
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
-    } catch (error: any) {
-      Alert.alert(error.message);
-    }
+    Linking.openURL(
+      `whatsapp://send?text=${FRONTEND_BASE_URL}register?ref=${username}`
+    );
   };
 
+  useEffect(() => {
+    setAvailableBalance(
+      (Number(refPoints?.available_points)
+        ? Number(refPoints.available_points) / Number(refPoints.threshold)
+        : 0) * 100
+    );
+  }, [refPoints]);
   useEffect(() => {
     refetch();
   }, []);
@@ -108,7 +102,7 @@ export default function EarningsBox() {
       >
         <Box
           width={`${
-            refPoints
+            refPoints?.available_points && refPoints?.threshold
               ? (Number(refPoints?.available_points)
                   ? Number(refPoints.available_points) /
                     Number(refPoints.threshold)
@@ -129,13 +123,7 @@ export default function EarningsBox() {
       </CustomText>
       <Box width="100%" flexDirection="row" alignItems="center">
         <CustomText variant="header" color="whitesmoke">
-          &#8358;{" "}
-          {refPoints
-            ? Number(
-                Number(refPoints?.naira_exchange_per_point) *
-                  Number(refPoints?.available_points)
-              ).toLocaleString()
-            : 0}
+          &#8358; {availableBalance}
         </CustomText>
       </Box>
       <CustomText color="whitesmoke" mt="l" variant="body">
