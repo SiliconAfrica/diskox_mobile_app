@@ -49,3 +49,8 @@ is_member_request_pending - value to check before pending
 ## Todo
 
 - After removing account, it still exists
+
+## To ask
+
+- How do you check if a user can withdraw
+- How does withdrawal list look

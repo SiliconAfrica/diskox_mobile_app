@@ -330,6 +330,7 @@ const Register = ({
               label="Username"
               removeSpecialCharater
               removeSpaces
+              maxLength={30}
               containerStyle={{ marginTop: 5 }}
             />
             <CustomTextInput

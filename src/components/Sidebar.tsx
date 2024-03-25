@@ -288,6 +288,7 @@ const Sidebar = ({ navigation }: DrawerContentComponentProps) => {
           AsyncStorage.setItem(`user`, "")
         );
         setAll({ isLoggedIn: false });
+        setModal({ addAccount: false });
         // toast.show(`Logged out successfully`, {
         //   type: "success",
         // });
