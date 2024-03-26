@@ -49,6 +49,7 @@ import MentionProfile from "../pages/user";
 import { getScreen } from "../utils/saveCurrentPosition";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../pages/login";
+import ReferralWithdrawalHistory from "../pages/profile/pages/referralWithdrawalsHistory";
 
 export type RootStackParamList = {
   home: undefined;
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   profile: { userId: number };
   "profile-setting": undefined;
   referrals: undefined;
+  referralWithdrawalHistory: undefined;
   settings: undefined;
   announcements: undefined;
   singleAnnouncement: { announcementId: string };
@@ -148,6 +150,10 @@ const MainNavigation = (): JSX.Element => {
           component={ProfileSetting}
         />
         <RootStackNavigation.Screen name="referrals" component={Referrals} />
+        <RootStackNavigation.Screen
+          name="referralWithdrawalHistory"
+          component={ReferralWithdrawalHistory}
+        />
         <RootStackNavigation.Screen name="settings" component={setting} />
         <RootStackNavigation.Screen name="security" component={Security} />
         <RootStackNavigation.Screen

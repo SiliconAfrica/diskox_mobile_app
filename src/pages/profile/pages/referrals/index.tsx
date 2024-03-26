@@ -35,7 +35,7 @@ export default function Referrals() {
   const toast = useToast();
 
   const { isLoading, refetch } = useQuery(
-    ["fetch_payment_accoun"],
+    ["fetch_payment_account"],
     () => httpService.get(`${URLS.BANK_ACCOUNT}`),
     {
       onSuccess: (data) => {
@@ -110,7 +110,7 @@ export default function Referrals() {
               paddingVertical: theme.spacing.s,
               borderRadius: 20,
             }}
-            onPress={showErr}
+            onPress={() => navigation.navigate("referralWithdrawalHistory")}
           >
             Withdrawals
           </CustomText>

@@ -150,5 +150,6 @@ export const URLS = {
   MARK_NOTIFICATION_READ: "/mark_notification_read",
   GET_ALL_COMMUNITY: "/all_communities",
   SEND_WITHDRAWAL_OTP: "/send_withdrawal_otp",
+  FETCH_USER_WITHDRAWAL: "/fetch_user_withdrawals",
   BANK_ACCOUNT: "/bank_accounts",
 };
