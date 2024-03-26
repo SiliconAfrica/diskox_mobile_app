@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../../../login";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../../../theme";
-import EarningsBox from "./EarningsBox";
+import EarningsBox, { TRefPoints } from "./EarningsBox";
 import TotalReferrals from "./totalReferrals";
 import ReferralList from "./ReferralList";
 import { ScrollView } from "react-native";
@@ -20,6 +20,7 @@ import { useQuery } from "react-query";
 import { URLS } from "../../../../services/urls";
 import { useState } from "react";
 import { CUSTOM_STATUS_CODE } from "../../../../enums/CustomCodes";
+import { useDetailsState } from "../../../../states/userState";
 
 interface IBank {
   id: number;
@@ -31,8 +32,26 @@ export default function Referrals() {
   const navigation = useNavigation<PageType>();
   const theme = useTheme<Theme>();
   const [bank, setBank] = useState<IBank>();
+  const [canWithdrawEarnings, setCanWithdrawEarnings] = useState(false);
   const { setAll } = useModalState();
   const toast = useToast();
+
+  const { isLoading: isLoadingRefPoint } = useQuery(
+    ["referrals_point"],
+    () => httpService.get(`${URLS.FETCH_REF_POINTS}`),
+    {
+      onSuccess: (data) => {
+        if (data.data.code === 1) {
+          if (data.data.data?.threshold === data.data.data?.available_points) {
+            setCanWithdrawEarnings(true);
+          }
+        }
+      },
+      onError: (error: any) => {
+        alert(error.message);
+      },
+    }
+  );
 
   const { isLoading, refetch } = useQuery(
     ["fetch_payment_account"],
@@ -41,8 +60,6 @@ export default function Referrals() {
       onSuccess: (data) => {
         if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
           setBank({ ...data.data.data });
-        } else {
-          toast.show("An error occurred", { type: "danger" });
         }
       },
       onError: (error: any) => {
@@ -53,7 +70,7 @@ export default function Referrals() {
 
   const showErr = () => {
     toast.show(
-      "You need to earn more points and reach the threshold to add a payment account or see withdrawals",
+      "You need to earn more points and reach the threshold to add a payment account",
       { type: "danger" }
     );
   };
@@ -92,11 +109,14 @@ export default function Referrals() {
         <Box
           flexDirection="row"
           justifyContent="space-between"
-          paddingBottom="m"
+          paddingVertical="m"
           paddingHorizontal="s"
           alignItems="center"
         >
-          <CustomText color="primaryColor" onPress={addPayment}>
+          <CustomText
+            color="primaryColor"
+            onPress={canWithdrawEarnings ? addPayment : showErr}
+          >
             {bank ? "Update Payment Account" : "Add Payment Account"}
           </CustomText>
 

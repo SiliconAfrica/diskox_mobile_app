@@ -37,9 +37,33 @@ export default function ReferralWithdrawalHistory() {
   const [page, setPage] = useState(1);
   const [fetchMore, setFetchMore] = useState(false);
   const [withdrawals, setWithdrawals] = useState<IWithdrawal[]>();
+  const [canWithdrawEarnings, setCanWithdrawEarnings] = useState(false);
   const { setAll } = useModalState();
   const toast = useToast();
 
+  const showErr = () => {
+    toast.show(
+      "You need to earn more points and reach the threshold to add a payment account",
+      { type: "danger" }
+    );
+  };
+
+  const { isLoading: isLoadingRefPoint } = useQuery(
+    ["referrals_point"],
+    () => httpService.get(`${URLS.FETCH_REF_POINTS}`),
+    {
+      onSuccess: (data) => {
+        if (data.data.code === 1) {
+          if (data.data.data?.threshold === data.data.data?.available_points) {
+            setCanWithdrawEarnings(true);
+          }
+        }
+      },
+      onError: (error: any) => {
+        alert(error.message);
+      },
+    }
+  );
   const { isLoading, refetch } = useQuery(
     ["fetch_payment_account"],
     () => httpService.get(`${URLS.BANK_ACCOUNT}`),
@@ -122,7 +146,7 @@ export default function ReferralWithdrawalHistory() {
         title="Withdrawals"
         handleArrowPressed={() => navigation.goBack()}
       />
-      <CustomText color="black" paddingTop="m" paddingHorizontal="s">
+      <CustomText color="black" paddingVertical="m" paddingHorizontal="s">
         <Feather
           name="info"
           size={theme.textVariants.body.fontSize}
@@ -160,7 +184,7 @@ export default function ReferralWithdrawalHistory() {
       >
         <CustomText
           color="primaryColor"
-          onPress={addPayment}
+          onPress={canWithdrawEarnings ? addPayment : showErr}
           textAlign="center"
           style={{ width: "100%" }}
         >
@@ -184,11 +208,7 @@ export default function ReferralWithdrawalHistory() {
           width={"60%"}
           alignSelf="center"
         >
-          <CustomText
-            color="primaryColor"
-            onPress={addPayment}
-            textAlign="center"
-          >
+          <CustomText color="primaryColor" textAlign="center">
             Withdrawals
           </CustomText>
         </Box>
