@@ -12,7 +12,7 @@ import { Alert, Linking, Pressable, Share, StyleSheet } from "react-native";
 import { copyToClipboard } from "../../../../utils/clipboard";
 import { useDetailsState } from "../../../../states/userState";
 
-type TRefPoints = {
+export type TRefPoints = {
   total_points: number;
   balance: number;
   threshold: number;
