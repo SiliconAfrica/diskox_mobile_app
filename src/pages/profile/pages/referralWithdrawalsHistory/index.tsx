@@ -26,10 +26,17 @@ interface IBank {
 }
 export interface IWithdrawal {
   id: number;
+  transaction_id: string;
+  email?: string;
+  username: string;
+  merchant_id?: string;
   amount: number;
-  paymentType: string;
-  status: string;
+  type: "payment";
+  payment_type: "withdrawal";
+  status: "pending" | "completed";
+  created_at: string;
 }
+
 export default function ReferralWithdrawalHistory() {
   const navigation = useNavigation<PageType>();
   const theme = useTheme<Theme>();
@@ -229,13 +236,13 @@ export default function ReferralWithdrawalHistory() {
               paddingVertical="s"
               marginTop="m"
             >
-              <Box width="10%">
+              <Box width="20%">
                 <CustomText color="grey">ID</CustomText>
               </Box>
               <Box width="40%">
                 <CustomText color="grey">Amount</CustomText>
               </Box>
-              <Box width="30%">
+              <Box width="20%">
                 <CustomText color="grey">Method</CustomText>
               </Box>
               <Box

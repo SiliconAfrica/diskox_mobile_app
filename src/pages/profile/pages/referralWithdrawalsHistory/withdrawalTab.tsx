@@ -12,18 +12,18 @@ export default function WithdrawalTab({
   const theme = useTheme<Theme>();
 
   const statusColor = (status) => {
-    return status === "success"
+    return status.toLowerCase() === "completed"
       ? {
           bgColor: theme.colors.almostPrimaryGreen,
-          textColor: theme.colors.primaryColor,
+          textColor: theme.colors.white,
         }
-      : status === "failed"
-      ? { bgColor: theme.colors.errorBg, textColor: theme.colors.error }
-      : status === "pending"
-      ? { bgColor: theme.colors.yellowGreen, textColor: theme.colors.yellow }
+      : status.toLowerCase() === "failed"
+      ? { bgColor: theme.colors.errorBg, textColor: theme.colors.white }
+      : status.toLowerCase() === "pending"
+      ? { bgColor: theme.colors.yellowGreen, textColor: theme.colors.white }
       : {
-          bgColor: theme.colors.almostPrimaryGreen,
-          textColor: theme.colors.primaryColor,
+          bgColor: theme.colors.grey,
+          textColor: theme.colors.black,
         };
   };
   return (
@@ -35,27 +35,28 @@ export default function WithdrawalTab({
       paddingHorizontal="s"
       paddingVertical="s"
     >
-      <Box width="10%">
-        <CustomText>ase1</CustomText>
+      <Box width="20%">
+        <CustomText variant="xs">{withdrawal.transaction_id}</CustomText>
       </Box>
       <Box width="40%">
-        <CustomText>N10,000</CustomText>
+        <CustomText>&#8358;{withdrawal.amount.toLocaleString()}</CustomText>
       </Box>
-      <Box width="30%">
-        <CustomText>Flutterwave</CustomText>
+      <Box width="20%">
+        <CustomText variant="xs">{withdrawal.type}</CustomText>
       </Box>
       <Box
         width="20%"
-        style={{ backgroundColor: statusColor("").bgColor }}
+        style={{ backgroundColor: statusColor(withdrawal.status).bgColor }}
         borderRadius={20}
         paddingVertical="s"
         paddingHorizontal="s"
       >
         <CustomText
-          style={{ color: statusColor("").textColor }}
+          style={{ color: statusColor(withdrawal.status).textColor }}
           textAlign="center"
+          variant="xs"
         >
-          Pending
+          {withdrawal.status.toLowerCase()}
         </CustomText>
       </Box>
     </Box>
