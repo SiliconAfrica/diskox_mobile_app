@@ -129,8 +129,11 @@ const CreatePost = ({
   const editPoll = React.useCallback(
     (e: string, i: number) => {
       const copy = [...polls];
-      copy[i] = e;
-      setPolls(copy);
+      if (copy[i].length !== 30) {
+        copy[i] = e;
+        setPolls(copy);
+      }
+
     },
     [polls]
   );

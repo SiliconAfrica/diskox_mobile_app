@@ -245,6 +245,10 @@ const WritePoll = ({
   const [dayLabel, setDayLabel] = React.useState("2 days");
   const days: { name: string; value: number }[] = [
     {
+      name: "duration",
+      value: 0,
+    },
+    {
       name: "2 days",
       value: 2,
     },
