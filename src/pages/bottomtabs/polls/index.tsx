@@ -181,7 +181,7 @@ const NewPost = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={1}
         ListEmptyComponent={() => (
-          <>isLoading, isError,
+          <>
             {!isLoading && posts.length < 1 && (
               <CustomText variant="body" textAlign="center" marginTop="s">No Post to view</CustomText>
               )}
@@ -196,7 +196,7 @@ const NewPost = ({
         keyExtractor={(item, index) => item.id.toString()}
         extraData={DeletedIds}
         renderItem={({ item }) => <FeedCard post={item} showReactions />}
-        data={poll}
+        data={posts}
         ListFooterComponent={() => (
           <Box width="100%" alignItems="center" marginVertical="m">
             {isLoading &&  (

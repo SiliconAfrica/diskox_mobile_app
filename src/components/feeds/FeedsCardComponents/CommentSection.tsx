@@ -35,6 +35,7 @@ import { PaginatedResponse } from "../../../models/PaginatedResponse";
 import { CUSTOM_STATUS_CODE } from "../../../enums/CustomCodes";
 import _ from "lodash";
 import { useCommentMentionState } from "../commentState";
+import {useModalState} from "../../../states/modalState";
 
 const CommentSection = ({ postId }: { postId?: number }) => {
   const theme = useTheme<Theme>();
@@ -127,6 +128,7 @@ const CommentSection = ({ postId }: { postId?: number }) => {
       toast.show("Comment created successfully", { type: "success" });
       queryClient.invalidateQueries([`getPostComments-${postId}`]);
       queryClient.invalidateQueries([`getPost${postId}`]);
+      queryClient.refetchQueries();
       setImages([]);
       setText("");
       reset();

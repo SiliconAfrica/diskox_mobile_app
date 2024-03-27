@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, Pressable } from 'react-native'
+import {View, Text, ActivityIndicator, Pressable, Alert} from 'react-native'
 import React from 'react'
 import Box from '../../components/general/Box'
 import CustomText from '../../components/general/CustomText'
@@ -24,6 +24,7 @@ const NotificationCard = ({ id, message, profile_image, created_at, read_at, act
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
 
+
   const { mutate } = useMutation({
     mutationFn: () => httpService.put(`${URLS.MARK_NOTIFICATION_READ}/${id}`),
     onSuccess: (data) => {
@@ -37,8 +38,17 @@ const NotificationCard = ({ id, message, profile_image, created_at, read_at, act
   const handleClick = () => {
     mutate();
     if (actionLink.includes('post')) {
+      const postId = actionLink.split('/post/')[1];
+      //const filtered = postId.split('/')[0]
+      navigation.navigate('slug-post', { slug: postId })
+      //Alert.alert('This is the action link', postId);
+    } else if (actionLink.includes('/q/')) {
       const postId = actionLink.split('post')[1];
-      //navigation.navigate('post', { postId })
+      //const filtered = postId.split('/')[0]
+      //navigation.navigate('slug-post', { slug: filtered })
+      //Alert.alert('This is the action link', postId);
+    } else {
+      //Alert.alert('Action Link', actionLink);
     }
   }
   return (
@@ -78,8 +88,30 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
   const [lastPage, setLastPage] = React.useState(1);
   const [notitications, setNotifications] = React.useState<INotification[]>([]);
 
+  const queryClient = useQueryClient();
 
-  const { isLoading, isError, error, data, refetch } = useQuery(['getNotifications', currentPage], () => httpService.get(`${URLS.GET_NOITIFICATIONS}`), {
+
+  const markAllAsRead = useMutation({
+    mutationFn: () => httpService.put(`${URLS.MARK_ALL_NOTIFICATIONS_AS_READ}`),
+    onSuccess: (data) => {
+      if (data.data.code === CUSTOM_STATUS_CODE.SUCCESS) {
+        queryClient.refetchQueries()
+            .then()
+      }
+    },
+    onError: (error) => {},
+  });
+
+  React.useEffect(() => {
+    markAllAsRead.mutate();
+  }, [])
+
+
+  const { isLoading, isError, error, data, refetch } = useQuery(['getNotifications', currentPage], () => httpService.get(`${URLS.GET_NOITIFICATIONS}`, {
+    params: {
+      page: currentPage,
+    }
+  }), {
     onSuccess: (data) => {
       if (notitications.length > 0) {
         const arr = [...notitications, ...data?.data?.data];
@@ -99,9 +131,7 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
 
    // functions
    const onEndReached = React.useCallback(async () => {
-    if (currentPage === lastPage) {
-      return;
-    } else {
+    if (!isLoading && notitications.length !== total) {
       setCurrentPage(prev => prev + 1);
     }
   }, [currentPage, lastPage]);
@@ -123,13 +153,14 @@ const Notifications = ({ navigation }: NativeStackScreenProps<RootStackParamList
 
 
       { !isError && (
-        <FlatList 
+        <FlatList
+            onEndReachedThreshold={0.5}
           onEndReached={onEndReached}
           keyExtractor={(_, i)=> i.toString()}
           data={notitications}
           ListEmptyComponent={() => (
             <Box width='100%' alignItems='center'>
-              { !isLoading && <CustomText>You have no notification</CustomText>}
+              {/*{ !isLoading && <CustomText>You have no notification</CustomText>}*/}
             </Box>
           )}
           renderItem={({ item }) => <NotificationCard {...item} />}

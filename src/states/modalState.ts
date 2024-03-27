@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { POST_FILTERR } from "../enums/Postfilters";
 import { IPost } from "../models/post";
 import { IChatMessage } from "../models/chatmessages";
+import {ITag} from "../models/Tag";
 
 export enum VISIBILITY {
   EVERYONE = "everyone",
@@ -40,6 +41,11 @@ interface State {
   activeReply_id: number;
   activeUser_id: number;
   activeChat: { userId: number; username: string } | null;
+  showReactedUsers: boolean;
+  reactionType: 'POST'|'COMMENT'|'REPLY';
+  reactionId: number;
+  tags: ITag[];
+  showTags: boolean;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -75,6 +81,11 @@ export const useModalState = create<State>((set) => ({
   activeComment_id: null,
   activeReply_id: null,
   activeUser_id: null,
+  showReactedUsers: false,
+  reactionId: null,
+  reactionType: 'POST',
+  tags: [],
+  showTags: false,
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

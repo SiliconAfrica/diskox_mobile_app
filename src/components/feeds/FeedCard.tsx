@@ -15,7 +15,7 @@ import { useTheme } from "@shopify/restyle";
 import { Theme } from "../../theme";
 import CustomButton from "../general/CustomButton";
 import CustomText from "../general/CustomText";
-import { colorizeHashtags } from "../../utils/colorizeText";
+import ColorizedText, { colorizeHashtags } from "../../utils/colorizeText";
 import CustomVideoplayer from "../general/CustomVideoplayer";
 import { Image } from "expo-image";
 import { IPost } from "../../models/post";
@@ -34,6 +34,8 @@ import { ArrowBigDown, ArrowBigUp } from "lucide-react-native";
 import RepostCard from "../repost/RepostCard";
 import PostDetails from "./PostDetails";
 import RepostFeedCard from "./RepostCard";
+import {TouchableOpacity} from "react-native-gesture-handler";
+import ColorizeHashtagsAndUrls from "../../utils/colorizeText";
 
 const FeedCard = ({
   post: activePost,
@@ -193,7 +195,7 @@ const FeedCard = ({
   const handleUpVote = () => {
     const check = checkloggedInState();
     if (check) {
-      setPost((prev) => ({ ...prev, has_upvoted: prev.has_upvoted === 0 ? 1:0, upvotes_count: prev.has_upvoted === 0 ? prev.upvotes_count + 1: prev.upvotes_count - 1  }))
+      setPost((prev) => ({ ...prev, has_upvoted: prev.has_upvoted === 0 ? 1:0, upvotes_count: prev.has_upvoted === 0 ? prev.upvotes_count + 1: prev.upvotes_count - 1, has_downvoted: prev.has_downvoted === 1 ? 0:0  }))
       upvote.mutate();
     }
   };
@@ -208,7 +210,7 @@ const FeedCard = ({
   const handleDownVote = () => {
     const check = checkloggedInState();
     if (check) {
-      setPost((prev) => ({ ...prev, has_downvoted: prev.has_downvoted === 0 ? 1:0  }))
+      setPost((prev) => ({ ...prev, has_downvoted: prev.has_downvoted === 0 ? 1:0, has_upvoted: prev.has_upvoted === 1 ?0:0, upvotes_count:prev.has_downvoted === 0 ? prev.upvotes_count - 1:prev.upvotes_count  }))
       downvote.mutate();
     }
   };
@@ -344,18 +346,20 @@ const FeedCard = ({
                   {community_id === null && tags.length > 1 && (
                     <>
                       <CustomText variant="xs"> tagged </CustomText>{" "}
-                      <CustomText variant="subheader" fontSize={14}>
-                        {tags[0].user.username} and {tags.length - 1} others
-                      </CustomText>
+                      <TouchableOpacity onPress={() => setAll({ tags, showTags: true })}>
+                        <CustomText variant="subheader" fontSize={14} textDecorationLine={'underline'}>
+                          {tags[0].user.username} and {tags.length - 1} others
+                        </CustomText>
+                      </TouchableOpacity>
                     </>
                   )}
                   {community_id !== null && tags.length < 1 && (
                     <>
                       <CustomText variant="xs"> Posted in </CustomText>
-                      <CustomText variant="subheader" fontSize={14}>
-                        {" "}
-                        {post?.community?.name}
-                      </CustomText>
+                        <CustomText variant="subheader" fontSize={14} marginTop={'m'} textDecorationLine={'underline'} onPress={() => navigation.navigate('community-username', { username: post?.community?.username })}>
+                          {" "}
+                          {post?.community?.name}
+                        </CustomText>
                     </>
                   )}
                   {community_id !== null && tags.length === 1 && (
@@ -414,9 +418,11 @@ const FeedCard = ({
                 </CustomText>
               </Box>
             )}
-            <CustomText variant="body" fontSize={12} color="lightGrey">
-              {moment(created_at).fromNow()}
-            </CustomText>
+            <TouchableOpacity onPress={() => navigation.navigate('post', { postId: post.id })}>
+              <CustomText variant="body" fontSize={12} color="lightGrey">
+                {moment(created_at).fromNow()}
+              </CustomText>
+            </TouchableOpacity>
           </Box>
         </Box>
 
@@ -490,10 +496,10 @@ const FeedCard = ({
             )}
             {post?.repost_comment !== null && <Box height={10} width="100%" />}
             {showMore
-              ? colorizeHashtags(post?.repost_comment ?? "")
+              ? <ColorizeHashtagsAndUrls text={post?.repost_comment ?? ""} />
               : post?.repost_comment?.length > 150
-              ? colorizeHashtags(`${post?.repost_comment?.slice(0, 150)}...`)
-              : colorizeHashtags(post?.repost_comment)}
+              ? <ColorizeHashtagsAndUrls text={`${post?.repost_comment?.slice(0, 150)}...`} />
+              : <ColorizeHashtagsAndUrls text={post?.repost_comment} />}
             {post?.repost_comment?.length > 150 && (
               <CustomText
                 style={{ width: "100%" }}
@@ -661,27 +667,36 @@ const FeedCard = ({
                 alignItems="center"
               >
                 <Box flexDirection="row">
-                  <Pressable
+                  <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
                       marginHorizontal: 10,
                     }}
-                    onPress={() => handleReaction("love")}
+
                   >
-                    <Heart
-                      size={20}
-                      color={
-                        post.has_reacted.length > 0
-                          ? theme.colors.primaryColor
-                          : theme.colors.textColor
-                      }
-                      variant={post.has_reacted.length > 0 ? "Bold" : "Outline"}
-                    />
-                    <CustomText variant="body" marginLeft="s">
-                      {reactions_count > 0 && reactions_count}
-                    </CustomText>
-                  </Pressable>
+                    <TouchableOpacity
+                        onPress={() => handleReaction("love")}
+                    >
+                      <Heart
+                          size={20}
+                          color={
+                            post.has_reacted.length > 0
+                                ? theme.colors.primaryColor
+                                : theme.colors.textColor
+                          }
+                          variant={post.has_reacted.length > 0 ? "Bold" : "Outline"}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity  onPress={() => {
+                      if(reactions_count > 0) {
+                        setModalState({ reactionType: 'POST', reactionId: post.id, showReactedUsers: true })
+                      }}}>
+                      <CustomText variant="body" marginLeft="s">
+                        {reactions_count > 0 && reactions_count}
+                      </CustomText>
+                    </TouchableOpacity>
+                  </View>
 
                   <Pressable
                     onPress={() => setShowComment((prev) => !prev)}

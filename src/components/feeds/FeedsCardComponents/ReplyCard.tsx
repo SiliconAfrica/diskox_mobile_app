@@ -32,8 +32,12 @@ import mime from "mime";
 import EmojiSelector from "react-native-emoji-selector";
 import { useDetailsState } from "../../../states/userState";
 import { useModalState } from "../../../states/modalState";
+import {PaginatedResponse} from "../../../models/PaginatedResponse";
+import {CUSTOM_STATUS_CODE} from "../../../enums/CustomCodes";
+import {TouchableOpacity} from "react-native-gesture-handler";
+import {useCommentMentionState} from "../commentState";
 
-const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
+const ReplyCard = ({ comment: activeComment, showReply = true }: { comment: IReply, showReply?: boolean }) => {
   const [reply, setReply] = React.useState(false);
   const [text, setText] = React.useState("");
   const [comment, setComment] = React.useState(activeComment);
@@ -45,11 +49,30 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
   const [editImage, setEditImage] = React.useState<string[]>([]);
   const [editComment, setEditComment] = React.useState("");
   const [newImage, setNewImage] = React.useState<ImagePickerAsset[]>([]);
+  const [replies, setReplies] = React.useState<IReply[]>([]);
+
+  const { users, selectedUsers, reset } = useCommentMentionState(
+      (state) => state
+  );
+
+  const { setAll } = useModalState((state) => state);
+
+  const getReplies = useQuery(
+      [`getReplies-${activeComment.id}`, comment.id],
+      () => httpService.get(`${URLS.GET_REPLIES}/${comment.id}`),
+      {
+        onSuccess: (data) => {
+          const item: PaginatedResponse<IReply> = data.data;
+          if (item.code === CUSTOM_STATUS_CODE.SUCCESS) {
+            setReplies(item.data.data);
+          }
+        },
+      }
+  );
 
   const toast = useToast();
   const queryClient = useQueryClient();
   const { id } = useDetailsState((state) => state);
-  const { setAll } = useModalState((state) => state);
 
   // get reply
   const getReply = useQuery(
@@ -173,7 +196,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
 
   const createReply = useMutation({
     mutationFn: (data: FormData) =>
-      httpService.post(`${URLS.CREATE_REPLY}/`, data),
+      httpService.post(`${URLS.CREATE_REPLY}`, data),
     onError: (error: any) => {
       toast.show(
         "Something went wrong when trying to create your reply, try again",
@@ -191,6 +214,45 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
       setShowMenu(false);
     },
   });
+
+
+  const handleSubmit = React.useCallback(() => {
+    if (createReply.isLoading) return;
+    const formData = new FormData();
+    formData.append("comment_id", comment.id as any);
+    const newText = text.replace(/@\[([^\]]*)\]\(\)/g, "@$1");
+    formData.append("comment", newText);
+    formData.append("reply", newText);
+    if (images.length > 0) {
+      for (let i = 0; i < images.length; i++) {
+        const name = images[i].uri.split("/").pop();
+        const mimeType = mime.getType(images[i].uri);
+        formData.append("reply_images[]", {
+          uri: images[i].uri,
+          type: mimeType,
+          name,
+        } as any);
+      }
+    }
+
+    const regex = /@\[\w+/g;
+    const mentionss = text.match(regex) || [];
+    const userIds: number[] = [];
+    mentionss.forEach((item) => {
+      const newItem = item.replace("[", "");
+
+      const user = selectedUsers.map((user) => {
+        if (
+            user.name.toLowerCase().includes(newItem.toLowerCase().substring(1))
+        ) {
+          userIds.push(user.id);
+          return user.id;
+        }
+      });
+    });
+    formData.append("mentioned_users[]", userIds as any);
+    createReply.mutate(formData);
+  }, [text, comment, createReply]);
 
   const handleReaction = () => {
     const formData = new FormData();
@@ -436,7 +498,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
             )}
 
             {/* REACTION */}
-            <Box width={"100%"} height={60} flexDirection="row" marginTop="m">
+            <Box width={"100%"} height={60} flexDirection="row" marginTop="m" borderBottomWidth={0.5} borderBottomColor={'lightGrey'}>
               {/* MAIN REACTION BOX */}
               <Box
                 width={"40%"}
@@ -444,7 +506,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
                 flexDirection="row"
                 borderRadius={20}
                 borderWidth={0.5}
-                borderColor="lightGrey"
+                borderColor="borderColor"
               >
                 {/* UPVOTE */}
                 <Pressable
@@ -485,7 +547,7 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
                         }
                       >
                         {comment.upvotes_count > 1 && comment.upvotes_count}{" "}
-                        UPVOTE
+                        Upvote
                       </CustomText>
                     </>
                   )}
@@ -531,34 +593,78 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
                 justifyContent="flex-start"
                 alignItems="center"
               >
-                <Pressable
-                  onPress={() => handleReaction()}
+                <View
                   style={{ flexDirection: "row", alignItems: "center" }}
                 >
-                  <Heart
-                    size={25}
-                    color={
-                      comment.has_reacted.length > 0
-                        ? theme.colors.primaryColor
-                        : theme.colors.lightGrey
-                    }
-                    variant={
-                      comment.has_reacted.length > 0 ? "Bold" : "Outline"
-                    }
-                  />
+                 <TouchableOpacity
+                     onPress={() => handleReaction()}
+                 >
+                   <Heart
+                       size={20}
+                       color={
+                         comment.has_reacted.length > 0
+                             ? theme.colors.primaryColor
+                             : theme.colors.lightGrey
+                       }
+                       variant={
+                         comment.has_reacted.length > 0 ? "Bold" : "Outline"
+                       }
+                   />
+                 </TouchableOpacity >
                   {comment.reactions_count > 0 && (
-                    <CustomText variant="body">
-                      {comment.reactions_count}
-                    </CustomText>
+                    <TouchableOpacity
+                        style={{ marginLeft: 8 }}
+                        onPress={() => {
+                      if (comment.reactions_count > 0) {
+                        setAll({ reactionType: 'REPLY', reactionId: comment.id, showReactedUsers: true })
+                    }}}>
+                      <CustomText variant="body">
+                        {comment.reactions_count}
+                      </CustomText>
+                    </TouchableOpacity>
                   )}
-                </Pressable>
+                </View>
 
-                {/* <CustomText onPress={() => setReply(prev => !prev)} variant='body' marginLeft='m' color={reply ? 'primaryColor' : 'grey'}>Reply</CustomText> */}
+                {showReply && <CustomText onPress={() => setReply(prev => !prev)} variant='body' marginLeft='m' color={reply ? 'primaryColor' : 'grey'}>Reply</CustomText>}
               </Box>
             </Box>
 
             {reply && (
-              <Box width="100%" minHeight={50} maxHeight={400}>
+              <Box width="100%" minHeight={50} maxHeight={400} marginTop={'m'}>
+                <Box width={"100%"} maxHeight={300}>
+                  {getReplies.isLoading && (
+                      <Box
+                          width={"100%"}
+                          height={30}
+                          justifyContent="center"
+                          alignItems="center"
+                      >
+                        <ActivityIndicator
+                            size={"small"}
+                            color={theme.colors.primaryColor}
+                        />
+                      </Box>
+                  )}
+                  {!getReplies.isLoading && replies.length < 1 && (
+                      <Box
+                          width={"100%"}
+                          height={30}
+                          justifyContent="center"
+                          alignItems="center"
+                      >
+                        <CustomText variant="subheader" fontSize={16}>
+                          No replies
+                        </CustomText>
+                      </Box>
+                  )}
+                  {!getReplies.isLoading && replies.length > 0 && (
+                      <ScrollView>
+                        {replies.map((item, index) => (
+                            <ReplyCard comment={item} key={index.toString()} showReply={false} />
+                        ))}
+                      </ScrollView>
+                  )}
+                </Box>
                 {/* REPLY SECTIONS */}
                 <Box flex={1}></Box>
                 {images.length > 0 && (
@@ -588,6 +694,10 @@ const ReplyCard = ({ comment: activeComment }: { comment: IReply }) => {
                   onImagePicked={handleImagePicked}
                   onTextChange={(e) => setText(e)}
                   text={text}
+                  isReply
+                  username={comment.user.username}
+                  onSubmit={handleSubmit}
+                  isLoading={createReply.isLoading}
                 />
               </Box>
             )}

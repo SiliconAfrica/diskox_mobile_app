@@ -23,7 +23,6 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { io } from 'socket.io-client';
 
 // import Pusher from 'pusher-js/react-native';
-import Echo from 'laravel-echo';
 import { BASE_URL } from "../utils/httpService";
 // import { PusherEvent } from "pusher-js/types/src/core/connection/protocol/message-types";
 // import { PusherEvent } from "pusher-js/types/src/core/connection/protocol/message-types";
