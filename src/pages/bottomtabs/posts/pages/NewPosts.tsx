@@ -501,7 +501,7 @@ const NewPost = ({
               style={{ marginBottom: 15 }}
             >
               {isLoggedIn && <Searchbar />}
-              <Box height={15} />
+              <Box height={6} />
               <FilterTopbar
                 activeTab={activeTab}
                 onActive={(data) => onActive(data)}

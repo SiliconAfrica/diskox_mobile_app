@@ -3,7 +3,7 @@ import React from 'react'
 import { IPost } from '../../models/post'
 import Box from '../general/Box';
 import CustomText from '../general/CustomText';
-import { colorizeHashtags } from '../../utils/colorizeText';
+import ColorizeHashtagsAndUrls, { colorizeHashtags} from '../../utils/colorizeText';
 import CustomVideoplayer from '../general/CustomVideoplayer';
 import { IMAGE_BASE } from '../../utils/httpService';
 import { Image } from 'expo-image'
@@ -51,7 +51,7 @@ const PostDetails = ({ post, vote }: IProps) => {
                 {post?.title !== null && (
                     <Box height={10} width='100%' />
                 )}
-                {showMore ? colorizeHashtags(post?.description ?? '') : post?.description?.length > 150 ? colorizeHashtags(`${post?.description?.slice(0, 150)}...`) : colorizeHashtags(post?.description)}
+                {showMore ? <ColorizeHashtagsAndUrls text={post?.description ?? ''} /> : post?.description?.length > 150 ? <ColorizeHashtagsAndUrls text={`${post?.description?.slice(0, 150)}...`} /> : <ColorizeHashtagsAndUrls text={post?.description} />}
                 {post?.description?.length > 150 && <CustomText style={{ width: '100%' }} onPress={() => setShowMore(!showMore)} color={showMore ? 'lightGrey' : 'primaryColor'}>{showMore ? 'Read less' : 'Read more'}</CustomText>}
             </Box>
 
@@ -182,7 +182,7 @@ const PostDetails = ({ post, vote }: IProps) => {
                 )}
 
                 {post.polls?.length > 0 && (
-                    <CustomText>{getDate() > 0 ? `${getDate()} days left` : 'Final result'} </CustomText>
+                    <CustomText>{getDate() > 0 ? getDate() === 1 ? `${getDate()} day left`: `${getDate()} days left` : 'Final result'} </CustomText>
                 )}
 
             </Box>

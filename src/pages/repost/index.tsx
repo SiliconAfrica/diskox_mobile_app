@@ -90,9 +90,9 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
     }, [comment]);
 
     const handleSubmit = () => {
-      if (comment.length < 1) {
-        toast.show('you have to type a comment', { type: 'warning' });
-      }
+      // if (comment.length < 1) {
+      //   toast.show('you have to type a comment', { type: 'warning' });
+      // }
       const formData = new FormData();
       formData.append('post_id', id.toString());
     
@@ -123,7 +123,7 @@ const Repost = ({ route,navigation }: NativeStackScreenProps<RootStackParamList,
         })
       })
       const newText = comment.replace(/@\[([^\]]*)\]\(\)/g, '@$1');
-      formData.append('repost_comment', newText);
+      formData.append('repost_comment', comment);
       console.log(userIds);
       formData.append('mentioned_users[]', userIds as any);
      

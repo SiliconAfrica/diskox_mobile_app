@@ -7,13 +7,14 @@ import { useTheme } from '@shopify/restyle'
 import Box from '../general/Box'
 import CustomText from '../general/CustomText'
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { ScrollView } from 'react-native-gesture-handler'
+import {ScrollView, TextInput} from 'react-native-gesture-handler'
 import PrimaryButton from '../general/PrimaryButton'
 import { useMutation } from 'react-query'
 import httpService from '../../utils/httpService'
 import { URLS } from '../../services/urls'
 import useToast from '../../hooks/useToast'
 import { useUtilState } from '../../states/util'
+
 
 // Hey, I’m on diskox, to stay connected with family and friends. 
 // Sign up with my referral code and get 1pt on your diskox wallet
@@ -81,7 +82,7 @@ const ReportItem = ({isActive, item, markAsActive, isDescriptionActive, showDesc
                 { isActive && <Feather name='check' size={13} color={'white'} /> }
             </Pressable>
             <CustomText marginHorizontal='m'>{item.name}</CustomText>
-            <Pressable 
+            <Pressable
             onPress={() => showDescription()}
             style={{
                 width: 25,
@@ -106,7 +107,8 @@ const ReportItem = ({isActive, item, markAsActive, isDescriptionActive, showDesc
 const ReportPost = () => {
     const [activeReport, setActiveReport] = React.useState('');
     const [activeDescription, steActiveDescription] = React.useState('');
-    const [activeIndex, setActiveIndex] = React.useState<number|null>(null)
+    const [activeIndex, setActiveIndex] = React.useState<number|null>(null);
+    const [text, setText] = React.useState('');
     const { height: HEIGHT } = useWindowDimensions();
 
     const { showReportPost, activePost, setAll } = useModalState((state) => state);
@@ -140,11 +142,11 @@ const ReportPost = () => {
         }
         const formData = new FormData();
         formData.append('post_id', activePost?.id.toString());
-        formData.append('reason', activeReport);
+        formData.append('reason', activeReport === 'Other' ? text:activeReport);
         mutate(formData);
     }
   return (
-    <ReactNavtieModalWrapper isVisible={showReportPost} height={ (HEIGHT / 100 * 60)} backgroundColor={theme.colors.secondaryBackGroundColor} >
+    <ReactNavtieModalWrapper isVisible={showReportPost} height={ activeReport !== 'Other' ? (HEIGHT / 100 * 60): (HEIGHT / 100 * 70)} backgroundColor={theme.colors.secondaryBackGroundColor} >
         <Box width='100%' padding='m' position='relative'>
 
             <Box flexDirection='row' width='100%' justifyContent='space-between' alignItems='center' position='relative' zIndex={2}>
@@ -154,12 +156,29 @@ const ReportPost = () => {
 
             <CustomText marginTop='s'>If this user has violated any of our community guidelines, let us know what happened and we will look into it.</CustomText>
             <Box width='100%' height={'65%'} marginVertical='s' overflow='visible' zIndex={9} position='relative'>
-                <ScrollView style={{ position: 'relative', zIndex: 10 }} contentContainerStyle={{ width: '100%', paddingTop: activeDescription !== '' && activeIndex === 0 || activeIndex === 1 ?100:0 }}>
+                <ScrollView style={{ position: 'relative', zIndex: 10 }} contentContainerStyle={{ width: '100%', paddingTop: activeDescription !== '' && activeIndex === 0 || activeIndex === 1 ?100:0, paddingBottom: 20 }}>
                     { Reports.map((item, index) => (
                         <ReportItem key={index.toString()} isActive={activeReport === item.name} item={item} markAsActive={() => setActiveReport(item.name)} isDescriptionActive={activeDescription === item.name} showDescription={() => handleShowDescription(item.name, index)} />
                     ))}
+                    { activeReport === 'Other' && (
+                        <TextInput value={text} onChangeText={(e) => setText(e)} style={{
+                            fontFamily: 'RedRegular',
+                            fontSize: 16,
+                            width: '100%',
+                            height: 45,
+                            borderRadius: 10,
+                            backgroundColor: theme.colors.mainBackGroundColor,
+                            color: theme.colors.textColor,
+                            paddingHorizontal: 10,
+                        }}
+                                   placeholderTextColor={theme.colors.textColor}
+                                   placeholder={'Enter your reason here'}
+                        />
+                    )}
                 </ScrollView>
             </Box>
+
+
 
             <Box width='100%' height={50} flexDirection='row' justifyContent='flex-end' alignItems='center'>
                 <CustomText marginRight='m' onPress={() => setAll({ showReportPost: false })}>Cancel</CustomText>

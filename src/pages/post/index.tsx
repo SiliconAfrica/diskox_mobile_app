@@ -23,12 +23,16 @@ import { Image } from "expo-image";
 import { IPost } from "../../models/post";
 import { Theme } from "../../theme";
 import { useTheme } from "@shopify/restyle";
-import { ScrollView } from "react-native-gesture-handler";
+import {ScrollView, TouchableOpacity} from "react-native-gesture-handler";
 import { Video, ResizeMode } from "expo-av";
 import CommentTextbox from "../../components/post/CommentTextbox";
 import SingleCommentTextbox from "../../components/post/SinglePostCommentPage";
 import { useModalState } from "../../states/modalState";
 import useCheckLoggedInState from "../../hooks/useCheckLoggedInState";
+import CommentSection from "../../components/feeds/FeedsCardComponents/CommentSection";
+import {Eye, Heart, Message} from "iconsax-react-native";
+import {ArrowBigDown, ArrowBigUp} from "lucide-react-native";
+import FeedCard from "../../components/feeds/FeedCard";
 
 const Post = ({
   route,
@@ -145,6 +149,7 @@ const Post = ({
       </Box>
     );
   }
+
   return (
     <Box flex={1} backgroundColor="mainBackGroundColor">
       <SettingsHeader
@@ -152,232 +157,7 @@ const Post = ({
         showSave={false}
         handleArrowPressed={handleBackPress}
       />
-
-      <ScrollView contentContainerStyle={{ paddingBottom: 10000 }}>
-        <Box flex={1}>
-          {/* HEADER SECTION */}
-          <Box
-            flexDirection="row"
-            height={100}
-            justifyContent="space-between"
-            alignItems="center"
-            paddingHorizontal="m"
-          >
-            <Box flexDirection="row">
-              <Box flexDirection="row">
-                <View
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 25,
-                    borderWidth: 2,
-                    borderColor: theme.colors.primaryColor,
-                    backgroundColor: theme.colors.secondaryBackGroundColor,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Image
-                    source={{ uri: `${IMAGE_BASE}${post?.user.profile_image}` }}
-                    contentFit="contain"
-                    style={{ width: "100%", height: "100%", borderRadius: 25 }}
-                  />
-                </View>
-
-                <Box marginLeft="s" justifyContent="center">
-                  <Box flexDirection="row">
-                    <CustomText variant="body" color="black">
-                      @{post?.user.username}{" "}
-                    </CustomText>
-                    <CustomText variant="body" color="grey"></CustomText>
-                  </Box>
-                  <CustomText variant="xs">
-                    {moment(post?.created_at).fromNow()}
-                  </CustomText>
-                </Box>
-              </Box>
-            </Box>
-            <Ionicons
-              name="ellipsis-vertical"
-              size={20}
-              color={theme.colors.textColor}
-            />
-          </Box>
-
-          {/* CONTENT SECTION */}
-          <ScrollView
-            contentContainerStyle={{
-              marginVertical: 20,
-              flex: 1,
-            }}
-          >
-            <Box paddingHorizontal="m">
-              <CustomText variant="body" textAlign="left">
-                {post?.description}
-              </CustomText>
-            </Box>
-
-            {/* IMAGE OR VIDEO SECTION */}
-            {(post?.post_images?.length > 0 ||
-              post?.post_videos?.length > 0) && (
-              <Pressable
-                onPress={openGallery}
-                style={{ marginTop: 8, height: 300, width: "100%" }}
-              >
-                {post.post_images.length > 0 && post.post_videos.length > 0 ? (
-                  <Box
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  >
-                    {post.post_images.length > 0 ? (
-                      <Image
-                        source={{
-                          uri: `${IMAGE_BASE}${post.post_images[0].image_path}`,
-                        }}
-                        contentFit="cover"
-                        style={{
-                          position: "relative",
-                          width: "100%",
-                          height: undefined,
-                          paddingTop: "83%",
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <Video
-                          source={{
-                            uri: `${IMAGE_BASE}${post.post_videos[0].video_path}`,
-                          }}
-                          posterSource={{
-                            uri: `${IMAGE_BASE}${post.post_videos[0].video_thumbnail}`,
-                          }}
-                          usePoster
-                          resizeMode={ResizeMode.COVER}
-                          useNativeControls
-                          isLooping={false}
-                          videoStyle={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 15,
-                            backgroundColor: "grey",
-                          }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 0,
-                            backgroundColor: "grey",
-                          }}
-                        />
-                        <Box
-                          style={{
-                            position: "absolute",
-                            width: "100%",
-                            height: "100%",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <FontAwesome5
-                            name="play"
-                            size={50}
-                            color={theme.colors.whitesmoke}
-                          />
-                        </Box>
-                      </>
-                    )}
-
-                    <Box
-                      backgroundColor="mainBackGroundColor"
-                      position="absolute"
-                      width={80}
-                      height={80}
-                      alignItems="center"
-                      justifyContent="center"
-                      bottom={0}
-                      right={0}
-                    >
-                      <CustomText variant="subheader">
-                        {post.post_images.length + post.post_videos.length - 1}+
-                      </CustomText>
-                    </Box>
-                  </Box>
-                ) : (
-                  <></>
-                )}
-              </Pressable>
-            )}
-
-            {/* Poll SECTION */}
-            {post?.polls?.length > 0 && (
-              <Box
-                flexDirection="row"
-                justifyContent="space-between"
-                marginTop="m"
-                paddingHorizontal="m"
-                maxHeight={300}
-                width={"100%"}
-              >
-                <ScrollView
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ width: "100%" }}
-                >
-                  {post?.polls.map((poll, index) => (
-                    <Box
-                      key={index.toString()}
-                      width="100%"
-                      height={45}
-                      position="relative"
-                      overflow="hidden"
-                      borderRadius={25}
-                      marginBottom="s"
-                    >
-                      {post?.has_voted_poll === 1 && (
-                        <Box
-                          position="absolute"
-                          width={`${poll.vote_count}%`}
-                          top={0}
-                          height="100%"
-                          zIndex={1}
-                          backgroundColor="fadedButtonBgColor"
-                        />
-                      )}
-                      <Pressable
-                        onPress={() => vote(poll.id)}
-                        style={{
-                          zIndex: 2,
-                          width: "100%",
-                          height: 45,
-                          borderRadius: 25,
-                          borderWidth: 1,
-                          borderColor: theme.colors.primaryColor,
-                          paddingHorizontal: 20,
-                          justifyContent: "center",
-                          marginBottom: 10,
-                        }}
-                      >
-                        <CustomText variant="body" color="primaryColor">
-                          {poll.subject} ({poll.vote_count}%)
-                        </CustomText>
-                      </Pressable>
-                    </Box>
-                  ))}
-                </ScrollView>
-              </Box>
-            )}
-
-            {post?.polls?.length > 0 && (
-              <CustomText marginLeft="m">
-                {getDate() > 0 ? `${getDate()} days left` : "Final result"}{" "}
-              </CustomText>
-            )}
-          </ScrollView>
-        </Box>
-
-        {/* COMMENT SECTIONS */}
-        <SingleCommentTextbox postId={postId} />
-      </ScrollView>
+        <FeedCard post={post} showReactions={true} />
     </Box>
   );
 };

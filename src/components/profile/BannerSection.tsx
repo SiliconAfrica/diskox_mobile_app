@@ -230,35 +230,35 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               flexDirection="row"
               width="100%"
               paddingHorizontal={"m"}
-              justifyContent="space-between"
+              justifyContent="flex-end"
             >
-              <Box
-                width={40}
-                height={40}
-                borderRadius={25}
-                bg="grey"
-                overflow="hidden"
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.71)',
-                }}
-              >
-                <Pressable
-                  onPress={() => navigation.goBack()}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: 25,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Feather
-                      name="arrow-left"
-                      size={20}
-                      color={'white'}
-                    />
-                </Pressable>
-              </Box>
+              {/*<Box*/}
+              {/*  width={40}*/}
+              {/*  height={40}*/}
+              {/*  borderRadius={25}*/}
+              {/*  bg="grey"*/}
+              {/*  overflow="hidden"*/}
+              {/*  style={{*/}
+              {/*    backgroundColor: 'rgba(0, 0, 0, 0.71)',*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  <Pressable*/}
+              {/*    onPress={() => navigation.goBack()}*/}
+              {/*    style={{*/}
+              {/*      width: "100%",*/}
+              {/*      height: "100%",*/}
+              {/*      borderRadius: 25,*/}
+              {/*      justifyContent: "center",*/}
+              {/*      alignItems: "center",*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    <Feather*/}
+              {/*        name="arrow-left"*/}
+              {/*        size={20}*/}
+              {/*        color={'white'}*/}
+              {/*      />*/}
+              {/*  </Pressable>*/}
+              {/*</Box>*/}
 
              {userId === id && (
                <Box
@@ -344,12 +344,13 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
       )}
 
       {!getUserDetails.isLoading && user?.cover_photo === null && (
-        <Box
+        <ImageBackground
+            source={require('../../../assets/images/logo.png')}
+            resizeMode={'cover'}
           style={{
             width: "100%",
             height: (HEIGHT / 100) * 25,
             paddingTop: 50,
-            backgroundColor: theme.colors.primaryColor,
           }}
         >
           {userId === id && (
@@ -421,7 +422,7 @@ const BannerSection = ({ currentTab, switchTab }: IProps) => {
               />
             </Pressable>
           </Box>
-        </Box>
+        </ImageBackground>
       )}
 
       {/* BUTTONS SECTION */}

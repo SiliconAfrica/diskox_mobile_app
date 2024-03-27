@@ -72,7 +72,7 @@ const PageTwo = ({next}: {
         </Box>       
 
         <Box width={'100%'} flex={1} flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <BorderButton width={100} borderColor={theme.colors.mainBackGroundColor} height={44} title='Go Back' onPress={() => next(1)} borderRadius={10} />
+            <BorderButton width={100} borderColor={theme.colors.borderColor} color={theme.colors.textColor} height={44} title='Go Back' onPress={() => next(1)} borderRadius={10} />
             <PrimaryButton width={100} height={44} title='Next' onPress={navigate} borderRadius={10} />
         </Box>
     </Box>

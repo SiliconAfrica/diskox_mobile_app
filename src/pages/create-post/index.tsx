@@ -35,6 +35,7 @@ import { includes } from "lodash";
 import { useGlobalFileState } from "../../states/pickedFileState";
 import CommunitiesModal from "../../components/modals/CommunitiesModal";
 import { ICommunity } from "../../models/Community";
+import { IPost } from "../../models/post";
 
 const CreatePost = ({
   navigation,
@@ -68,7 +69,8 @@ const CreatePost = ({
   const [status, setStatus] = React.useState<"active" | "draft">("active");
   const [cancel, setCancel] = React.useState(false);
   const [community, setCommunity] = React.useState<ICommunity|null>(null);
-  const [showCommunities, setShowCommunities] = React.useState(false)
+  const [showCommunities, setShowCommunities] = React.useState(false);
+  const [changed, setChanged] = React.useState(false);
 
   const theme = useTheme<Theme>();
   const toast = useToast();
@@ -100,9 +102,9 @@ const CreatePost = ({
         if (
           value !== "" ||
           question !== "" ||
-          pollQuestion !== "" ||
-          files.length > 0 ||
-          polls.length > 0
+          pollQuestion !== ""
+          // files.length > 0 ||
+          // polls.length > 0
         ) {
           e.preventDefault();
           setShowModal(true);
@@ -173,7 +175,8 @@ const CreatePost = ({
   const { isLoading, mutate } = useMutation({
     mutationFn: (data: FormData) => httpService.post("/create_post", data),
     onSuccess: (data) => {
-      toast.show("Post created", { type: "success" });
+      toast.show("Your post has been created", { type: "success" });
+      const post: IPost = data.data.data;
       // clean up
       setFiles([]);
       setValues("");
@@ -184,7 +187,9 @@ const CreatePost = ({
       setCancel(true);
       clearFiles();
       setCommunity(null);
-      navigation.goBack();
+      navigation.navigate('post', { postId: post.id });
+
+      //navigation.goBack();
     },
     onError: (error: any) => {
       toast.show(error?.message, { type: "error" });
@@ -399,17 +404,27 @@ const CreatePost = ({
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
+        allowsMultipleSelection: true,
         mediaTypes: ImagePicker.MediaTypeOptions[documentType || "Images"],
         allowsEditing: true,
         base64: false,
       });
 
       if (!result.canceled) {
+        let files = [];
+        if (result.assets.length > 10) {
+          files = result.assets.slice(0, 9);
+        } else {
+          files = result.assets;
+        }
         const formData = new FormData();
-        const name = result.assets[0].uri.split("/").pop();
-        const mimeType = mime.getType(result.assets[0].uri);
-        const arr = [...files, result.assets[0]];
-        setFiles(arr);
+        for(let i = 0; i < files.length; i++) {
+          const name = result.assets[i].uri.split("/").pop();
+          const mimeType = mime.getType(result.assets[i].uri);
+          const arr = [...files, result.assets[i]];
+          setFiles(arr);
+        }
+
       }
     },
     [files]
@@ -453,7 +468,10 @@ const CreatePost = ({
         tags={tags}
         setTags={(tags) => handleCheck(tags)}
       />
-      <CommunitiesModal isVisisble={showCommunities} onClose={() => setShowCommunities(false)} activeCommunity={community} setActiveCommunity={(data) =>setCommunity(data)} />
+      <CommunitiesModal isVisisble={showCommunities} onClose={() => setShowCommunities(false)} activeCommunity={community} setActiveCommunity={(data) =>{
+        setCommunity(data);
+        setChanged(true);
+      }} />
       <Saveasdraft
         isLoading={isLoading}
         isVisible={showModal}
@@ -504,50 +522,60 @@ const CreatePost = ({
                   marginRight: 20,
                 }}
               >
-                <Ionicons
-                  name={
-                    "people"
-                  }
-                  size={20}
-                  color={theme.colors.textColor}
-                />
-                <CustomText variant="xs">{community === null ? 'Choose community':community.name}</CustomText>
-                <Feather
-                  name="chevron-down"
-                  size={20}
-                  color={theme.colors.textColor}
-                />
+              { community === null && !changed && (
+                  <>
+                    <Ionicons
+                        name={
+                          "people"
+                        }
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                    <CustomText variant="xs" marginHorizontal={'s'}>c/</CustomText>
+                    <Feather
+                        name="chevron-down"
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                  </>
+              )}
+              { community !== null && (
+                  <>
+                    <Ionicons
+                        name={
+                          "people"
+                        }
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                    <CustomText variant="xs" marginHorizontal={'s'}>{community === null ? 'Choose community':community.name}</CustomText>
+                    <Feather
+                        name="chevron-down"
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                  </>
+              )}
+              { community === null && changed && (
+                  <>
+                    <Ionicons
+                        name={
+                          "people"
+                        }
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                    <CustomText variant="xs" marginHorizontal={'s'}>{visibility}</CustomText>
+                    <Feather
+                        name="chevron-down"
+                        size={20}
+                        color={theme.colors.textColor}
+                    />
+                  </>
+
+              )}
             </Pressable>
 
-          {community === null && (
-            <Pressable
-            onPress={() => setAll({ showVisibility: true })}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderRadius: 30,
-              backgroundColor: theme.colors.secondaryBackGroundColor,
-              padding: 2,
-              width: 110,
-              height: 30
-            }}
-          >
-            <Ionicons
-              name={
-                visibility === "everyone" ? "globe-outline" : "people-outline"
-              }
-              size={20}
-              color={theme.colors.textColor}
-            />
-            <CustomText variant="xs">{visibility}</CustomText>
-            <Feather
-              name="chevron-down"
-              size={20}
-              color={theme.colors.textColor}
-            />
-        </Pressable>
-          )}
         </Box>
 
        <Box width={'100%'} flexDirection="row" justifyContent="space-between">

@@ -1,4 +1,14 @@
-import { View, Text, TextInput, NativeSyntheticEvent, TextInputKeyPressEventData, ScrollView, Pressable, ActivityIndicator } from 'react-native'
+import {
+    View,
+    Text,
+    TextInput,
+    NativeSyntheticEvent,
+    TextInputKeyPressEventData,
+    ScrollView,
+    Pressable,
+    ActivityIndicator,
+    Platform
+} from 'react-native'
 import React from 'react'
 import Box from '../../general/Box'
 import { Ionicons } from '@expo/vector-icons'
@@ -7,9 +17,8 @@ import { useTheme } from '@shopify/restyle'
 import { Theme } from '../../../theme'
 import { ImagePickerAsset, MediaTypeOptions, UIImagePickerPresentationStyle, launchImageLibraryAsync } from 'expo-image-picker'
 import CustomText from '../../general/CustomText'
-import EmojiPicker, {emojiFromUtf16} from "rn-emoji-picker"
+//import EmojiPicker, {emojiFromUtf16} from "rn-emoji-picker"
 import {emojis} from "rn-emoji-picker/dist/data"
-import EmojiSelector from 'react-native-emoji-selector'
 import { MentionInput, MentionSuggestionsProps } from 'react-native-controlled-mentions'
 import { Mention } from '../../../models/mention'
 import { useQuery } from 'react-query'
@@ -21,6 +30,11 @@ import { uniqBy } from 'lodash'
 import { useCommentMentionState } from '../commentState'
 import { Image } from 'expo-image'
 import { UserRound } from 'lucide-react-native'
+import EmojiSelector from 'react-native-emoji-selector'
+import EmojiPicker from "rn-emoji-picker";
+import {FlatList, TouchableOpacity} from "react-native-gesture-handler";
+import { useAssets } from 'expo-asset';
+import Emojipicker from "../../general/emojipicker";
 
 const suggestions = [
   {id: '1', name: 'David Tabaka'},
@@ -119,11 +133,13 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
     const [mentionedUsers, setMentionedUsers] = React.useState<string[]>([]);
     const [recent, setRecent] = React.useState([]);
     const [showEmojis, setShowEmojis] = React.useState(false);
-
+    //const [assets, error] = useAssets([require('rn-emoji-picker/dist/data')])
+    const [selection, setSelection] = React.useState({ start: 0, end: 0});
+    const inputRef = React.useRef<TextInput>();
 
 
     const theme = useTheme<Theme>();
-    const { setId, ids } = useCommentMentionState((state) => state)
+    const { setId, ids } = useCommentMentionState((state) => state);
 
 
     const pickImage = async () => {
@@ -159,15 +175,15 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
     };
 
     const handleEmojiPicked = React.useCallback((emoji: string) => {
-      // Get the current cursor position
-      const cursorPosition = text.length;
+        const { start, end } = selection;
 
-      // Insert the emoji at the cursor position
-      const updatedText = text.slice(0, cursorPosition) + emoji + text.slice(cursorPosition);
-
-      // Update the text
+        // Create the new text with inserted content
+        const insertedText = 'Your text to insert';
+        const updatedText = `${text.substring(0, start)}${emoji}${text.substring(end)}`;
+        onTextChange(updatedText);
       onTextChange(updatedText);
-    }, [onTextChange, text]);
+      setShowEmojis(false);
+    }, [onTextChange, text, selection]);
 
     const handleSelectMention = (user: string) => {
         const updatedText = text.replace(`@${user}`, `@${user} `);
@@ -184,34 +200,9 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
   return (
     <Box width={'100%'}>
           {
-            showEmojis && (
-              <Box width='100%' maxHeight={300} position='absolute' zIndex={30} top={-200} bottom={80} >
-                <ScrollView nestedScrollEnabled contentContainerStyle={{ height: 200 }}>
-                <EmojiPicker
-
-                      emojis={emojis} // emojis data source see data/emojis
-                      recent={recent} // store of recently used emojis
-                      autoFocus={true} // autofocus search input
-                      loading={false} // spinner for if your emoji data or recent store is async
-                      darkMode={true} // to be or not to be, that is the question
-                      perLine={10} // # of emoji's per line
-                      onSelect={(e) => handleEmojiPicked(e.emoji)} // callback when user selects emoji - returns emoji obj
-                      onChangeRecent={setRecent}
-                      backgroundColor={theme.colors.secondaryBackGroundColor}// callback to update recent storage - arr of emoji objs
-                      // backgroundColor={'#000'} // optional custom bg color
-                      // enabledCategories={[ // optional list of enabled category keys
-                      //   'recent',
-                      //   'emotion',
-                      //   'emojis',
-                      //   'activities',
-                      //   'flags',
-                      //   'food',
-                      //   'places',
-                      //   'nature'
-                      // ]}
-                      // defaultCategory={'food'} // optional default category key
-                  />
-                </ScrollView>
+            showEmojis &&(
+              <Box width='100%' maxHeight={300} overflow={'hidden'} borderRadius={10} position='absolute' zIndex={30} top={-200} bottom={80} >
+                  <Emojipicker onSelected={(e) => handleEmojiPicked(e)} />
               </Box>
             )
           }
@@ -229,10 +220,9 @@ const CommentTextBox = ({ onImagePicked, text, onTextChange,  buttonText = 'Comm
                           pattern: /(@\w+)/g
                         }
                       ]}
-
-
-
-                      value={text} onChange={handleTextChange} containerStyle={{ minHeight: 80,  paddingHorizontal: 10, borderWidth: 0 }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, borderWidth: 0 }} placeholderTextColor={theme.colors.textColor} placeholder={isReply ? `@${username}`:'Write your comment here...'} multiline numberOfLines={2} onKeyPress={handleTextInputKeyPress}
+                      inputRef={inputRef}
+                      onSelectionChange={(e) => setSelection({ start: e.nativeEvent.selection.start, end: e.nativeEvent.selection.end})}
+                      value={text} onChange={handleTextChange} containerStyle={{ minHeight: 80,  paddingHorizontal: 10, borderWidth: 0 }} style={{ fontFamily: 'RedRegular', fontSize: 14, color: theme.colors.textColor, borderWidth: 0 }} placeholderTextColor={theme.colors.textColor} placeholder={isReply ? `@${username}`:'Leave a comment'} multiline numberOfLines={2} onKeyPress={handleTextInputKeyPress}
                     />
 
                 </Box>

@@ -43,6 +43,9 @@ import SignIn from "../pages/signin";
 import FollowingPage from "../pages/following";
 import EditPost from "../pages/create-post/EditPost";
 import SelectCommunities from "../pages/selectCommunities";
+import PostBySlug from "../pages/PostBySlug";
+import SingleCommunity from "../pages/bottomtabs/community/pages/SingleCommunity";
+import MentionProfile from "../pages/user";
 
 export type RootStackParamList = {
   home: undefined;
@@ -82,6 +85,7 @@ export type RootStackParamList = {
   categories: { shouldSelectCommunitiesNext: boolean };
   "select-communities": undefined;
   community: { id: number; data: ICommunity };
+  "community-username": {username: string},
   "community-members": { id: number; username: string };
   "community-settings": {
     id: number;
@@ -94,6 +98,8 @@ export type RootStackParamList = {
   "trending-hashtags": undefined;
   following: { id: number };
   "edit-post": { postId: number; type: number };
+  "slug-post": { slug: string };
+  "mention-profile": { username: string }
 };
 
 const RootStackNavigation = createNativeStackNavigator<RootStackParamList>();
@@ -207,6 +213,21 @@ const MainNavigation = (): JSX.Element => {
         <RootStackNavigation.Screen
           name="following"
           component={FollowingPage}
+        />
+
+        <RootStackNavigation.Screen
+            name="slug-post"
+            component={PostBySlug}
+        />
+
+        <RootStackNavigation.Screen
+            name="community-username"
+            component={SingleCommunity}
+        />
+
+        <RootStackNavigation.Screen
+            name="mention-profile"
+            component={MentionProfile}
         />
 
         <RootStackNavigation.Screen name="edit-post" component={EditPost} />

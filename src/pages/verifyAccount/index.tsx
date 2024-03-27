@@ -57,6 +57,8 @@ const VerifyAccount = ({ navigation }: NativeStackScreenProps<RootStackParamList
     const handleBack = () => {
         if(step > 1) {
             setStep(step - 1)
+        }else {
+            navigation.goBack();
         }
     }
     

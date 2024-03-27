@@ -5,23 +5,67 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c3b7b898-71fc-419a-9182-0a6bb56a982c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Header.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/modals/ReactionModal.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/modals/TagsModal.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/reaction.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/PostBySlug/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/bottomtabs/community/pages/SingleCommunity.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Comments.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Drafts.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Polls.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Posts.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Upvotes.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/overview.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/EarningsBox.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/ReferralList.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/totalReferrals.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/totalWithdrawals.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Searchbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Searchbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentSection.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentTextBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentTextBox.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/feeds/FilterTopbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FilterTopbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/form/CustomDropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/form/CustomDropdown.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/general/CustomButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/CustomButton.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/profile/StatsCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/profile/StatsCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/profile/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/profile/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/set-up/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/set-up/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/theme/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/theme/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/ReplyCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/ReplyCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/PostDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/PostDetails.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/general/emojipicker.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/emojipicker.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/CommunitiesModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modals/CommunitiesModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/ReportPost.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modals/ReportPost.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/profile/BannerSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/profile/BannerSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/renderModals.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/renderModals.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/MainNavigation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/MainNavigation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/community/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/community/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/polls/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/polls/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/posts/pages/NewPosts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/posts/pages/NewPosts.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/create-post/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/create-post/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/notifications/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/notifications/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/post/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/post/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/repost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/repost/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageFour.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageFour.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageThree.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageThree.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageTwo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageTwo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/urls.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/urls.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/states/modalState.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/states/modalState.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/colorizeText.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/colorizeText.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -61,7 +105,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;live&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/daniel/Documents/projects/diskox&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/daniel/Documents/projects/diskox/src/pages/user&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -70,15 +114,14 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.completion&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/daniel/Documents/projects/diskox/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-db596990d856-JavaScript-WS-241.14024.30" />
-      </set>
-    </attachedChunks>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/pages/user" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -96,6 +139,11 @@
       <workItem from="1709890262290" duration="90000" />
       <workItem from="1709895645925" duration="4368000" />
       <workItem from="1709900086987" duration="171000" />
+      <workItem from="1710822965568" duration="276000" />
+      <workItem from="1710823264884" duration="12733000" />
+      <workItem from="1711316809168" duration="8932000" />
+      <workItem from="1711373442987" duration="49950000" />
+      <workItem from="1711546230779" duration="7069000" />
     </task>
     <servers />
   </component>

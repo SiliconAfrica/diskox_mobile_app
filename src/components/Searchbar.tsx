@@ -44,7 +44,7 @@ const Searchbar = () => {
         []
       );
   return (
-    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} borderTopWidth={0.3} borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s' style={{ marginTop:15 }}>
+    <Box backgroundColor={isDarkMode ? 'secondaryBackGroundColor':'mainBackGroundColor'} borderBottomWidth={0.3} borderBottomColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} borderTopWidth={0.3} borderTopColor={isDarkMode ? 'secondaryBackGroundColor':"lightGrey"} width='100%' height={70} flexDirection='row' alignItems='center' paddingHorizontal='s' style={{ marginTop: 6 }}>
          <TouchableOpacity onPress={() => navigation.navigate('profile', { userId: id })}>
          {
                     profile_image && (

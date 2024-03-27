@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import {ScrollView, TouchableOpacity} from "react-native-gesture-handler";
 import React from "react";
 import Box from "../../general/Box";
 import { useTheme } from "@shopify/restyle";
@@ -37,6 +37,7 @@ import ReplyCard from "./ReplyCard";
 import { useModalState } from "../../../states/modalState";
 import { useDetailsState } from "../../../states/userState";
 import { useCommentMentionState } from "../commentState";
+import ColorizeHashtagsAndUrls from "../../../utils/colorizeText";
 
 const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
   const [reply, setReply] = React.useState(false);
@@ -98,26 +99,6 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
       toast.show(error?.message, { type: "error" });
     },
     onSuccess: (data) => {
-      const obj: IComment =
-        comment.has_downvoted === 1
-          ? {
-              ...comment,
-              has_upvoted: comment.has_upvoted === 0 ? 1 : 0,
-              upvotes_count:
-                comment.has_upvoted === 1
-                  ? comment.upvotes_count - 1
-                  : comment.upvotes_count + 1,
-              has_downvoted: 0,
-            }
-          : {
-              ...comment,
-              has_upvoted: comment.has_upvoted === 0 ? 1 : 0,
-              upvotes_count:
-                comment.has_upvoted === 1
-                  ? comment.upvotes_count - 1
-                  : comment.upvotes_count + 1,
-            };
-      setComment(obj);
       queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
       queryClient.invalidateQueries([`getNewPosts`]);
     },
@@ -130,18 +111,6 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      const obj: IComment =
-        comment.has_upvoted === 1
-          ? {
-              ...comment,
-              has_downvoted: comment.has_downvoted === 0 ? 1 : 0,
-              has_upvoted: 0,
-            }
-          : {
-              ...comment,
-              has_downvoted: comment.has_downvoted === 0 ? 1 : 0,
-            };
-      setComment(obj);
       queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
       queryClient.invalidateQueries([`getNewPosts`]);
     },
@@ -154,13 +123,9 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
       alert(error.message);
     },
     onSuccess: (data) => {
-      const obj: IComment = {
-        ...comment,
-        has_reacted: comment.has_reacted.length > 0 ? [] : [1],
-      };
-      setComment(obj);
-      queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
-      queryClient.invalidateQueries([`getNewPosts`]);
+      // queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
+      // queryClient.invalidateQueries([`getNewPosts`]);
+      queryClient.refetchQueries().then();
     },
   });
 
@@ -207,6 +172,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
       toast.show("Comment updated successfully", { type: "success" });
       // queryClient.invalidateQueries([`getPostComments-${comment.post_id}`]);
       queryClient.invalidateQueries([`getReplies-${activeComment.id}`]);
+      queryClient.resetQueries().then();
       setText(editComment);
       if (removedImages.length > 0) {
         setNewImage(editedImage);
@@ -217,12 +183,45 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
   });
 
   const handleReaction = () => {
+    const obj: IComment = {
+      ...comment,
+      has_reacted: comment.has_reacted.length > 0 ? [] : [1],
+      reactions_count: comment.has_reacted.length > 0 ? comment.reactions_count - 1: comment.reactions_count + 1
+    };
+    setComment(obj);
     const formData = new FormData();
     formData.append("comment_id", comment.id.toString());
     formData.append("type", "like");
 
     reacttocomment.mutate(formData);
   };
+
+  const handleUpvote = () => {
+    const obj: IComment =
+        {
+          ...comment,
+          has_upvoted: comment.has_upvoted === 0 ? 1 : 0,
+          upvotes_count:
+              comment.has_upvoted === 1
+                  ? comment.upvotes_count - 1
+                  : comment.upvotes_count + 1,
+          has_downvoted: comment.has_downvoted === 0 ? 0:0,
+        };
+    setComment(obj);
+    upvote.mutate()
+  }
+
+  const handleDownvote = () => {
+    const obj: IComment = {
+      ...comment,
+      has_downvoted: comment.has_downvoted === 0 ? 1 : 0,
+      has_upvoted: comment.has_upvoted === 0 ? 0:0,
+      upvotes_count: comment.has_upvoted === 0 ? comment.has_upvoted: comment.has_upvoted - 1,
+    };
+    setComment(obj);
+    downvote.mutate();
+  }
+
   const handleImagePicked = (image: ImagePickerAsset) => {
     if (images.length > 0) {
       toast.show("Cannot pick more than one image", {
@@ -345,6 +344,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
   const handleReport = () => {
     setAll({ activeComment_id: activeComment.id, showReportComment: true });
   };
+
   return (
     <Box
       width="100%"
@@ -448,9 +448,7 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
           <Box width={"100%"} paddingLeft="m" paddingBottom="s">
             {/* TEXT AND IMAGE SECTION */}
             <Box width={"100%"} paddingHorizontal="m">
-              <CustomText variant="body"  fontSize={15}>
-                {comment.comment}
-              </CustomText>
+                <ColorizeHashtagsAndUrls text={comment.comment} />
             </Box>
 
             {/* generate random image of a dog */}
@@ -523,15 +521,15 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                     borderRightWidth: 0.5,
                     borderRightColor: theme.colors.borderColor,
                   }}
-                  onPress={() => upvote.mutate()}
+                  onPress={() => handleUpvote()}
                 >
-                  {upvote.isLoading && (
-                    <ActivityIndicator
-                      size={"small"}
-                      color={theme.colors.primaryColor}
-                    />
-                  )}
-                  {!upvote.isLoading && (
+                  {/*{upvote.isLoading && (*/}
+                  {/*  <ActivityIndicator*/}
+                  {/*    size={"small"}*/}
+                  {/*    color={theme.colors.primaryColor}*/}
+                  {/*  />*/}
+                  {/*)}*/}
+                  { (
                     <>
                       <Image
                         source={
@@ -544,14 +542,14 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                       />
                       <CustomText
                         variant="xs"
-                        fontSize={12}
+                        fontSize={14}
                         marginLeft="s"
                         color={
                           comment.has_upvoted === 0 ? "grey" : "primaryColor"
                         }
                       >
                         {comment.upvotes_count > 1 && comment.upvotes_count}{" "}
-                        UPVOTE
+                        upvote
                       </CustomText>
                     </>
                   )}
@@ -565,15 +563,15 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                     justifyContent: "center",
                     alignItems: "center",
                   }}
-                  onPress={() => downvote.mutate()}
+                  onPress={() => handleDownvote()}
                 >
-                  {downvote.isLoading && (
-                    <ActivityIndicator
-                      size={"small"}
-                      color={theme.colors.primaryColor}
-                    />
-                  )}
-                  {!downvote.isLoading && (
+                  {/*{downvote.isLoading && (*/}
+                  {/*  <ActivityIndicator*/}
+                  {/*    size={"small"}*/}
+                  {/*    color={theme.colors.primaryColor}*/}
+                  {/*  />*/}
+                  {/*)}*/}
+                  {(
                     <Image
                       source={
                         comment.has_downvoted === 0
@@ -597,27 +595,37 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                 justifyContent="flex-start"
                 alignItems="center"
               >
-                <Pressable
-                  onPress={() => handleReaction()}
+                <View
                   style={{ flexDirection: "row", alignItems: "center" }}
                 >
-                  <Heart
-                    size={20}
-                    color={
-                      comment.has_reacted.length > 0
-                        ? theme.colors.primaryColor
-                        : theme.colors.lightGrey
-                    }
-                    variant={
-                      comment.has_reacted.length > 0 ? "Bold" : "Outline"
-                    }
-                  />
+                  <TouchableOpacity
+                      onPress={() => handleReaction()}
+                  >
+                    <Heart
+                        size={20}
+                        color={
+                          comment.has_reacted.length > 0
+                              ? theme.colors.primaryColor
+                              : theme.colors.lightGrey
+                        }
+                        variant={
+                          comment.has_reacted.length > 0 ? "Bold" : "Outline"
+                        }
+                    />
+                  </TouchableOpacity>
                   {comment.reactions_count > 0 && (
-                    <CustomText variant="body">
-                      {comment.reactions_count}
-                    </CustomText>
+                   <TouchableOpacity
+                       onPress={() => {
+                     if (comment.reactions_count > 0) {
+                       setAll({ reactionId: comment.id, reactionType: 'COMMENT', showReactedUsers: true });
+                     }
+                   }}>
+                     <CustomText variant="body" marginLeft={'s'} >
+                       {comment.reactions_count}
+                     </CustomText>
+                   </TouchableOpacity>
                   )}
-                </Pressable>
+                </View>
 
                 <CustomText
                   onPress={() => setReply((prev) => !prev)}
@@ -636,6 +644,8 @@ const CommentCard = ({ comment: activeComment }: { comment: IComment }) => {
                 maxHeight={400}
                 borderTopWidth={0.3}
                 borderTopColor="lightGrey"
+                paddingTop={'l'}
+                marginTop={'m'}
               >
                 {/* REPLY SECTIONS */}
                 <Box width={"100%"} maxHeight={300}>
