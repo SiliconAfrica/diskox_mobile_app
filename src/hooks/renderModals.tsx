@@ -23,6 +23,8 @@ import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 import SelectChatModal from "../components/modals/SelectedChatBottom";
 import PaymentAccountModal from "../components/modals/PaymentAccountModal";
 import FlutterwavePaymentModal from "../components/modals/FlutterwavePaymentModal";
+import ReactionModal from "../components/modals/ReactionModal";
+import TagsModal from "../components/modals/TagsModal";
 
 const renderModals = () => {
   const {
@@ -46,6 +48,8 @@ const renderModals = () => {
     showAddCommunityRule,
     showPaymentAccountModal,
     showFlutterPaymentModal,
+      showReactedUsers,
+      showTags
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -72,6 +76,8 @@ const renderModals = () => {
         {showAddCommunityRule && <AddCommunityRuleModal />}
         {showPaymentAccountModal && <PaymentAccountModal />}
         {showFlutterPaymentModal && <FlutterwavePaymentModal />}
+        {showReactedUsers && <ReactionModal />}
+        {showTags && <TagsModal /> }
       </>
     );
   }, [
@@ -95,6 +101,8 @@ const renderModals = () => {
     showAddCommunityRule,
     showPaymentAccountModal,
     showFlutterPaymentModal,
+      showReactedUsers,
+      showTags
   ]);
 
   return {

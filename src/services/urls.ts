@@ -152,4 +152,15 @@ export const URLS = {
   SEND_WITHDRAWAL_OTP: "/send_withdrawal_otp",
   FETCH_USER_WITHDRAWAL: "/fetch_user_withdrawals",
   BANK_ACCOUNT: "/bank_accounts",
+  SEND_PUSH_NOTIFICATION_TOKEN: '/save_mobile_logs_token',
+  GET_NOTIFICATION_COUNT: '/fetch_unread_notifications_count',
+  MARK_NOTIFICATION_READ: '/mark_notification_read',
+  MARK_ALL_NOTIFICATIONS_AS_READ: '/mark_all_notification_read',
+  GET_ALL_COMMUNITY: '/all_communities',
+  GET_POST_BY_SLUG: '/fetch_single_post_by_slug',
+
+  // URLS WITH DYNAMIC
+  GET_POST_REACTION: (id: number) => `fetch_post_reacted_users_by_reaction_type/${id}/love`,
+  GET_COMMENT_REACTION: (comment_id: number) => `/fetch_comment_reacted_users_by_reaction_type/${comment_id}/love`,
+  GET_REPLY_REACTION: (reply_id: number) => `/fetch_reply_reacted_users_by_reaction_type/${reply_id}/love`,
 };

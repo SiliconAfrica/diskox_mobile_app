@@ -4,15 +4,68 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3b7b898-71fc-419a-9182-0a6bb56a982c" name="Changes" comment="completed 80% of Updates">
+    <list default="true" id="c3b7b898-71fc-419a-9182-0a6bb56a982c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/components/modals/ReactionModal.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/modals/TagsModal.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/models/reaction.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/PostBySlug/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/bottomtabs/community/pages/SingleCommunity.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Comments.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Drafts.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Polls.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Posts.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/Upvotes.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/overview.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/EarningsBox.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/ReferralList.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/totalReferrals.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/user/pages/referrals/totalWithdrawals.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/createpost/WritePoll.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/createpost/WritePoll.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Searchbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Searchbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentTextBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/CommentTextBox.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/ReplyCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/FeedsCardComponents/ReplyCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/feeds/PostDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/feeds/PostDetails.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/general/emojipicker.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/general/emojipicker.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/CommunitiesModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modals/CommunitiesModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/modals/ReportPost.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/modals/ReportPost.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/profile/BannerSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/profile/BannerSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/renderModals.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/renderModals.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/MainNavigation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/MainNavigation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/navigation/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/navigation/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/community/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/community/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/polls/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/polls/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/bottomtabs/posts/pages/NewPosts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/bottomtabs/posts/pages/NewPosts.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/create-post/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/create-post/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/notifications/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/notifications/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/post/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/post/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/repost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/repost/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageFour.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageFour.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageThree.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageThree.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageTwo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/verifyAccount/pages/PageTwo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/urls.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/urls.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/states/modalState.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/states/modalState.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/colorizeText.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/colorizeText.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -61,6 +114,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;live&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/daniel/Documents/projects/diskox/src/pages/user&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/daniel/Documents/projects/diskox/src/pages/user&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -70,9 +124,14 @@
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.completion&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/home/daniel/Documents/projects/diskox/node_modules/typescript/lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/daniel/Documents/projects/diskox/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/pages/user" />
+    </key>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/pages/user" />
@@ -98,15 +157,7 @@
       <workItem from="1710823264884" duration="12733000" />
       <workItem from="1711316809168" duration="8932000" />
       <workItem from="1711373442987" duration="49950000" />
-      <workItem from="1711546230779" duration="9406000" />
-    </task>
-    <task id="LOCAL-00001" summary="completed 80% of Updates">
-      <option name="closed" value="true" />
-      <created>1711563462999</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1711563462999</updated>
+      <workItem from="1711546230779" duration="7069000" />
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />

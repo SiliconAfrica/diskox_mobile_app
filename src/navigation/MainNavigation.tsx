@@ -50,6 +50,9 @@ import { getScreen } from "../utils/saveCurrentPosition";
 import { useNavigation } from "@react-navigation/native";
 import { PageType } from "../pages/login";
 import ReferralWithdrawalHistory from "../pages/profile/pages/referralWithdrawalsHistory";
+import PostBySlug from "../pages/PostBySlug";
+import SingleCommunity from "../pages/bottomtabs/community/pages/SingleCommunity";
+import MentionProfile from "../pages/user";
 
 export type RootStackParamList = {
   home: undefined;
