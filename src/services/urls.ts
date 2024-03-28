@@ -124,7 +124,7 @@ export const URLS = {
   UPDATE_COVER_PHOTO: "/update_cover_photo",
   REACT_TO_COMMENT: "/react_to_comment",
   GET_BOOKMARK_POSTS: "/fetch_bookmarked_post",
-  REPORT_USER: "/report_post",
+  REPORT_USER: "/report_user",
   REPORT_COMMENT: "/report_comment",
   REPORT_REPLY: "/report_reply",
   GOOGLE_AUTH: "/auth/login_or_register_with_google",
@@ -151,7 +151,7 @@ export const URLS = {
   MARK_ALL_NOTIFICATIONS_AS_READ: '/mark_all_notification_read',
   GET_ALL_COMMUNITY: '/all_communities',
   GET_POST_BY_SLUG: '/fetch_single_post_by_slug',
-
+  REPORT_POST: '/report_post',
   // URLS WITH DYNAMIC
   GET_POST_REACTION: (id: number) => `fetch_post_reacted_users_by_reaction_type/${id}/love`,
   GET_COMMENT_REACTION: (comment_id: number) => `/fetch_comment_reacted_users_by_reaction_type/${comment_id}/love`,

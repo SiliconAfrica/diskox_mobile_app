@@ -1,55 +1,40 @@
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
-import React, { useEffect } from "react";
+import {ActivityIndicator, Pressable, StyleSheet, TouchableWithoutFeedback,} from "react-native";
+import React, {useEffect} from "react";
 import Box from "../../components/general/Box";
-import ChatList from "../../components/chats/ChatList";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../navigation/MainNavigation";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../../navigation/MainNavigation";
 import ChatSectionHeader from "../../components/chats/ChatSectionHeader";
-import { Ionicons, Feather } from "@expo/vector-icons";
-import { useTheme } from "@shopify/restyle";
-import { Theme } from "../../theme";
-import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import {Feather, Ionicons} from "@expo/vector-icons";
+import {useTheme} from "@shopify/restyle";
+import {Theme} from "../../theme";
+import {ScrollView, TextInput} from "react-native-gesture-handler";
+import {useMutation, useQuery, useQueryClient} from "react-query";
 import httpService from "../../utils/httpService";
-import { URLS } from "../../services/urls";
+import {URLS} from "../../services/urls";
 import CustomText from "../../components/general/CustomText";
-import {
-  IChatContainer,
-  IChatMessage,
-  IPost_Image,
-  UNsentMessage,
-} from "../../models/chatmessages";
+import {IChatMessage, IPost_Image, UNsentMessage,} from "../../models/chatmessages";
 import MessageBubble from "../../components/chats/messageBubble";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import mime from "mime";
 import MediaCard from "../../components/createpost/MediaCard";
-import { extract_day } from "../../utils/utils";
 import moment from "moment";
 import ViewImageModal from "../../components/modals/ViewImageModal";
-import { useDetailsState } from "../../states/userState";
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from "react-native-popup-menu";
+import {useDetailsState} from "../../states/userState";
 import SelectedChatBottom from "../../components/modals/SelectedChatBottom";
-import { useNavigation } from "@react-navigation/native";
-import { PageType } from "../login";
-import { uniqBy } from "lodash";
-import { CUSTOM_STATUS_CODE } from "../../enums/CustomCodes";
+import {useNavigation} from "@react-navigation/native";
+import {PageType} from "../login";
+import {uniqBy} from "lodash";
+import {CUSTOM_STATUS_CODE} from "../../enums/CustomCodes";
+import {IUser} from "../../models/user";
+import {Image} from "expo-image";
+import {ResizeMode, Video} from 'expo-av';
+import Emojipicker from "../../components/general/emojipicker";
 
 enum FILE_TYPE {
   IMAGE,
   DOC,
+  VIDEO = 2,
 }
 
 export type IFile = {
@@ -64,6 +49,13 @@ export interface ISelectedMessageAction {
   edit: boolean;
   delete: boolean;
 }
+
+interface TempMessage {
+  date: string;
+  message: string;
+  files: IFile[];
+}
+
 const currentDate = moment(); // Current date
 const previousDate = moment().subtract(1, "day").format("MMMM DD YYYY");
 
@@ -82,6 +74,7 @@ const Chat = ({
   const [selectedMessage, setSelectedMessage] = React.useState<
     Partial<IChatMessage>
   >({});
+
   const [selectedMessageAction, setSelectedMessageAction] =
     React.useState<ISelectedMessageAction>({
       selected: false,
@@ -93,17 +86,24 @@ const Chat = ({
     []
   );
   const [chats, setChats] = React.useState<Array<IChatMessage>>([]);
+  const [previous, setPrevious] = React.useState(null);
   const [search, setSearch] = React.useState("");
   const [files, setFiles] = React.useState<IFile[]>([]);
   const [showPickerModal, setShowPickerModal] = React.useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
-  const [fileType, setFileType] = React.useState(FILE_TYPE.IMAGE);
+  const [fileType, setFileType] = React.useState(null);
   const [showImagesModal, setShowImagesModals] = React.useState(false);
   const [activeImages, setActiveImages] = React.useState<Array<IPost_Image>>(
     []
   );
+  const [tempMessages, setTempMessages] = React.useState<TempMessage[]>([]);
+
+  const [user, setUser] = React.useState<IUser>(null);
   const [unsent, seetUnsent] = React.useState<UNsentMessage[]>([]);
+  const [showSmiley, setShowSmiley] = React.useState(false);
   const { id: loggedUser } = useDetailsState((state) => state);
+  const [selection, setSelection] = React.useState({ start: 0, end: 0});
+
 
   const unselectMessage = (closereply?: boolean) => {
     setSelectedMessageAction((prev) => ({
@@ -134,6 +134,10 @@ const Chat = ({
             scrollViewRef.current?.scrollToEnd({ animated: true });
           }
           setChats(arr);
+
+          if (arr.length > previous && tempMessages.length > 0) {
+            setTempMessages([]);
+          }
         }
         
       },
@@ -142,10 +146,11 @@ const Chat = ({
 
   const getUser = useQuery(
     ["getChatUser", userId],
-    () => httpService.get(`${URLS.GET_USER_BY_USERNAME}/${username}`),
+    () => httpService.get(`${URLS.GET_USER_BY_ID}/${userId}`),
     {
       onSuccess: (data) => {
-        console.log(data.data);
+        setUser(data.data.data);
+        // alert(JSON.stringify(data.data.data));
       },
     }
   );
@@ -155,6 +160,7 @@ const Chat = ({
     mutationFn: (data: FormData) =>
       httpService.post(`${URLS.POST_CHAT_MESSAGE}`, data),
     onSuccess: (data) => {
+      setPrevious(chats.length);
       queryClient.invalidateQueries(["getMessages"]);
       setMessage("");
       setFileType(null);
@@ -186,6 +192,8 @@ const Chat = ({
       setMessage(selectedMessage.message);
     }
   }, [selectedMessageAction]);
+
+
   // functions
   const openImagesModal = React.useCallback((data: IPost_Image[]) => {
     setActiveImages(data);
@@ -209,19 +217,37 @@ const Chat = ({
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
+      mediaTypes: fileType === null ? ImagePicker.MediaTypeOptions.All : fileType === FILE_TYPE.IMAGE ? ImagePicker.MediaTypeOptions.Images:ImagePicker.MediaTypeOptions.Videos,
       base64: false,
+      allowsMultipleSelection: files.length > 0,
     });
 
     if (!result.canceled) {
-      const name = result.assets[0].uri.split("/").pop();
-      const mimeType = mime.getType(result.assets[0].uri);
-      setFiles((prev) => [
-        ...prev,
-        { uri: result.assets[0].uri, type: mimeType, name },
-      ]);
-      setFileType(FILE_TYPE.IMAGE);
+      if (result.assets.length === 1) {
+        const name = result.assets[0].uri.split("/").pop();
+        const mimeType = mime.getType(result.assets[0].uri);
+        if (mimeType.includes('image')) {
+          setFileType(FILE_TYPE.IMAGE)
+        }
+        if (mimeType.includes('video')) {
+          setFileType(FILE_TYPE.VIDEO);
+        }
+      }
+      //
+      // const name = result.assets[0].uri.split("/").pop();
+      // const mimeType = mime.getType(result.assets[0].uri);
+        const arr = [...files];
+        result.assets.map((item) => {
+          arr.push({ uri: item.uri, type: mime.getType(item.uri), name: item.uri.split('/').pop() })
+        });
+
+        if (arr.length > 10) {
+          const newArr = arr.splice(0, 10);
+          setFiles(newArr);
+        } else {
+          setFiles(arr);
+        }
+      // setFileType(FILE_TYPE.IMAGE);
       setShowPickerModal(false);
     }
   };
@@ -229,16 +255,25 @@ const Chat = ({
   const pickDoc = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       type: ["application/pdf", "application/msword"],
-      multiple: false,
+      multiple: true,
+
     });
 
     if (!result.canceled) {
-      const name = result.assets[0].name;
-      const type = mime.getType(result.assets[0].uri);
-      console.log(type);
-      const uri = result.assets[0].uri;
-      setFiles((prev) => [...prev, { name, type, uri }]);
+
+      const arr = [...files];
+      result.assets.map((item) => {
+        arr.push({ uri: item.uri, type: mime.getType(item.uri), name: item.uri.split('/').pop() })
+      });
+
       setFileType(FILE_TYPE.DOC);
+
+      if (arr.length > 10) {
+        const newArr = arr.splice(0, 10);
+        setFiles(newArr);
+      } else {
+        setFiles(arr);
+      }
       setShowPickerModal(false);
     }
   };
@@ -267,10 +302,14 @@ const Chat = ({
       files.map((item, i) => {
         formData.append("chat_images[]", item as any);
       });
-    } else {
+    } else if (fileType === FILE_TYPE.DOC) {
       files.map((item, i) => {
         formData.append("chat_files[]", item as any);
       });
+    } else {
+      files.map((item, index) => {
+        formData.append('chat_videos[]', item as any);
+      })
     }
     // if (image.length > 0) {
     //   formData.append('chat_images[]', image[0] as any);
@@ -278,9 +317,16 @@ const Chat = ({
     if (selectedMessageAction.edit === true) {
       editMessage.mutate({ message });
     } else {
+      setTempMessages((prev) => [...prev, {
+        message,
+        files,
+        date: new Date().toISOString(),
+      }])
       sendMessage.mutate(formData);
+      setMessage('');
+      setFiles([]);
     }
-  }, [message, selectedMessageAction]);
+  }, [message, selectedMessageAction, fileType, files]);
 
   const handleMediaDelete = React.useCallback(
     ({ index, clearAll }: { index: number; clearAll: boolean }) => {
@@ -292,6 +338,16 @@ const Chat = ({
     },
     [files]
   );
+
+  const handleEmojiPicked = React.useCallback((emoji: string) => {
+    const { start, end } = selection;
+
+    // Create the new text with inserted content
+    const insertedText = 'Your text to insert';
+    const updatedText = `${message.substring(0, start)}${emoji}${message.substring(end)}`;
+    setMessage(updatedText);
+    setShowSmiley(false);
+  }, [setMessage, message, selection]);
 
   const groupChatMessagesByDate = () => {
     if (chats?.length < 1) {
@@ -342,10 +398,10 @@ const Chat = ({
         />
 
         <ChatSectionHeader
-          last_seen={last_seen}
+          last_seen={user?.last_seen}
           userId={userId}
-          username={username}
-          profile_image={profile_image}
+          username={user?.username}
+          profile_image={user?.profile_image}
         />
 
         {/* CHAT AREA */}
@@ -389,7 +445,122 @@ const Chat = ({
                   ))}
                 </React.Fragment>
               ))}
-            
+
+            {tempMessages.length > 0 && (
+                <Box width={'100%'} alignItems={'flex-end'}>
+                  {tempMessages.map((item, index) => (
+                      <Box zIndex={10}
+                           maxWidth="70%"
+                           minWidth="10%"
+                           marginBottom="m"
+                           borderTopRightRadius={10}
+                           borderTopLeftRadius={10}
+                           borderBottomLeftRadius={10}
+                           borderBottomRightRadius={0}
+                           padding={'s'}
+                           backgroundColor={'secondaryBackGroundColor'}
+                      >
+                        {item.files.length > 0 && fileType === FILE_TYPE.IMAGE && (
+                            <Box height={140}>
+                              <ScrollView horizontal={true} style={{ width: '100%'}}>
+                                { item.files.map((item, index) => (
+                                    <Pressable
+
+                                        style={{
+                                          width: 150,
+                                          maxHeight: 120,
+                                          overflow: "hidden",
+                                          borderRadius: 10,
+                                          marginRight: 20,
+                                        }}
+                                        key={index.toString()}
+                                    >
+                                      <Image
+                                          source={{ uri: item.uri }}
+                                          style={{ width: "100%", height: "100%" }}
+                                          contentFit="cover"
+                                      />
+                                    </Pressable>
+                                ))}
+                              </ScrollView>
+                            </Box>
+                        )}
+                        {item.files.length > 0 && fileType === FILE_TYPE.VIDEO && (
+                            <Box height={140}>
+                              <ScrollView style={{ width: '100%'}}>
+                                { item.files.map((item, index) => (
+                                    <Pressable
+
+                                        style={{
+                                          width: 150,
+                                          maxHeight: 120,
+                                          overflow: "hidden",
+                                          borderRadius: 10,
+                                          marginRight: 20,
+                                        }}
+                                        key={index.toString()}
+                                    >
+                                      <Video
+                                          source={{ uri: item.uri }}
+                                          style={{ width: "100%", height: "100%" }}
+                                          resizeMode={ResizeMode.COVER}
+                                      />
+                                    </Pressable>
+                                ))}
+                              </ScrollView>
+                            </Box>
+                        )}
+                        {item.files.length > 0 && fileType === FILE_TYPE.DOC && (
+                            <Box height={140}>
+                              <ScrollView horizontal={true} style={{ width: '100%'}}>
+                                { item.files.map((item, index) => (
+                                    <Pressable
+
+                                        style={{
+                                          width: 150,
+                                          maxHeight: 120,
+                                          overflow: "hidden",
+                                          borderRadius: 10,
+                                          marginRight: 20,
+                                        }}
+                                        key={index.toString()}
+                                    >
+                                      <CustomText marginRight="m">{item.name.split('.')[1]}</CustomText>
+                                      <Feather
+                                          name="download-cloud"
+                                          size={25}
+                                          color={theme.colors.textColor}
+                                      />
+                                    </Pressable>
+                                ))}
+                              </ScrollView>
+                            </Box>
+                        )}
+                        <CustomText
+                            variant="body"
+                            fontSize={15}
+                        >
+                          {item.message}
+                        </CustomText>
+
+                        <Box flexDirection={'row'} marginTop={'s'}>
+                          <CustomText variant={'xs'} color={'lightGrey'} marginRight={'s'}>{moment(item.date).startOf('s').fromNow()}</CustomText>
+                          {/*<Ionicons*/}
+                          {/*    name="checkmark-circle-sharp"*/}
+                          {/*    size={15}*/}
+                          {/*    color={theme.colors.primaryColor}*/}
+                          {/*/>*/}
+                        </Box>
+                      </Box>
+                  ))}
+                </Box>
+            )}
+            { user?.iBlocked === 1 && (
+                <Box width={'100%'} height={40} alignItems={'center'} justifyContent={'center'} marginTop={'m'}>
+                  <CustomText variant={'subheader'} fontSize={16}>You have blocked this contact</CustomText>
+                  <CustomText variant={"body"} color={'lightGrey'}>You cannot send or recieve messages from this user</CustomText>
+                </Box>
+            )}
           </ScrollView>
 
           {files.length > 0 && (
@@ -430,9 +601,9 @@ const Chat = ({
                       borderColor: theme.colors.secondaryBackGroundColor,
                     }}
                     onPress={() => {
-                      if (fileType === FILE_TYPE.IMAGE) {
+                      if (fileType === FILE_TYPE.IMAGE || fileType === FILE_TYPE.VIDEO) {
                         pickImage();
-                      } else {
+                      } else  {
                         pickDoc();
                       }
                     }}
@@ -566,6 +737,12 @@ const Chat = ({
                 />
               )}
 
+              { showSmiley && (
+                  <Box width='100%' maxHeight={300} overflow={'hidden'} borderRadius={10} position='absolute' zIndex={30} top={-200} bottom={80} >
+                    <Emojipicker onSelected={(e) => handleEmojiPicked(e)} />
+                  </Box>
+              )}
+
               <Box
                 flex={0.9}
                 height={50}
@@ -575,7 +752,16 @@ const Chat = ({
                 borderColor="secondaryBackGroundColor"
                 borderRadius={25}
                 backgroundColor="secondaryBackGroundColor"
+                flexDirection={'row'}
+                alignItems={'center'}
+                paddingLeft={'s'}
               >
+                <Feather
+                  name={'smile'}
+                  color={showSmiley ? theme.colors.primaryColor:theme.colors.textColor}
+                  size={25}
+                  onPress={() => setShowSmiley((prev) =>!prev)}
+                />
                 <TextInput
                   value={message}
                   onChangeText={(e) => setMessage(e)}
@@ -583,6 +769,7 @@ const Chat = ({
                   multiline
                   placeholder="Type your message here"
                   placeholderTextColor={theme.colors.textColor}
+                  onSelectionChange={(e) => setSelection({ start: e.nativeEvent.selection.start, end: e.nativeEvent.selection.end})}
                   style={{
                     flex: 1,
                     height: 50,

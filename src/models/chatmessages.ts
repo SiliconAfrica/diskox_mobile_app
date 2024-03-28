@@ -20,6 +20,16 @@ export type IChatMessage = {
     processed: number;
     type: string;
   }>;
+  post_videos: Array<{
+    created_at: string;
+    deleted_by: any;
+    deleted_for: any;
+    deleted_time: string;
+    id: number;
+    video_path: string;
+    processed: number;
+    type: string;
+  }>;
   reactions: Array<{
     id: number;
     type: string;

@@ -1,22 +1,23 @@
-import { View, Text, Pressable } from "react-native";
-import React, { useEffect } from "react";
+import {Pressable} from "react-native";
+import React, {useEffect} from "react";
 import Box from "../general/Box";
-import { IChatMessage, IPost_Image } from "../../models/chatmessages";
-import { useDetailsState } from "../../states/userState";
+import {IChatMessage, IPost_Image} from "../../models/chatmessages";
+import {useDetailsState} from "../../states/userState";
 import CustomText from "../general/CustomText";
 import moment from "moment";
-import { Image } from "expo-image";
-import httpService, { IMAGE_BASE } from "../../utils/httpService";
-import { ScrollView } from "react-native-gesture-handler";
-import { useTheme } from "@shopify/restyle";
-import { Theme } from "../../theme";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { useMutation, useQueryClient } from "react-query";
-import { URLS } from "../../services/urls";
+import {Image} from "expo-image";
+import httpService, {IMAGE_BASE} from "../../utils/httpService";
+import {ScrollView} from "react-native-gesture-handler";
+import {useTheme} from "@shopify/restyle";
+import {Theme} from "../../theme";
+import {Feather, Ionicons} from "@expo/vector-icons";
+import {useMutation, useQueryClient} from "react-query";
+import {URLS} from "../../services/urls";
 import useToast from "../../hooks/useToast";
 import DeleteMessageModal from "../modals/DeleteMessageModal";
-import { useUtilState } from "../../states/util";
-import { ISelectedMessageAction } from "../../pages/chat";
+import {useUtilState} from "../../states/util";
+import {ISelectedMessageAction} from "../../pages/chat";
+import {ResizeMode, Video} from "expo-av";
 
 const REACTIONS: Array<{ name: string; icon: string }> = [
   {
@@ -61,6 +62,7 @@ const MessageBubble = ({
   setSelectedMessage,
   selectedMessageAction,
   setSelectedMessageAction,
+    post_videos
 }: IChatMessage & {
   openModal: (data: IPost_Image[]) => void;
   theMessage: IChatMessage;
@@ -74,6 +76,7 @@ const MessageBubble = ({
   const theme = useTheme<Theme>();
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [showDleteModal, setDeleteModal] = React.useState(false);
+  const [tempReaction, setTempReaction] = React.useState<Array<{ id: number, type: string, reacted_by: number}>>([])
   const queryClient = useQueryClient();
   const toast = useToast();
   const { isDarkMode } = useUtilState((state) => state);
@@ -85,7 +88,8 @@ const MessageBubble = ({
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries("getMessages");
-      toast.show(`${data?.data?.message}`, { type: "success" });
+      // setTempReaction([]);
+      //toast.show(`${data?.data?.message}`, { type: "success" });
     },
   });
 
@@ -118,7 +122,7 @@ const MessageBubble = ({
       <Box
         zIndex={10}
         maxWidth="70%"
-        minWidth="30%"
+        minWidth="50%"
         marginBottom="m"
         borderTopRightRadius={10}
         borderTopLeftRadius={10}
@@ -159,27 +163,50 @@ const MessageBubble = ({
 
         {(deleted_by !== null && reactions !== null) ||
           (reactions !== undefined && reactions.length > 0 && (
+          <Box
+          zIndex={30}
+          position="absolute"
+          bottom={-12}
+          right={0}
+          width={25}
+          height={25}
+          paddingHorizontal="s"
+          backgroundColor="secondaryBackGroundColor"
+          borderRadius={20}
+          elevation={5}
+          justifyContent="center"
+          alignContent="center"
+      >
+        {reactions.map((item, i) => (
+            <CustomText fontSize={9} key={i.toString()}>
+              {REACTIONS.filter((ite) => ite.name === item.type)[0]?.icon}
+            </CustomText>
+        ))}
+      </Box>
+          ))}
+
+        {tempReaction.length > 0 && (
             <Box
-              zIndex={30}
-              position="absolute"
-              bottom={-25}
-              right={0}
-              width={35}
-              height={35}
-              paddingHorizontal="s"
-              backgroundColor="secondaryBackGroundColor"
-              borderRadius={20}
-              elevation={5}
-              justifyContent="center"
-              alignContent="center"
+                zIndex={30}
+                position="absolute"
+                bottom={-12}
+                right={0}
+                width={25}
+                height={25}
+                paddingHorizontal="s"
+                backgroundColor="secondaryBackGroundColor"
+                borderRadius={20}
+                elevation={5}
+                justifyContent="center"
+                alignContent="center"
             >
-              {reactions.map((item, i) => (
-                <CustomText key={i.toString()}>
-                  {REACTIONS.filter((ite) => ite.name === item.type)[0]?.icon}
-                </CustomText>
+              {tempReaction.map((item, i) => (
+                  <CustomText fontSize={9} key={i.toString()}>
+                    {REACTIONS.filter((ite) => ite.name === item.type)[0]?.icon}
+                  </CustomText>
               ))}
             </Box>
-          ))}
+        )}
 
         {selectedMessageAction.selected &&
           selectedMessage.id === message_id && (
@@ -198,7 +225,10 @@ const MessageBubble = ({
               <ScrollView horizontal contentContainerStyle={{ width: "100%" }}>
                 {REACTIONS.map((item, i) => (
                   <Pressable
-                    onPress={() => mutate(item.name)}
+                    onPress={() => {
+                      mutate(item.name);
+                      setTempReaction(() => [{ id: 23, reacted_by: id, type: item.name }])
+                    }}
                     style={{ flex: 1 }}
                     key={i.toString()}
                   >
@@ -261,6 +291,27 @@ const MessageBubble = ({
                 ))}
             </ScrollView>
           </Box>
+        )}
+
+        {deleted_by === null && post_videos?.length > 0 && (
+            <Box maxHeight={340} maxWidth={300} marginBottom="s">
+              <ScrollView horizontal>
+                {post_videos?.length > 0 &&
+                    post_videos.map((item, i) => (
+                        <Video
+                             key={i.toString()}
+                             source={{ uri: `${IMAGE_BASE}${item.video_path}`}}
+                          resizeMode={ResizeMode.COVER}
+                          style={{ width: 220, height: 300, borderRadius: 10,  }}
+                          useNativeControls={true}
+                             isLooping={true}
+
+                          // // usePoster={true}
+                          // // posterSource={{ uri: `${IMAGE_BASE}${item.}`}}
+                         />
+                    ))}
+              </ScrollView>
+            </Box>
         )}
 
         {deleted_by === null && post_files.length > 0 && (

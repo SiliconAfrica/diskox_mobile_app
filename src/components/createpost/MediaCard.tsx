@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
 import Box from '../general/Box'
-import { DocumentResult} from 'expo-document-picker'
 import { Image } from 'expo-image'
 import { Video, ResizeMode } from 'expo-av';
 import { Feather } from '@expo/vector-icons'
@@ -42,7 +41,7 @@ const MediaCard = ({ file, index, onDelete, width = 150, height = '90%' }: IProp
             }
     }, [file]);
   return (
-    <Box width={width} height={height} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
+    <Box width={width as any} height={height as any} borderRadius={15} overflow='hidden' marginLeft='m' zIndex={1}>
         <Pressable style={{ ...style.deleteButton, backgroundColor: '#000000b9'}} onPress={() => onDelete({ index, clearAll: false })}>
             <Feather name='trash-2' size={25} color={theme.colors.textColor} />
         </Pressable>

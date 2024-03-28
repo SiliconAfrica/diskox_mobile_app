@@ -3,6 +3,7 @@ import React from 'react'
 import { FlatList } from 'react-native-gesture-handler'
 import Box from '../general/Box'
 import CustomText from '../general/CustomText'
+import CommunityListCard from "../community/CommunityListCard";
 
 const CommunityResult = ({ data }: { data: any[] }) => {
   return (
@@ -14,7 +15,7 @@ const CommunityResult = ({ data }: { data: any[] }) => {
     )}
     data={data}
     renderItem={({ item }) => (
-        <></>
+       <CommunityListCard {...item} />
     )}
 />
   )

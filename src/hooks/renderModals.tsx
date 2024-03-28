@@ -23,6 +23,7 @@ import AddCommunityRuleModal from "../components/modals/AddCommunityRuleModal";
 import SelectChatModal from "../components/modals/SelectedChatBottom";
 import ReactionModal from "../components/modals/ReactionModal";
 import TagsModal from "../components/modals/TagsModal";
+import ReportUser from "../components/modals/ReportUser";
 
 const renderModals = () => {
   const {
@@ -45,7 +46,8 @@ const renderModals = () => {
     showBlockMemberFromCommunity,
     showAddCommunityRule,
       showReactedUsers,
-      showTags
+      showTags,
+      showReportUser
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -72,6 +74,7 @@ const renderModals = () => {
         {showAddCommunityRule && <AddCommunityRuleModal />}
         {showReactedUsers && <ReactionModal />}
         {showTags && <TagsModal /> }
+        {showReportUser && <ReportUser />}
       </>
     );
   }, [
@@ -94,7 +97,8 @@ const renderModals = () => {
     showBlockMemberFromCommunity,
     showAddCommunityRule,
       showReactedUsers,
-      showTags
+      showTags,
+      showReportUser
   ]);
 
   return {

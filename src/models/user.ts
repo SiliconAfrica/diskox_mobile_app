@@ -21,6 +21,8 @@ export interface IUser  {
   suspension_expired_at: string;
   last_seen: string;
   isFollowing?: 0|1;
+  iBlocked: 0|1;
+  isBlocked:0|1;
 };
 
 export interface UserStats {

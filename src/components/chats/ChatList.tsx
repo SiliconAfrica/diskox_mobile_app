@@ -54,7 +54,7 @@ export const UserList = ({ user, action }: {
                     <CustomText variant='body' fontSize={14}>{user.message.length > 40 ? user.message.substring(0, 40) + '...': user.message}</CustomText>
                 </Box>
             </Box>
-            <CustomText variant='xs'>{moment(user.created_at).startOf('seconds').fromNow()}</CustomText>
+            <CustomText variant='xs'>{moment(user.created_at).format('MM DD, YYYY')}</CustomText>
         </Pressable>
     )
 }

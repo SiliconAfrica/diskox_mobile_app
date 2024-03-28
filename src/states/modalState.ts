@@ -46,6 +46,8 @@ interface State {
   reactionId: number;
   tags: ITag[];
   showTags: boolean;
+  showReportUser: boolean;
+  report_user_id: number;
   setAll: (data: Partial<State>) => void;
 }
 
@@ -86,6 +88,8 @@ export const useModalState = create<State>((set) => ({
   reactionType: 'POST',
   tags: [],
   showTags: false,
+  showReportUser: false,
+  report_user_id: null,
   setAll: (data: Partial<Omit<State, "setAll">>) =>
     set((state) => ({ ...state, ...data })),
 }));

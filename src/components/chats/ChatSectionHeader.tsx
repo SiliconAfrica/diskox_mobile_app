@@ -31,7 +31,7 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
             <Ionicons name='arrow-back-outline' size={25} color={theme.colors.textColor} onPress={() => navigation.goBack()} />
             <Box flexDirection='row' alignItems='center' >
                 <Box width={40} height={40} borderRadius={25} overflow='hidden' marginHorizontal='m'>
-                    <Image source={{ uri: `${IMAGE_BASE}${profile_image}`}} style={{ width: '100%', height: '100%' }} contentFit='cover' />
+                    <Image source={profile_image !== null ? { uri: `${IMAGE_BASE}${profile_image}`}:require('../../../assets/images/dummy.jpeg')} style={{ width: '100%', height: '100%' }} contentFit='cover' />
                 </Box>
                 <Box>
                     <CustomText variant='body'>{username}</CustomText>
@@ -53,8 +53,15 @@ const ChatSectionHeader = ({ username, last_seen, profile_image, userId }: Parti
             }}>
                 <MenuOption  onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: true, showDeleteConvo: false })}>
                     <Box flexDirection='row'>
-                        <Feather name='slash' size={20} color={theme.colors.textColor} />
+                        <Feather name='alert-circle' size={20} color={theme.colors.textColor} />
                         <CustomText variant="body" marginLeft='s'>Block this person</CustomText>
+                    </Box>
+                </MenuOption>
+
+                <MenuOption  onSelect={() => setAll({ report_user_id: userId, showReportUser: true, showDeleteConvo: false })}>
+                    <Box flexDirection='row'>
+                        <Feather name='slash' size={20} color={'red'} />
+                        <CustomText variant="body" marginLeft='s'>Report user</CustomText>
                     </Box>
                 </MenuOption>
                 {/* <MenuOption onSelect={() => setAll({ activeChat: { userId, username}, showBlockUser: false, showDeleteConvo: true })}>
