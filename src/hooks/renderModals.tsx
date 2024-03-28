@@ -25,6 +25,7 @@ import PaymentAccountModal from "../components/modals/PaymentAccountModal";
 import FlutterwavePaymentModal from "../components/modals/FlutterwavePaymentModal";
 import ReactionModal from "../components/modals/ReactionModal";
 import TagsModal from "../components/modals/TagsModal";
+import ReportUser from "../components/modals/ReportUser";
 
 const renderModals = () => {
   const {
@@ -49,7 +50,8 @@ const renderModals = () => {
     showPaymentAccountModal,
     showFlutterPaymentModal,
       showReactedUsers,
-      showTags
+      showTags,
+      showReportUser
   } = useModalState((state) => state);
 
   const renderModal = React.useCallback(() => {
@@ -78,6 +80,7 @@ const renderModals = () => {
         {showFlutterPaymentModal && <FlutterwavePaymentModal />}
         {showReactedUsers && <ReactionModal />}
         {showTags && <TagsModal /> }
+        {showReportUser && <ReportUser />}
       </>
     );
   }, [
@@ -102,7 +105,8 @@ const renderModals = () => {
     showPaymentAccountModal,
     showFlutterPaymentModal,
       showReactedUsers,
-      showTags
+      showTags,
+      showReportUser
   ]);
 
   return {

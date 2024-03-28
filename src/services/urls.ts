@@ -158,7 +158,7 @@ export const URLS = {
   MARK_ALL_NOTIFICATIONS_AS_READ: '/mark_all_notification_read',
   GET_ALL_COMMUNITY: '/all_communities',
   GET_POST_BY_SLUG: '/fetch_single_post_by_slug',
-
+  REPORT_POST: '/report_post',
   // URLS WITH DYNAMIC
   GET_POST_REACTION: (id: number) => `fetch_post_reacted_users_by_reaction_type/${id}/love`,
   GET_COMMENT_REACTION: (comment_id: number) => `/fetch_comment_reacted_users_by_reaction_type/${comment_id}/love`,
